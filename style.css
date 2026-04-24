@@ -1,34 +1,33 @@
-/* JEDA LOGO & NAV */
+/* MEMBERI JEDA LOGO */
 .logo-link {
     display: flex;
     align-items: center;
     text-decoration: none;
-    margin-right: 20px; /* Jeda antara logo dan menu/tulisan */
+    margin-right: 30px; /* Ini jeda antara logo dan menu, silakan tambah/kurangi */
 }
 
 .main-logo {
-    height: 40px;
+    height: 38px; /* Ukuran logo */
     width: auto;
     display: block;
 }
 
-/* NAV MENU LAYOUT */
+/* NAV MENU */
 .nav-menu {
     display: flex;
-    gap: 15px;
+    gap: 10px;
     align-items: center;
 }
 
 .nav-link {
     text-decoration: none;
-    color: var(--text-dark);
+    color: #1A1A1A;
     font-weight: 700;
     font-size: 14px;
     padding: 8px 12px;
-    transition: all 0.3s ease;
 }
 
-/* DROPDOWN SYSTEM */
+/* DROPDOWN STYLE */
 .dropdown {
     position: relative;
     display: inline-block;
@@ -38,17 +37,16 @@
     display: none;
     position: absolute;
     background-color: #ffffff;
-    min-width: 140px;
+    min-width: 150px;
     box-shadow: 0px 8px 16px rgba(0,0,0,0.1);
     border-radius: 12px;
-    z-index: 1;
+    z-index: 100;
     top: 100%;
-    overflow: hidden;
     border: 1px solid #eee;
 }
 
 .dropdown-content a {
-    color: var(--text-dark);
+    color: #1A1A1A;
     padding: 12px 16px;
     text-decoration: none;
     display: block;
@@ -57,25 +55,11 @@
 }
 
 .dropdown-content a:hover {
-    background-color: var(--soft-blue);
-    color: var(--primary-blue);
+    background-color: #E8EFFF; /* Warna biru muda saat hover */
+    color: #3A70E2;
 }
 
-/* Munculkan dropdown saat hover (untuk Desktop) */
+/* Munculkan dropdown saat kursor di atas menu */
 .dropdown:hover .dropdown-content {
     display: block;
-}
-
-/* Responsive: Agar tidak berantakan di HP */
-@media (max-width: 600px) {
-    .nav-menu {
-        gap: 5px;
-    }
-    .nav-link {
-        font-size: 12px;
-        padding: 5px 8px;
-    }
-    .logo-link {
-        margin-right: 10px;
-    }
 }

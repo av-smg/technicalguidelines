@@ -1,99 +1,81 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
-
-:root {
-    --primary-orange: #FF7E27;
-    --soft-orange: #FFF0E5;
-    --primary-blue: #3A70E2;
-    --soft-blue: #E8EFFF;
-    --bg-color: #F4F5F7;
-    --text-dark: #1A1A1A;
-    --text-gray: #6B7280;
-    --card-radius: 24px;
-}
-
-* {
-    margin: 0; padding: 0; box-sizing: border-box;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    -webkit-tap-highlight-color: transparent;
-}
-
-body {
-    background-color: var(--bg-color); color: var(--text-dark);
-    padding-bottom: 80px; overflow-x: hidden;
-}
-
-/* HEADER & NAVBAR */
-header { padding: 15px; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
-.nav-container {
-    max-width: 1200px; margin: 0 auto; background: rgba(255, 255, 255, 0.9);
-    border-radius: 100px; display: flex; align-items: center; padding: 8px 16px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid rgba(255,255,255,0.5);
-}
-.logo-combined { display: flex; text-decoration: none; border-radius: 10px; overflow: hidden; font-weight: 800; font-size: 18px; margin-right: 12px; }
-.logo-audio { background-color: var(--primary-orange); color: white; }
-.logo-video { background-color: var(--primary-blue); color: white; }
-.site-title { font-size: 16px; font-weight: 700; margin-right: auto; }
+/* JEDA LOGO & NAV */
 .logo-link {
     display: flex;
     align-items: center;
     text-decoration: none;
+    margin-right: 20px; /* Jeda antara logo dan menu/tulisan */
 }
 
 .main-logo {
-    height: 40px; /* Sesuaikan tinggi ini agar pas di navbar kamu */
+    height: 40px;
     width: auto;
     display: block;
 }
-/* HERO SECTION */
-.hero { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
-.hero h1 { font-size: 42px; font-weight: 800; line-height: 1.2; }
-.hero h1 span { transform: rotate(-2deg); background: #FFE066; padding: 0 10px; border-radius: 8px; display: inline-block; }
-.hero p { color: var(--text-gray); font-size: 16px; margin-top: 12px; line-height: 1.5; }
 
-/* CONTENT & SECTIONS */
-.content-container { max-width: 1200px; margin: 0 auto; padding: 15px; }
-.team-section { margin-bottom: 30px; background: #ffffff; border-radius: 32px; padding: 30px; box-shadow: 0 8px 24px rgba(0,0,0,0.03); }
-.team-header { display: flex; align-items: center; margin-bottom: 20px; gap: 12px; }
-.team-badge { font-size: 12px; font-weight: 800; padding: 6px 14px; border-radius: 100px; letter-spacing: 1px; }
-
-.badge-audio { background: var(--soft-orange); color: var(--primary-orange); }
-.badge-video { background: var(--soft-blue); color: var(--primary-blue); }
-
-.team-header h2 { font-size: 26px; font-weight: 800; }
-
-/* GRID & CARDS */
-.grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
-.card-link { text-decoration: none; display: block; height: 100%; }
-
-.mission-card {
-    background: #ffffff; border: 2px solid #F0F0F0; border-radius: var(--card-radius);
-    padding: 20px; transition: all 0.3s ease; height: 100%; position: relative;
-    display: flex; flex-direction: column;
+/* NAV MENU LAYOUT */
+.nav-menu {
+    display: flex;
+    gap: 15px;
+    align-items: center;
 }
-.mission-card:hover { border-color: #D1D5DB; transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.04); }
-.mission-card:active { transform: scale(0.98); }
 
-.card-emoji { font-size: 28px; margin-bottom: 15px; background: #F9FAFB; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 14px; }
-.mission-card h3 { font-size: 20px; margin-bottom: 8px; font-weight: 800; color: var(--text-dark); }
-.mission-card p { font-size: 14px; color: var(--text-gray); margin-bottom: 20px; line-height: 1.4; flex-grow: 1; }
-
-.btn-go {
-    display: inline-flex; align-items: center; gap: 5px; font-size: 14px; font-weight: 700;
-    color: var(--primary-blue); padding: 8px 16px; background: var(--soft-blue); border-radius: 100px;
-    align-self: flex-start;
+.nav-link {
+    text-decoration: none;
+    color: var(--text-dark);
+    font-weight: 700;
+    font-size: 14px;
+    padding: 8px 12px;
+    transition: all 0.3s ease;
 }
-.card-link:hover .btn-go { background: var(--primary-blue); color: white; }
 
-/* Custom Buttons Theme */
-.card-link.audio-link .btn-go { color: var(--primary-orange); background: var(--soft-orange); }
-.card-link.audio-link:hover .btn-go { background: var(--primary-orange); color: white; }
-.card-link.inv-link .btn-go { color: #2C3E50; background: #EAECEE; }
-.card-link.inv-link:hover .btn-go { background: #2C3E50; color: white; }
+/* DROPDOWN SYSTEM */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
 
-/* MOBILE RESPONSIVENESS */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #ffffff;
+    min-width: 140px;
+    box-shadow: 0px 8px 16px rgba(0,0,0,0.1);
+    border-radius: 12px;
+    z-index: 1;
+    top: 100%;
+    overflow: hidden;
+    border: 1px solid #eee;
+}
+
+.dropdown-content a {
+    color: var(--text-dark);
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.dropdown-content a:hover {
+    background-color: var(--soft-blue);
+    color: var(--primary-blue);
+}
+
+/* Munculkan dropdown saat hover (untuk Desktop) */
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Responsive: Agar tidak berantakan di HP */
 @media (max-width: 600px) {
-    .hero h1 { font-size: 32px; }
-    .team-section { padding: 20px; border-radius: 24px; }
-    .team-header h2 { font-size: 22px; }
-    .grid-cards { grid-template-columns: 1fr; }
+    .nav-menu {
+        gap: 5px;
+    }
+    .nav-link {
+        font-size: 12px;
+        padding: 5px 8px;
+    }
+    .logo-link {
+        margin-right: 10px;
+    }
 }

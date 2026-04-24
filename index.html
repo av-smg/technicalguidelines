@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Panduan Teknis — Home</title>
+
+  <link rel="stylesheet" href="assets/style.css?v=40">
+  
+  <style>
+    /* =========================================
+       HOME PREMIUM UPGRADE (TIDAK GANGGU STYLE.CSS)
+    ========================================== */
+
+    /* Wrapper spacing */
+    .home-wrap {
+      max-width: 1100px;
+      margin: auto;
+      padding: 30px 20px;
+    }
+
+    /* MAIN TITLE */
+    .hero-title {
+      font-size: 46px;
+      font-weight: 900;
+      letter-spacing: -1px;
+      margin-bottom: 4px;
+    }
+
+    .hero-sub {
+      opacity: .7;
+      margin-bottom: 26px;
+      font-size: 16px;
+    }
+
+    /* GRID PREMIUM */
+    .hero-grid {
+      display: grid;
+      gap: 24px;
+      margin-top: 15px;
+    }
+    @media(min-width: 720px) {
+      .hero-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    /* CARD PREMIUM */
+    .card-hero {
+      position: relative;
+      border-radius: 18px;
+      overflow: hidden;
+      min-height: 230px;
+
+      background: var(--card);
+      border: 1px solid var(--line);
+      
+      /* Premium Shadow */
+      box-shadow: 0 8px 26px rgba(0,0,0,.50);
+
+      transition: .35s ease;
+    }
+    .card-hero:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 14px 38px rgba(0,0,0,.65);
+    }
+
+    /* BACKGROUND IMAGE */
+    .card-hero img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+
+      filter: brightness(.72) saturate(1.1);
+      transition: .35s ease;
+    }
+    .card-hero:hover img {
+      filter: brightness(.90) saturate(1.3);
+    }
+
+    /* CATEGORY LABEL */
+    .card-hero .label {
+      position: relative;
+      z-index: 2;
+
+      font-size: 40px;
+      font-weight: 900;
+      text-shadow: 0 3px 16px rgba(0,0,0,.6);
+
+      /* ✅ FIX: Tidak mepet kiri */
+      padding-left: 16px;
+      padding-right: 16px;
+
+      opacity: 0;
+      transform: translateY(16px);
+      transition: .35s ease;
+    }
+    .card-hero:hover .label {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <!-- ✅ NAVBAR PREMIUM -->
+  <div class="navbar">
+    <div class="navbar-inner">
+
+      <a class="brand" href="index.html">PANDUAN TEKNIS - Regional 2026 | Javanese</a>
+
+      <nav class="nav">
+        <a class="active" href="index.html">Home</a>
+        <a href="audio.html">Audio</a>
+        <a href="video.html">Video</a>
+        <a href="stage.html">Podium</a>
+        <a href="it.html">IT</a>
+        <a href="apendiks.html">Apendiks</a>
+
+        <button id="themeBtn" class="theme-toggle">🌙 Dark</button>
+      </nav>
+
+    </div>
+  </div>
+
+
+  <main class="home-wrap">
+
+    <!-- PAGE TITLE -->
+    <section>
+      <h1 class="hero-title">PANDUAN TEKNIS</h1>
+      <p class="hero-sub">Audio • Video • Podium • IT</p>
+    </section>
+
+    <!-- PREMIUM GRID -->
+    <section class="hero-grid">
+
+      <!-- AUDIO -->
+      <a class="card" href="audio.html">
+        <div class="card-hero">
+          <img src="assets/img/audio.jpg" alt="Audio">
+          <span class="label" style="color:var(--audio)">AUDIO</span>
+        </div>
+      </a>
+
+      <!-- VIDEO -->
+      <a class="card" href="video.html">
+        <div class="card-hero">
+          <img src="assets/img/video.jpg" alt="Video">
+          <span class="label" style="color:var(--video)">VIDEO</span>
+        </div>
+      </a>
+
+      <!-- PODIUM -->
+      <a class="card" href="stage.html">
+        <div class="card-hero">
+          <img src="assets/img/stage.jpg" alt="Podium">
+          <span class="label" style="color:var(--stage)">PODIUM</span>
+        </div>
+      </a>
+
+      <!-- IT -->
+      <a class="card" href="it.html">
+        <div class="card-hero">
+          <img src="assets/img/it.jpg" alt="IT">
+          <span class="label" style="color:var(--it)">IT</span>
+        </div>
+      </a>
+
+      <!-- APENDIKS -->
+      <a class="card" href="apendiks.html">
+        <div class="card-hero">
+          <img src="assets/img/apendiks.jpg" alt="Apendiks">
+          <span class="label" style="color:var(--apendiks)">APENDIKS</span>
+        </div>
+      </a>
+
+    </section>
+
+    <footer style="margin-top:40px; opacity:.6; text-align:center;">
+      © 2026 — Disusun oleh Truna
+    </footer>
+
+  </main>
+
+  <script src="assets/theme.js?v=40"></script>
+
+</body>
+</html>

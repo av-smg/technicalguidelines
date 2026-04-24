@@ -3,103 +3,57 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>A/V Mission Control 🚀</title>
-    <link rel="stylesheet" href="style.css">
     {% include head.html %}
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-{% include navbar.html %}
+
+    {% include navbar.html %}
 
     <main>
         <section class="hero">
-            <h1>Vibe Check: <br><span>Ready for Action!</span> ⚡</h1>
-            <p>Pilih divisi kamu di bawah untuk masuk ke halaman detail misi, instruksi kerja, dan checklist hari ini.</p>
+            <h1>Mission Control: <br><span>Select Your Region</span> 🌍</h1>
+            <p>Pilih lokasi penugasan kamu untuk mengakses checklist teknis dan instruksi kerja spesifik.</p>
         </section>
 
         <div class="content-container">
-            <section class="team-section">
-                <div class="team-header">
-                    <span class="team-badge badge-audio">AUDIO</span>
-                    <h2>Tim Audio</h2>
+            
+            <a href="jw-08/index.html" class="location-main-card-link">
+                <div class="location-main-card jw-card">
+                    <div class="card-content">
+                        <span class="location-label">Region Alpha</span>
+                        <h2>JW-08 Indonesia</h2>
+                        <p>Akses dashboard utama untuk koordinasi A/V di wilayah JW-08.</p>
+                        <span class="btn-enter">Buka Dashboard &rarr;</span>
+                    </div>
+                    <div class="card-illustration">🇮🇩</div>
                 </div>
-                <div class="grid-cards">
-                    <a href="audio-booth.html" class="card-link audio-link">
-                        <div class="mission-card">
-                            <div class="card-emoji">🎛️</div>
-                            <h3>Tim Booth</h3>
-                            <p>Kontrol DSP, Gain, EQ, dan pantau jalannya pidato.</p>
-                            <span class="btn-go">Masuk Misi &rarr;</span>
-                        </div>
-                    </a>
-                    <a href="audio-kabel.html" class="card-link audio-link">
-                        <div class="mission-card">
-                            <div class="card-emoji">🔌</div>
-                            <h3>Tim Kabel</h3>
-                            <p>Routing, lakban jalur, dan pastikan konektor aman.</p>
-                            <span class="btn-go">Masuk Misi &rarr;</span>
-                        </div>
-                    </a>
-                    <a href="audio-speaker.html" class="card-link audio-link">
-                        <div class="mission-card">
-                            <div class="card-emoji">🔊</div>
-                            <h3>Tim Speaker</h3>
-                            <p>Rigging TOA F2000, arah suara, & cegah feedback.</p>
-                            <span class="btn-go">Masuk Misi &rarr;</span>
-                        </div>
-                    </a>
-                    <a href="inventaris.html" class="card-link inv-link">
-                        <div class="mission-card">
-                            <div class="card-emoji">📱</div>
-                            <h3>Tim Inventaris</h3>
-                            <p>Data barang keluar/masuk, cek kondisi mic, dan baterai.</p>
-                            <span class="btn-go">Logistik &rarr;</span>
-                        </div>
-                    </a>
-                </div>
-            </section>
+            </a>
 
-            <section class="team-section">
-                <div class="team-header">
-                    <span class="team-badge badge-video">VIDEO</span>
-                    <h2>Tim Video</h2>
+            <a href="ja-01/index.html" class="location-main-card-link">
+                <div class="location-main-card ja-card">
+                    <div class="card-content">
+                        <span class="location-label">Region Beta</span>
+                        <h2>JA-01 Jawa</h2>
+                        <p>Panduan teknis dan alur kerja khusus untuk operasional JA-01.</p>
+                        <span class="btn-enter">Buka Dashboard &rarr;</span>
+                    </div>
+                    <div class="card-illustration">🗺️</div>
                 </div>
-                <div class="grid-cards">
-                    <a href="video-booth.html" class="card-link">
-                        <div class="mission-card">
-                            <div class="card-emoji">💻</div>
-                            <h3>Tim Booth</h3>
-                            <p>Setup Switcher, Record, Stream, dan pindah kamera saat live.</p>
-                            <span class="btn-go">Masuk Misi &rarr;</span>
-                        </div>
-                    </a>
-                    <a href="video-kamera.html" class="card-link">
-                        <div class="mission-card">
-                            <div class="card-emoji">🎥</div>
-                            <h3>Tim Kamera</h3>
-                            <p>Framing medium/tight, Exposure, dan White Balance.</p>
-                            <span class="btn-go">Masuk Misi &rarr;</span>
-                        </div>
-                    </a>
-                    <a href="video-tv.html" class="card-link">
-                        <div class="mission-card">
-                            <div class="card-emoji">📺</div>
-                            <h3>Tim TV / Layar</h3>
-                            <p>Routing slide presentasi pembicara ke layar utama / Videotron.</p>
-                            <span class="btn-go">Masuk Misi &rarr;</span>
-                        </div>
-                    </a>
-                    <a href="video-kabel.html" class="card-link">
-                        <div class="mission-card">
-                            <div class="card-emoji">🔗</div>
-                            <h3>Tim Kabel</h3>
-                            <p>Tarik SDI/HDMI dari kamera ke switcher dan gulung kabel sisa.</p>
-                            <span class="btn-go">Masuk Misi &rarr;</span>
-                        </div>
-                    </a>
+            </a>
+
+            <a href="apendiks.html" class="location-main-card-link">
+                <div class="location-main-card apendiks-card">
+                    <div class="card-content">
+                        <span class="location-label">Resources</span>
+                        <h2>Apendiks</h2>
+                        <p>Dokumentasi tambahan, glossary istilah, dan referensi peralatan.</p>
+                        <span class="btn-enter">Lihat Referensi &rarr;</span>
+                    </div>
+                    <div class="card-illustration">📚</div>
                 </div>
-            </section>
+            </a>
+
         </div>
     </main>
 

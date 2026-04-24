@@ -216,3 +216,104 @@ header { padding: 15px; position: sticky; top: 0; z-index: 100; backdrop-filter:
     position: relative;
     overflow: hidden;
 }
+/* RESET LINK UTAMA AGAR TIDAK UNGU */
+.location-main-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    margin-bottom: 24px;
+}
+
+/* CONTAINER KARTU */
+.location-main-card {
+    background: #ffffff;
+    border-radius: 32px;
+    padding: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #F0F0F0;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+
+.location-main-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+}
+
+/* AKSEN WARNA SAMPING */
+.jw-card { border-left: 10px solid var(--primary-orange); }
+.ja-card { border-left: 10px solid var(--primary-blue); }
+.apendiks-card { border-left: 10px solid #6366F1; }
+
+/* KONTEN DALAM KARTU */
+.location-label {
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--text-gray);
+    display: block;
+    margin-bottom: 8px;
+}
+
+.location-main-card h2 {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+}
+
+.location-main-card p {
+    color: var(--text-gray);
+    font-size: 15px;
+    margin-bottom: 20px;
+    max-width: 450px;
+}
+
+/* TOMBOL MASUK */
+.btn-enter {
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--primary-blue);
+    padding: 10px 20px;
+    background: var(--soft-blue);
+    border-radius: 100px;
+    transition: all 0.3s;
+}
+
+.location-main-card:hover .btn-enter {
+    background: var(--primary-blue);
+    color: white;
+}
+
+/* ILUSTRASI EMOJI DI KANAN */
+.card-illustration {
+    font-size: 80px;
+    opacity: 0.15;
+    transition: all 0.3s ease;
+}
+
+.location-main-card:hover .card-illustration {
+    opacity: 0.3;
+    transform: scale(1.1);
+}
+
+/* MOBILE RESPONSIVE */
+@media (max-width: 600px) {
+    .location-main-card {
+        padding: 25px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .card-illustration {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        font-size: 50px;
+    }
+}

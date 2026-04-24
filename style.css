@@ -196,3 +196,23 @@ header { padding: 15px; position: sticky; top: 0; z-index: 100; backdrop-filter:
 }
 
 /* Jika lokasinya JA-01 mungkin mau warna beda? Bisa pakai class tambahan nanti */
+
+/* Variasi Warna Aksen di Pinggir Kartu */
+.jw-card { border-left: 8px solid var(--primary-orange); }
+.ja-card { border-left: 8px solid var(--primary-blue); }
+.apendiks-card { border-left: 8px solid #6366F1; }
+
+.location-main-card {
+    background: #ffffff;
+    border-radius: 32px;
+    padding: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #F0F0F0;
+    border-right: 1px solid #F0F0F0;
+    border-bottom: 1px solid #F0F0F0;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}

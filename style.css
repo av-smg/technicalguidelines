@@ -180,3 +180,19 @@ header { padding: 15px; position: sticky; top: 0; z-index: 100; backdrop-filter:
         margin-right: 10px;
     }
 }
+
+/* Badge Lokasi di Kanan Navbar */
+.location-badge {
+    margin-left: auto; /* Mendorong ke paling kanan */
+    background: var(--primary-blue);
+    color: white;
+    padding: 6px 16px;
+    border-radius: 100px;
+    font-weight: 800;
+    font-size: 12px;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 10px rgba(58, 112, 226, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Jika lokasinya JA-01 mungkin mau warna beda? Bisa pakai class tambahan nanti */

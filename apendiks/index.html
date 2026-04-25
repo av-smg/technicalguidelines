@@ -4,56 +4,64 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Apendiks | Daftar Lampiran</title>
-    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="../style.css">
 </head>
-<body>
-
-    <div class="main-wrapper">
-        <header class="page-header">
-            <h1>Daftar Apendiks</h1>
-            <p>Referensi teknis, dokumen pendukung, dan aset media.</p>
-            <input type="text" id="appendixSearch" placeholder="Cari dokumen..." onkeyup="searchFunction()">
-        </header>
-
-        <section class="appendix-content">
-            <div class="category">
-                <h2>Dokumen Teknis</h2>
-                <ul class="list-items">
-                    <li><a href="docs/skema-audio.pdf">Skema Jalur Audio TOA</a></li>
-                    <li><a href="docs/inventory-logic.md">Logika Sistem Inventaris</a></li>
-                </ul>
+<body class="light-mode"> <div class="article-master-container">
+        <article class="article-content-card">
+            
+            <div class="article-tags-row">
+                <span class="badge-pill badge-podium">Referensi</span>
+                <span class="badge-pill badge-it">Dokumen</span>
             </div>
 
-            <div class="category">
-                <h2>Media & Videografi</h2>
-                <ul class="list-items">
-                    <li><a href="assets/shotlist-template.xlsx">Template Shotlist Video</a></li>
-                    <li><a href="assets/ghibli-color-palette.pdf">Palet Warna Ghibli Style</a></li>
-                </ul>
+            <h1 class="article-main-title">Daftar Apendiks</h1>
+            <div class="article-title-line"></div>
+
+            <div class="article-main-body">
+                <p>Kumpulan dokumen pendukung, aset visual, dan referensi teknis proyek.</p>
+
+                <div class="search-box" style="margin-bottom: 30px;">
+                    <input type="text" id="missionSearch" placeholder="Cari lampiran..." onkeyup="filterAppendix()">
+                </div>
+
+                <div id="appendixContainer">
+                    <section class="appendix-group">
+                        <h2>A. Dokumen Teknis</h2>
+                        <ul class="list-items" style="list-style: none; padding: 0;">
+                            <li style="padding: 12px 0; border-bottom: 1px solid var(--border-color);">
+                                <a href="docs/skema-audio.pdf" style="color: var(--primary-blue); text-decoration: none; font-weight: 600;">Skema Jalur Audio TOA DIY</a>
+                            </li>
+                            <li style="padding: 12px 0; border-bottom: 1px solid var(--border-color);">
+                                <a href="docs/manual-camera.pdf" style="color: var(--primary-blue); text-decoration: none; font-weight: 600;">Manual Pengaturan Canon 1200D</a>
+                            </li>
+                        </ul>
+                    </section>
+
+                    <section class="appendix-group" style="margin-top: 40px;">
+                        <h2>B. Aset & Media</h2>
+                        <ul class="list-items" style="list-style: none; padding: 0;">
+                            <li style="padding: 12px 0; border-bottom: 1px solid var(--border-color);">
+                                <a href="assets/ghibli-prompts.txt" style="color: var(--primary-blue); text-decoration: none; font-weight: 600;">Daftar Prompt Ghibli Style AI</a>
+                            </li>
+                        </ul>
+                    </section>
+                </div>
             </div>
-        </section>
+
+            <div class="article-bottom-footer">
+                <a href="index.html" class="btn-back">← Kembali ke Beranda</a>
+            </div>
+        </article>
     </div>
 
     <script>
-        function searchFunction() {
-            let input = document.getElementById('appendixSearch').value.toLowerCase();
-            let categories = document.querySelectorAll('.category');
+        function filterAppendix() {
+            let input = document.getElementById('missionSearch').value.toLowerCase();
+            let items = document.querySelectorAll('.list-items li');
             
-            categories.forEach(cat => {
-                let items = cat.querySelectorAll('li');
-                let hasVisibleItem = false;
-
-                items.forEach(item => {
-                    let text = item.textContent.toLowerCase();
-                    if (text.includes(input)) {
-                        item.style.display = "";
-                        hasVisibleItem = true;
-                    } else {
-                        item.style.display = "none";
-                    }
-                });
-                // Sembunyikan judul kategori jika tidak ada isi yang cocok
-                cat.style.display = hasVisibleItem ? "" : "none";
+            items.forEach(item => {
+                let text = item.textContent.toLowerCase();
+                item.style.display = text.includes(input) ? "" : "none";
             });
         }
     </script>

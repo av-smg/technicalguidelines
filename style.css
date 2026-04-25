@@ -214,6 +214,30 @@ body.dark-mode .hero h1 span {
 .card-link.inv-link:hover .btn-go { background: #2C3E50; color: white; }
 
 @media (max-width: 600px) {
+    /* Bikin dropdown nggak melayang tapi mendorong konten di bawahnya */
+    .dropdown-content {
+        position: relative; /* Berubah dari absolute ke relative */
+        top: 0;
+        width: 100%;
+        box-shadow: none; /* Hapus bayangan agar terlihat menyatu */
+        background-color: var(--soft-blue); /* Kasih warna beda dikit biar tahu itu sub-menu */
+        border-radius: 8px;
+        margin-top: 5px;
+    }
+
+    /* Class .show yang dipanggil JS tadi */
+    .dropdown-content.show {
+        display: block !important;
+    }
+
+    /* Kasih indikator panah atau jarak di sub-menu */
+    .dropdown-content a {
+        padding: 10px 20px;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+}
+
+@media (max-width: 600px) {
     .nav-menu {
         flex-direction: column; /* Menu jadi berurutan ke bawah */
         align-items: flex-start;

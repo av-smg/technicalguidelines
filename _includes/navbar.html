@@ -25,12 +25,15 @@
         </div>
 
    <div class="nav-group-right">
-    <div class="search-wrapper-desktop" id="search-desktop-container">
-       <input type="text" id="missionSearch" placeholder="Cari..." onkeyup="filterMissions()" onkeypress="handleSearchEnter(event)">
-        
-<div id="search-results-list"></div>
-        <button class="search-toggle-btn" id="search-trigger-global">🔍</button>
-    </div>
+    <div class="search-wrapper">
+        <div class="search-content">
+            <div class="search-header">
+                <input type="text" id="search-input" placeholder="Ketik kata kunci pencarian..." autocomplete="off">
+                <button class="search-close">&times;</button>
+            </div>
+            <ul id="results-container"></ul>
+        </div>
+    </div
 
     <button class="mobile-search-trigger" id="mobile-search-trigger-btn">🔍</button>
 

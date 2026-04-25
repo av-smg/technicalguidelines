@@ -3,50 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apendiks | Dokumentasi Proyek</title>
-    <link rel="stylesheet" href="style-appendix.css">
+    <title>Apendiks | Daftar Lampiran</title>
+    <link rel="stylesheet" href="./style.css">
 </head>
 <body>
 
-    <div class="container">
-        <header>
+    <div class="main-wrapper">
+        <header class="page-header">
             <h1>Daftar Apendiks</h1>
-            <p>Kumpulan dokumen pendukung, aset, dan referensi teknis.</p>
-            <input type="text" id="searchInput" placeholder="Cari lampiran..." onkeyup="filterAppendix()">
+            <p>Referensi teknis, dokumen pendukung, dan aset media.</p>
+            <input type="text" id="appendixSearch" placeholder="Cari dokumen..." onkeyup="searchFunction()">
         </header>
 
-        <main id="appendixList">
-            <section class="appendix-section">
-                <h2>A. Dokumen Teknis</h2>
-                <ul>
-                    <li><a href="docs/skema-audio.pdf" target="_blank">Skema Jalur Audio TOA DIY</a></li>
-                    <li><a href="docs/manual-camera.pdf" target="_blank">Manual Pengaturan Canon 1200D</a></li>
-                    <li><a href="docs/api-inventory.json" target="_blank">Endpoint API Inventory (JSON)</a></li>
+        <section class="appendix-content">
+            <div class="category">
+                <h2>Dokumen Teknis</h2>
+                <ul class="list-items">
+                    <li><a href="docs/skema-audio.pdf">Skema Jalur Audio TOA</a></li>
+                    <li><a href="docs/inventory-logic.md">Logika Sistem Inventaris</a></li>
                 </ul>
-            </section>
+            </div>
 
-            <section class="appendix-section">
-                <h2>B. Aset Visual & Media</h2>
-                <ul>
-                    <li><a href="assets/branding-guide.pdf" target="_blank">Panduan Warna & Logo</a></li>
-                    <li><a href="assets/ghibli-prompts.txt" target="_blank">Daftar Prompt Ghibli Style AI</a></li>
+            <div class="category">
+                <h2>Media & Videografi</h2>
+                <ul class="list-items">
+                    <li><a href="assets/shotlist-template.xlsx">Template Shotlist Video</a></li>
+                    <li><a href="assets/ghibli-color-palette.pdf">Palet Warna Ghibli Style</a></li>
                 </ul>
-            </section>
-        </main>
-
-        <footer>
-            <p>&copy; 2026 | Dibuat dengan HTML & CSS</p>
-        </footer>
+            </div>
+        </section>
     </div>
 
     <script>
-        function filterAppendix() {
-            let input = document.getElementById('searchInput').value.toLowerCase();
-            let items = document.querySelectorAll('.appendix-section li');
+        function searchFunction() {
+            let input = document.getElementById('appendixSearch').value.toLowerCase();
+            let categories = document.querySelectorAll('.category');
             
-            items.forEach(item => {
-                let text = item.textContent.toLowerCase();
-                item.style.display = text.includes(input) ? "" : "none";
+            categories.forEach(cat => {
+                let items = cat.querySelectorAll('li');
+                let hasVisibleItem = false;
+
+                items.forEach(item => {
+                    let text = item.textContent.toLowerCase();
+                    if (text.includes(input)) {
+                        item.style.display = "";
+                        hasVisibleItem = true;
+                    } else {
+                        item.style.display = "none";
+                    }
+                });
+                // Sembunyikan judul kategori jika tidak ada isi yang cocok
+                cat.style.display = hasVisibleItem ? "" : "none";
             });
         }
     </script>

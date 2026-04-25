@@ -1,0 +1,55 @@
+---
+layout: default
+---
+{%- assign path_parts = page.path | split: "/" -%}
+{%- assign category = path_parts[1] | capitalize -%}
+
+{%- if category == "Audio" -%}{%- assign cat_color = "#ff9800" -%}
+{%- elsif category == "Video" -%}{%- assign cat_color = "#2196f3" -%}
+{%- elsif category == "It" -%}{%- assign cat_color = "#4caf50" -%}
+{%- elsif category == "Podium" -%}{%- assign cat_color = "#9c27b0" -%}
+{%- else -%}{%- assign cat_color = "#9e9e9e" -%}{%- endif -%}
+
+{%- if page.location == "JW-08" -%}{%- assign loc_color = "#E91E63" -%}
+{%- elsif page.location == "JA-01" -%}{%- assign loc_color = "#673AB7" -%}
+{%- else -%}{%- assign loc_color = "#607D8B" -%}{%- endif -%}
+
+<div class="article-master-container">
+    <div class="article-content-card">
+        <header class="article-top-header">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>{{ page.title }}</title>
+    <link rel="stylesheet" href="/style.css">
+        {% include head.html %}
+
+            <div class="article-tags-row">
+                <span class="badge-pill dynamic-color" data-color="{{ loc_color }}">
+                    {{ page.location | default: "GLOBAL" }}
+                </span>
+                <span class="badge-pill dynamic-color" data-color="{{ cat_color }}">
+                    {{ category | default: "General" }}
+                </span>
+            </div>
+            <h1 class="article-main-title">{{ page.title }}</h1>
+            <div class="article-title-line"></div>
+        </header>
+
+        <section class="article-main-body">
+            {{ content }}
+        </section>
+
+        <footer class="article-bottom-footer">
+            <a href="/" class="btn-back">
+                &larr; Kembali ke Beranda
+            </a>
+        </footer>
+    </div>
+</div>
+
+<script>
+    // Pastikan warna badge muncul
+    document.querySelectorAll('.dynamic-color').forEach(el => {
+        el.style.backgroundColor = el.getAttribute('data-color');
+    });
+</script>

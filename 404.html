@@ -1,0 +1,97 @@
+---
+permalink: /404.html
+---
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>404 - Misi Tidak Ditemukan 🚀</title>
+    {% include head.html %}
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        /* Style tambahan khusus untuk halaman 404 */
+        .error-container {
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .error-code {
+            font-size: 100px;
+            font-weight: 800;
+            background: linear-gradient(90deg, var(--primary-orange), var(--primary-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+            margin-bottom: 10px;
+        }
+
+        .error-emoji {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+
+        .error-msg {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--text-dark);
+        }
+
+        .error-sub {
+            color: var(--text-gray);
+            max-width: 400px;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .btn-home {
+            background-color: var(--primary-blue);
+            color: white;
+            padding: 14px 28px;
+            border-radius: 100px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(58, 112, 226, 0.3);
+        }
+
+        .btn-home:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(58, 112, 226, 0.4);
+            filter: brightness(1.1);
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="nav-container">
+        <a href="index.html" class="logo-combined">
+            <div class="logo-part logo-audio">A</div>
+            <div class="logo-part logo-video">V</div>
+        </a>
+        <div class="site-title">A/V Mission Control</div>
+    </div>
+</header>
+
+<main class="error-container">
+    <div class="error-emoji">📡</div>
+    <div class="error-code">404</div>
+    <p class="error-msg">Sinyal Terputus!</p>
+    <p class="error-sub">
+        Maaf, koordinat misi yang kamu cari tidak ditemukan atau kabelnya sedang dicabut. Silakan kembali ke markas utama.
+    </p>
+    
+    <a href="index.html" class="btn-home">
+        Kembali ke Beranda 🚀
+    </a>
+</main>
+
+</body>
+</html>

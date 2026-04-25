@@ -1,0 +1,22 @@
+---
+layout: none
+---
+[
+  {%- assign all_pages = site.pages | concat: site.posts -%}
+  {%- assign first_item = true -%}
+  {%- for page in all_pages -%}
+    {%- if page.title and page.url != "/search.json" and page.url != "/search.html" -%}
+      {%- unless first_item -%},{%- endunless -%}
+      {%- assign path_parts = page.path | split: "/" -%}
+      {%- assign category = path_parts[1] | capitalize -%}
+      {
+  "title"    : {{ page.title | jsonify }},
+  "url"      : {{ page.url | relative_url | jsonify }},
+  "content"  : {{ page.content | strip_html | jsonify }},
+  "location" : {{ page.location | jsonify }},
+  "category" : {{ category | jsonify }}
+}
+      {%- assign first_item = false -%}
+    {%- endif -%}
+  {%- endfor -%}
+]

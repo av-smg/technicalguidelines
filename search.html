@@ -1,0 +1,106 @@
+---
+layout: default
+title: "Hasil Pencarian"
+---
+<head>
+    {% include head.html %}
+    <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+    {% include navbar.html %}
+
+<div class="search-page-container">
+    <h1 class="search-title">Hasil Pencarian untuk: <span id="search-query-text"></span></h1>
+    
+    <div id="search-results-page-list">
+        <div class="search-loading">Mencari informasi...</div>
+    </div>
+</div>
+</body>
+<style>
+    .search-page-container { padding: 40px 20px; max-width: 900px; margin: 0 auto; }
+    
+    .search-page-item { 
+        background: var(--card-bg); 
+        padding: 25px; 
+        border-radius: 20px; 
+        margin-bottom: 25px; 
+        border: 1px solid var(--border-color);
+        transition: all 0.3s ease;
+        display: block;
+        text-decoration: none;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+    }
+
+    .search-page-item:hover { 
+        transform: translateY(-5px); 
+        box-shadow: 0 15px 30px rgba(0,0,0,0.08);
+        border-color: var(--primary-blue);
+    }
+
+    .search-item-header { display: flex; gap: 10px; margin-bottom: 12px; }
+
+    /* Badge Style */
+    .badge-loc, .badge-cat {
+        font-size: 10px;
+        font-weight: 800;
+        padding: 4px 12px;
+        border-radius: 50px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .badge-loc { 
+    /* background: #f0f0f0;  <-- HAPUS ATAU KOMENTARI BARIS INI */
+    /* color: #666;        <-- HAPUS ATAU KOMENTARI BARIS INI */
+    font-size: 10px;
+    font-weight: 800;
+    padding: 4px 12px;
+    border-radius: 50px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+    .badge-cat { color: white; }
+
+    .res-page-title { 
+        font-size: 1.3rem; 
+        font-weight: 700; 
+        color: var(--text-dark); 
+        margin-bottom: 10px;
+        line-height: 1.3;
+    }
+
+    .res-page-snippet { 
+        font-size: 0.95rem; 
+        color: var(--text-gray); 
+        line-height: 1.6;
+        margin-bottom: 15px;
+    }
+
+    .search-item-footer {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--primary-blue);
+        display: flex;
+        align-items: center;
+    }
+
+    #search-results-page-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Memberikan jarak otomatis antar kartu */
+    margin-top: 30px;
+}
+
+.search-page-item { 
+    margin-bottom: 0; /* Kita pakai gap saja supaya lebih rapi */
+    /* ... sisa kode lainnya tetap ... */
+}
+
+.res-page-snippet {
+    line-height: 1.7; /* Menambah spasi antar baris tulisan agar enak dibaca */
+    margin-bottom: 20px;
+    display: block;
+}
+</style>

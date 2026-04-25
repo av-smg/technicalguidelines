@@ -1,0 +1,1298 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+
+
+/* ============================================================
+   1. VARIABEL & ROOT (LIGHT MODE)
+   ============================================================ */
+:root {
+    --primary-orange: #FF7E27;
+    --soft-orange: #FFF0E5;
+    --primary-blue: #003366;
+    --soft-blue: #E8EFFF;
+    --bg-color: #F4F5F7;
+    --text-dark: #1A1A1A;
+    --text-gray: #6B7280;
+    --card-radius: 24px;
+    --card-bg: #ffffff;
+    --nav-bg: rgba(255, 255, 255, 0.9);
+    --border-color: rgba(0,0,0,0.1);
+}
+
+/* ============================================================
+   2. DARK MODE VARIABLES & OVERRIDES
+   ============================================================ */
+body.dark-mode {
+    --bg-color: #0F172A;
+    --text-dark: #F8FAFC;
+    --text-gray: #94A3B8;
+    --card-bg: #1E293B;
+    --nav-bg: rgba(30, 41, 59, 0.9);
+    --soft-blue: #334155;
+    --soft-orange: #452a1a;
+    --border-color: #415068;
+}
+
+body.dark-mode .nav-container,
+body.dark-mode .dropdown-content,
+body.dark-mode .location-main-card, 
+body.dark-mode .team-section, 
+body.dark-mode .mission-card,
+body.dark-mode .theme-toggle {
+    border: 1px solid var(--border-color) !important;
+}
+
+body.dark-mode .jw-card { border-left: 10px solid #FFA366 !important; }
+body.dark-mode .ja-card { border-left: 10px solid #60A5FA !important; }
+body.dark-mode .apendiks-card { border-left: 10px solid #A78BFA !important; }
+
+body.dark-mode .hero h1 span { background: #CA8A04; color: #FFFFFF; }
+
+/* ============================================================
+   3. GLOBAL RESET & BASE STYLES
+   ============================================================ */
+* {
+    margin: 0; padding: 0; box-sizing: border-box;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    background-color: var(--bg-color); 
+    color: var(--text-dark);
+    padding-bottom: 80px; 
+    overflow-x: hidden;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* ============================================================
+   4. HEADER & NAVIGATION
+   ============================================================ */
+header { 
+    padding: 15px; position: sticky; top: 0; z-index: 1000; 
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); 
+}
+
+.nav-container {
+    max-width: 1200px; margin: 0 auto; 
+    background: var(--nav-bg);
+    border-radius: 100px; display: flex; align-items: center; padding: 8px 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05); 
+    border: 1px solid var(--border-color);
+}
+
+.logo-link { display: flex; align-items: center; text-decoration: none; margin-right: 20px; }
+.main-logo { height: 40px; width: auto; display: block; }
+
+.nav-menu { display: flex; gap: 10px; align-items: center; }
+.nav-link {
+    text-decoration: none; color: var(--text-dark);
+    font-weight: 700; font-size: 14px; padding: 8px 12px; transition: 0.3s;
+}
+
+.theme-toggle {
+    cursor: pointer; background: var(--soft-blue); border: 1px solid var(--border-color);
+    width: 38px; height: 38px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    margin-left: auto; margin-right: 12px; transition: 0.3s; z-index: 1001;
+}
+
+.location-badge {
+    background: var(--primary-blue); color: white;
+    padding: 6px 16px; border-radius: 100px;
+    font-weight: 800; font-size: 15px; letter-spacing: 1px;
+}
+
+/* Dropdown */
+.dropdown { position: relative; }
+.dropdown-content {
+    display: none; position: absolute; background: var(--card-bg);
+    min-width: 140px; border-radius: 12px; top: 100%;
+    box-shadow: 0px 8px 16px rgba(0,0,0,0.1); border: 1px solid var(--border-color);
+}
+.dropdown:hover .dropdown-content { display: block; }
+.dropdown-content a {
+    color: var(--text-dark); padding: 12px 16px;
+    text-decoration: none; display: block; font-size: 13px; font-weight: 600;
+}
+.dropdown-content a:hover { background: var(--soft-blue); }
+
+/* ============================================================
+   5. HERO & SECTIONS
+   ============================================================ */
+.hero { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+.hero h1 { font-size: 42px; font-weight: 800; line-height: 1.2; }
+.hero h1 span { 
+    transform: rotate(-2deg); background: #FFE066; 
+    padding: 0 10px; border-radius: 8px; display: inline-block; 
+}
+.hero p { color: var(--text-gray); font-size: 16px; margin-top: 12px; }
+
+.content-container { max-width: 1200px; margin: 0 auto; padding: 15px; }
+
+/* Cards (Halaman Utama) */
+.location-main-card-link { text-decoration: none; color: inherit; display: block; margin-bottom: 24px; }
+.location-main-card {
+    background: var(--card-bg); border-radius: 32px; padding: 40px;
+    display: flex; justify-content: space-between; align-items: center;
+    border: 1px solid var(--border-color); transition: 0.3s;
+    position: relative; overflow: hidden;
+}
+.location-main-card:hover { transform: translateY(-5px); box-shadow: 0 12px 30px rgba(0,0,0,0.08); }
+
+.jw-card { border-left: 10px solid var(--primary-orange); }
+.ja-card { border-left: 10px solid var(--primary-blue); }
+.apendiks-card { border-left: 10px solid #6366F1; }
+
+.card-illustration { font-size: 80px; opacity: 0.15; transition: 0.3s; }
+
+/* Grid Mission (Halaman Lokasi) */
+.team-section { 
+    margin-bottom: 30px; background: var(--card-bg); 
+    border-radius: 32px; padding: 30px; border: 1px solid var(--border-color);
+}
+.grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+/* ============================================================
+   FIX MISSION CARD (JA-01 & JW-08 INDEX)
+   ============================================================ */
+
+/* Container link agar tidak berwarna biru browser */
+.card-link {
+    text-decoration: none !important;
+    color: inherit !important;
+    display: block;
+    height: 100%;
+}
+
+.mission-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--card-radius);
+    padding: 24px;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* Jeda otomatis antar elemen di dalam kartu */
+    position: relative;
+    height: 100%;
+}
+
+.mission-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary-blue);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+/* Emoji/Icon Box */
+.card-emoji {
+    font-size: 24px;
+    background: var(--bg-color);
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    margin-bottom: 4px;
+}
+
+/* Judul Tim */
+.mission-card h3 {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--text-dark);
+}
+
+/* Deskripsi Tugas */
+.mission-card p {
+    font-size: 14px;
+    color: var(--text-gray);
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Tombol Masuk Misi */
+/* ============================================================
+   THEMATIC COLOR SYSTEM (AUDIO & VIDEO)
+   ============================================================ */
+
+/* Reset tombol dasar agar fleksibel */
+.btn-go {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 8px 18px;
+    border-radius: 100px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+/* TEMA AUDIO (ORANGE) */
+.audio-link .mission-card:hover { border-color: var(--primary-orange); }
+.audio-link .btn-go { 
+    background-color: var(--soft-orange); 
+    color: var(--primary-orange); 
+}
+
+/* Saat di-hover: Tetap Orange, tapi background lebih pekat */
+.audio-link:hover .btn-go { 
+    background-color: var(--primary-orange); 
+    color: white; 
+}
+
+/* TEMA VIDEO (BIRU TUA) */
+.video-link .mission-card:hover { border-color: var(--primary-blue); }
+.video-link .btn-go { 
+    background-color: var(--soft-blue); 
+    color: var(--primary-blue); 
+}
+
+/* Saat di-hover: Tetap Biru, tapi background lebih pekat */
+.video-link:hover .btn-go { 
+    background-color: var(--primary-blue); 
+    color: white; 
+}
+
+/* KHUSUS DARK MODE */
+body.dark-mode .audio-link .btn-go { background-color: rgba(255, 126, 39, 0.1); }
+body.dark-mode .video-link .btn-go { background-color: rgba(0, 51, 102, 0.2); }
+
+.card-link:hover .btn-go {
+    background: var(--primary-blue);
+    color: rgb(97, 44, 44);
+}
+
+/* KHUSUS DARK MODE (Agar lebih "Deep") */
+body.dark-mode .mission-card {
+    background: #1e293b;
+    border-color: rgba(255,255,255,0.05);
+}
+
+body.dark-mode .card-emoji {
+    background: rgba(255,255,255,0.05);
+}
+
+/* ============================================================
+   TEAM BADGE STYLE (AUDIO & VIDEO)
+   ============================================================ */
+
+/* 1. SEJAJARKAN BADGE & TEKS */
+.team-header {
+    display: flex;
+    align-items: center; /* Kapsul & Judul sejajar tengah */
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.team-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    border-radius: 100px;
+    font-size: 15px;
+    font-weight: 800;
+    text-transform: uppercase;
+    line-height: 1;
+    margin-bottom: 0; /* Hapus margin yang bikin jomplang */
+}
+
+/* 2. WARNA TETAP (IDENTITAS) */
+/* Audio Theme */
+.audio-link .btn-go { 
+    background-color: var(--soft-orange); 
+    color: var(--primary-orange); 
+}
+
+/* Video Theme */
+.video-link .btn-go { 
+    background-color: var(--soft-blue); 
+    color: var(--primary-blue); 
+}
+
+/* 3. ANIMASI HOVER (TANPA GANTI WARNA) */
+/* Kita matikan perubahan warna saat hover */
+.audio-link:hover .btn-go,
+.video-link:hover .btn-go,
+.card-link:hover .btn-go { 
+    background-color: inherit; /* Tetap pakai warna aslinya */
+    color: inherit; 
+    transform: translateX(5px); /* Animasi geser dikit ke kanan biar asik */
+}
+
+/* Kartunya tetap naik sedikit & ada bayangan */
+.mission-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+/* Variasi Warna Audio (Dominan Oranye) */
+.badge-audio {
+    background-color: var(--primary-orange);
+    color: white;
+    box-shadow: 0 4px 10px rgba(255, 126, 39, 0.2);
+}
+
+/* Variasi Warna Video (Dominan Biru Tua) */
+.badge-video {
+    background-color: var(--primary-blue);
+    color: white;
+    box-shadow: 0 4px 10px rgba(0, 51, 102, 0.2);
+}
+
+/* Penyesuaian di Dark Mode agar tetap menyala */
+body.dark-mode .badge-audio {
+    background-color: #ff914d; /* Oranye yang sedikit lebih cerah */
+}
+
+body.dark-mode .badge-video {
+    background-color: #1e40af; /* Biru yang lebih vibrant */
+}
+
+/* ============================================================
+   6. RESPONSIVE DESIGN
+   ============================================================ */
+@media (max-width: 600px) {
+    .nav-container { padding: 8px 12px; }
+    .nav-menu { overflow-x: auto; white-space: nowrap; flex-grow: 1; scrollbar-width: none; }
+    .nav-menu::-webkit-scrollbar { display: none; }
+    .nav-link { font-size: 12px; padding: 6px 8px; }
+    .main-logo { height: 30px; }
+    
+    .hero h1 { font-size: 32px; }
+    
+    .location-main-card { padding: 25px; flex-direction: column; align-items: flex-start; }
+    .card-illustration { position: absolute; top: 15px; right: 15px; font-size: 40px; }
+    .btn-enter { width: 100%; text-align: center; margin-top: 15px; }
+
+    /* Dropdown Mobile Fix */
+    .dropdown-content.show { display: block !important; position: absolute; top: 100%; }
+    
+    .grid-cards { grid-template-columns: 1fr; }
+    .team-section { padding: 20px; }
+}
+
+
+
+/* ============================================================
+   THEMATIC COLOR SYSTEM (IT & PODIUM)
+   ============================================================ */
+
+/* --- TEMA IT (SILVER / SLATE) --- */
+.badge-it {
+    background-color: #94A3B8; /* Slate/Silver */
+    color: white;
+}
+
+.it-link .btn-go { 
+    background-color: #F1F5F9; 
+    color: #475569; 
+}
+
+/* Hover effect: Tetap warna aslinya, cuma geser */
+.it-link:hover .btn-go { transform: translateX(5px); }
+.it-link .mission-card:hover { border-color: #94A3B8; }
+
+
+/* --- TEMA PODIUM (PURPLE) --- */
+.badge-podium {
+    background-color: #6D28D9; /* Deep Purple */
+    color: white;
+}
+
+.podium-link .btn-go { 
+    background-color: #F5F3FF; 
+    color: #6D28D9; 
+}
+
+/* Hover effect: Tetap warna aslinya, cuma geser */
+.podium-link:hover .btn-go { transform: translateX(5px); }
+.podium-link .mission-card:hover { border-color: #6D28D9; }
+
+/* KHUSUS DARK MODE */
+body.dark-mode .it-link .btn-go { background-color: rgba(148, 163, 184, 0.1); color: #CBD5E1; }
+body.dark-mode .podium-link .btn-go { background-color: rgba(109, 40, 217, 0.1); color: #A78BFA; }
+
+/* SEARCH BAR STYLE */
+.search-container {
+    max-width: 1200px;
+    margin: 0 auto 30px auto;
+    padding: 0 20px;
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    padding: 12px 20px;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    transition: 0.3s;
+}
+
+.search-box:focus-within {
+    border-color: var(--primary-blue);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+}
+
+.search-icon { margin-right: 12px; opacity: 0.5; }
+
+#missionSearch {
+    border: none;
+    background: transparent;
+    outline: none;
+    width: 100%;
+    font-size: 15px;
+    color: var(--text-dark);
+    font-weight: 600;
+}
+
+/* Biar rapi di HP */
+@media (max-width: 600px) {
+    .search-container { margin-bottom: 20px; }
+    #missionSearch { font-size: 14px; }
+}
+
+/* NAVBAR LAYOUT RE-STRUCTURE */
+.nav-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Ini yang bikin kiri dan kanan terpisah */
+    padding: 8px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.nav-group-left, .nav-group-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Reset margin-left auto pada toggle & badge karena sudah pakai grouping */
+.theme-toggle, .location-badge {
+    margin-left: 0 !important;
+}
+
+/* Rapihkan Search Bar (Hapus Logo di dalam Search) */
+.nav-search {
+    display: flex;
+    align-items: center;
+    background: var(--bg-color);
+    padding: 6px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    min-width: 180px;
+    transition: 0.3s;
+}
+
+.nav-search:focus-within {
+    border-color: var(--primary-blue);
+    background: var(--card-bg);
+    min-width: 220px;
+}
+
+.nav-search input {
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 13px;
+    width: 100%;
+    margin-left: 8px;
+    color: var(--text-dark);
+}
+
+/* Sembunyikan search di HP kalau terlalu sempit */
+@media (max-width: 900px) {
+    .nav-search {
+        display: none; 
+    }
+}
+
+/* HAMBURGER STYLE */
+.hamburger {
+    display: none; /* Sembunyi di desktop */
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    z-index: 1005 !important; /* Pastikan dia berada di lapisan paling atas */
+    position: relative;
+    padding: 10px; /* Perlebar area klik agar jempol lebih mudah menyentuh */
+}
+#side-menu {
+    z-index: 2000 !important; /* Menu samping harus lebih tinggi lagi */
+}
+
+.hamburger span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--text-dark);
+    border-radius: 2px;
+    transition: 0.3s;
+}
+
+/* RESPONSIVE MOBILE (Max 600px) */
+@media (max-width: 600px) {
+    .hamburger { display: flex; }
+
+    /* Nav Menu jadi Slide-in Menu */
+    .nav-menu {
+        position: fixed;
+        top: 0;
+        left: -100%; /* Sembunyi di kiri luar layar */
+        width: 280px;
+        height: 100vh;
+        background: var(--card-bg);
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        padding: 80px 30px !important;
+        box-shadow: 10px 0 30px rgba(0,0,0,0.1);
+        transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 2000;
+        gap: 20px !important;
+    }
+
+    .nav-menu.active {
+        left: 0; /* Muncul ke dalam layar */
+    }
+
+    .menu-close {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        font-size: 30px;
+        background: none;
+        border: none;
+        color: var(--text-dark);
+        cursor: pointer;
+    }
+
+    .nav-link {
+        font-size: 18px !important;
+        width: 100%;
+    }
+
+@media (max-width: 600px) {
+    /* Pastikan nav-group-right tidak menyembunyikan search */
+    .nav-search {
+        display: flex !important; /* Munculkan kembali */
+        min-width: 100px !important; /* Perkecil ukurannya di HP */
+        max-width: 130px !important;
+        padding: 5px 10px !important;
+        margin-right: 5px !important;
+    }
+
+    .nav-search input {
+        font-size: 11px !important; /* Kecilkan teks inputnya */
+    }
+
+    .search-icon {
+        font-size: 12px;
+    }
+
+    /* Kecilkan jarak antar elemen di kanan agar muat */
+    .nav-group-right {
+        gap: 5px !important;
+    }
+
+    /* Kalau lencana lokasi (Badge) terlalu panjang, kita sembunyikan atau kecilkan */
+    .location-badge {
+        padding: 4px 8px !important;
+        font-size: 10px !important;
+    }
+}
+}
+
+/* ============================================================
+   ARCHITECT MOBILE NAVBAR (HACKING THE STRUCTURE)
+   ============================================================ */
+@media (max-width: 600px) {
+    /* 1. Reset Global Container */
+    .nav-container {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+    }
+
+    /* 2. Group Kiri (Hamburger & Logo) */
+    .nav-group-left {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+    }
+
+    .hamburger {
+        display: flex !important; /* Pastikan muncul */
+        z-index: 1005;
+    }
+
+    /* Tagline baru di sebelah logo AV */
+    .site-tagline {
+        display: inline-block !important;
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text-dark);
+        opacity: 0.8;
+        margin-left: 8px;
+        white-space: nowrap;
+        border-left: 1px solid var(--border-color);
+        padding-left: 8px;
+    }
+
+    .main-logo { height: 26px !important; }
+
+    /* 3. Group Kanan Mobile (Icon Search & Badge) */
+    .nav-group-right-mobile {
+        display: flex !important;
+        align-items: center !important;
+        gap: 10px !important;
+        margin-left: auto !important; /* Dorong ke paling kanan */
+    }
+
+    /* Sembunyikan toggle Dark Mode & Search Desktop asli */
+    .theme-toggle, .nav-search:not(.expanded-mobile) { 
+        display: none !important; 
+    }
+
+    /* Icon Search Mobile */
+    .search-toggle-mobile {
+        order: 1 !important; /* Sekarang dia muncul pertama (di sebelah kiri badge) */
+        background: none !important;
+        border: none !important;
+        font-size: 18px !important;
+        padding: 5px !important;
+    }
+
+    /* Badge Lokasi diperkecil */
+    .location-badge {
+        order: 2 !important; /* Muncul kedua (paling kanan) */
+        padding: 4px 10px !important;
+        font-size: 10px !important;
+        background: var(--primary-blue) !important;
+        color: white !important;
+        border-radius: 100px !important;
+        white-space: nowrap !important;
+        font-weight: 800 !important;
+    }
+
+    /* 4. EXPANDED SEARCH BAR (Mobile Fullscreen) */
+    .nav-search.expanded-mobile {
+        display: flex !important;
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        background: var(--card-bg) !important;
+        z-index: 2100 !important; /* Di atas segalanya */
+        padding: 0 15px !important;
+        align-items: center !important;
+        border-radius: 100px !important;
+    }
+
+    .search-close-mobile {
+        display: block !important;
+        background: none; border: none; font-size: 24px; color: var(--text-dark);
+        margin-right: 15px; cursor: pointer;
+    }
+
+    .nav-search.expanded-mobile input {
+        font-size: 15px !important;
+        flex: 1;
+    }
+
+    /* 5. SIDE MENU & TOMBOL DI BAWAH */
+    .nav-menu {
+        display: flex !important; /* Kita kontrol lewat class .active */
+        justify-content: space-between; /* Pisahkan atas dan bawah */
+        padding: 60px 30px 40px 30px !important; /* Padding bawah extra */
+    }
+
+    /* Daftar menu (atas) */
+    .menu-content-top {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        width: 100%;
+    }
+
+    /* Container Tombol (Bawah) */
+    .menu-content-bottom-mobile {
+        width: 100%;
+        margin-top: auto; /* Dorong ke paling bawah */
+    }
+
+    /* Style Tombol Dark Mode di Side Menu */
+    .theme-toggle-mobile {
+        display: flex !important;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        padding: 15px;
+        background: var(--bg-color);
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        cursor: pointer;
+        color: var(--text-dark);
+        font-size: 20px;
+        font-weight: 700;
+        transition: 0.3s;
+    }
+
+    .theme-toggle-mobile:active { transform: scale(0.98); }
+    
+    #theme-icon { font-size: 25px; }
+}
+
+/* Sembunyikan elemen mobile baru ini di Desktop */
+.site-tagline, 
+.nav-group-right-mobile, 
+.search-close-mobile, 
+.menu-content-bottom-mobile,
+.theme-toggle-mobile { 
+    display: none; 
+}
+
+@media (max-width: 600px) {
+    /* Side Menu (Drawer) */
+    .nav-menu {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        width: 280px;
+        height: 100vh; /* WAJIB: Biar setinggi layar HP */
+        background: var(--card-bg);
+        display: flex !important; /* WAJIB: Biar flexbox jalan */
+        flex-direction: column !important; 
+        justify-content: space-between; /* Ini yang bikin atas dan bawah terpisah */
+        padding: 80px 25px 30px 25px !important; /* Padding bawah 30px agar tidak nempel lantai */
+        transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 2000;
+        box-sizing: border-box; /* Biar padding tidak nambah ukuran */
+    }
+
+    /* Bagian Bawah Menu (Tempat Tombol) */
+    .menu-content-bottom-mobile {
+        display: block !important;
+        width: 100%;
+        margin-top: auto; /* Dorong ke paling bawah */
+    }
+
+    .theme-toggle-mobile {
+        display: flex !important;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        padding: 14px;
+        background: var(--soft-blue); /* Pakai warna soft blue kamu */
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        color: var(--text-dark);
+        font-weight: 700;
+        font-size: 14px;
+        cursor: pointer;
+    }
+}
+/* ============================================================
+   FIX NAVBAR DESKTOP (LOGO & MENU LEFT | SEARCH & MODE RIGHT)
+   ============================================================ */
+@media (min-width: 601px) {
+    /* 1. Sembunyikan elemen mobile */
+    .hamburger, .menu-close, .search-toggle-mobile, .search-close-mobile, .menu-content-bottom-mobile, .site-tagline {
+        display: none !important;
+    }
+
+    /* 2. Container Utama */
+    .nav-container {
+        display: flex !important;
+        justify-content: space-between !important; /* Paksa grup kiri dan kanan ke ujung */
+        align-items: center !important;
+        padding: 8px 24px !important;
+    }
+
+    /* 3. GROUP KIRI (LOGO + MENU) */
+    .nav-group-left {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-start !important; /* Paksa rata kiri */
+        flex: 1 !important; /* Ambil ruang agar bisa dorong grup kanan */
+        gap: 25px !important; /* Jarak antara logo dan menu navigasi */
+    }
+
+    .nav-menu {
+        position: static !important;
+        display: flex !important;
+        flex-direction: row !important;
+        background: none !important;
+        width: auto !important;
+        height: auto !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+    }
+
+    .menu-content-top {
+        display: flex !important;
+        gap: 15px !important;
+    }
+
+    .nav-link {
+        padding: 8px 12px !important;
+        white-space: nowrap !important;
+    }
+
+    /* 4. GROUP KANAN (SEARCH + MODE) */
+    .nav-group-right {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-end !important; /* Paksa rata kanan */
+        flex: 0 0 auto !important; /* Jangan biarkan grup ini melebar ke kiri */
+        gap: 15px !important;
+    }
+
+    /* Search Bar Compact di Kanan */
+    .nav-search {
+        display: flex !important;
+        align-items: center !important;
+        background: var(--bg-color) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 12px !important;
+        padding: 6px 12px !important;
+        width: 200px !important;
+        position: static !important;
+        margin: 0 !important;
+    }
+
+    .nav-search input {
+        width: 100% !important;
+        font-size: 13px !important;
+        background: transparent !important;
+        border: none !important;
+        outline: none !important;
+        color: var(--text-dark) !important;
+    }
+
+    /* Toggle & Badge */
+    .theme-toggle {
+        display: flex !important;
+        margin: 0 !important;
+    }
+
+    .location-badge {
+        flex-shrink: 0 !important;
+        white-space: nowrap !important;
+    }
+}
+
+.search-dropdown-global {
+    position: absolute;
+    top: 85px; /* Sesuaikan dengan tinggi navbar */
+    right: 24px; /* Rata kanan di desktop */
+    width: 350px; /* Lebar dropdown di desktop */
+    background: var(--card-bg);
+    border-radius: 16px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    border: 1px solid var(--border-color);
+    padding: 12px 18px;
+    
+    /* Efek Sembunyi */
+    transform: translateY(-15px);
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1100;
+}
+
+/* Saat Aktif */
+.search-dropdown-global.active {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+}
+
+.search-inner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.search-inner input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 15px;
+    color: var(--text-dark);
+    font-weight: 600;
+}
+
+/* Tombol Trigger (Icon Kaca Pembesar) */
+.search-toggle-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+    padding: 8px;
+    border-radius: 10px;
+}
+
+.search-toggle-btn:hover {
+    background: var(--soft-blue);
+}
+
+.search-wrapper-desktop, 
+.mobile-search-trigger, 
+.search-dropdown-mobile {
+    display: none !important;
+}
+
+
+/* ============================================================
+   SEARCH DROPDOWN MOBILE (DI BAWAH NAVBAR)
+   ============================================================ */
+@media (max-width: 600px) {
+    /* Sembunyikan search lama jika masih ada */
+    .nav-search { display: none !important; }
+
+    .search-dropdown-mobile {
+        display: block; /* Munculkan hanya di mobile */
+        position: absolute;
+        top: 80px; /* Atur supaya pas di bawah navbar putih kamu */
+        left: 20px;
+        right: 20px;
+        background: var(--card-bg);
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        border: 1px solid var(--border-color);
+        padding: 12px 15px;
+        
+        /* Efek Sembunyi Awal */
+        transform: translateY(-10px);
+        opacity: 0;
+        visibility: hidden;
+        transition: 0.3s ease;
+        z-index: 1000;
+    }
+
+    /* Saat Class .active dipanggil lewat JS */
+    .search-dropdown-mobile.active {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .search-inner {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .search-inner input {
+        flex: 1;
+        border: none;
+        background: transparent;
+        outline: none;
+        font-size: 14px;
+        color: var(--text-dark);
+        font-weight: 600;
+    }
+
+    .search-close-btn {
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: var(--text-gray);
+    }
+}
+/* ============================================================
+   SEARCH DESKTOP (EXPAND KE KIRI)
+   ============================================================ */
+@media (min-width: 601px) {
+    .search-wrapper-desktop {
+        display: flex !important; /* Munculkan hanya di desktop */
+        align-items: center;
+        background: var(--bg-color);
+        border: 1px solid var(--border-color);
+        border-radius: 100px;
+        width: 40px; 
+        overflow: hidden;
+        transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+    }
+
+    /* Saat Class .active dipanggil lewat JS */
+    .search-wrapper-desktop.active {
+        width: 250px !important;
+        padding-left: 15px;
+    }
+
+    .search-wrapper-desktop input {
+        width: 0;
+        opacity: 0;
+        border: none;
+        background: transparent;
+        outline: none;
+        transition: 0.3s;
+        font-size: 14px;
+    }
+
+    .search-wrapper-desktop.active input {
+        width: 100%;
+        opacity: 1;
+    }
+
+    .search-toggle-btn {
+        background: none; border: none; font-size: 18px; cursor: pointer; flex-shrink: 0; padding: 6px;
+    }
+
+
+    /* Hilangkan gaya dropdown global yang tadi di Desktop */
+    .search-dropdown-global { display: none !important; }
+}
+
+/* Tetap gunakan dropdown untuk Mobile (Max 600px) */
+@media (max-width: 600px) {
+    .search-wrapper-desktop { display: none; }
+    /* ... (kode dropdown mobile kamu yang sudah jalan tetap di sini) ... */
+}
+
+/* ============================================================
+   TAMPILAN MOBILE (Max 600px)
+   ============================================================ */
+@media (max-width: 600px) {
+    .mobile-search-trigger {
+        display: block !important; /* Munculkan icon kaca pembesar di mobile */
+        background: none; border: none; font-size: 20px;
+    }
+
+    .search-dropdown-mobile {
+        display: block !important; 
+        position: absolute;
+        top: 75px; left: 15px; right: 15px;
+        background: var(--card-bg);
+        border-radius: 15px;
+        padding: 12px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        z-index: 1000;
+        transform: translateY(-10px);
+        opacity: 0;
+        visibility: hidden;
+        transition: 0.3s ease;
+    }
+
+    .search-dropdown-mobile.active {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+    }
+}
+
+#search-results-list {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-top: 10px;
+}
+
+.search-result-item {
+    display: block;
+    padding: 10px;
+    border-bottom: 1px solid var(--border-color);
+    text-decoration: none;
+    color: var(--text-dark);
+}
+
+.search-result-item:hover { background: var(--soft-blue); }
+
+.res-title { font-weight: bold; font-size: 14px; color: var(--primary-blue); }
+.res-snippet { font-size: 12px; color: #666; }
+
+/* ==========================================
+   DESIGN HALAMAN ARTIKEL (DI ROOT STYLE.CSS)
+   ========================================== */
+.article-master-container {
+    padding: 15px 10px !important;
+}
+
+.article-content-card {
+    max-width: 800px;
+    margin: 0 auto;
+    background: var(--card-bg);
+    padding: 50px;
+    border-radius: 28px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 25px rgba(0,0,0,0.03);
+}
+
+.article-tags-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.badge-pill {
+    font-size: 11px;
+    font-weight: 800;
+    padding: 6px 16px;
+    border-radius: 50px;
+    color: #ffffff !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: inline-block;
+}
+
+.article-main-title {
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--text-dark);
+    margin: 0;
+    line-height: 1.1;
+    letter-spacing: -1.5px;
+}
+
+.article-title-line {
+    width: 60px;
+    height: 6px;
+    background: var(--primary-blue);
+    margin-top: 30px;
+    border-radius: 10px;
+}
+
+.article-main-body {
+    margin-top: 50px;
+    font-size: 1.15rem;
+    line-height: 1.9;
+    color: var(--text-gray);
+}
+
+.article-main-body h2 {
+    margin-top: 50px;
+    font-size: 1.8rem;
+    color: var(--text-dark);
+    border-left: 6px solid var(--primary-blue);
+    padding-left: 20px;
+    font-weight: 700;
+}
+
+.article-main-body blockquote {
+    background: var(--soft-blue);
+    border-left: 6px solid var(--primary-blue);
+    padding: 30px;
+    margin: 40px 0;
+    border-radius: 0 20px 20px 0;
+    font-style: italic;
+    color: var(--text-dark);
+}
+
+.article-bottom-footer {
+    margin-top: 60px;
+    padding-top: 30px;
+    border-top: 1px solid var(--border-color);
+}
+
+.btn-back {
+    color: var(--primary-blue);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+@media (max-width: 600px) {
+    .article-master-container { padding: 20px 10px; }
+    .article-content-card { padding: 30px 20px; border: none; background: transparent; box-shadow: none; }
+    .article-main-title { font-size: 2.2rem; }
+}
+
+/* --- STYLING ARTIKEL PREMIUM --- */
+.article-master-container {
+    padding: 60px 20px;
+    background: var(--bg-color);
+    min-height: 100vh;
+    display: block !important; /* Memastikan container muncul */
+}
+
+.article-content-card {
+    padding: 25px 15px !important;
+        border: none !important;
+        background: transparent !important; /* Biar nyatu sama background body */
+        box-shadow: none !important;
+        width: 100% !important;
+}
+
+.article-tags-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.badge-pill {
+    font-size: 11px;
+    font-weight: 800;
+    padding: 6px 16px;
+    border-radius: 50px;
+    color: #ffffff !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: inline-block;
+}
+
+.article-main-title {
+    font-size: 1.8rem !important; 
+        line-height: 1.2 !important;
+}
+
+.article-title-line {
+    width: 60px;
+    height: 6px;
+    background: var(--primary-blue);
+    margin-top: 25px;
+    border-radius: 10px;
+}
+
+.article-main-body {
+font-size: 1.05rem !important;
+        margin-top: 30px !important;
+}
+
+.article-main-body h2 {
+    margin-top: 45px;
+    font-size: 1.8rem;
+    color: var(--text-dark);
+    font-weight: 700;
+    border-left: 6px solid var(--primary-blue);
+    padding-left: 20px;
+}
+
+.article-main-body p {
+    margin-bottom: 25px;
+}
+
+.article-bottom-footer {
+    margin-top: 60px;
+    padding-top: 30px;
+    border-top: 1px solid var(--border-color);
+}
+
+.btn-back {
+    color: var(--primary-blue);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+/* Responsif HP */
+@media (max-width: 600px) {
+    .article-master-container { padding: 20px 10px; }
+    .article-content-card {
+        padding: 30px 15px;
+        border: none;
+        box-shadow: none;
+        background: transparent !important;
+    }
+    .article-main-title { font-size: 2.2rem !important; }
+}

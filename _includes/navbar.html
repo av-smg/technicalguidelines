@@ -4,10 +4,11 @@
             <button class="hamburger" id="menu-open-btn">
                 <span></span><span></span><span></span>
             </button>
-            <a href="../index.html" class="logo-link">
+            <a href="{{ '/' | relative_url }}" class="logo-link">
                 <img src="{{ '/assets/image_94faf8.png' | relative_url }}" alt="Logo" class="main-logo">
                 <span class="site-tagline">Technical Guidelines</span>
             </a>
+            
             <nav class="nav-menu" id="side-menu-drawer">
                 <button class="menu-close" id="menu-close-btn">&times;</button>
                 <div class="menu-content-top">
@@ -24,57 +25,55 @@
             </nav>
         </div>
 
-   <div class="nav-group-right">
-    <div class="search-wrapper">
-        <div class="search-content">
-            <div class="search-header">
-                <input type="text" id="search-input" placeholder="Ketik kata kunci pencarian..." autocomplete="off">
-                <button class="search-close">&times;</button>
+        <div class="nav-group-right">
+            <div class="search-wrapper" id="search-wrapper-desktop">
+                <div class="search-content">
+                    <div class="search-header">
+                        <input type="text" id="missionSearch" placeholder="Cari panduan..." autocomplete="off" onkeyup="filterMissions()">
+                        <button class="search-close" id="search-close-desktop">&times;</button>
+                    </div>
+                </div>
             </div>
-            <ul id="results-container"></ul>
+
+            <button class="mobile-search-trigger" id="search-trigger-global">🔍</button>
+
+            <button class="theme-toggle" onclick="toggleTheme()">
+                <span class="theme-icon-status">🌙</span>
+            </button>
+
+            {% if page.location %}
+            <div class="location-badge">{{ page.location }}</div>
+            {% endif %}
         </div>
-    </div
-
-    <button class="mobile-search-trigger" id="mobile-search-trigger-btn">🔍</button>
-
-    <button class="theme-toggle" onclick="toggleTheme()">
-        <span class="theme-icon-status">🌙</span>
-    </button>
-
-    {% if page.location %}<div class="location-badge">{{ page.location }}</div>{% endif %}
-</div>
-
-<div class="search-dropdown-mobile" id="search-mobile-dropdown">
-    <div class="search-inner">
-        <span>🔍</span>
-        <input type="text" id="missionSearchMobile" placeholder="Cari..." onkeyup="filterMissionsMobile()" onkeypress="handleSearchEnter(event)">
-        <div id="search-results-list"></div>
-        <button class="search-close-btn" id="search-close-mobile">&times;</button>
     </div>
-</div>
+
+    <div class="search-dropdown-mobile" id="search-mobile-dropdown">
+        <div class="search-inner">
+            <span>🔍</span>
+            <input type="text" id="missionSearchMobile" placeholder="Cari..." onkeyup="filterMissionsMobile()">
+            <button class="search-close-btn" id="search-close-mobile">&times;</button>
+        </div>
+        <div id="search-results-list"></div>
+    </div>
 </header>
 
 <script>
-   document.addEventListener('DOMContentLoaded', function() {
-    
-    // === 1. PENGATURAN DARK MODE (SINKRON) ===
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. THEME MANAGEMENT
     const body = document.body;
     const themeIcons = document.querySelectorAll('.theme-icon-status');
 
-    // Fungsi untuk memperbarui semua icon bulan/matahari
     function updateIcons(isDark) {
         themeIcons.forEach(icon => {
             icon.innerText = isDark ? '☀️' : '🌙';
         });
     }
 
-    // Cek preferensi tersimpan di browser
     if (localStorage.getItem('theme') === 'dark') {
         body.classList.add('dark-mode');
         updateIcons(true);
     }
 
-    // Fungsi global toggleTheme (bisa dipanggil dari atribut onclick di HTML)
     window.toggleTheme = function() {
         body.classList.toggle('dark-mode');
         const isDarkNow = body.classList.contains('dark-mode');
@@ -82,77 +81,70 @@
         updateIcons(isDarkNow);
     };
 
-    // === 2. LOGIKA HAMBURGER MENU (MOBILE) ===
+    // 2. HAMBURGER MENU
     const menuDrawer = document.getElementById('side-menu-drawer');
     const openBtn = document.getElementById('menu-open-btn');
     const closeBtn = document.getElementById('menu-close-btn');
 
-    if (openBtn && menuDrawer) {
-        openBtn.addEventListener('click', () => {
-            menuDrawer.classList.add('active');
-        });
-    }
+    if (openBtn) openBtn.addEventListener('click', () => menuDrawer.classList.add('active'));
+    if (closeBtn) closeBtn.addEventListener('click', () => menuDrawer.classList.remove('active'));
 
-    if (closeBtn && menuDrawer) {
-        closeBtn.addEventListener('click', () => {
-            menuDrawer.classList.remove('active');
-        });
-    }
-
-    // === 3. LOGIKA SEARCH (DESKTOP EXPAND & MOBILE DROPDOWN) ===
-    const searchWrapper = document.getElementById('search-wrapper'); // Wrapper Desktop
-    const searchDropdown = document.getElementById('search-dropdown-bar'); // Wrapper Mobile
+    // 3. SEARCH LOGIC (DESKTOP VS MOBILE)
     const searchBtn = document.getElementById('search-trigger-global');
-    const searchInput = document.getElementById('missionSearch');
+    const searchWrapper = document.getElementById('search-wrapper-desktop');
+    const searchDropdown = document.getElementById('search-mobile-dropdown');
+    const inputDesktop = document.getElementById('missionSearch');
+    const inputMobile = document.getElementById('missionSearchMobile');
 
     if (searchBtn) {
         searchBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); // Mencegah window.onclick langsung menutup search
-            
-            // Deteksi apakah sedang di mobile atau desktop
+            e.stopPropagation();
             if (window.innerWidth > 600) {
-                // Mode Desktop: Expand Horizontal
-                if (searchWrapper) searchWrapper.classList.toggle('active');
+                // Desktop: Expand Horizontal
+                searchWrapper.classList.toggle('active');
+                if (searchWrapper.classList.contains('active')) inputDesktop.focus();
             } else {
-                // Mode Mobile: Dropdown Bawah
-                if (searchDropdown) searchDropdown.classList.toggle('active');
+                // Mobile: Dropdown
+                searchDropdown.classList.toggle('active');
+                if (searchDropdown.classList.contains('active')) inputMobile.focus();
             }
-            
-            // Fokus otomatis ke kotak ketik
-            if (searchInput) searchInput.focus();
         });
     }
 
-    // === 4. SISTEM TUTUP OTOMATIS (CLICK OUTSIDE) ===
-    window.addEventListener('click', (event) => {
-        // Tutup Search jika klik di luar area search
-        if (searchWrapper && !searchWrapper.contains(event.target)) {
+    // Tombol Close
+    document.getElementById('search-close-desktop')?.addEventListener('click', () => searchWrapper.classList.remove('active'));
+    document.getElementById('search-close-mobile')?.addEventListener('click', () => searchDropdown.classList.remove('active'));
+
+    // Click Outside to Close
+    window.addEventListener('click', (e) => {
+        if (searchWrapper && !searchWrapper.contains(e.target) && e.target !== searchBtn) {
             searchWrapper.classList.remove('active');
         }
-        if (searchDropdown && !searchDropdown.contains(event.target) && event.target !== searchBtn) {
+        if (searchDropdown && !searchDropdown.contains(e.target) && e.target !== searchBtn) {
             searchDropdown.classList.remove('active');
         }
-        
-        // Tutup Hamburger Menu jika klik di luar drawer
-        if (menuDrawer && !menuDrawer.contains(event.target) && !openBtn.contains(event.target)) {
+        if (menuDrawer && !menuDrawer.contains(e.target) && !openBtn.contains(e.target)) {
             menuDrawer.classList.remove('active');
         }
     });
 });
 
-// === 5. FUNGSI FILTER SEARCH (LIVE FILTER) ===
+// 4. FILTER FUNCTIONS
 function filterMissions() {
     let input = document.getElementById('missionSearch').value.toLowerCase();
-    // Mencari kartu di halaman utama atau halaman lokasi
     let cards = document.querySelectorAll('.location-main-card-link, .card-link');
-    
     cards.forEach(card => {
-        let title = card.querySelector('h2, h3');
-        let desc = card.querySelector('p');
-        let text = (title ? title.innerText : "") + (desc ? desc.innerText : "");
-        
-        // Sembunyikan kartu yang tidak cocok dengan kata kunci
-        card.style.display = text.toLowerCase().includes(input) ? "" : "none";
+        let text = card.innerText.toLowerCase();
+        card.style.display = text.includes(input) ? "" : "none";
+    });
+}
+
+function filterMissionsMobile() {
+    let input = document.getElementById('missionSearchMobile').value.toLowerCase();
+    let cards = document.querySelectorAll('.location-main-card-link, .card-link');
+    cards.forEach(card => {
+        let text = card.innerText.toLowerCase();
+        card.style.display = text.includes(input) ? "" : "none";
     });
 }
 </script>

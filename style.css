@@ -214,6 +214,54 @@ body.dark-mode .hero h1 span {
 .card-link.inv-link:hover .btn-go { background: #2C3E50; color: white; }
 
 @media (max-width: 600px) {
+    /* Container utama dikurangi paddingnya agar kartu bisa lebih lebar */
+    .content-container {
+        padding: 10px;
+    }
+
+    /* KARTU UTAMA INDEX (JW-08 & JA-01) */
+    .location-main-card {
+        padding: 20px; /* Kurangi dari 40px ke 20px */
+        border-radius: 20px; /* Sudut lebih kecil agar pas di HP */
+        flex-direction: column; /* Teks dan Ikon tidak lagi berjejer samping */
+        align-items: flex-start;
+        min-height: auto; /* Biar tingginya mengikuti isi */
+        margin-bottom: 15px;
+    }
+
+    /* Ukuran Judul di HP */
+    .location-main-card h2 {
+        font-size: 20px; /* Kecilkan sedikit agar tidak makan tempat */
+        margin-bottom: 5px;
+    }
+
+    /* Ukuran Deskripsi di HP */
+    .location-main-card p {
+        font-size: 13px;
+        line-height: 1.4;
+        margin-bottom: 15px;
+        max-width: 100%; /* Biar teks bisa pakai lebar penuh */
+    }
+
+    /* Ilustrasi Emoji dikecilkan dan ditaruh di pojok */
+    .card-illustration {
+        font-size: 35px; /* Dari 80px ke 35px */
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        opacity: 0.2;
+    }
+
+    /* Tombol Enter dibuat lebih ramping */
+    .btn-enter {
+        width: 100%; /* Di HP tombol jadi lebar penuh biar gampang di-tap jempol */
+        text-align: center;
+        padding: 10px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 600px) {
     /* Navbar lebih ramping */
     .nav-container {
         padding: 8px 10px;

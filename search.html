@@ -17,6 +17,54 @@ title: "Hasil Pencarian"
         <div class="search-loading">Mencari informasi...</div>
     </div>
 </div>
+
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const params = new URLSearchParams(window.location.search);
+    const query = params.get('q');
+    const resultsContainer = document.getElementById('search-results-page-list');
+    const queryDisplay = document.getElementById('search-query-text');
+
+    if (query) {
+        queryDisplay.innerText = query;
+
+        // Ambil data dari search.json yang sudah kamu buat
+        fetch("{{ '/search.json' | relative_url }}")
+            .then(response => response.json())
+            .then(data => {
+                // Cari kata kunci di judul atau isi konten
+                const results = data.filter(item => {
+                    return (item.title && item.title.toLowerCase().includes(query.toLowerCase())) || 
+                           (item.content && item.content.toLowerCase().includes(query.toLowerCase()));
+                });
+                displayResults(results);
+            })
+            .catch(err => {
+                console.error("Error loading search index:", err);
+                resultsContainer.innerHTML = "<div class='search-loading'>Gagal memuat indeks pencarian.</div>";
+            });
+    }
+
+    function displayResults(results) {
+        if (results.length === 0) {
+            resultsContainer.innerHTML = "<div class='search-loading'>Tidak ditemukan hasil yang cocok.</div>";
+            return;
+        }
+
+        resultsContainer.innerHTML = results.map(item => `
+            <a href="${item.url}" class="search-page-item">
+                <div class="search-item-header">
+                    <span class="badge-loc" style="background: var(--primary-blue); color: white;">${item.location || 'Technical'}</span>
+                    <span class="badge-cat" style="background: var(--primary-orange); color: white;">${item.category || 'Guide'}</span>
+                </div>
+                <div class="res-page-title">${item.title}</div>
+                <div class="res-page-snippet">${item.content.substring(0, 180)}...</div>
+                <div class="search-item-footer">Baca Selengkapnya →</div>
+            </a>
+        `).join('');
+    }
+});
+</script>
     <script>
 document.addEventListener('DOMContentLoaded', function() {
     const params = new URLSearchParams(window.location.search);

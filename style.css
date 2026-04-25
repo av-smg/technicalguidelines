@@ -238,18 +238,59 @@ body.dark-mode .hero h1 span {
 }
 
 @media (max-width: 600px) {
-    .nav-menu {
-        flex-direction: column; /* Menu jadi berurutan ke bawah */
-        align-items: flex-start;
-        width: 100%;
-        display: none; /* Sembunyikan dulu (Nanti bisa pakai hamburger menu) */
+    /* Navbar tetap satu baris tapi bisa di-swipe */
+    .nav-container {
+        padding: 8px 12px;
+        justify-content: flex-start; /* Elemen mulai dari kiri */
+        overflow: hidden; /* Biar nggak meluber keluar container utama */
     }
-    
-    /* Atau kalau mau tetep kelihatan tapi rapi: */
+
     .nav-menu {
         display: flex;
-        flex-wrap: wrap; /* Biar kalau kepanjangan dia turun ke bawah, nggak meluber ke samping */
-        gap: 8px;
+        flex-direction: row; /* PAKSA TETAP KE SAMPING */
+        gap: 5px;
+        overflow-x: auto; /* Aktifkan scroll horizontal */
+        white-space: nowrap; /* Jangan biarkan teks turun ke bawah */
+        flex-grow: 1; /* Ambil sisa ruang di tengah */
+        
+        /* Sembunyikan scrollbar agar rapi */
+        scrollbar-width: none; 
+        -ms-overflow-style: none;
+        -webkit-overflow-scrolling: touch; /* Biar scroll-nya halus di iPhone */
+    }
+
+    .nav-menu::-webkit-scrollbar {
+        display: none; /* Sembunyikan scrollbar di Chrome/Safari */
+    }
+
+    .nav-link {
+        font-size: 13px;
+        padding: 6px 10px;
+    }
+
+    /* Logo dikecilkan dikit biar nggak menuh-menuhin */
+    .main-logo {
+        height: 30px;
+        margin-right: 10px;
+    }
+
+    /* Dropdown di HP kita bikin melayang lagi tapi simpel */
+    .dropdown-content {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        min-width: 120px;
+        background: var(--card-bg);
+        border: 1px solid var(--border-dark);
+        z-index: 1002;
+    }
+
+    /* Tombol toggle & badge tetep mepet kanan */
+    .theme-toggle {
+        margin-left: 5px;
+        width: 35px;
+        height: 35px;
+        flex-shrink: 0; /* Biar nggak gepeng saat menu panjang */
     }
 }
 

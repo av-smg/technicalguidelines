@@ -21,18 +21,18 @@
         </div>
 
         <div class="nav-group-right">
-        <div class="search-wrapper" id="search-wrapper-desktop">
-            <div class="search-content">
-                <input type="text" id="missionSearch" 
-                       placeholder="Cari..." 
-                       autocomplete="off" 
-                       onkeyup="filterMissions()"
-                       onkeypress="handleSearchEnter(event)"> <button class="search-close" id="search-close-desktop">&times;</button>
+            <div class="search-wrapper" id="search-wrapper-desktop">
+                <div class="search-content">
+                    <input type="text" id="missionSearch" 
+                           placeholder="Cari..." 
+                           autocomplete="off" 
+                           onkeyup="filterMissions()"
+                           onkeypress="handleSearchEnter(event)">
+                    <button class="search-close" id="search-close-desktop">&times;</button>
+                </div>
             </div>
-        </div>
 
-        <button class="mobile-search-trigger" id="search-trigger-global">🔍</button>
-        </div>
+            <button class="mobile-search-trigger" id="search-trigger-global">🔍</button>
 
             <button class="theme-toggle" onclick="toggleTheme()">
                 <span class="theme-icon-status">🌙</span>
@@ -50,10 +50,83 @@
             <input type="text" id="missionSearchMobile" 
                    placeholder="Cari..." 
                    onkeyup="filterMissionsMobile()"
-                   onkeypress="handleSearchEnter(event)"> <button class="search-close-btn" id="search-close-mobile">&times;</button>
+                   onkeypress="handleSearchEnter(event)">
+            <button class="search-close-btn" id="search-close-mobile">&times;</button>
         </div>
     </div>
 </header>
+
+<style>
+/* CSS UNTUK SEARCH & ANIMASI */
+#search-trigger-global {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+}
+
+#search-wrapper-desktop {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    right: 130px; /* Jarak dari kanan navbar */
+    top: 50%;
+    transform: translateY(-50%) scaleX(0);
+    transform-origin: right;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    opacity: 0;
+    pointer-events: none;
+}
+
+#search-wrapper-desktop.active {
+    transform: translateY(-50%) scaleX(1);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+#search-wrapper-desktop input {
+    border: 2px solid var(--primary-orange);
+    padding: 8px 15px;
+    border-radius: 50px;
+    background: var(--card-bg);
+    color: var(--text-dark);
+    outline: none;
+    width: 200px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+#search-mobile-dropdown {
+    position: absolute;
+    top: -100px;
+    left: 0;
+    width: 100%;
+    background: var(--nav-bg);
+    padding: 15px;
+    z-index: 1000;
+    transition: all 0.4s ease-in-out;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    opacity: 0;
+    visibility: hidden;
+}
+
+#search-mobile-dropdown.active {
+    top: 70px; /* Muncul tepat di bawah navbar */
+    opacity: 1;
+    visibility: visible;
+}
+
+#search-mobile-dropdown .search-inner {
+    display: flex;
+    align-items: center;
+    border: 2px solid var(--primary-blue);
+    border-radius: 12px;
+    padding: 5px 15px;
+    background: var(--card-bg);
+}
+</style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -98,11 +171,9 @@ document.addEventListener('DOMContentLoaded', function() {
         searchBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             if (window.innerWidth > 600) {
-                // Desktop: Expand Horizontal
                 searchWrapper.classList.toggle('active');
                 if (searchWrapper.classList.contains('active')) inputDesktop.focus();
             } else {
-                // Mobile: Dropdown
                 searchDropdown.classList.toggle('active');
                 if (searchDropdown.classList.contains('active')) inputMobile.focus();
             }
@@ -120,9 +191,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         if (searchDropdown && !searchDropdown.contains(e.target) && e.target !== searchBtn) {
             searchDropdown.classList.remove('active');
-        }
-        if (menuDrawer && !menuDrawer.contains(e.target) && !openBtn.contains(e.target)) {
-            menuDrawer.classList.remove('active');
         }
     });
 });
@@ -146,108 +214,12 @@ function filterMissionsMobile() {
     });
 }
 
-                    // 5.Fungsi untuk handle tombol ENTER
 function handleSearchEnter(event) {
     if (event.key === "Enter") {
-        const query = event.target.value.toLowerCase();
-        // Cari kartu pertama yang tidak tersembunyi (hasil filter teratas)
         const firstMatch = document.querySelector('.location-main-card-link:not([style*="display: none"]), .card-link:not([style*="display: none"])');
-        
         if (firstMatch) {
-            window.location.href = firstMatch.href; // Buka link kartu tersebut
+            window.location.href = firstMatch.href;
         }
     }
 }
 </script>
-<style>/* Pastikan tombol kaca pembesar terlihat */
-#search-trigger-global {
-    background: none;
-    border: none;
-    font-size: 1.2rem;
-    cursor: pointer;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Sembunyikan textbox desktop sampai class .active muncul */
-#search-wrapper-desktop {
-    display: none; 
-    opacity: 0;
-    transition: all 0.3s ease;
-}
-
-#search-wrapper-desktop.active {
-    display: block;
-    opacity: 1;
-}
-
-/* Untuk Mobile */
-#search-mobile-dropdown {
-    display: none;
-}
-
-#search-mobile-dropdown.active {
-    display: block;
-}
-
-    /* --- Animasi & Estetika Search Desktop --- */
-#search-wrapper-desktop {
-    display: flex;
-    align-items: center;
-    position: absolute;
-    right: 120px; /* Sesuaikan posisi agar tidak menumpuk */
-    top: 50%;
-    transform: translateY(-50%) scaleX(0); /* Sembunyi dengan skala 0 */
-    transform-origin: right;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    opacity: 0;
-    pointer-events: none;
-}
-
-#search-wrapper-desktop.active {
-    transform: translateY(-50%) scaleX(1); /* Muncul dengan animasi */
-    opacity: 1;
-    pointer-events: auto;
-}
-
-#search-wrapper-desktop input {
-    border: 2px solid var(--primary-orange); /* Gunakan variabel orange kamu */
-    padding: 8px 15px;
-    border-radius: 50px;
-    background: var(--card-bg);
-    color: var(--text-dark);
-    outline: none;
-    width: 250px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-}
-
-/* --- Animasi Search Mobile Dropdown --- */
-#search-mobile-dropdown {
-    position: absolute;
-    top: -100px; /* Mulai dari atas layar */
-    left: 0;
-    width: 100%;
-    background: var(--nav-bg);
-    padding: 15px;
-    z-index: 1000;
-    transition: all 0.4s ease-in-out;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    opacity: 0;
-}
-
-#search-mobile-dropdown.active {
-    top: 60px; /* Turun ke bawah navbar */
-    opacity: 1;
-}
-
-#search-mobile-dropdown .search-inner {
-    display: flex;
-    align-items: center;
-    border: 2px solid var(--primary-blue);
-    border-radius: 12px;
-    padding: 5px 15px;
-    background: var(--card-bg);
-}
-</style>

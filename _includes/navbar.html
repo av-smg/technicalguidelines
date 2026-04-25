@@ -222,8 +222,13 @@ function filterMissionsMobile() {
 
 function handleSearchEnter(event) {
     if (event.key === "Enter") {
-        const firstMatch = document.querySelector('.location-main-card-link:not([style*="display: none"]), .card-link:not([style*="display: none"])');
-        if (firstMatch) window.location.href = firstMatch.href;
+        const query = event.target.value.trim(); // Ambil teks pencarian
+        
+        if (query.length > 0) {
+            // REDIRECT ke halaman search.html dengan membawa parameter q
+            // relative_url di Jekyll biasanya mengarah ke root, pastikan jalurnya benar
+            window.location.href = "{{ '/search.html' | relative_url }}?q=" + encodeURIComponent(query);
+        }
     }
 }
 </script>

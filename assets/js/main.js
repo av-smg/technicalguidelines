@@ -163,7 +163,7 @@ fetch(jsonPath)
                             <a href="/" style="color: var(--primary-blue); text-decoration: underline;">Kembali ke Beranda</a>
                         </div>`;
                 }
-                })
+                }
                 .catch(err => {
                     console.error("Error loading search index:", err);
                     resultsContainer.innerHTML = "<p>Gagal memuat index data. Silakan coba lagi.</p>";

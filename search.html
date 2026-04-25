@@ -17,6 +17,52 @@ title: "Hasil Pencarian"
         <div class="search-loading">Mencari informasi...</div>
     </div>
 </div>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const params = new URLSearchParams(window.location.search);
+    const query = params.get('q');
+    const queryDisplay = document.getElementById('search-query-text');
+    const resultsContainer = document.getElementById('search-results-page-list');
+
+    if (query) {
+        queryDisplay.innerText = query;
+
+        // Ambil data dari search.json (File yang di-generate Jekyll)
+        fetch("{{ '/search.json' | relative_url }}")
+            .then(response => response.json())
+            .then(data => {
+                const results = data.filter(item => {
+                    return item.title.toLowerCase().includes(query.toLowerCase()) || 
+                           item.content.toLowerCase().includes(query.toLowerCase());
+                });
+
+                displayResults(results);
+            })
+            .catch(error => {
+                console.error("Gagal memuat search.json:", error);
+                resultsContainer.innerHTML = '<div class="search-loading">Gagal memuat data pencarian.</div>';
+            });
+    }
+
+    function displayResults(results) {
+        if (results.length === 0) {
+            resultsContainer.innerHTML = '<div class="search-loading">Tidak ada hasil yang ditemukan.</div>';
+            return;
+        }
+
+        resultsContainer.innerHTML = results.map(item => `
+            <a href="${item.url}" class="search-page-item">
+                <div class="search-item-header">
+                    <span class="badge-loc" style="background: var(--soft-blue); color: var(--primary-blue);">${item.location || 'Umum'}</span>
+                </div>
+                <div class="res-page-title">${item.title}</div>
+                <div class="res-page-snippet">${item.content.substring(0, 150)}...</div>
+                <div class="search-item-footer">Baca Selengkapnya →</div>
+            </a>
+        `).join('');
+    }
+});
+</script>
 </body>
 <style>
     .search-page-container { padding: 40px 20px; max-width: 900px; margin: 0 auto; }

@@ -214,6 +214,46 @@ body.dark-mode .hero h1 span {
 .card-link.inv-link:hover .btn-go { background: #2C3E50; color: white; }
 
 @media (max-width: 600px) {
+    .nav-menu {
+        flex-direction: column; /* Menu jadi berurutan ke bawah */
+        align-items: flex-start;
+        width: 100%;
+        display: none; /* Sembunyikan dulu (Nanti bisa pakai hamburger menu) */
+    }
+    
+    /* Atau kalau mau tetep kelihatan tapi rapi: */
+    .nav-menu {
+        display: flex;
+        flex-wrap: wrap; /* Biar kalau kepanjangan dia turun ke bawah, nggak meluber ke samping */
+        gap: 8px;
+    }
+}
+
+/* Update di style.css */
+@media (max-width: 600px) {
+    /* Pastikan dropdown muncul di bawah menu, bukan melayang menutupi teks */
+    .dropdown-content {
+        position: static; /* Biar dia mendorong menu di bawahnya ke bawah */
+        display: none; /* Tetap sembunyi dulu */
+        width: 100%;
+        box-shadow: none;
+        border: none;
+        background-color: var(--soft-blue); /* Kasih warna beda biar kelihatan itu sub-menu */
+        padding-left: 15px; /* Jeda biar kelihatan menjorok */
+    }
+
+    /* Class sakti yang akan dipanggil JS */
+    .dropdown-content.show {
+        display: block;
+    }
+    
+    .nav-item.dropdown {
+        display: block; /* Biar ambil lebar penuh di HP */
+        width: 100%;
+    }
+}
+
+@media (max-width: 600px) {
     /* Container utama dikurangi paddingnya agar kartu bisa lebih lebar */
     .content-container {
         padding: 10px;

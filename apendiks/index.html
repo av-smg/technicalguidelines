@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apendiks | Dokumentasi Proyek</title>
+    <link rel="stylesheet" href="style-appendix.css">
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Daftar Apendiks</h1>
+            <p>Kumpulan dokumen pendukung, aset, dan referensi teknis.</p>
+            <input type="text" id="searchInput" placeholder="Cari lampiran..." onkeyup="filterAppendix()">
+        </header>
+
+        <main id="appendixList">
+            <section class="appendix-section">
+                <h2>A. Dokumen Teknis</h2>
+                <ul>
+                    <li><a href="docs/skema-audio.pdf" target="_blank">Skema Jalur Audio TOA DIY</a></li>
+                    <li><a href="docs/manual-camera.pdf" target="_blank">Manual Pengaturan Canon 1200D</a></li>
+                    <li><a href="docs/api-inventory.json" target="_blank">Endpoint API Inventory (JSON)</a></li>
+                </ul>
+            </section>
+
+            <section class="appendix-section">
+                <h2>B. Aset Visual & Media</h2>
+                <ul>
+                    <li><a href="assets/branding-guide.pdf" target="_blank">Panduan Warna & Logo</a></li>
+                    <li><a href="assets/ghibli-prompts.txt" target="_blank">Daftar Prompt Ghibli Style AI</a></li>
+                </ul>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 | Dibuat dengan HTML & CSS</p>
+        </footer>
+    </div>
+
+    <script>
+        function filterAppendix() {
+            let input = document.getElementById('searchInput').value.toLowerCase();
+            let items = document.querySelectorAll('.appendix-section li');
+            
+            items.forEach(item => {
+                let text = item.textContent.toLowerCase();
+                item.style.display = text.includes(input) ? "" : "none";
+            });
+        }
+    </script>
+</body>
+</html>

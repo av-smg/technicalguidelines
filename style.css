@@ -213,12 +213,88 @@ body.dark-mode .hero h1 span {
 .card-link.inv-link .btn-go { color: #2C3E50; background: #EAECEE; }
 .card-link.inv-link:hover .btn-go { background: #2C3E50; color: white; }
 
-/* MOBILE RESPONSIVENESS */
 @media (max-width: 600px) {
-    .hero h1 { font-size: 32px; }
-    .team-section { padding: 20px; border-radius: 24px; }
-    .team-header h2 { font-size: 22px; }
-    .grid-cards { grid-template-columns: 1fr; }
+    /* Navbar lebih ramping */
+    .nav-container {
+        padding: 8px 10px;
+        border-radius: 15px; /* Sedikit lebih kotak agar hemat ruang */
+        gap: 5px;
+    }
+
+    /* Logo lebih kecil */
+    .main-logo {
+        height: 28px;
+    }
+
+    /* Menu navigasi bisa di-scroll ke samping kalau kepanjangan */
+    .nav-menu {
+        gap: 5px;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 2px;
+        scrollbar-width: none; /* Sembunyikan scrollbar di Firefox */
+    }
+    
+    .nav-menu::-webkit-scrollbar {
+        display: none; /* Sembunyikan scrollbar di Chrome/Safari */
+    }
+
+    .nav-link {
+        font-size: 11px;
+        padding: 6px 8px;
+    }
+
+    /* Tombol toggle & badge dikecilkan */
+    .theme-toggle {
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        font-size: 14px;
+        margin-left: auto;
+        margin-right: 5px;
+    }
+
+    .location-badge {
+        padding: 4px 10px;
+        font-size: 10px;
+    }
+}
+
+@media (max-width: 600px) {
+    /* Hero Section */
+    .hero {
+        padding: 30px 15px;
+        text-align: center;
+    }
+    .hero h1 { font-size: 28px; }
+    .hero p { font-size: 14px; }
+
+    /* Kartu Utama Index */
+    .location-main-card {
+        padding: 25px;
+        flex-direction: column; /* Teks di atas, tombol di bawah */
+        align-items: flex-start;
+        text-align: left;
+    }
+
+    .location-main-card h2 {
+        font-size: 22px;
+    }
+
+    .location-main-card p {
+        font-size: 13px;
+        margin-bottom: 15px;
+    }
+
+    /* Pindahkan ilustrasi emoji ke pojok agar tidak mengganggu */
+    .card-illustration {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        font-size: 40px;
+        opacity: 0.1;
+    }
 }
 
 /* JEDA LOGO & NAV */

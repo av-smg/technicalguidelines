@@ -17,25 +17,20 @@
                     <a href="{{ '/jw-08/' | relative_url }}" class="nav-link">JW-08</a>
                     <a href="{{ '/apendiks/' | relative_url }}" class="nav-link">Apendiks</a>
                 </div>
-                <div class="menu-content-bottom-mobile">
-                    <button class="theme-toggle-mobile" onclick="toggleTheme()">
-                        <span class="theme-icon-status">🌙</span> <span>Mode Layar</span>
-                    </button>
-                </div>
             </nav>
         </div>
 
         <div class="nav-group-right">
             <div class="search-wrapper" id="search-wrapper-desktop">
                 <div class="search-content">
-                    <div class="search-header">
-                        <input type="text" id="missionSearch" placeholder="Cari panduan..." autocomplete="off" onkeyup="filterMissions()">
-                        <button class="search-close" id="search-close-desktop">&times;</button>
-                    </div>
+                    <input type="text" id="missionSearch" placeholder="Cari..." autocomplete="off" onkeyup="filterMissions()">
+                    <button class="search-close" id="search-close-desktop">&times;</button>
                 </div>
             </div>
 
-            <button class="mobile-search-trigger" id="search-trigger-global">🔍</button>
+            <button class="mobile-search-trigger" id="search-trigger-global" style="display: block !important; visibility: visible !important;">
+                🔍
+            </button>
 
             <button class="theme-toggle" onclick="toggleTheme()">
                 <span class="theme-icon-status">🌙</span>
@@ -53,7 +48,6 @@
             <input type="text" id="missionSearchMobile" placeholder="Cari..." onkeyup="filterMissionsMobile()">
             <button class="search-close-btn" id="search-close-mobile">&times;</button>
         </div>
-        <div id="search-results-list"></div>
     </div>
 </header>
 
@@ -148,3 +142,36 @@ function filterMissionsMobile() {
     });
 }
 </script>
+<style>/* Pastikan tombol kaca pembesar terlihat */
+#search-trigger-global {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Sembunyikan textbox desktop sampai class .active muncul */
+#search-wrapper-desktop {
+    display: none; 
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+#search-wrapper-desktop.active {
+    display: block;
+    opacity: 1;
+}
+
+/* Untuk Mobile */
+#search-mobile-dropdown {
+    display: none;
+}
+
+#search-mobile-dropdown.active {
+    display: block;
+}
+</style>

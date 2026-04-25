@@ -111,11 +111,16 @@ document.addEventListener('DOMContentLoaded', function() {
         if (query && resultsContainer) {
             queryDisplay.innerText = `"${query}"`;
             
-            fetch('/search.json')
-                .then(res => res.json())
-                .then(data => {
-                    // Filter: buang data kosong & jangan tampilkan halaman search itu sendiri
-                    const cleanData = data.filter(item => item && item.title && item.url !== "/search.html");
+            const jsonPath = window.location.pathname.includes('/nama-repo') 
+                 ? '/nama-repo/search.json' 
+                 : '/search.json';
+
+fetch(jsonPath)
+    .then(res => res.json())
+    .then(data => {
+        searchIndex = data;
+        console.log("Index loaded from:", jsonPath);
+    });
 
                     // Cari di Judul atau Konten
                     const matches = cleanData.filter(item => {

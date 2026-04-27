@@ -1,9 +1,15 @@
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<script src="{{ '/assets/js/main.js' | relative_url }}"></script>
+
+<title>{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}</title>
+
+<link rel="stylesheet" href="{{ '/style.css' | relative_url }}">
+
 <link rel="icon" type="image/png" href="{{ '/assets/image_94faf8.png' | relative_url }}">
-<title>A/V Mission Control 🚀</title>
+
+<script src="{{ '/assets/js/main.js' | relative_url }}"></script>
+
 <script>
-    // Tunggu sampai semua elemen HTML selesai dimuat
     document.addEventListener('DOMContentLoaded', function() {
         const toggleBtn = document.getElementById('theme-toggle');
         const themeIcon = document.getElementById('theme-icon');
@@ -23,7 +29,7 @@
                 if(themeIcon) themeIcon.textContent = isDark ? '☀️' : '🌙';
                 localStorage.setItem('theme', isDark ? 'dark' : 'light');
                 
-                console.log("Mode saat ini:", isDark ? "Dark" : "Light"); // Cek di Console F12
+                console.log("Mode saat ini:", isDark ? "Dark" : "Light");
             });
         }
     });

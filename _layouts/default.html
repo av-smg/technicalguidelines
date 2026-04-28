@@ -1,2 +1,25 @@
-<link rel="stylesheet" href="{{ '/style.css' | relative_url }}">
-<script src="{{ '/assets/js/main.js' | relative_url }}"></script>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>{{ page.title }} | A/V Mission Control</title>
+    
+    <link rel="stylesheet" href="{{ '/style.css' | relative_url }}">
+    
+    {% include head.html %}
+</head>
+<body>
+
+    {% include navbar.html %}
+
+    <main>
+        {{ content }}
+    </main>
+
+    {% if site.data.includes.footer %}
+        {% include footer.html %}
+    {% endif %}
+
+</body>
+</html>

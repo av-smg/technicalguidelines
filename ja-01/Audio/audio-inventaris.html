@@ -9,7 +9,6 @@ location: "Semarang"
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Inventory Control 🚀</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
 
@@ -28,28 +27,15 @@ location: "Semarang"
 
         body { background-color: var(--bg-color); color: var(--text-dark); padding-bottom: 50px; }
 
-        /* NAV */
-        header { padding: 15px; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
-        .nav-container {
-            max-width: 1200px; margin: 0 auto; background: rgba(255, 255, 255, 0.9);
-            border-radius: 100px; display: flex; align-items: center; padding: 8px 16px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid rgba(255,255,255,0.5);
-        }
-        .logo-combined { display: flex; text-decoration: none; border-radius: 10px; overflow: hidden; font-weight: 800; margin-right: 12px; }
-        .logo-part { padding: 6px 12px; }
-        .logo-audio { background: var(--primary-orange); color: white; }
-        .logo-video { background: var(--primary-blue); color: white; }
-
-        /* HERO */
-        .hero { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
-        .hero h1 { font-size: 32px; font-weight: 800; margin-bottom: 10px; }
-        .hero span { background: #FFE066; padding: 0 8px; border-radius: 6px; }
-        
-        .filter-container { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+        /* FILTER AREA */
+        .filter-section { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
+        .filter-container { display: flex; gap: 10px; flex-wrap: wrap; }
         .custom-input {
             padding: 12px 16px; border-radius: 100px; border: 2px solid #E5E7EB;
             font-size: 14px; font-weight: 600; outline: none; background: white;
+            transition: 0.3s;
         }
+        .custom-input:focus { border-color: var(--primary-blue); box-shadow: 0 0 0 4px var(--soft-blue); }
         .search-bar { flex-grow: 1; min-width: 250px; }
 
         /* GRID & CARDS */
@@ -65,71 +51,66 @@ location: "Semarang"
 
         .card-img { width: 100%; height: 180px; object-fit: cover; border-radius: 16px; margin-bottom: 12px; background: #eee; }
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .card-header h3 { font-size: 16px; font-weight: 800; text-transform: uppercase; }
-        .qty-badge { background: #1A1A1A; color: white; padding: 4px 10px; border-radius: 100px; font-size: 12px; }
+        .card-header h3 { font-size: 16px; font-weight: 800; text-transform: uppercase; color: var(--text-dark); }
+        .qty-badge { background: #1A1A1A; color: white; padding: 4px 12px; border-radius: 100px; font-size: 12px; font-weight: 800; }
 
         .tag-group { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px; }
-        .badge { font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 100px; text-transform: uppercase; }
+        .badge { font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 100px; text-transform: uppercase; letter-spacing: 0.5px; }
         .badge-green { background: #D1FAE5; color: #059669; }
         .badge-red { background: #FEE2E2; color: #DC2626; }
         .badge-gray { background: #E5E7EB; color: #4B5563; }
+        .badge-audio { background: var(--primary-orange); color: white; }
+        .badge-video { background: var(--primary-blue); color: white; }
 
-        .card-desc { font-size: 13px; color: var(--text-gray); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .card-desc { font-size: 13px; color: var(--text-gray); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-style: italic; }
 
-        /* MODAL */
+        /* MODAL GALERI */
         .modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85);
             display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
+            backdrop-filter: blur(5px);
         }
         .modal-overlay.active { display: flex; }
         .modal-content {
             background: white; border-radius: var(--card-radius); max-width: 500px; width: 100%;
-            padding: 20px; position: relative;
+            padding: 24px; position: relative; animation: slideUp 0.3s ease;
         }
-        .modal-main-img { width: 100%; height: 250px; object-fit: contain; background: #f9f9f9; border-radius: 15px; }
-        .modal-thumbs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
-        .modal-thumb { width: 100%; height: 60px; object-fit: cover; border-radius: 8px; cursor: pointer; opacity: 0.6; }
-        .modal-thumb:hover { opacity: 1; }
-        .modal-close { position: absolute; top: -40px; right: 0; color: white; font-size: 30px; background: none; border: none; cursor: pointer; }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .modal-main-img { width: 100%; height: 280px; object-fit: contain; background: #F9FAFB; border-radius: 16px; margin-bottom: 12px; }
+        .modal-thumbs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .modal-thumb { width: 100%; height: 65px; object-fit: cover; border-radius: 10px; cursor: pointer; border: 2px solid transparent; transition: 0.2s; opacity: 0.7; }
+        .modal-thumb:hover { opacity: 1; border-color: var(--primary-orange); }
+        .modal-close { position: absolute; top: -45px; right: 0; color: white; font-size: 35px; background: none; border: none; cursor: pointer; }
 
-        #loading { text-align: center; padding: 40px; font-weight: 700; color: var(--text-gray); }
+        #loading { text-align: center; padding: 60px; font-weight: 800; color: var(--text-gray); font-size: 14px; }
     </style>
 </head>
 <body>
 
-<header>
-    <div class="nav-container">
-        <div class="logo-combined">
-            <div class="logo-part logo-audio">A</div>
-            <div class="logo-part logo-video">V</div>
-        </div>
-        <div style="font-weight: 700;">Inventory Team</div>
-    </div>
-</header>
-
 <main>
-    <section class="hero">
-        <h1>Cek Logistik: <br><span>Ready for Action!</span> ⚡</h1>
+    <section class="filter-section">
         <div class="filter-container">
             <select id="filterTim" class="custom-input"><option value="">🎯 Semua Tim</option></select>
             <select id="filterMilik" class="custom-input"><option value="">🏢 Kepemilikan</option></select>
-            <input id="searchInput" type="text" placeholder="🔍 Cari nama barang..." class="custom-input search-bar">
+            <input id="searchInput" type="text" placeholder="🔍 Cari nama alat..." class="custom-input search-bar">
         </div>
     </section>
 
     <div class="content-container">
-        <div id="loading">⏳ Menghubungkan ke satelit...</div>
+        <div id="loading">⏳ MENYINKRONKAN DATA...</div>
         <div id="grid" class="grid-cards"></div>
     </div>
 </main>
 
+<!-- MODAL GALERI -->
 <div id="modal" class="modal-overlay">
     <div class="modal-content">
         <button id="closeModal" class="modal-close">✕</button>
-        <h2 id="modalName" style="margin-bottom: 10px; text-transform: uppercase;"></h2>
+        <h2 id="modalName" style="margin-bottom: 15px; text-transform: uppercase; font-weight: 800;"></h2>
         <img id="modalImage" class="modal-main-img" src="">
         <div id="modalThumbs" class="modal-thumbs"></div>
-        <p id="modalDesc" style="margin-top: 15px; font-size: 14px; color: var(--text-gray); background: #f4f4f4; padding: 10px; border-radius: 10px;"></p>
+        <p id="modalDesc" style="margin-top: 20px; font-size: 14px; color: var(--text-gray); background: #F4F5F7; padding: 12px; border-radius: 12px; line-height: 1.5; font-style: italic;"></p>
     </div>
 </div>
 
@@ -139,15 +120,18 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw_o-g7N48O6w9rJuoHy
 let allItems = [];
 const grid = document.getElementById("grid");
 
-// 1. Ambil Data
+// 1. Ambil Data dari Apps Script
 fetch(SCRIPT_URL)
     .then(res => res.json())
     .then(data => {
         document.getElementById("loading").style.display = "none";
-        // Filter data agar tidak mengambil baris kosong atau header
+        // Filter out header row and empty rows
         allItems = data.filter(item => item.nama_barang && item.nama_barang !== "Nama Barang");
         populateFilters();
         renderItems();
+    })
+    .catch(err => {
+        document.getElementById("loading").innerHTML = "❌ Gagal memuat data. Cek Deployment Apps Script.";
     });
 
 function populateFilters() {
@@ -173,26 +157,26 @@ function renderItems() {
     const fSearch = document.getElementById("searchInput").value.toLowerCase();
 
     const filtered = allItems.filter(i => {
-        return (!fTim || i.tim.toLowerCase() === fTim) &&
-               (!fMilik || i.barang_milik.toLowerCase() === fMilik) &&
-               (!fSearch || i.nama_barang.toLowerCase().includes(fSearch));
+        return (!fTim || String(i.tim).toLowerCase() === fTim) &&
+               (!fMilik || String(i.barang_milik).toLowerCase() === fMilik) &&
+               (!fSearch || String(i.nama_barang).toLowerCase().includes(fSearch));
     });
 
     filtered.forEach(item => {
         const card = document.createElement("div");
         card.className = "mission-card";
         
-        // Pilih foto pertama yang ada
         const mainImg = item.foto_1 || "https://via.placeholder.com/400x300?text=No+Image";
+        const timClass = String(item.tim).toLowerCase().includes('audio') ? 'badge-audio' : 'badge-video';
 
         card.innerHTML = `
-            <img src="${mainImg}" class="card-img">
+            <img src="${mainImg}" class="card-img" loading="lazy">
             <div class="card-header">
                 <h3>${item.nama_barang}</h3>
                 <span class="qty-badge">${item.jumlah}</span>
             </div>
             <div class="tag-group">
-                <span class="badge ${item.tim.toLowerCase().includes('audio') ? 'logo-audio' : 'logo-video'}" style="color:white">${item.tim}</span>
+                <span class="badge ${timClass}">${item.tim}</span>
                 <span class="badge badge-green">${item.barang_milik}</span>
                 <span class="badge ${item.kondisi === 'Rusak' ? 'badge-red' : 'badge-gray'}">${item.kondisi}</span>
             </div>
@@ -207,7 +191,11 @@ function renderItems() {
 function openModal(item) {
     const modal = document.getElementById("modal");
     document.getElementById("modalName").textContent = item.nama_barang;
-    document.getElementById("modalDesc").textContent = item.keterangan || "Tidak ada keterangan tambahan.";
+    
+    // ISI DESKRIPSI MODAL
+    document.getElementById("modalDesc").textContent = item.keterangan && String(item.keterangan).trim() !== "" 
+        ? item.keterangan 
+        : "Tidak ada keterangan tambahan.";
     
     const photos = [item.foto_1, item.foto_2, item.foto_3, item.foto_4].filter(Boolean);
     const mImg = document.getElementById("modalImage");
@@ -218,7 +206,10 @@ function openModal(item) {
     photos.forEach(p => {
         const t = document.createElement("img");
         t.src = p; t.className = "modal-thumb";
-        t.onclick = () => mImg.src = p;
+        t.onclick = (e) => {
+            e.stopPropagation();
+            mImg.src = p;
+        };
         thumbs.appendChild(t);
     });
 
@@ -226,6 +217,11 @@ function openModal(item) {
 }
 
 document.getElementById("closeModal").onclick = () => document.getElementById("modal").classList.remove("active");
+window.onclick = (event) => {
+    const modal = document.getElementById("modal");
+    if (event.target == modal) modal.classList.remove("active");
+};
+
 document.getElementById("filterTim").onchange = renderItems;
 document.getElementById("filterMilik").onchange = renderItems;
 document.getElementById("searchInput").oninput = renderItems;

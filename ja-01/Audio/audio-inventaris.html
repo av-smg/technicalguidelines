@@ -40,7 +40,7 @@ location: "Semarang"
 
     <script>
         // GANTI INI dengan URL Web App Google Apps Script kamu
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw_o-g7N48O6w9rJuoHyo2Z177xyBHSpQKJpzcCyJhdnzOtOIdWzVUyHeBwL4f3VDA5/exec";
+       const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw_o-g7N48O6w9rJuoHyo2Z177xyBHSpQKJpzcCyJhdnzOtOIdWzVUyHeBwL4f3VDA5/exec?action=api";
 
         async function fetchInventory() {
             const grid = document.getElementById('inventory-grid');
@@ -54,25 +54,29 @@ location: "Semarang"
                 grid.innerHTML = '';
 
                 data.forEach(item => {
-                    const statusClass = item.Status === "Tersedia" ? "background: #DCFCE7; color: #166534;" : "background: #FEE2E2; color: #991B1B;";
-                    
-                    const card = document.createElement('div');
-                    card.className = 'inv-card-item';
-                    card.style = "background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 20px; padding: 20px; transition: 0.3s;";
-                    
-                    card.innerHTML = `
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
-                            <span style="font-size: 12px; font-weight: 700; color: var(--text-gray);">${item.ID || 'AV-ITM'}</span>
-                            <span style="font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 50px; ${statusClass}">${item.Status}</span>
-                        </div>
-                        <h3 style="color: var(--text-dark); margin: 10px 0;">${item.NamaBarang}</h3>
-                        <div style="font-size: 14px; color: var(--text-gray);">
-                            <p>📍 ${item.Lokasi}</p>
-                            <p>📦 Jumlah: ${item.Jumlah} ${item.Satuan}</p>
-                        </div>
-                    `;
-                    grid.appendChild(card);
-                });
+    // Sesuaikan: di Apps Script kamu pakai 'kondisi', bukan 'Status'
+    const statusClass = item.kondisi === "Tersedia" ? "background: #DCFCE7; color: #166534;" : "background: #FEE2E2; color: #991B1B;";
+    
+    const card = document.createElement('div');
+    card.className = 'inv-card-item';
+    card.style = "background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 20px; padding: 20px; transition: 0.3s;";
+    
+    card.innerHTML = `
+        <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+            <span style="font-size: 12px; font-weight: 700; color: var(--text-gray);">${item.barang_milik || 'AV-ITM'}</span>
+            <span style="font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 50px; ${statusClass}">${item.kondisi}</span>
+        </div>
+        <!-- Menampilkan foto jika ada -->
+        ${item.foto_1 ? `<img src="${item.foto_1}" style="width:100%; border-radius:10px; margin-bottom:10px;">` : ''}
+        <h3 style="color: var(--text-dark); margin: 10px 0;">${item.nama_barang}</h3>
+        <div style="font-size: 14px; color: var(--text-gray);">
+            <p>📍 ${item.tim}</p>
+            <p>📦 Jumlah: ${item.jumlah}</p>
+            <p style="font-size: 12px; margin-top:5px;">📝 ${item.keterangan}</p>
+        </div>
+    `;
+    grid.appendChild(card);
+});
             } catch (error) {
                 loading.innerHTML = `<p style="color: var(--primary-orange);">Gagal memuat data. Cek koneksi atau URL Script.</p>`;
             }

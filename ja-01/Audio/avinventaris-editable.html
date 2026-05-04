@@ -3,177 +3,258 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Inventaris - Semarang Team</title>
+    <title>Inventaris AV - Semarang Team</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
-
-        :root {
-            --primary-navy: #0A192F;
-            --accent-orange: #FF7E27;
-            --bg-color: #F8F9FB;
+        
+        :root { 
+            --navy: #0A192F; 
+            --orange: #FF7E27; 
+            --bg: #F8F9FB; 
             --card-radius: 20px;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background-color: var(--bg-color); padding: 15px; color: var(--primary-navy); }
+        body { background: var(--bg); padding: 15px; color: var(--navy); }
 
-        .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
-
-        /* BENTO MISSION CARD */
-        .mission-card {
-            background: white; border: 1px solid #E2E8F0; border-radius: var(--card-radius);
-            padding: 16px; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative; overflow: hidden;
+        /* HEADER & SEARCH */
+        header { text-align: center; margin: 20px 0 30px; }
+        .controls { max-width: 1200px; margin: 0 auto 20px; }
+        .search-bar { 
+            width: 100%; padding: 14px 20px; border-radius: 18px; 
+            border: 1px solid #E2E8F0; outline: none; font-weight: 600; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03); 
         }
-        .mission-card:hover { transform: translateY(-5px); border-color: var(--accent-orange); box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
-        .card-img { width: 100%; height: 180px; object-fit: cover; border-radius: 14px; margin-bottom: 12px; background: #f0f0f0; }
-        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
-        .card-header h3 { font-size: 15px; font-weight: 800; text-transform: uppercase; color: var(--primary-navy); line-height: 1.2; }
-        .qty-badge { background: var(--primary-navy); color: white; padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 800; }
+        
+        /* GRID LAYOUT */
+        .grid-cards { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 20px; max-width: 1200px; margin: 0 auto; 
+        }
 
-        .tag-group { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px; }
-        .badge { font-size: 9px; font-weight: 800; padding: 4px 10px; border-radius: 100px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .badge-orange { background: var(--accent-orange); color: white; }
+        /* CARD DESIGN */
+        .mission-card { 
+            background: white; border: 1px solid #E2E8F0; border-radius: var(--card-radius); 
+            padding: 15px; cursor: pointer; transition: 0.3s; position: relative; 
+        }
+        .mission-card:hover { border-color: var(--orange); transform: translateY(-3px); }
+        .card-img-main { width: 100%; height: 160px; object-fit: cover; border-radius: 12px; margin-bottom: 12px; background: #eee; }
+        
+        .badge { font-size: 9px; font-weight: 800; padding: 4px 10px; border-radius: 100px; text-transform: uppercase; }
+        .badge-orange { background: var(--orange); color: white; }
         .badge-blue { background: #3A70E2; color: white; }
         .badge-green { background: #DCFCE7; color: #166534; }
 
-        /* MODAL EDITOR */
-        .modal-overlay {
-            position: fixed; inset: 0; background: rgba(10, 25, 47, 0.9);
-            display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; backdrop-filter: blur(5px);
+        /* MODAL & GALLERY SLIDER */
+        .modal-overlay { 
+            position: fixed; inset: 0; background: rgba(10,25,47,0.9); 
+            display: none; align-items: center; justify-content: center; 
+            z-index: 1000; padding: 20px; backdrop-filter: blur(8px); 
         }
         .modal-overlay.active { display: flex; }
-        .modal-content { background: white; border-radius: var(--card-radius); max-width: 450px; width: 100%; padding: 25px; position: relative; animation: slideUp 0.3s ease; }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-        .input-text { width: 100%; padding: 12px; border-radius: 12px; border: 2px solid #EDF2F7; margin-bottom: 15px; font-weight: 600; outline: none; font-size: 14px; }
-        .check-container { display: flex; align-items: center; gap: 12px; font-weight: 800; margin-bottom: 20px; background: #F7FAFC; padding: 15px; border-radius: 15px; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
-        .check-container:has(input:checked) { border-color: var(--accent-orange); background: #FFF5F0; }
+        .modal-content { 
+            background: white; border-radius: 24px; max-width: 480px; width: 100%; 
+            padding: 25px; position: relative; max-height: 90vh; overflow-y: auto; 
+        }
         
-        .btn-update { background: var(--accent-orange); color: white; border: none; padding: 16px; border-radius: 16px; width: 100%; font-weight: 800; cursor: pointer; font-size: 14px; transition: 0.2s; }
-        .btn-update:active { transform: scale(0.98); }
+        .image-gallery { 
+            display: flex; gap: 10px; overflow-x: auto; 
+            scroll-snap-type: x mandatory; margin-bottom: 20px; padding-bottom: 10px; 
+        }
+        .image-gallery::-webkit-scrollbar { height: 4px; }
+        .image-gallery::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 10px; }
+        
+        .gallery-item { 
+            flex: 0 0 100%; scroll-snap-align: start; border-radius: 15px; 
+            height: 250px; object-fit: cover; background: #f1f5f9; 
+        }
+
+        /* INPUTS */
+        .ref-box { 
+            background: #F8FAFC; padding: 12px; border-radius: 12px; 
+            font-size: 12px; margin-bottom: 15px; border-left: 4px solid var(--orange); 
+            color: #475569; line-height: 1.4; 
+        }
+        .input-text { 
+            width: 100%; padding: 12px; border-radius: 12px; border: 2px solid #EDF2F7; 
+            margin-bottom: 15px; font-weight: 600; font-size: 14px; outline: none; 
+        }
+        .check-btn { 
+            display: flex; align-items: center; gap: 12px; background: #F1F5F9; 
+            padding: 15px; border-radius: 15px; margin-bottom: 15px; 
+            cursor: pointer; font-weight: 800; font-size: 14px; transition: 0.2s;
+        }
+        .check-btn:has(input:checked) { background: #FFF5F0; border: 1px solid var(--orange); }
+        
+        .btn-update { 
+            background: var(--orange); color: white; border: none; padding: 16px; 
+            border-radius: 16px; width: 100%; font-weight: 800; cursor: pointer; 
+            box-shadow: 0 4px 12px rgba(255, 126, 39, 0.2);
+        }
         .modal-close { position: absolute; top: -45px; right: 0; color: white; font-size: 30px; background: none; border: none; cursor: pointer; }
         
-        #loading { text-align: center; padding: 100px 20px; font-weight: 800; color: var(--primary-navy); opacity: 0.6; }
+        #loading { text-align: center; padding: 50px; font-weight: 800; opacity: 0.5; }
     </style>
 </head>
 <body>
 
-    <header style="text-align: center; margin: 30px 0;">
+    <header>
         <h2 style="font-weight: 800; letter-spacing: -0.5px;">INVENTORY PORTAL</h2>
-        <p style="font-size: 12px; font-weight: 600; opacity: 0.5;">JAWA - SEMARANG REGION</p>
+        <p style="font-size: 11px; font-weight: 700; opacity: 0.4;">JAWA - SEMARANG REGION</p>
     </header>
+
+    <div class="controls">
+        <input type="text" id="searchInput" class="search-bar" placeholder="Cari nama barang, tim, atau pemilik..." oninput="filterData()">
+    </div>
     
-    <div id="loading">MENGAMBIL DATA...</div>
+    <div id="loading">Memuat data inventaris...</div>
     <div id="grid" class="grid-cards"></div>
 
     <div id="modal" class="modal-overlay">
         <div class="modal-content">
             <button onclick="closeModal()" class="modal-close">✕</button>
-            <h2 id="m-name" style="margin-bottom: 8px; font-weight: 800; text-transform: uppercase; font-size: 18px; color: var(--primary-navy);"></h2>
-            <p style="font-size: 12px; font-weight: 600; color: #718096; margin-bottom: 20px;">Update status pemakaian dan log barang.</p>
+            
+            <div id="m-gallery" class="image-gallery"></div>
 
-            <label class="check-container">
-                <input type="checkbox" id="m-check" style="width: 22px; height: 22px; accent-color: var(--accent-orange);"> 
+            <h2 id="m-name" style="margin-bottom: 5px; font-weight: 800; text-transform: uppercase; font-size: 18px;"></h2>
+            <div id="m-badges" style="display:flex; gap:5px; margin-bottom: 15px;"></div>
+            
+            <p style="font-size: 10px; font-weight: 800; margin-bottom: 5px; opacity: 0.5;">KETERANGAN TEKNIS (CELL I - REFERENSI):</p>
+            <div id="m-ref" class="ref-box"></div>
+
+            <label class="check-btn">
+                <input type="checkbox" id="m-check" style="width: 22px; height: 22px; accent-color: var(--orange);"> 
                 <span>SEDANG DIGUNAKAN</span>
             </label>
 
-            <label style="font-size: 11px; font-weight: 800; color: var(--primary-navy); margin-bottom: 8px; display: block; opacity: 0.7;">CATATAN / KETERANGAN:</label>
-            <textarea id="m-desc" class="input-text" rows="4" placeholder="Misal: Dibawa ke lokasi X oleh tim Y..."></textarea>
+            <label style="font-size: 10px; font-weight: 800; margin-bottom: 5px; display: block; opacity: 0.5;">LOG / CATATAN PENGGUNAAN (CELL M):</label>
+            <textarea id="m-desc" class="input-text" rows="3" placeholder="Contoh: Dipakai ke lokasi X oleh tim Y..."></textarea>
             
             <button id="saveBtn" class="btn-update">SIMPAN PERUBAHAN</button>
         </div>
     </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwQoGWiuBj6wTfIoEFiodos8YBvyew1ITzyKEhbaQrpyakedqc4dx3acq6nazyRdXKx/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzl0Kks1oPGYtgGF2eKwK9JMj-EIbZ_V9-f_FibOqxugeB1rr2rbo5xaswP1BnZo_3X/exec";
     let allItems = [];
     let userPin = "";
     let currentItem = null;
 
     window.onload = () => {
-        userPin = prompt("Masukkan PIN Keamanan:");
-        if(!userPin) window.location.reload();
+        userPin = prompt("Masukkan PIN Akses Inventaris:");
+        if(!userPin) {
+            alert("Akses ditolak. PIN diperlukan.");
+            window.location.reload();
+        }
         loadData();
     };
 
-    function loadData() {
-        fetch(SCRIPT_URL + "?action=api")
-        .then(res => res.json())
-        .then(data => {
+    async function loadData() {
+        try {
+            const res = await fetch(SCRIPT_URL + "?action=api");
+            allItems = await res.json();
             document.getElementById("loading").style.display = "none";
-            allItems = data;
-            render();
-        });
+            render(allItems);
+        } catch (e) {
+            document.getElementById("loading").innerText = "Gagal memuat data. Periksa koneksi.";
+        }
     }
 
-    function render() {
+    function render(data) {
         const grid = document.getElementById("grid");
         grid.innerHTML = "";
-        allItems.forEach(item => {
-            const isAudio = String(item.tim).toLowerCase().includes('audio');
-            const inUse = item.terpakai === "TRUE";
-            
+        data.forEach(item => {
             const card = document.createElement("div");
             card.className = "mission-card";
-            if(inUse) card.style.borderColor = "var(--accent-orange)";
-            
             card.innerHTML = `
-                <img src="${item.foto_1 || 'https://via.placeholder.com/300x180'}" class="card-img">
-                <div class="card-header">
-                    <h3>${item.nama_barang}</h3>
-                    <span class="qty-badge">${item.jumlah}</span>
+                <img src="${item.fotos[0] || 'https://via.placeholder.com/300x160?text=No+Image'}" class="card-img-main">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
+                    <h3 style="font-size:14px; font-weight:800; flex:1; line-height:1.2;">${item.nama_barang}</h3>
+                    <span style="background:var(--navy); color:white; padding:2px 8px; border-radius:6px; font-size:10px; margin-left:10px; font-weight:800;">${item.jumlah}</span>
                 </div>
-                <div class="tag-group">
-                    <span class="badge ${isAudio ? 'badge-orange' : 'badge-blue'}">${item.tim}</span>
+                <div style="display:flex; gap:5px; flex-wrap: wrap;">
+                    <span class="badge ${item.tim.toLowerCase().includes('audio') ? 'badge-orange' : 'badge-blue'}">${item.tim}</span>
                     <span class="badge badge-green">${item.barang_milik}</span>
                 </div>
-                ${inUse ? "<div style='margin-top:12px; font-size:10px; font-weight:800; color:var(--accent-orange); display:flex; align-items:center; gap:5px;'>● SEDANG TERPAKAI</div>" : ""}
+                ${item.terpakai === "TRUE" ? "<div style='color:var(--orange); font-size:10px; font-weight:800; margin-top:12px; display:flex; align-items:center; gap:5px;'>● SEDANG TERPAKAI</div>" : ""}
             `;
             card.onclick = () => openModal(item);
             grid.appendChild(card);
         });
     }
 
+    function filterData() {
+        const query = document.getElementById("searchInput").value.toLowerCase();
+        const filtered = allItems.filter(i => 
+            i.nama_barang.toLowerCase().includes(query) || 
+            i.tim.toLowerCase().includes(query) ||
+            i.barang_milik.toLowerCase().includes(query)
+        );
+        render(filtered);
+    }
+
     function openModal(item) {
         currentItem = item;
+        const gallery = document.getElementById("m-gallery");
+        gallery.innerHTML = "";
+        
+        // Render semua foto yang ada (E-H)
+        if(item.fotos && item.fotos.length > 0) {
+            item.fotos.forEach(url => {
+                const img = document.createElement("img");
+                img.src = url;
+                img.className = "gallery-item";
+                gallery.appendChild(img);
+            });
+        } else {
+            gallery.innerHTML = `<img src="https://via.placeholder.com/400x250?text=Tidak+Ada+Foto" class="gallery-item">`;
+        }
+
         document.getElementById("m-name").innerText = item.nama_barang;
-        document.getElementById("m-desc").value = item.keterangan;
+        document.getElementById("m-ref").innerText = item.keterangan_ref || "(Tidak ada keterangan teknis)";
+        document.getElementById("m-desc").value = item.keterangan_edit || "";
         document.getElementById("m-check").checked = (item.terpakai === "TRUE");
+        
         document.getElementById("modal").classList.add("active");
     }
 
     function closeModal() { document.getElementById("modal").classList.remove("active"); }
 
     document.getElementById("saveBtn").onclick = async function() {
-        const btn = this;
-        const newDesc = document.getElementById("m-desc").value;
-        const isChecked = document.getElementById("m-check").checked;
-
-        btn.disabled = true;
-        btn.innerText = "MENYIMPAN...";
-
+        this.disabled = true; 
+        const originalText = this.innerText;
+        this.innerText = "MENYIMPAN...";
+        
         const payload = {
             action: "update_item",
             pin: userPin,
             row_index: currentItem.row_index,
-            terpakai: isChecked ? "TRUE" : "FALSE",
-            keterangan: newDesc
+            terpakai: document.getElementById("m-check").checked ? "TRUE" : "FALSE",
+            keterangan: document.getElementById("m-desc").value
         };
 
         try {
-            const res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
+            const res = await fetch(SCRIPT_URL, { 
+                method: "POST", 
+                body: JSON.stringify(payload) 
+            });
             const result = await res.text();
+            
             if(result === "SUCCESS") {
-                alert("Data diperbarui!");
+                alert("Data berhasil diperbarui!");
                 location.reload();
             } else {
-                alert("Gagal menyimpan. Cek kembali PIN Anda.");
+                alert("Gagal menyimpan. PIN mungkin salah.");
+                this.disabled = false;
+                this.innerText = originalText;
             }
-        } catch (e) { alert("Kesalahan koneksi ke server."); }
-        btn.disabled = false;
-        btn.innerText = "SIMPAN PERUBAHAN";
-    }
+        } catch (e) {
+            alert("Terjadi kesalahan koneksi ke server.");
+            this.disabled = false;
+            this.innerText = originalText;
+        }
+    };
 </script>
 </body>
 </html>

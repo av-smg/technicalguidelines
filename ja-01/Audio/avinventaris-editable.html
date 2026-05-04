@@ -6,94 +6,37 @@
     <title>Inventaris AV - Semarang Team</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
-        
-        :root { 
-            --navy: #0A192F; 
-            --orange: #FF7E27; 
-            --bg: #F8F9FB; 
-            --card-radius: 20px;
-        }
-
+        :root { --navy: #0A192F; --orange: #FF7E27; --bg: #F8F9FB; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: var(--bg); padding: 15px; color: var(--navy); }
 
-        /* HEADER & SEARCH */
-        header { text-align: center; margin: 20px 0 30px; }
+        header { text-align: center; margin: 10px 0 25px; }
         .controls { max-width: 1200px; margin: 0 auto 20px; }
-        .search-bar { 
-            width: 100%; padding: 14px 20px; border-radius: 18px; 
-            border: 1px solid #E2E8F0; outline: none; font-weight: 600; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03); 
-        }
+        .search-bar { width: 100%; padding: 14px 20px; border-radius: 18px; border: 1px solid #E2E8F0; outline: none; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
         
-        /* GRID LAYOUT */
-        .grid-cards { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
-            gap: 20px; max-width: 1200px; margin: 0 auto; 
-        }
-
-        /* CARD DESIGN */
-        .mission-card { 
-            background: white; border: 1px solid #E2E8F0; border-radius: var(--card-radius); 
-            padding: 15px; cursor: pointer; transition: 0.3s; position: relative; 
-        }
+        .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
+        .mission-card { background: white; border: 1px solid #E2E8F0; border-radius: 20px; padding: 15px; cursor: pointer; transition: 0.3s; }
         .mission-card:hover { border-color: var(--orange); transform: translateY(-3px); }
         .card-img-main { width: 100%; height: 160px; object-fit: cover; border-radius: 12px; margin-bottom: 12px; background: #eee; }
         
-        .badge { font-size: 9px; font-weight: 800; padding: 4px 10px; border-radius: 100px; text-transform: uppercase; }
+        .badge { font-size: 9px; font-weight: 800; padding: 4px 10px; border-radius: 100px; text-transform: uppercase; margin-right: 4px; }
         .badge-orange { background: var(--orange); color: white; }
         .badge-blue { background: #3A70E2; color: white; }
         .badge-green { background: #DCFCE7; color: #166534; }
 
-        /* MODAL & GALLERY SLIDER */
-        .modal-overlay { 
-            position: fixed; inset: 0; background: rgba(10,25,47,0.9); 
-            display: none; align-items: center; justify-content: center; 
-            z-index: 1000; padding: 20px; backdrop-filter: blur(8px); 
-        }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(10,25,47,0.9); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; backdrop-filter: blur(8px); }
         .modal-overlay.active { display: flex; }
-        .modal-content { 
-            background: white; border-radius: 24px; max-width: 480px; width: 100%; 
-            padding: 25px; position: relative; max-height: 90vh; overflow-y: auto; 
-        }
+        .modal-content { background: white; border-radius: 24px; max-width: 480px; width: 100%; padding: 25px; position: relative; max-height: 90vh; overflow-y: auto; }
         
-        .image-gallery { 
-            display: flex; gap: 10px; overflow-x: auto; 
-            scroll-snap-type: x mandatory; margin-bottom: 20px; padding-bottom: 10px; 
-        }
-        .image-gallery::-webkit-scrollbar { height: 4px; }
-        .image-gallery::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 10px; }
-        
-        .gallery-item { 
-            flex: 0 0 100%; scroll-snap-align: start; border-radius: 15px; 
-            height: 250px; object-fit: cover; background: #f1f5f9; 
-        }
+        .image-gallery { display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; margin-bottom: 20px; padding-bottom: 10px; }
+        .gallery-item { flex: 0 0 100%; scroll-snap-align: start; border-radius: 15px; height: 250px; object-fit: cover; background: #f1f5f9; }
 
-        /* INPUTS */
-        .ref-box { 
-            background: #F8FAFC; padding: 12px; border-radius: 12px; 
-            font-size: 12px; margin-bottom: 15px; border-left: 4px solid var(--orange); 
-            color: #475569; line-height: 1.4; 
-        }
-        .input-text { 
-            width: 100%; padding: 12px; border-radius: 12px; border: 2px solid #EDF2F7; 
-            margin-bottom: 15px; font-weight: 600; font-size: 14px; outline: none; 
-        }
-        .check-btn { 
-            display: flex; align-items: center; gap: 12px; background: #F1F5F9; 
-            padding: 15px; border-radius: 15px; margin-bottom: 15px; 
-            cursor: pointer; font-weight: 800; font-size: 14px; transition: 0.2s;
-        }
-        .check-btn:has(input:checked) { background: #FFF5F0; border: 1px solid var(--orange); }
+        .ref-box { background: #F8FAFC; padding: 12px; border-radius: 12px; font-size: 12px; margin-bottom: 15px; border-left: 4px solid var(--orange); color: #475569; line-height: 1.4; }
+        .input-text { width: 100%; padding: 12px; border-radius: 12px; border: 2px solid #EDF2F7; margin-bottom: 15px; font-weight: 600; font-size: 14px; outline: none; }
+        .check-btn { display: flex; align-items: center; gap: 12px; background: #F1F5F9; padding: 15px; border-radius: 15px; margin-bottom: 15px; cursor: pointer; font-weight: 800; font-size: 14px; }
         
-        .btn-update { 
-            background: var(--orange); color: white; border: none; padding: 16px; 
-            border-radius: 16px; width: 100%; font-weight: 800; cursor: pointer; 
-            box-shadow: 0 4px 12px rgba(255, 126, 39, 0.2);
-        }
+        .btn-update { background: var(--orange); color: white; border: none; padding: 16px; border-radius: 16px; width: 100%; font-weight: 800; cursor: pointer; }
         .modal-close { position: absolute; top: -45px; right: 0; color: white; font-size: 30px; background: none; border: none; cursor: pointer; }
-        
         #loading { text-align: center; padding: 50px; font-weight: 800; opacity: 0.5; }
     </style>
 </head>
@@ -105,48 +48,43 @@
     </header>
 
     <div class="controls">
-        <input type="text" id="searchInput" class="search-bar" placeholder="Cari nama barang, tim, atau pemilik..." oninput="filterData()">
+        <input type="text" id="searchInput" class="search-bar" placeholder="Cari nama barang..." oninput="filterData()">
     </div>
     
-    <div id="loading">Memuat data inventaris...</div>
+    <div id="loading">Memuat data...</div>
     <div id="grid" class="grid-cards"></div>
 
     <div id="modal" class="modal-overlay">
         <div class="modal-content">
             <button onclick="closeModal()" class="modal-close">✕</button>
-            
             <div id="m-gallery" class="image-gallery"></div>
-
-            <h2 id="m-name" style="margin-bottom: 5px; font-weight: 800; text-transform: uppercase; font-size: 18px;"></h2>
-            <div id="m-badges" style="display:flex; gap:5px; margin-bottom: 15px;"></div>
+            <h2 id="m-name" style="font-weight: 800; text-transform: uppercase; font-size: 18px; margin-bottom: 15px;"></h2>
             
-            <p style="font-size: 10px; font-weight: 800; margin-bottom: 5px; opacity: 0.5;">KETERANGAN TEKNIS (CELL I - REFERENSI):</p>
+            <p style="font-size: 10px; font-weight: 800; margin-bottom: 5px; opacity: 0.5;">KETERANGAN TEKNIS (CELL I):</p>
             <div id="m-ref" class="ref-box"></div>
 
             <label class="check-btn">
-                <input type="checkbox" id="m-check" style="width: 22px; height: 22px; accent-color: var(--orange);"> 
-                <span>SEDANG DIGUNAKAN</span>
+                <input type="checkbox" id="m-check" style="width: 20px; height: 20px; accent-color: var(--orange);"> 
+                SEDANG DIGUNAKAN
             </label>
 
-            <label style="font-size: 10px; font-weight: 800; margin-bottom: 5px; display: block; opacity: 0.5;">LOG / CATATAN PENGGUNAAN (CELL M):</label>
-            <textarea id="m-desc" class="input-text" rows="3" placeholder="Contoh: Dipakai ke lokasi X oleh tim Y..."></textarea>
+            <label style="font-size: 10px; font-weight: 800; margin-bottom: 5px; display: block; opacity: 0.5;">LOG PENGGUNAAN (CELL M):</label>
+            <textarea id="m-desc" class="input-text" rows="3" placeholder="Tulis catatan penggunaan di sini..."></textarea>
             
             <button id="saveBtn" class="btn-update">SIMPAN PERUBAHAN</button>
         </div>
     </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyzClPIRU8cM21h4AIdgMDuf_Z5sajZ9m8QcLpVDLSxN6mzoyDbugZ-3uH4NKoiSGaT/exec";
+    // GANTI URL DI BAWAH INI DENGAN URL WEB APP BARU ANDA
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz9LE8zTl0F4zV4DBr9o95tYLvl6zcs2y3o0HcQgCBCMkVmHA_LXvKY6pglBBe_m_bF/exec"; 
     let allItems = [];
     let userPin = "";
     let currentItem = null;
 
     window.onload = () => {
-        userPin = prompt("Masukkan PIN Akses Inventaris:");
-        if(!userPin) {
-            alert("Akses ditolak. PIN diperlukan.");
-            window.location.reload();
-        }
+        userPin = prompt("Masukkan PIN Akses:");
+        if(!userPin) window.location.reload();
         loadData();
     };
 
@@ -157,7 +95,7 @@
             document.getElementById("loading").style.display = "none";
             render(allItems);
         } catch (e) {
-            document.getElementById("loading").innerText = "Gagal memuat data. Periksa koneksi.";
+            document.getElementById("loading").innerText = "Gagal memuat data.";
         }
     }
 
@@ -168,30 +106,20 @@
             const card = document.createElement("div");
             card.className = "mission-card";
             card.innerHTML = `
-                <img src="${item.fotos[0] || 'https://via.placeholder.com/300x160?text=No+Image'}" class="card-img-main">
-                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
-                    <h3 style="font-size:14px; font-weight:800; flex:1; line-height:1.2;">${item.nama_barang}</h3>
-                    <span style="background:var(--navy); color:white; padding:2px 8px; border-radius:6px; font-size:10px; margin-left:10px; font-weight:800;">${item.jumlah}</span>
+                <img src="${item.fotos[0] || 'https://via.placeholder.com/300x160'}" class="card-img-main">
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                    <h3 style="font-size:14px; font-weight:800;">${item.nama_barang}</h3>
+                    <span style="font-size:10px; font-weight:800; background:#eee; padding:2px 6px; border-radius:4px;">${item.jumlah}</span>
                 </div>
-                <div style="display:flex; gap:5px; flex-wrap: wrap;">
+                <div>
                     <span class="badge ${item.tim.toLowerCase().includes('audio') ? 'badge-orange' : 'badge-blue'}">${item.tim}</span>
                     <span class="badge badge-green">${item.barang_milik}</span>
                 </div>
-                ${item.terpakai === "TRUE" ? "<div style='color:var(--orange); font-size:10px; font-weight:800; margin-top:12px; display:flex; align-items:center; gap:5px;'>● SEDANG TERPAKAI</div>" : ""}
+                ${item.terpakai === "TRUE" ? "<p style='color:var(--orange); font-size:10px; font-weight:800; margin-top:10px;'>● TERPAKAI</p>" : ""}
             `;
             card.onclick = () => openModal(item);
             grid.appendChild(card);
         });
-    }
-
-    function filterData() {
-        const query = document.getElementById("searchInput").value.toLowerCase();
-        const filtered = allItems.filter(i => 
-            i.nama_barang.toLowerCase().includes(query) || 
-            i.tim.toLowerCase().includes(query) ||
-            i.barang_milik.toLowerCase().includes(query)
-        );
-        render(filtered);
     }
 
     function openModal(item) {
@@ -199,7 +127,7 @@
         const gallery = document.getElementById("m-gallery");
         gallery.innerHTML = "";
         
-        // Render semua foto yang ada (E-H)
+        // Loop foto dari Kolom E sampai H
         if(item.fotos && item.fotos.length > 0) {
             item.fotos.forEach(url => {
                 const img = document.createElement("img");
@@ -208,23 +136,20 @@
                 gallery.appendChild(img);
             });
         } else {
-            gallery.innerHTML = `<img src="https://via.placeholder.com/400x250?text=Tidak+Ada+Foto" class="gallery-item">`;
+            gallery.innerHTML = `<img src="https://via.placeholder.com/400x250?text=No+Image" class="gallery-item">`;
         }
 
         document.getElementById("m-name").innerText = item.nama_barang;
-        document.getElementById("m-ref").innerText = item.keterangan_ref || "(Tidak ada keterangan teknis)";
+        document.getElementById("m-ref").innerText = item.keterangan_ref || "-";
         document.getElementById("m-desc").value = item.keterangan_edit || "";
         document.getElementById("m-check").checked = (item.terpakai === "TRUE");
-        
         document.getElementById("modal").classList.add("active");
     }
 
     function closeModal() { document.getElementById("modal").classList.remove("active"); }
 
     document.getElementById("saveBtn").onclick = async function() {
-        this.disabled = true; 
-        const originalText = this.innerText;
-        this.innerText = "MENYIMPAN...";
+        this.disabled = true; this.innerText = "MENYIMPAN...";
         
         const payload = {
             action: "update_item",
@@ -235,26 +160,24 @@
         };
 
         try {
-            const res = await fetch(SCRIPT_URL, { 
-                method: "POST", 
-                body: JSON.stringify(payload) 
+            await fetch(SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                body: JSON.stringify(payload)
             });
-            const result = await res.text();
-            
-            if(result === "SUCCESS") {
-                alert("Data berhasil diperbarui!");
-                location.reload();
-            } else {
-                alert("Gagal menyimpan. PIN mungkin salah.");
-                this.disabled = false;
-                this.innerText = originalText;
-            }
+            alert("Data terkirim! Halaman akan memuat ulang.");
+            location.reload();
         } catch (e) {
-            alert("Terjadi kesalahan koneksi ke server.");
-            this.disabled = false;
-            this.innerText = originalText;
+            alert("Gagal mengirim data.");
+            this.disabled = false; this.innerText = "SIMPAN PERUBAHAN";
         }
     };
+
+    function filterData() {
+        const query = document.getElementById("searchInput").value.toLowerCase();
+        const filtered = allItems.filter(i => i.nama_barang.toLowerCase().includes(query));
+        render(filtered);
+    }
 </script>
 </body>
 </html>

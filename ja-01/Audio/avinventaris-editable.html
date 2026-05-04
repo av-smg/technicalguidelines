@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Edit Inventaris - JA Semarang</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+        :root { --primary-orange: #FF7E27; --primary-blue: #3A70E2; --bg-color: #F4F5F7; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background-color: var(--bg-color); padding: 20px; }
+        
+        .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .card { background: white; border-radius: 20px; padding: 15px; border: 2px solid #EEE; transition: 0.3s; }
+        .card img { width: 100%; height: 150px; object-fit: cover; border-radius: 12px; }
+        
+        .edit-area { margin-top: 15px; padding-top: 15px; border-top: 1px dashed #DDD; }
+        .status-check { display: flex; align-items: center; gap: 10px; font-weight: 800; margin-bottom: 10px; }
+        
+        textarea { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #DDD; font-size: 13px; resize: none; }
+        .btn-save { background: var(--primary-blue); color: white; border: none; padding: 10px; border-radius: 10px; width: 100%; margin-top: 10px; font-weight: 800; cursor: pointer; }
+        .btn-save:disabled { background: #CCC; }
+
+        #loading { text-align: center; padding: 50px; font-weight: 800; }
+    </style>
+</head>
+<body>
+
+    <h2 style="margin-bottom: 20px;">🛠 EDIT INVENTARIS</h2>
+    <div id="loading">Memuat data...</div>
+    <div id="grid" class="grid-cards"></div>
+
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwvgGRYAfPK2HXUaUDgJlLAX0w9OAiethcuXqlFdtRCrgYgY9Vce-51KYnxpCYQRmhE/exec";
+    let userPin = "";
+
+    window.onload = () => {
+        userPin = prompt("Masukkan PIN Akses:");
+        if(!userPin) window.location.reload();
+        loadData();
+    };
+
+    function loadData() {
+        fetch(SCRIPT_URL + "?action=api")
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("loading").style.display = "none";
+            render(data);
+        });
+    }
+
+    function render(items) {
+        const grid = document.getElementById("grid");
+        grid.innerHTML = "";
+        items.forEach(item => {
+            const isChecked = item.terpakai === "TRUE" ? "checked" : "";
+            const card = document.createElement("div");
+            card.className = "card";
+            card.innerHTML = `
+                <img src="${item.foto_1 || 'https://via.placeholder.com/300x150'}">
+                <h3 style="margin-top:10px">${item.nama_barang}</h3>
+                <div class="edit-area">
+                    <label class="status-check">
+                        <input type="checkbox" id="check-${item.row_index}" ${isChecked}> TERPAKAI
+                    </label>
+                    <textarea id="desc-${item.row_index}" rows="2">${item.keterangan}</textarea>
+                    <button class="btn-save" onclick="updateItem(${item.row_index})">SIMPAN</button>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    async function updateItem(rowIndex) {
+        const isChecked = document.getElementById(`check-${rowIndex}`).checked;
+        const newDesc = document.getElementById(`desc-${rowIndex}`).value;
+        const btn = event.target;
+
+        btn.disabled = true;
+        btn.innerText = "MENYIMPAN...";
+
+        const payload = {
+            action: "update_item",
+            pin: userPin,
+            row_index: rowIndex,
+            terpakai: isChecked ? "TRUE" : "FALSE",
+            keterangan: newDesc
+        };
+
+        try {
+            const response = await fetch(SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
+            const result = await response.text();
+            if(result === "SUCCESS") {
+                alert("Berhasil diperbarui!");
+            } else if(result === "WRONG_PIN") {
+                alert("PIN SALAH!");
+            } else {
+                alert("Gagal memperbarui.");
+            }
+        } catch (e) {
+            alert("Error koneksi.");
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "SIMPAN";
+        }
+    }
+</script>
+</body>
+</html>

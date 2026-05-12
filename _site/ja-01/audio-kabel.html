@@ -1,0 +1,578 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <link rel="stylesheet" href="../style.css" />
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title></title>
+
+<link rel="stylesheet" href="/style.css">
+
+<link rel="icon" type="image/png" href="/assets/image_94faf8.png">
+
+<script src="/assets/js/main.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleBtn = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        
+        // 1. Cek simpanan di browser
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+            if(themeIcon) themeIcon.textContent = '☀️';
+        }
+
+        // 2. Fungsi Klik
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                const isDark = document.body.classList.contains('dark-mode');
+                
+                if(themeIcon) themeIcon.textContent = isDark ? '☀️' : '🌙';
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                
+                console.log("Mode saat ini:", isDark ? "Dark" : "Light");
+            });
+        }
+    });
+</script>
+
+    <style>
+      /* Gaya Khusus untuk Mode Misi Lapangan */
+      .mission-container {
+        max-width: 600px;
+        margin: 40px auto;
+        padding: 0 20px;
+      }
+      .mission-header {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .progress-badge {
+        background: var(--soft-blue);
+        color: var(--primary-blue);
+        padding: 8px 16px;
+        border-radius: 100px;
+        font-weight: 800;
+        font-size: 14px;
+        display: inline-block;
+        margin-bottom: 15px;
+      }
+
+      /* --- STYLING OVERVIEW (BRIEFING MODE) --- */
+      .overview-card {
+        background: var(--card-bg);
+        border: 2px solid var(--border-color);
+        border-radius: 24px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+        animation: slideIn 0.5s ease-out;
+      }
+      .overview-card h2 {
+        text-align: center;
+        font-size: 20px;
+        margin-bottom: 20px;
+        color: var(--text-dark);
+      }
+
+      .mission-list {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 25px 0;
+      }
+      .mission-list li {
+        background: var(--bg-color);
+        padding: 15px;
+        border-radius: 12px;
+        margin-bottom: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-dark);
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        border: 1px solid var(--border-color);
+      }
+      .step-num {
+        background: var(--primary-blue);
+        color: white;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        font-weight: 800;
+        flex-shrink: 0;
+      }
+
+      .btn-start-all {
+        background: var(--primary-orange);
+        color: white;
+        border: none;
+        padding: 16px 30px;
+        font-size: 16px;
+        font-weight: 800;
+        border-radius: 100px;
+        width: 100%;
+        cursor: pointer;
+        transition: 0.3s;
+        box-shadow: 0 8px 20px rgba(255, 126, 39, 0.2);
+      }
+      .btn-start-all:hover {
+        background: #e66a15;
+        transform: translateY(-3px);
+      }
+
+      /* --- STYLING ACTIVE CARD (ACTION MODE) --- */
+      .active-mission-card {
+        background: var(--card-bg);
+        border: 2px solid var(--primary-blue);
+        border-radius: 24px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        text-align: center;
+        animation: slideIn 0.5s ease-out;
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateY(20px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .active-mission-card h2 {
+        font-size: 24px;
+        font-weight: 800;
+        margin-bottom: 15px;
+        color: var(--text-dark);
+      }
+      .active-mission-card p {
+        font-size: 16px;
+        line-height: 1.6;
+        color: var(--text-gray);
+        margin-bottom: 30px;
+      }
+
+      /* --- TOMBOL AKSI DALAM KARTU --- */
+      .action-buttons {
+        display: flex;
+        gap: 12px;
+      }
+
+      .btn-prev {
+        background: var(--bg-color);
+        color: var(--text-gray);
+        border: 1px solid var(--border-color);
+        padding: 16px 20px;
+        font-size: 15px;
+        font-weight: 800;
+        border-radius: 100px;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+      .btn-prev:hover {
+        background: #e2e8f0;
+        color: var(--text-dark);
+      }
+
+      .btn-finish {
+        background: var(--primary-blue);
+        color: white;
+        border: none;
+        padding: 16px 20px;
+        font-size: 16px;
+        font-weight: 800;
+        border-radius: 100px;
+        flex: 1;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+      .btn-finish:hover {
+        background: #002244;
+        transform: translateY(-3px);
+      }
+      .btn-finish:disabled {
+        background: #94a3b8;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      #loading-state,
+      #empty-state,
+      #success-state {
+        text-align: center;
+        padding: 50px 20px;
+        font-weight: 700;
+        color: var(--text-gray);
+      }
+      #success-state {
+        display: none;
+      }
+      .success-emoji {
+        font-size: 60px;
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+  <div class="nav-container">
+    <div class="nav-group-left">
+      <button class="hamburger" id="menu-open-btn"><span></span><span></span><span></span></button>
+      <a href="/" class="logo-link">
+        <img src="/assets/image_94faf8.png" alt="Logo" class="main-logo" />
+        <span class="site-tagline">Technical Guidelines</span>
+      </a>
+
+      <nav class="nav-menu" id="side-menu-drawer">
+        <button class="menu-close" id="menu-close-btn">&times;</button>
+        <div class="menu-content-top">
+          <a href="/" class="nav-link">Home</a>
+          <a href="/ja-01/" class="nav-link">JA-01</a>
+          <a href="/jw-08/" class="nav-link">JW-08</a>
+          <a href="/apendiks/" class="nav-link">Apendiks</a>
+        </div>
+        <div class="menu-content-bottom-mobile">
+          <button class="theme-toggle-mobile" onclick="toggleTheme()"><span class="theme-icon-status">🌙</span> <span>Mode Layar</span></button>
+        </div>
+      </nav>
+    </div>
+
+    <div class="nav-group-right">
+      <div class="search-wrapper-desktop" id="search-desktop-container">
+        <input type="text" id="missionSearch" placeholder="Cari..." onkeyup="filterMissions()" />
+        <button class="search-toggle-btn" id="search-trigger-global">🔍</button>
+      </div>
+
+      <button class="mobile-search-trigger" id="mobile-search-trigger-btn">🔍</button>
+
+      <button class="theme-toggle" onclick="toggleTheme()">
+        <span class="theme-icon-status">🌙</span>
+      </button>
+
+      
+      <div class="location-badge">JA-01</div>
+      
+    </div>
+  </div>
+
+  <div class="search-dropdown-mobile" id="search-mobile-dropdown">
+    <div class="search-inner">
+      <span style="opacity: 0.5">🔍</span>
+      <input type="text" id="missionSearchMobile" placeholder="Cari panduan..." onkeyup="filterMissionsMobile()" />
+      <button class="search-close-btn" id="search-close-mobile">&times;</button>
+    </div>
+    <div id="search-results-list-mobile"></div>
+  </div>
+</header>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // === 1. PENGATURAN DARK MODE (SINKRON) ===
+    const body = document.body;
+    const themeIcons = document.querySelectorAll(".theme-icon-status");
+
+    function updateIcons(isDark) {
+      themeIcons.forEach((icon) => {
+        icon.innerText = isDark ? "☀️" : "🌙";
+      });
+    }
+
+    if (localStorage.getItem("theme") === "dark") {
+      body.classList.add("dark-mode");
+      updateIcons(true);
+    }
+
+    window.toggleTheme = function () {
+      body.classList.toggle("dark-mode");
+      const isDarkNow = body.classList.contains("dark-mode");
+      localStorage.setItem("theme", isDarkNow ? "dark" : "light");
+      updateIcons(isDarkNow);
+    };
+
+    // === 2. LOGIKA HAMBURGER MENU ===
+    const menuDrawer = document.getElementById("side-menu-drawer");
+    const openBtn = document.getElementById("menu-open-btn");
+    const closeBtn = document.getElementById("menu-close-btn");
+
+    if (openBtn && menuDrawer) {
+      openBtn.addEventListener("click", () => menuDrawer.classList.add("active"));
+    }
+    if (closeBtn && menuDrawer) {
+      closeBtn.addEventListener("click", () => menuDrawer.classList.remove("active"));
+    }
+
+    // === 3. LOGIKA SEARCH MOBILE & DESKTOP YANG SUDAH DIPERBAIKI ===
+
+    // -- Variabel Desktop --
+    const searchDesktopWrapper = document.getElementById("search-desktop-container");
+    const searchDesktopBtn = document.getElementById("search-trigger-global");
+    const searchDesktopInput = document.getElementById("missionSearch");
+
+    // -- Variabel Mobile --
+    const searchMobileDropdown = document.getElementById("search-mobile-dropdown");
+    const searchMobileBtn = document.getElementById("mobile-search-trigger-btn");
+    const searchMobileClose = document.getElementById("search-close-mobile");
+    const searchMobileInput = document.getElementById("missionSearchMobile");
+
+    // Toggle Desktop
+    if (searchDesktopBtn && searchDesktopWrapper) {
+      searchDesktopBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        searchDesktopWrapper.classList.toggle("active");
+        if (searchDesktopWrapper.classList.contains("active") && searchDesktopInput) {
+          searchDesktopInput.focus();
+        }
+      });
+    }
+
+    // Toggle Mobile (Membuka Dropdown)
+    if (searchMobileBtn && searchMobileDropdown) {
+      searchMobileBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        searchMobileDropdown.classList.add("active"); // Munculkan Dropdown
+        if (searchMobileInput) searchMobileInput.focus();
+      });
+    }
+
+    // Close Mobile (Tutup pakai tombol X)
+    if (searchMobileClose && searchMobileDropdown) {
+      searchMobileClose.addEventListener("click", (e) => {
+        e.stopPropagation();
+        searchMobileDropdown.classList.remove("active");
+      });
+    }
+
+    // === 4. SISTEM TUTUP OTOMATIS (CLICK OUTSIDE) ===
+    window.addEventListener("click", (event) => {
+      // Tutup Search Desktop
+      if (searchDesktopWrapper && !searchDesktopWrapper.contains(event.target)) {
+        searchDesktopWrapper.classList.remove("active");
+      }
+
+      // Tutup Search Mobile (Jika klik di luar kotak dropdown)
+      if (searchMobileDropdown && !searchMobileDropdown.contains(event.target) && event.target !== searchMobileBtn) {
+        searchMobileDropdown.classList.remove("active");
+      }
+
+      // Tutup Side Menu
+      if (menuDrawer && !menuDrawer.contains(event.target) && !openBtn.contains(event.target)) {
+        menuDrawer.classList.remove("active");
+      }
+    });
+  });
+
+  // === 5. FUNGSI FILTER SEARCH ===
+  function filterMissions() {
+    let input = document.getElementById("missionSearch").value.toLowerCase();
+    filterLogic(input);
+  }
+
+  function filterMissionsMobile() {
+    let input = document.getElementById("missionSearchMobile").value.toLowerCase();
+    filterLogic(input);
+  }
+
+  function filterLogic(input) {
+    let cards = document.querySelectorAll(".location-main-card-link, .card-link");
+    cards.forEach((card) => {
+      let title = card.querySelector("h2, h3");
+      let desc = card.querySelector("p");
+      let text = (title ? title.innerText : "") + (desc ? desc.innerText : "");
+      card.style.display = text.toLowerCase().includes(input) ? "" : "none";
+    });
+  }
+</script>
+
+
+    <main class="mission-container">
+      <div class="mission-header">
+        <div class="progress-badge" id="progress-text" style="display: none">Misi: 0 / 0</div>
+        <h1 id="page-title">Memuat Data...</h1>
+      </div>
+
+      <div id="loading-state">⏳ Mengambil instruksi dari pusat...</div>
+
+      <div id="empty-state" style="display: none">📭 Belum ada misi yang ditugaskan untuk divisi ini hari ini.</div>
+
+      <div id="overview-state" style="display: none">
+        <div class="overview-card">
+          <h2>📋 Daftar Misi Hari Ini</h2>
+          <ul id="mission-list-preview" class="mission-list"></ul>
+          <button class="btn-start-all" onclick="mulaiEksekusiMisi()">🚀 MULAI KERJAKAN</button>
+        </div>
+      </div>
+
+      <div id="mission-card-container" style="display: none">
+        <div class="active-mission-card">
+          <h2 id="mission-title">Judul Misi</h2>
+          <p id="mission-desc">Deskripsi instruksi kerja akan muncul di sini.</p>
+
+          <div class="action-buttons">
+            <button id="btn-prev-mission" class="btn-prev" onclick="misiSebelumnya()">&#8592;</button>
+            <button id="btn-submit-mission" class="btn-finish" onclick="selesaikanMisi()">✅ TANDAI SELESAI</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="success-state">
+        <div class="success-emoji">🎉</div>
+        <h2>Kerja Bagus!</h2>
+        <p>Semua misi di sektor ini telah diselesaikan. Silakan kembali ke Dashboard atau bantu tim lain.</p>
+        <a href="index.html" class="btn-finish" style="display: inline-block; text-decoration: none; margin-top: 20px">Kembali ke Dashboard</a>
+      </div>
+    </main>
+
+    <script>
+      // =========================================================================
+      // PENGATURAN UTAMA
+      // =========================================================================
+      const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwqC1aFhzpfZA1ymTsqSO1stO_B11W13uaMT82q0cuS1xrASiCyRtMIRtY0jCGIoHnt/exec";
+      const KODE_HALAMAN = "audio-kabel";
+      // =========================================================================
+
+      let daftarMisi = [];
+      let indeksMisiSaatIni = 0;
+      let namaPetugas = localStorage.getItem("nama_petugas_av");
+
+      if (!namaPetugas) {
+        namaPetugas = prompt("Siapa nama kamu yang bertugas hari ini?");
+        if (!namaPetugas) namaPetugas = "Anonim";
+        localStorage.setItem("nama_petugas_av", namaPetugas);
+      }
+
+      window.onload = () => {
+        document.getElementById("page-title").innerText = `Tim ${KODE_HALAMAN.toUpperCase()}`;
+        tarikDataMisi();
+      };
+
+      async function tarikDataMisi() {
+        try {
+          const response = await fetch(SCRIPT_URL + "?action=get_misi");
+          const semuaMisi = await response.json();
+
+          daftarMisi = semuaMisi.filter((misi) => misi.kode_halaman === KODE_HALAMAN).sort((a, b) => a.urutan - b.urutan);
+
+          document.getElementById("loading-state").style.display = "none";
+
+          if (daftarMisi.length === 0) {
+            document.getElementById("empty-state").style.display = "block";
+          } else {
+            tampilkanOverview();
+          }
+        } catch (error) {
+          document.getElementById("loading-state").innerText = "❌ Gagal memuat data. Cek koneksi internet.";
+        }
+      }
+
+      function tampilkanOverview() {
+        const listContainer = document.getElementById("mission-list-preview");
+        listContainer.innerHTML = "";
+
+        daftarMisi.forEach((misi, index) => {
+          const li = document.createElement("li");
+          li.innerHTML = `<span class="step-num">${index + 1}</span> <span>${misi.judul_misi}</span>`;
+          listContainer.appendChild(li);
+        });
+
+        document.getElementById("overview-state").style.display = "block";
+      }
+
+      function mulaiEksekusiMisi() {
+        document.getElementById("overview-state").style.display = "none";
+        document.getElementById("progress-text").style.display = "inline-block";
+
+        tampilkanMisi();
+      }
+
+      function tampilkanMisi() {
+        document.getElementById("progress-text").innerText = `Misi: ${indeksMisiSaatIni + 1} / ${daftarMisi.length}`;
+
+        const misiAktif = daftarMisi[indeksMisiSaatIni];
+        document.getElementById("mission-title").innerText = misiAktif.judul_misi;
+        document.getElementById("mission-desc").innerText = misiAktif.deskripsi;
+
+        // Logika Sembunyikan/Tampilkan Tombol Kembali
+        const btnPrev = document.getElementById("btn-prev-mission");
+        if (indeksMisiSaatIni === 0) {
+          btnPrev.style.display = "none"; // Hilang di misi pertama
+        } else {
+          btnPrev.style.display = "block"; // Muncul di misi kedua dst
+        }
+
+        const container = document.getElementById("mission-card-container");
+        container.style.display = "block";
+
+        const card = container.querySelector(".active-mission-card");
+        card.style.animation = "none";
+        card.offsetHeight;
+        card.style.animation = null;
+      }
+
+      // FUNGSI BARU: Mundur ke Misi Sebelumnya
+      function misiSebelumnya() {
+        if (indeksMisiSaatIni > 0) {
+          indeksMisiSaatIni--;
+          tampilkanMisi();
+        }
+      }
+
+      async function selesaikanMisi() {
+        const btn = document.getElementById("btn-submit-mission");
+        const btnPrev = document.getElementById("btn-prev-mission");
+        const misiAktif = daftarMisi[indeksMisiSaatIni];
+
+        // Kunci kedua tombol saat loading
+        btn.disabled = true;
+        btnPrev.disabled = true;
+        btn.innerText = "⏳ MENGIRIM...";
+
+        const payload = {
+          nama_petugas: namaPetugas,
+          halaman_tugas: KODE_HALAMAN,
+          misi_selesai: misiAktif.judul_misi,
+        };
+
+        try {
+          await fetch(SCRIPT_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          lanjutMisi();
+        } catch (error) {
+          lanjutMisi();
+        }
+
+        function lanjutMisi() {
+          indeksMisiSaatIni++;
+          btn.disabled = false;
+          btnPrev.disabled = false;
+          btn.innerText = "✅ TANDAI SELESAI";
+
+          if (indeksMisiSaatIni < daftarMisi.length) {
+            tampilkanMisi();
+          } else {
+            document.getElementById("mission-card-container").style.display = "none";
+            document.getElementById("progress-text").style.display = "none";
+            document.getElementById("page-title").style.display = "none";
+            document.getElementById("success-state").style.display = "block";
+          }
+        }
+      }
+    </script>
+  </body>
+</html>

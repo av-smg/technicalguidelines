@@ -1,142 +1,145 @@
 ---
 location: "JW-08"
 ---
-<!DOCTYPE html>
+
+<!doctype html>
 <html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>A/V Mission Control 🚀</title>
-    <link rel="stylesheet" href="../style.css">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <link rel="stylesheet" href="../style.css" />
     {% include head.html %}
-</head>
-<body>
-{% include navbar.html %}
+  </head>
+  <body>
+    {% include navbar.html %}
 
     <main>
-        <section class="hero">
-            <h1>Vibe Check: <br><span>Ready for Action!</span> ⚡</h1>
-            <p>Pilih divisi kamu di bawah untuk masuk ke halaman detail misi, instruksi kerja, dan checklist hari ini.</p>
+      <section class="hero">
+        <h1>Vibe Check: <br /><span>Ready for Action!</span> ⚡</h1>
+        <p>Pilih divisi kamu di bawah untuk masuk ke halaman detail misi, instruksi kerja, dan checklist hari ini.</p>
+      </section>
+
+      <div class="content-container">
+        <section class="team-section">
+          <div class="team-header">
+            <span class="team-badge badge-audio">AUDIO</span>
+            <h2>Tim Audio</h2>
+          </div>
+          <div class="grid-cards">
+            <a href="audio-booth.html" class="card-link audio-link">
+              <div class="mission-card">
+                <div class="card-emoji">🎛️</div>
+                <h3>Tim Booth</h3>
+                <p>Kontrol DSP, Gain, EQ, dan pantau jalannya pidato.</p>
+                <span class="btn-go">Masuk Misi &rarr;</span>
+              </div>
+            </a>
+            <a href="audio-kabel.html" class="card-link audio-link">
+              <div class="mission-card">
+                <div class="card-emoji">🔌</div>
+                <h3>Tim Kabel</h3>
+                <p>Routing, lakban jalur, dan pastikan konektor aman.</p>
+                <span class="btn-go">Masuk Misi &rarr;</span>
+              </div>
+            </a>
+            <a href="audio-speaker.html" class="card-link audio-link">
+              <div class="mission-card">
+                <div class="card-emoji">🔊</div>
+                <h3>Tim Speaker</h3>
+                <p>Rigging TOA F2000, arah suara, & cegah feedback.</p>
+                <span class="btn-go">Masuk Misi &rarr;</span>
+              </div>
+            </a>
+          </div>
         </section>
 
-        <div class="content-container">
-            <section class="team-section">
-                <div class="team-header">
-                    <span class="team-badge badge-audio">AUDIO</span>
-                    <h2>Tim Audio</h2>
-                </div>
-                <div class="grid-cards">
-                    <a href="audio-booth.html" class="card-link audio-link">
-                        <div class="mission-card">
-                            <div class="card-emoji">🎛️</div>
-                            <h3>Tim Booth</h3>
-                            <p>Kontrol DSP, Gain, EQ, dan pantau jalannya pidato.</p>
-                            <span class="btn-go">Masuk Misi &rarr;</span>
-                        </div>
-                    </a>
-                    <a href="audio-kabel.html" class="card-link audio-link">
-                        <div class="mission-card">
-                            <div class="card-emoji">🔌</div>
-                            <h3>Tim Kabel</h3>
-                            <p>Routing, lakban jalur, dan pastikan konektor aman.</p>
-                            <span class="btn-go">Masuk Misi &rarr;</span>
-                        </div>
-                    </a>
-                    <a href="audio-speaker.html" class="card-link audio-link">
-                        <div class="mission-card">
-                            <div class="card-emoji">🔊</div>
-                            <h3>Tim Speaker</h3>
-                            <p>Rigging TOA F2000, arah suara, & cegah feedback.</p>
-                            <span class="btn-go">Masuk Misi &rarr;</span>
-                        </div>
-                    </a>
-                    <a href="inventaris.html" class="card-link audio-link">
-                        <div class="mission-card">
-                            <div class="card-emoji">📱</div>
-                            <h3>Tim Inventaris</h3>
-                            <p>Data barang keluar/masuk, cek kondisi mic, dan baterai.</p>
-                            <span class="btn-go">Logistik &rarr;</span>
-                        </div>
-                    </a>
-                </div>
-            </section>
-
-            <section class="team-section">
-                <div class="team-header">
-                    <span class="team-badge badge-video">VIDEO</span>
-                    <h2>Tim Video</h2>
-                </div>
-                <div class="grid-cards">
-                    <a href="video-booth.html" class="card-link video-link">
-                        <div class="mission-card">
-                            <div class="card-emoji">💻</div>
-                            <h3>Tim Booth</h3>
-                            <p>Setup Switcher, Record, Stream, dan pindah kamera saat live.</p>
-                            <span class="btn-go">Masuk Misi &rarr;</span>
-                        </div>
-                    </a>
-                    <a href="video-kamera.html" class="card-link video-link">
-                        <div class="mission-card">
-                            <div class="card-emoji">🎥</div>
-                            <h3>Tim Kamera</h3>
-                            <p>Framing medium/tight, Exposure, dan White Balance.</p>
-                            <span class="btn-go">Masuk Misi &rarr;</span>
-                        </div>
-                    </a>
-                    <a href="video-tv.html" class="card-link video-link">
-                        <div class="mission-card">
-                            <div class="card-emoji">📺</div>
-                            <h3>Tim TV / Layar</h3>
-                            <p>Routing slide presentasi pembicara ke layar utama / Videotron.</p>
-                            <span class="btn-go">Masuk Misi &rarr;</span>
-                        </div>
-                    </a>
-                    <a href="video-kabel.html" class="card-link video-link">
-                        <div class="mission-card">
-                            <div class="card-emoji">🔗</div>
-                            <h3>Tim Kabel</h3>
-                            <p>Tarik SDI/HDMI dari kamera ke switcher dan gulung kabel sisa.</p>
-                            <span class="btn-go">Masuk Misi &rarr;</span>
-                        </div>
-                    </a>
-                </div>
-            </section>
-        </div>
-<section class="team-section">
-        <div class="team-section">
-        <div class="team-header">
-        <span class="team-badge badge-it">IT Support</span>
-        <h2>Tim IT</h2>
-         </div>
-            <div class="grid-cards">
-            <a href="it/network.html" class="card-link it-link">
-             <div class="mission-card">
-                <div class="card-emoji">🌐</div>
-                <h3>Network Admin</h3>
-                <p>Pantau vLAN, ketersediaan internet, dan backup link.</p>
+        <section class="team-section">
+          <div class="team-header">
+            <span class="team-badge badge-video">VIDEO</span>
+            <h2>Tim Video</h2>
+          </div>
+          <div class="grid-cards">
+            <a href="video-booth.html" class="card-link video-link">
+              <div class="mission-card">
+                <div class="card-emoji">💻</div>
+                <h3>Tim Booth</h3>
+                <p>Setup Switcher, Record, Stream, dan pindah kamera saat live.</p>
                 <span class="btn-go">Masuk Misi &rarr;</span>
-            </div>
+              </div>
             </a>
-            </div>
-        </div>
-    </section>
-<div class="team-section">
-    <div class="team-header">
-        <span class="team-badge badge-podium">Podium</span>
-        <h2>Tim Podium</h2>
-    </div>
-    <div class="grid-cards">
-        <a href="podium/mic.html" class="card-link podium-link">
-            <div class="mission-card">
-                <div class="card-emoji">🎤</div>
-                <h3>Podium Setup</h3>
-                <p>Setting tinggi mic, kabel rapi, dan monitor podium.</p>
+            <a href="video-kamera.html" class="card-link video-link">
+              <div class="mission-card">
+                <div class="card-emoji">🎥</div>
+                <h3>Tim Kamera</h3>
+                <p>Framing medium/tight, Exposure, dan White Balance.</p>
                 <span class="btn-go">Masuk Misi &rarr;</span>
-            </div>
-        </a>
-    </div>
-</div>
+              </div>
+            </a>
+            <a href="video-tv.html" class="card-link video-link">
+              <div class="mission-card">
+                <div class="card-emoji">📺</div>
+                <h3>Tim TV / Layar</h3>
+                <p>Routing slide presentasi ke videotron atau layar utama.</p>
+                <span class="btn-go">Masuk Misi &rarr;</span>
+              </div>
+            </a>
+          </div>
+        </section>
+
+        <section class="team-section">
+          <div class="team-header">
+            <span class="team-badge badge-it">IT SUPPORT</span>
+            <h2>Tim IT</h2>
+          </div>
+          <div class="grid-cards">
+            <a href="it-network.html" class="card-link it-link">
+              <div class="mission-card">
+                <div class="card-emoji">🌐</div>
+                <h3>Jaringan & Internet</h3>
+                <p>Setup router, cek bandwidth, dan pastikan koneksi stabil.</p>
+                <span class="btn-go">Masuk Misi &rarr;</span>
+              </div>
+            </a>
+            <a href="it-troubleshoot.html" class="card-link it-link">
+              <div class="mission-card">
+                <div class="card-emoji">🛠️</div>
+                <h3>Technical Support</h3>
+                <p>Troubleshoot laptop pembicara, capture card, dan driver.</p>
+                <span class="btn-go">Masuk Misi &rarr;</span>
+              </div>
+            </a>
+          </div>
+        </section>
+
+        <section class="team-section">
+          <div class="team-header">
+            <span class="team-badge badge-podium">PODIUM</span>
+            <h2>Tim Podium</h2>
+          </div>
+          <div class="grid-cards">
+            <a href="podium-setup.html" class="card-link podium-link">
+              <div class="mission-card">
+                <div class="card-emoji">🏛️</div>
+                <h3>Tata Letak</h3>
+                <p>Posisi podium, kerapihan kabel stage, dan estetika panggung.</p>
+                <span class="btn-go">Masuk Misi &rarr;</span>
+              </div>
+            </a>
+            <a href="podium-mic.html" class="card-link podium-link">
+              <div class="mission-card">
+                <div class="card-emoji">🎤</div>
+                <h3>Mic Management</h3>
+                <p>Setup gooseneck mic, wireless handheld, dan baterai cadangan.</p>
+                <span class="btn-go">Masuk Misi &rarr;</span>
+              </div>
+            </a>
+          </div>
+        </section>
+      </div>
     </main>
 
-</body>
+    <footer class="simple-footer">
+      <p>&copy; 2026 Tim Teknis A/V. All rights reserved.</p>
+    </footer>
+  </body>
 </html>

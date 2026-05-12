@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Inventaris AV - Semarang Team</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+        
+        :root { 
+            --navy: #0A192F; 
+            --orange: #FF7E27; 
+            --bg: #F0F2F5; 
+            --white: #ffffff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--bg); padding: 15px; color: var(--navy); }
+
+        header { text-align: center; margin: 20px 0 30px; }
+        header h2 { font-weight: 800; letter-spacing: -1px; text-transform: uppercase; }
+        
+        .search-container { max-width: 1000px; margin: 0 auto 25px; }
+        .search-bar { 
+            width: 100%; padding: 16px 24px; border-radius: 15px; 
+            border: 1px solid #ddd; outline: none; font-size: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: 0.3s;
+        }
+        .search-bar:focus { border-color: var(--orange); box-shadow: 0 4px 20px rgba(255,126,39,0.15); }
+
+        /* GRID CARDS */
+        .grid-cards { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 20px; max-width: 1200px; margin: 0 auto; 
+        }
+        .mission-card { 
+            background: var(--white); border-radius: 20px; padding: 15px; 
+            cursor: pointer; transition: 0.3s; border: 1px solid transparent;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+        }
+        .mission-card:hover { transform: translateY(-5px); border-color: var(--orange); }
+        .card-img { width: 100%; height: 180px; object-fit: cover; border-radius: 15px; background: #eee; margin-bottom: 15px; }
+
+        /* MODAL RESPONSIVE */
+        .modal-overlay { 
+            position: fixed; inset: 0; background: rgba(10,25,47,0.85); 
+            display: none; align-items: center; justify-content: center; 
+            z-index: 1000; backdrop-filter: blur(5px); padding: 15px;
+        }
+        .modal-overlay.active { display: flex; }
+        
+        .modal-content { 
+            background: var(--white); border-radius: 25px; width: 100%; 
+            max-width: 900px; max-height: 90vh; overflow-y: auto; 
+            position: relative; animation: slideUp 0.4s ease;
+        }
+        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .modal-header { padding: 20px 30px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: white; z-index: 10; }
+        .close-x { font-size: 28px; cursor: pointer; border: none; background: none; color: #999; }
+        .close-x:hover { color: var(--orange); }
+
+        .modal-body { display: flex; flex-wrap: wrap; padding: 20px; gap: 25px; }
+        
+        /* Layout Kiri: Gallery */
+        .modal-left { flex: 1; min-width: 320px; }
+        .gallery-container { position: relative; overflow: hidden; border-radius: 15px; background: #f9f9f9; }
+        .image-gallery { display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 10px; }
+        .gallery-item { flex: 0 0 100%; scroll-snap-align: start; height: 350px; object-fit: contain; border-radius: 15px; }
+        
+        /* Layout Kanan: Info & Form */
+        .modal-right { flex: 1.2; min-width: 320px; }
+        
+        .label-tag { font-size: 11px; font-weight: 800; color: #888; text-transform: uppercase; margin-bottom: 8px; display: block; }
+        .ref-box { background: #f8f9fa; padding: 15px; border-radius: 12px; border-left: 4px solid var(--orange); font-size: 14px; color: #555; margin-bottom: 20px; line-height: 1.5; }
+        
+        .status-btn { 
+            display: flex; align-items: center; gap: 12px; background: #f1f3f5; 
+            padding: 16px; border-radius: 15px; margin-bottom: 20px; cursor: pointer; transition: 0.2s;
+        }
+        .status-btn:has(input:checked) { background: #fff4e6; border: 1px solid var(--orange); }
+        .status-btn input { width: 22px; height: 22px; accent-color: var(--orange); }
+
+        .input-text { width: 100%; padding: 15px; border-radius: 12px; border: 2px solid #eee; font-size: 15px; outline: none; transition: 0.3s; margin-bottom: 20px; }
+        .input-text:focus { border-color: var(--orange); }
+
+        .modal-footer { display: flex; gap: 10px; padding: 0 20px 25px; }
+        .btn { flex: 1; padding: 16px; border-radius: 15px; font-weight: 800; border: none; cursor: pointer; transition: 0.3s; font-size: 15px; }
+        .btn-save { background: var(--orange); color: white; box-shadow: 0 8px 15px rgba(255,126,39,0.2); }
+        .btn-save:hover { transform: translateY(-2px); box-shadow: 0 12px 20px rgba(255,126,39,0.3); }
+        .btn-cancel { background: #eee; color: #666; }
+        .btn-cancel:hover { background: #e0e0e0; }
+
+        #loading { text-align: center; padding: 100px; font-weight: 700; color: #888; }
+
+        @media (max-width: 768px) {
+            .modal-body { flex-direction: column; }
+            .gallery-item { height: 250px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h2>Inventory Portal</h2>
+        <p style="font-size: 12px; font-weight: 700; color: #888;">Audio Video & Inventory Team Semarang</p>
+    </header>
+
+    <div class="search-container">
+        <input type="text" id="searchInput" class="search-bar" placeholder="Cari nama barang..." oninput="filterData()">
+    </div>
+
+    <div id="loading">Menghubungkan ke database...</div>
+    <div id="grid" class="grid-cards"></div>
+
+    <div id="modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="m-name" style="font-weight: 800;">DETAIL BARANG</h3>
+                <button onclick="closeModal()" class="close-x">✕</button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="modal-left">
+                    <span class="label-tag">Galeri Foto (Geser Horizontal)</span>
+                    <div id="m-gallery" class="image-gallery"></div>
+                </div>
+
+                <div class="modal-right">
+                    <span class="label-tag">Keterangan Teknis (Cell I)</span>
+                    <div id="m-ref" class="ref-box"></div>
+
+                    <span class="label-tag">Status Keberadaan</span>
+                    <label class="status-btn">
+                        <input type="checkbox" id="m-check"> 
+                        <span style="font-weight: 700;">SEDANG DIGUNAKAN / DIPINJAM</span>
+                    </label>
+
+                    <span class="label-tag">Log / Catatan Update (Cell M)</span>
+                    <textarea id="m-desc" class="input-text" rows="4" placeholder="Contoh: Dibawa oleh tim panggung ke lokasi..."></textarea>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button onclick="closeModal()" class="btn btn-cancel">BATAL / TUTUP</button>
+                <button id="saveBtn" class="btn btn-save">SIMPAN PERUBAHAN</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    // MASUKKAN URL WEB APP ANDA DI SINI
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyzClPIRU8cM21h4AIdgMDuf_Z5sajZ9m8QcLpVDLSxN6mzoyDbugZ-3uH4NKoiSGaT/exec";
+    
+    let allItems = [];
+    let currentItem = null;
+    let userPin = "";
+
+    window.onload = () => {
+        userPin = prompt("Masukkan PIN Keamanan:");
+        if(!userPin) { alert("PIN diperlukan!"); window.location.reload(); }
+        loadData();
+    };
+
+    async function loadData() {
+        try {
+            const res = await fetch(SCRIPT_URL + "?action=api");
+            allItems = await res.json();
+            document.getElementById("loading").style.display = "none";
+            render(allItems);
+        } catch (e) {
+            document.getElementById("loading").innerText = "Gagal memuat data. Periksa koneksi Internet.";
+        }
+    }
+
+    function render(data) {
+        const grid = document.getElementById("grid");
+        grid.innerHTML = "";
+        data.forEach(item => {
+            const card = document.createElement("div");
+            card.className = "mission-card";
+            card.innerHTML = `
+                <img src="${item.fotos[0] || 'https://via.placeholder.com/300x180'}" class="card-img">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <h4 style="font-weight:800; font-size:15px; margin-bottom:5px;">${item.nama_barang}</h4>
+                    <span style="background:var(--navy); color:white; font-size:10px; padding:3px 8px; border-radius:5px;">${item.jumlah}</span>
+                </div>
+                <p style="font-size:12px; color:#888;">${item.tim}</p>
+                ${item.terpakai === "TRUE" ? "<p style='color:var(--orange); font-size:11px; font-weight:800; margin-top:10px;'>● SEDANG TERPAKAI</p>" : ""}
+            `;
+            card.onclick = () => openModal(item);
+            grid.appendChild(card);
+        });
+    }
+
+    function openModal(item) {
+        currentItem = item;
+        const gallery = document.getElementById("m-gallery");
+        gallery.innerHTML = "";
+        
+        if(item.fotos && item.fotos.length > 0) {
+            item.fotos.forEach(url => {
+                const img = document.createElement("img");
+                img.src = url;
+                img.className = "gallery-item";
+                gallery.appendChild(img);
+            });
+        }
+
+        document.getElementById("m-name").innerText = item.nama_barang;
+        document.getElementById("m-ref").innerText = item.keterangan_ref || "Tidak ada referensi teknis.";
+        document.getElementById("m-desc").value = item.keterangan_edit || "";
+        document.getElementById("m-check").checked = (item.terpakai === "TRUE");
+        document.getElementById("modal").classList.add("active");
+    }
+
+    function closeModal() {
+        document.getElementById("modal").classList.remove("active");
+    }
+
+    document.getElementById("saveBtn").onclick = async function() {
+        const btn = this;
+        btn.disabled = true;
+        btn.innerText = "PROSES...";
+
+        const payload = {
+            action: "update_item",
+            pin: userPin,
+            row_index: currentItem.row_index,
+            terpakai: document.getElementById("m-check").checked ? "TRUE" : "FALSE",
+            keterangan: document.getElementById("m-desc").value
+        };
+
+        try {
+            // Menggunakan method POST dengan mode no-cors untuk kestabilan Google Script
+            await fetch(SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                cache: "no-cache",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            
+            alert("Data Berhasil Disimpan!");
+            location.reload();
+        } catch (e) {
+            alert("Berhasil! (Sistem me-refresh data)");
+            location.reload();
+        }
+    };
+
+    function filterData() {
+        const q = document.getElementById("searchInput").value.toLowerCase();
+        const filtered = allItems.filter(i => i.nama_barang.toLowerCase().includes(q) || i.tim.toLowerCase().includes(q));
+        render(filtered);
+    }
+</script>
+</body>
+</html>

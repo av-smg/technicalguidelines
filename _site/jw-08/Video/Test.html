@@ -1,4 +1,53 @@
-<header>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Setting Mixer TOA ZA-2128MW | A/V Mission Control</title>
+    
+    <link rel="stylesheet" href="/style.css">
+    
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>Setting Mixer TOA ZA-2128MW</title>
+
+<link rel="stylesheet" href="/style.css">
+
+<link rel="icon" type="image/png" href="/assets/image_94faf8.png">
+
+<script src="/assets/js/main.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleBtn = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        
+        // 1. Cek simpanan di browser
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+            if(themeIcon) themeIcon.textContent = '☀️';
+        }
+
+        // 2. Fungsi Klik
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                const isDark = document.body.classList.contains('dark-mode');
+                
+                if(themeIcon) themeIcon.textContent = isDark ? '☀️' : '🌙';
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                
+                console.log("Mode saat ini:", isDark ? "Dark" : "Light");
+            });
+        }
+    });
+</script>
+
+</head>
+<body>
+
+    <header>
   <div class="nav-container">
     <div class="nav-group-left">
       <button class="hamburger" id="menu-open-btn"><span></span><span></span><span></span></button>
@@ -33,9 +82,9 @@
         <span class="theme-icon-status">🌙</span>
       </button>
 
-      {% if page.location %}
-      <div class="location-badge">{{ page.location }}</div>
-      {% endif %}
+      
+      <div class="location-badge">JA-01</div>
+      
     </div>
   </div>
 
@@ -166,3 +215,98 @@
     });
   }
 </script>
+
+
+    <main>
+        <div class="article-master-container">
+    <div class="article-content-card">
+        <header class="article-top-header">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Setting Mixer TOA ZA-2128MW</title>
+    <link rel="stylesheet" href="/style.css">
+        <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>Setting Mixer TOA ZA-2128MW</title>
+
+<link rel="stylesheet" href="/style.css">
+
+<link rel="icon" type="image/png" href="/assets/image_94faf8.png">
+
+<script src="/assets/js/main.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleBtn = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        
+        // 1. Cek simpanan di browser
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+            if(themeIcon) themeIcon.textContent = '☀️';
+        }
+
+        // 2. Fungsi Klik
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                const isDark = document.body.classList.contains('dark-mode');
+                
+                if(themeIcon) themeIcon.textContent = isDark ? '☀️' : '🌙';
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                
+                console.log("Mode saat ini:", isDark ? "Dark" : "Light");
+            });
+        }
+    });
+</script>
+
+
+            <div class="article-tags-row">
+                <span class="badge-pill dynamic-color" data-color="#673AB7">
+                    JA-01
+                </span>
+                <span class="badge-pill dynamic-color" data-color="#2196f3">
+                    Video
+                </span>
+            </div>
+            <h1 class="article-main-title">Setting Mixer TOA ZA-2128MW</h1>
+            <div class="article-title-line"></div>
+        </header>
+
+        <section class="article-main-body">
+            <h2 id="persiapan-awal">Persiapan Awal</h2>
+<p>Pastikan kabel power sudah terhubung ke stopkontak. Mixer ini sering digunakan di area <strong>Pemalang</strong> dan <strong>Tegal</strong> untuk acara skala menengah.</p>
+
+<h3 id="langkah-langkah">Langkah-langkah:</h3>
+<ol>
+  <li>Hubungkan mikrofon ke <strong>Channel 1</strong>.</li>
+  <li>Putur knob <strong>Gain</strong> ke arah jam 12.</li>
+  <li>Atur <strong>Master Volume</strong> agar suara tidak pecah (distorsi).</li>
+</ol>
+
+<p>Materi ini adalah bagian dari Technical Guidelines untuk tim media di lapangan.</p>
+
+        </section>
+
+        <footer class="article-bottom-footer">
+            <a href="/" class="btn-back">
+                &larr; Kembali ke Beranda
+            </a>
+        </footer>
+    </div>
+</div>
+
+<script>
+    // Pastikan warna badge muncul
+    document.querySelectorAll('.dynamic-color').forEach(el => {
+        el.style.backgroundColor = el.getAttribute('data-color');
+    });
+</script>
+    </main>
+
+    
+
+</body>
+</html>

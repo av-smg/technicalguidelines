@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Inventaris Audio | A/V Mission Control</title>
+    
+    <link rel="stylesheet" href="/style.css">
+    
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>Inventaris Audio</title>
+
+<link rel="stylesheet" href="/style.css">
+
+<link rel="icon" type="image/png" href="/assets/image_94faf8.png">
+
+<script src="/assets/js/main.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleBtn = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        
+        // 1. Cek simpanan di browser
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+            if(themeIcon) themeIcon.textContent = '☀️';
+        }
+
+        // 2. Fungsi Klik
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                const isDark = document.body.classList.contains('dark-mode');
+                
+                if(themeIcon) themeIcon.textContent = isDark ? '☀️' : '🌙';
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                
+                console.log("Mode saat ini:", isDark ? "Dark" : "Light");
+            });
+        }
+    });
+</script>
+
+</head>
+<body>
+
+    <header>
+  <div class="nav-container">
+    <div class="nav-group-left">
+      <button class="hamburger" id="menu-open-btn"><span></span><span></span><span></span></button>
+      <a href="/" class="logo-link">
+        <img src="/assets/image_94faf8.png" alt="Logo" class="main-logo" />
+        <span class="site-tagline">Technical Guidelines</span>
+      </a>
+
+      <nav class="nav-menu" id="side-menu-drawer">
+        <button class="menu-close" id="menu-close-btn">&times;</button>
+        <div class="menu-content-top">
+          <a href="/" class="nav-link">Home</a>
+          <a href="/ja-01/" class="nav-link">JA-01</a>
+          <a href="/jw-08/" class="nav-link">JW-08</a>
+          <a href="/apendiks/" class="nav-link">Apendiks</a>
+        </div>
+        <div class="menu-content-bottom-mobile">
+          <button class="theme-toggle-mobile" onclick="toggleTheme()"><span class="theme-icon-status">🌙</span> <span>Mode Layar</span></button>
+        </div>
+      </nav>
+    </div>
+
+    <div class="nav-group-right">
+      <div class="search-wrapper-desktop" id="search-desktop-container">
+        <input type="text" id="missionSearch" placeholder="Cari..." onkeyup="filterMissions()" />
+        <button class="search-toggle-btn" id="search-trigger-global">🔍</button>
+      </div>
+
+      <button class="mobile-search-trigger" id="mobile-search-trigger-btn">🔍</button>
+
+      <button class="theme-toggle" onclick="toggleTheme()">
+        <span class="theme-icon-status">🌙</span>
+      </button>
+
+      
+      <div class="location-badge">Semarang</div>
+      
+    </div>
+  </div>
+
+  <div class="search-dropdown-mobile" id="search-mobile-dropdown">
+    <div class="search-inner">
+      <span style="opacity: 0.5">🔍</span>
+      <input type="text" id="missionSearchMobile" placeholder="Cari panduan..." onkeyup="filterMissionsMobile()" />
+      <button class="search-close-btn" id="search-close-mobile">&times;</button>
+    </div>
+    <div id="search-results-list-mobile"></div>
+  </div>
+</header>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // === 1. PENGATURAN DARK MODE (SINKRON) ===
+    const body = document.body;
+    const themeIcons = document.querySelectorAll(".theme-icon-status");
+
+    function updateIcons(isDark) {
+      themeIcons.forEach((icon) => {
+        icon.innerText = isDark ? "☀️" : "🌙";
+      });
+    }
+
+    if (localStorage.getItem("theme") === "dark") {
+      body.classList.add("dark-mode");
+      updateIcons(true);
+    }
+
+    window.toggleTheme = function () {
+      body.classList.toggle("dark-mode");
+      const isDarkNow = body.classList.contains("dark-mode");
+      localStorage.setItem("theme", isDarkNow ? "dark" : "light");
+      updateIcons(isDarkNow);
+    };
+
+    // === 2. LOGIKA HAMBURGER MENU ===
+    const menuDrawer = document.getElementById("side-menu-drawer");
+    const openBtn = document.getElementById("menu-open-btn");
+    const closeBtn = document.getElementById("menu-close-btn");
+
+    if (openBtn && menuDrawer) {
+      openBtn.addEventListener("click", () => menuDrawer.classList.add("active"));
+    }
+    if (closeBtn && menuDrawer) {
+      closeBtn.addEventListener("click", () => menuDrawer.classList.remove("active"));
+    }
+
+    // === 3. LOGIKA SEARCH MOBILE & DESKTOP YANG SUDAH DIPERBAIKI ===
+
+    // -- Variabel Desktop --
+    const searchDesktopWrapper = document.getElementById("search-desktop-container");
+    const searchDesktopBtn = document.getElementById("search-trigger-global");
+    const searchDesktopInput = document.getElementById("missionSearch");
+
+    // -- Variabel Mobile --
+    const searchMobileDropdown = document.getElementById("search-mobile-dropdown");
+    const searchMobileBtn = document.getElementById("mobile-search-trigger-btn");
+    const searchMobileClose = document.getElementById("search-close-mobile");
+    const searchMobileInput = document.getElementById("missionSearchMobile");
+
+    // Toggle Desktop
+    if (searchDesktopBtn && searchDesktopWrapper) {
+      searchDesktopBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        searchDesktopWrapper.classList.toggle("active");
+        if (searchDesktopWrapper.classList.contains("active") && searchDesktopInput) {
+          searchDesktopInput.focus();
+        }
+      });
+    }
+
+    // Toggle Mobile (Membuka Dropdown)
+    if (searchMobileBtn && searchMobileDropdown) {
+      searchMobileBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        searchMobileDropdown.classList.add("active"); // Munculkan Dropdown
+        if (searchMobileInput) searchMobileInput.focus();
+      });
+    }
+
+    // Close Mobile (Tutup pakai tombol X)
+    if (searchMobileClose && searchMobileDropdown) {
+      searchMobileClose.addEventListener("click", (e) => {
+        e.stopPropagation();
+        searchMobileDropdown.classList.remove("active");
+      });
+    }
+
+    // === 4. SISTEM TUTUP OTOMATIS (CLICK OUTSIDE) ===
+    window.addEventListener("click", (event) => {
+      // Tutup Search Desktop
+      if (searchDesktopWrapper && !searchDesktopWrapper.contains(event.target)) {
+        searchDesktopWrapper.classList.remove("active");
+      }
+
+      // Tutup Search Mobile (Jika klik di luar kotak dropdown)
+      if (searchMobileDropdown && !searchMobileDropdown.contains(event.target) && event.target !== searchMobileBtn) {
+        searchMobileDropdown.classList.remove("active");
+      }
+
+      // Tutup Side Menu
+      if (menuDrawer && !menuDrawer.contains(event.target) && !openBtn.contains(event.target)) {
+        menuDrawer.classList.remove("active");
+      }
+    });
+  });
+
+  // === 5. FUNGSI FILTER SEARCH ===
+  function filterMissions() {
+    let input = document.getElementById("missionSearch").value.toLowerCase();
+    filterLogic(input);
+  }
+
+  function filterMissionsMobile() {
+    let input = document.getElementById("missionSearchMobile").value.toLowerCase();
+    filterLogic(input);
+  }
+
+  function filterLogic(input) {
+    let cards = document.querySelectorAll(".location-main-card-link, .card-link");
+    cards.forEach((card) => {
+      let title = card.querySelector("h2, h3");
+      let desc = card.querySelector("p");
+      let text = (title ? title.innerText : "") + (desc ? desc.innerText : "");
+      card.style.display = text.toLowerCase().includes(input) ? "" : "none";
+    });
+  }
+</script>
+
+
+    <main>
+        <!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+
+        :root {
+            --primary-orange: #FF7E27;
+            --primary-blue: #3A70E2;
+            --bg-color: #F4F5F7;
+            --text-dark: #1A1A1A;
+            --text-gray: #6B7280;
+            --card-radius: 24px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-dark); padding-bottom: 50px; }
+
+        /* FILTER AREA */
+        .filter-section { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
+        .filter-container { display: flex; gap: 10px; flex-wrap: wrap; }
+        .custom-input {
+            padding: 12px 16px; border-radius: 100px; border: 2px solid #E5E7EB;
+            font-size: 14px; font-weight: 600; outline: none; background: white;
+        }
+        .search-bar { flex-grow: 1; min-width: 250px; }
+
+        /* GRID & CARDS */
+        .content-container { max-width: 1200px; margin: 0 auto; padding: 15px; }
+        .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+
+        .mission-card {
+            background: white; border: 2px solid #F0F0F0; border-radius: var(--card-radius);
+            padding: 16px; display: flex; flex-direction: column; cursor: pointer;
+            transition: 0.3s; height: 100%;
+        }
+        .mission-card:hover { transform: translateY(-5px); border-color: var(--primary-orange); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+
+        .card-img { width: 100%; height: 180px; object-fit: cover; border-radius: 16px; margin-bottom: 12px; background: #eee; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .card-header h3 { font-size: 16px; font-weight: 800; text-transform: uppercase; }
+        .qty-badge { background: #1A1A1A; color: white; padding: 4px 12px; border-radius: 100px; font-size: 12px; font-weight: 800; }
+
+        .tag-group { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px; }
+        .badge { font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 100px; text-transform: uppercase; }
+        .badge-green { background: #D1FAE5; color: #059669; }
+        .badge-red { background: #FEE2E2; color: #DC2626; }
+        .badge-gray { background: #E5E7EB; color: #4B5563; }
+        .badge-orange { background: var(--primary-orange); color: white; }
+        .badge-blue { background: var(--primary-blue); color: white; }
+
+        .card-desc { font-size: 13px; color: var(--text-gray); line-height: 1.4; font-style: italic; }
+
+        /* MODAL GALERI */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+            display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
+            backdrop-filter: blur(8px);
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-content {
+            background: white; border-radius: var(--card-radius); max-width: 500px; width: 100%;
+            padding: 24px; position: relative; animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .modal-main-img { width: 100%; height: 280px; object-fit: contain; background: #F9FAFB; border-radius: 16px; margin-bottom: 12px; }
+        .modal-thumbs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; }
+        .modal-thumb { width: 100%; height: 65px; object-fit: cover; border-radius: 10px; cursor: pointer; border: 2px solid transparent; }
+        .modal-thumb:hover { border-color: var(--primary-orange); }
+        .modal-close { position: absolute; top: -45px; right: 0; color: white; font-size: 35px; background: none; border: none; cursor: pointer; }
+
+        #loading { text-align: center; padding: 60px; font-weight: 800; color: var(--text-gray); }
+    </style>
+</head>
+<body>
+
+<main>
+    <section class="filter-section">
+        <div class="filter-container">
+            <select id="filterTim" class="custom-input"><option value="">🎯 Semua Tim</option></select>
+            <select id="filterMilik" class="custom-input"><option value="">🏢 Kepemilikan</option></select>
+            <input id="searchInput" type="text" placeholder="🔍 Cari nama alat..." class="custom-input search-bar">
+        </div>
+    </section>
+
+    <div class="content-container">
+        <div id="loading">⏳ MENYINKRONKAN DATA...</div>
+        <div id="grid" class="grid-cards"></div>
+    </div>
+</main>
+
+<!-- MODAL GALERI -->
+<div id="modal" class="modal-overlay">
+    <div class="modal-content">
+        <button id="closeModal" class="modal-close">✕</button>
+        
+        <!-- Header Modal: Nama & Qty -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h2 id="modalName" style="text-transform: uppercase; font-weight: 800; font-size: 20px;"></h2>
+            <span id="modalQty" class="qty-badge"></span>
+        </div>
+
+        <!-- Tags Modal -->
+        <div id="modalTags" class="tag-group" style="margin-bottom: 15px;"></div>
+        
+        <img id="modalImage" class="modal-main-img" src="">
+        <div id="modalThumbs" class="modal-thumbs"></div>
+        
+        <!-- Keterangan -->
+        <div style="background: #F4F5F7; padding: 15px; border-radius: 15px; border-left: 5px solid var(--primary-orange);">
+            <p id="modalDesc" style="font-size: 14px; color: var(--text-dark); line-height: 1.5; font-weight: 600;"></p>
+        </div>
+    </div>
+</div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw_o-g7N48O6w9rJuoHyo2Z177xyBHSpQKJpzcCyJhdnzOtOIdWzVUyHeBwL4f3VDA5/exec?action=api";
+
+let allItems = [];
+const grid = document.getElementById("grid");
+
+fetch(SCRIPT_URL).then(res => res.json()).then(data => {
+    document.getElementById("loading").style.display = "none";
+    allItems = data.filter(item => item.nama_barang && item.nama_barang !== "Nama Barang");
+    populateFilters();
+    renderItems();
+});
+
+function populateFilters() {
+    const tims = [...new Set(allItems.map(i => i.tim).filter(Boolean))];
+    const miliks = [...new Set(allItems.map(i => i.barang_milik).filter(Boolean))];
+    tims.forEach(t => { const opt = document.createElement("option"); opt.value = t; opt.textContent = t; document.getElementById("filterTim").appendChild(opt); });
+    miliks.forEach(m => { const opt = document.createElement("option"); opt.value = m; opt.textContent = m; document.getElementById("filterMilik").appendChild(opt); });
+}
+
+// Fungsi bantu buat badge
+function getBadgesHTML(item) {
+    const timClass = String(item.tim).toLowerCase().includes('audio') ? 'badge-orange' : 'badge-blue';
+    return `
+        <span class="badge ${timClass}">${item.tim}</span>
+        <span class="badge badge-green">${item.barang_milik}</span>
+        <span class="badge ${item.kondisi === 'Rusak' ? 'badge-red' : 'badge-gray'}">${item.kondisi}</span>
+    `;
+}
+
+function renderItems() {
+    grid.innerHTML = "";
+    const fSearch = document.getElementById("searchInput").value.toLowerCase();
+    const fTim = document.getElementById("filterTim").value.toLowerCase();
+    const fMilik = document.getElementById("filterMilik").value.toLowerCase();
+
+    const filtered = allItems.filter(i => {
+        return (!fTim || String(i.tim).toLowerCase() === fTim) &&
+               (!fMilik || String(i.barang_milik).toLowerCase() === fMilik) &&
+               (!fSearch || String(i.nama_barang).toLowerCase().includes(fSearch));
+    });
+
+    filtered.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "mission-card";
+        card.innerHTML = `
+            <img src="${item.foto_1 || 'https://via.placeholder.com/400x300?text=No+Image'}" class="card-img">
+            <div class="card-header">
+                <h3>${item.nama_barang}</h3>
+                <span class="qty-badge">${item.jumlah}</span>
+            </div>
+            <div class="tag-group">${getBadgesHTML(item)}</div>
+            <p class="card-desc">${item.keterangan || 'Tidak ada deskripsi.'}</p>
+        `;
+        card.onclick = () => openModal(item);
+        grid.appendChild(card);
+    });
+}
+
+function openModal(item) {
+    const modal = document.getElementById("modal");
+    document.getElementById("modalName").textContent = item.nama_barang;
+    document.getElementById("modalQty").textContent = item.jumlah;
+    document.getElementById("modalTags").innerHTML = getBadgesHTML(item);
+    document.getElementById("modalDesc").textContent = (item.keterangan && item.keterangan.trim() !== "") ? item.keterangan : "Tidak ada keterangan tambahan.";
+    
+    const photos = [item.foto_1, item.foto_2, item.foto_3, item.foto_4].filter(Boolean);
+    const mImg = document.getElementById("modalImage");
+    mImg.src = photos[0] || "https://via.placeholder.com/400x300?text=No+Image";
+    
+    const thumbs = document.getElementById("modalThumbs");
+    thumbs.innerHTML = "";
+    photos.forEach(p => {
+        const t = document.createElement("img");
+        t.src = p; t.className = "modal-thumb";
+        t.onclick = (e) => { e.stopPropagation(); mImg.src = p; };
+        thumbs.appendChild(t);
+    });
+
+    modal.classList.add("active");
+}
+
+document.getElementById("closeModal").onclick = () => document.getElementById("modal").classList.remove("active");
+document.getElementById("filterTim").onchange = renderItems;
+document.getElementById("filterMilik").onchange = renderItems;
+document.getElementById("searchInput").oninput = renderItems;
+</script>
+
+</body>
+</html>
+
+    </main>
+
+    
+
+</body>
+</html>

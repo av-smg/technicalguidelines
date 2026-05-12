@@ -1,4 +1,47 @@
-<header>
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title></title>
+
+<link rel="stylesheet" href="/style.css">
+
+<link rel="icon" type="image/png" href="/assets/image_94faf8.png">
+
+<script src="/assets/js/main.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleBtn = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        
+        // 1. Cek simpanan di browser
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+            if(themeIcon) themeIcon.textContent = '☀️';
+        }
+
+        // 2. Fungsi Klik
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                const isDark = document.body.classList.contains('dark-mode');
+                
+                if(themeIcon) themeIcon.textContent = isDark ? '☀️' : '🌙';
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                
+                console.log("Mode saat ini:", isDark ? "Dark" : "Light");
+            });
+        }
+    });
+</script>
+
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
   <div class="nav-container">
     <div class="nav-group-left">
       <button class="hamburger" id="menu-open-btn"><span></span><span></span><span></span></button>
@@ -33,9 +76,7 @@
         <span class="theme-icon-status">🌙</span>
       </button>
 
-      {% if page.location %}
-      <div class="location-badge">{{ page.location }}</div>
-      {% endif %}
+      
     </div>
   </div>
 
@@ -166,3 +207,55 @@
     });
   }
 </script>
+
+
+    <main>
+      <section class="hero">
+        <h1>Dashboard Teknis: <br /><span>Galed</span> 🌍</h1>
+        <p>Pilih lokasi penugasan kamu untuk mengakses panduan dan alur kerja A/V spesifik.</p>
+      </section>
+
+      <div class="content-container">
+        <a href="jw-08/index.html" class="location-main-card-link">
+          <div class="location-main-card jw-card">
+            <div class="card-content">
+              <span class="location-label badge-jw">Region Alpha</span>
+              <h2>JW-08 Indonesia</h2>
+              <p>Dashboard koordinasi A/V utama wilayah Indonesia.</p>
+              <span class="btn-enter">Buka Region &rarr;</span>
+            </div>
+            <div class="card-illustration">🇮🇩</div>
+          </div>
+        </a>
+
+        <a href="ja-01/index.html" class="location-main-card-link">
+          <div class="location-main-card ja-card">
+            <div class="card-content">
+              <span class="location-label badge-ja">Region Beta</span>
+              <h2>JA-01 Jawa</h2>
+              <p>Panduan teknis dan alur kerja operasional wilayah Jawa.</p>
+              <span class="btn-enter">Buka Region &rarr;</span>
+            </div>
+            <div class="card-illustration">🗺️</div>
+          </div>
+        </a>
+
+        <a href="apendiks/index.html" class="location-main-card-link">
+          <div class="location-main-card apendiks-card">
+            <div class="card-content">
+              <span class="location-label badge-apendiks">Resources</span>
+              <h2>Apendiks</h2>
+              <p>Glossary, dokumentasi alat, dan referensi tambahan.</p>
+              <span class="btn-enter">Buka Resource &rarr;</span>
+            </div>
+            <div class="card-illustration">📚</div>
+          </div>
+        </a>
+      </div>
+    </main>
+
+    <footer class="simple-footer">
+      <p>&copy; 2026 Tim Teknis A/V. All rights reserved.</p>
+    </footer>
+  </body>
+</html>

@@ -1,4 +1,53 @@
-<header>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Daftar Apendiks | A/V Mission Control</title>
+    
+    <link rel="stylesheet" href="/style.css">
+    
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>Daftar Apendiks</title>
+
+<link rel="stylesheet" href="/style.css">
+
+<link rel="icon" type="image/png" href="/assets/image_94faf8.png">
+
+<script src="/assets/js/main.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleBtn = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        
+        // 1. Cek simpanan di browser
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+            if(themeIcon) themeIcon.textContent = '☀️';
+        }
+
+        // 2. Fungsi Klik
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                const isDark = document.body.classList.contains('dark-mode');
+                
+                if(themeIcon) themeIcon.textContent = isDark ? '☀️' : '🌙';
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                
+                console.log("Mode saat ini:", isDark ? "Dark" : "Light");
+            });
+        }
+    });
+</script>
+
+</head>
+<body>
+
+    <header>
   <div class="nav-container">
     <div class="nav-group-left">
       <button class="hamburger" id="menu-open-btn"><span></span><span></span><span></span></button>
@@ -33,9 +82,7 @@
         <span class="theme-icon-status">🌙</span>
       </button>
 
-      {% if page.location %}
-      <div class="location-badge">{{ page.location }}</div>
-      {% endif %}
+      
     </div>
   </div>
 
@@ -166,3 +213,85 @@
     });
   }
 </script>
+
+
+    <main>
+        <link rel="stylesheet" href="style_apendiks.css">
+
+<div class="content-container">
+    <section class="hero">
+        <div class="badge-group" style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <span class="team-badge badge-it">REFERENSI</span>
+            <span class="team-badge" style="background: #4b5563;">DOKUMEN</span>
+        </div>
+        <h1>Daftar <span>Apendiks</span> ⚡</h1>
+        <p>Kumpulan dokumen pendukung, aset visual, dan referensi teknis proyek av-smg.</p>
+    </section>
+
+    <div class="search-wrapper" style="margin-bottom: 40px;">
+        <input type="text" id="appendixSearch" class="search-input" placeholder="Cari lampiran...">
+    </div>
+
+    <section class="team-section">
+        <div class="team-header">
+            <span class="team-badge badge-audio">A. DOKUMEN TEKNIS</span>
+        </div>
+        <div class="grid-cards">
+            <a href="skema-jalur-audio-toa.html" class="card-link audio-link">
+                <div class="mission-card">
+                    <div class="card-emoji">🔌</div>
+                    <h3>Skema Jalur Audio TOA DIY</h3>
+                    <p>Diagram teknis instalasi dan jalur kabel audio khusus sistem TOA.</p>
+                    <span class="btn-go">Buka &rarr;</span>
+                </div>
+            </a>
+            <a href="manual-canon-1200d.html" class="card-link audio-link">
+                <div class="mission-card">
+                    <div class="card-emoji">📸</div>
+                    <h3>Manual Canon 1200D</h3>
+                    <p>Panduan konfigurasi kamera untuk produksi video.</p>
+                    <span class="btn-go">Buka &rarr;</span>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <section class="team-section" style="margin-top: 40px;">
+        <div class="team-header">
+            <span class="team-badge badge-it">B. ASET & MEDIA</span>
+        </div>
+        <div class="grid-cards">
+            <a href="prompt-ghibli-ai.html" class="card-link it-link">
+                <div class="mission-card">
+                    <div class="card-emoji">🎨</div>
+                    <h3>Prompt Ghibli Style AI</h3>
+                    <p>Koleksi keyword prompt gaya Studio Ghibli.</p>
+                    <span class="btn-go">Buka &rarr;</span>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <div style="margin-top: 50px; padding-bottom: 50px;">
+        <a href="/" style="color: #60a5fa; text-decoration: none; font-weight: bold;">← Kembali ke Beranda</a>
+    </div>
+</div>
+
+<script>
+    const searchInput = document.getElementById('appendixSearch');
+    const cards = document.querySelectorAll('.card-link');
+    if(searchInput) {
+        searchInput.addEventListener('input', function() {
+            const filter = searchInput.value.toLowerCase();
+            cards.forEach(card => {
+                card.style.display = card.innerText.toLowerCase().includes(filter) ? 'block' : 'none';
+            });
+        });
+    }
+</script>
+    </main>
+
+    
+
+</body>
+</html>

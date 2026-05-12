@@ -98,6 +98,7 @@
         gap: 15px;
         border: 1px solid var(--border-color);
       }
+
       .step-num {
         background: var(--primary-blue);
         color: white;
@@ -110,6 +111,16 @@
         font-size: 13px;
         font-weight: 800;
         flex-shrink: 0;
+        transition: 0.3s;
+      }
+
+      /* Style khusus untuk misi yang sudah selesai */
+      .step-done {
+        background: #10b981 !important;
+      } /* Hijau */
+      .text-done {
+        text-decoration: line-through;
+        color: #9ca3af !important;
       }
 
       .btn-start-all {
@@ -403,15 +414,15 @@
         <h1 id="page-title">Memuat Data...</h1>
       </div>
 
-      <div id="loading-state">⏳ Mengambil instruksi dari pusat...</div>
+      <div id="loading-state">⏳ Menyinkronkan data dengan pusat...</div>
 
       <div id="empty-state" style="display: none">📭 Belum ada misi yang ditugaskan untuk divisi ini hari ini.</div>
 
       <div id="overview-state" style="display: none">
         <div class="overview-card">
-          <h2>📋 Daftar Misi Hari Ini</h2>
+          <h2>📋 Progress Tim Hari Ini</h2>
           <ul id="mission-list-preview" class="mission-list"></ul>
-          <button class="btn-start-all" onclick="mulaiEksekusiMisi()">🚀 MULAI KERJAKAN</button>
+          <button id="btn-start-action" class="btn-start-all" onclick="mulaiEksekusiMisi()">🚀 MULAI KERJAKAN</button>
         </div>
       </div>
 
@@ -424,13 +435,16 @@
             <button id="btn-prev-mission" class="btn-prev" onclick="misiSebelumnya()">&#8592;</button>
             <button id="btn-submit-mission" class="btn-finish" onclick="selesaikanMisi()">✅ TANDAI SELESAI</button>
           </div>
+          <div style="text-align: center; margin-top: 25px">
+            <button onclick="kembaliKeOverview()" class="btn-enter" style="background-color: var(--soft-blue); color: var(--primary-blue); border: none; cursor: pointer; padding: 12px 24px">📄 Lihat Daftar Misi</button>
+          </div>
         </div>
       </div>
 
       <div id="success-state">
         <div class="success-emoji">🎉</div>
-        <h2>Kerja Bagus!</h2>
-        <p>Semua misi di sektor ini telah diselesaikan. Silakan kembali ke Dashboard atau bantu tim lain.</p>
+        <h2>Semua Clear!</h2>
+        <p>Seluruh instruksi kerja di sektor ini telah diselesaikan. Silakan istirahat atau bantu tim lain.</p>
         <a href="index.html" class="btn-finish" style="display: inline-block; text-decoration: none; margin-top: 20px">Kembali ke Dashboard</a>
       </div>
     </main>
@@ -439,11 +453,12 @@
       // =========================================================================
       // PENGATURAN UTAMA
       // =========================================================================
-      const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwqC1aFhzpfZA1ymTsqSO1stO_B11W13uaMT82q0cuS1xrASiCyRtMIRtY0jCGIoHnt/exec";
+      const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzR9sTwg8gWpIQa3zpUfxYHZS5FDNaJr9Bi4rYAZGqxKOXskGpKJ6AVYEdN23FDyAp9/exec";
       const KODE_HALAMAN = "audio-kabel";
       // =========================================================================
 
       let daftarMisi = [];
+      let logAktivitas = [];
       let indeksMisiSaatIni = 0;
       let namaPetugas = localStorage.getItem("nama_petugas_av");
 
@@ -460,40 +475,80 @@
 
       async function tarikDataMisi() {
         try {
-          const response = await fetch(SCRIPT_URL + "?action=get_misi");
-          const semuaMisi = await response.json();
+          // Sekarang kita panggil get_data_lengkap (Misi + Log)
+          const response = await fetch(SCRIPT_URL + "?action=get_data_lengkap");
+          const dataPusat = await response.json();
 
-          daftarMisi = semuaMisi.filter((misi) => misi.kode_halaman === KODE_HALAMAN).sort((a, b) => a.urutan - b.urutan);
+          // 1. Saring Daftar Misi
+          daftarMisi = dataPusat.misi.filter((misi) => misi.kode_halaman === KODE_HALAMAN).sort((a, b) => a.urutan - b.urutan);
+
+          // 2. Saring Log Aktivitas (Hanya ambil log untuk halaman ini)
+          logAktivitas = dataPusat.log.filter((log) => log.halaman_tugas === KODE_HALAMAN);
 
           document.getElementById("loading-state").style.display = "none";
 
           if (daftarMisi.length === 0) {
             document.getElementById("empty-state").style.display = "block";
           } else {
-            tampilkanOverview();
+            kalkulasiProgress();
           }
         } catch (error) {
           document.getElementById("loading-state").innerText = "❌ Gagal memuat data. Cek koneksi internet.";
         }
       }
 
-      function tampilkanOverview() {
+      function kembaliKeOverview() {
+        // Sembunyikan kartu aksi & progress bar
+        document.getElementById("mission-card-container").style.display = "none";
+        document.getElementById("progress-text").style.display = "none";
+
+        // Panggil fungsi kalkulasi untuk memunculkan ulang list dengan centang terbaru
+        kalkulasiProgress();
+      }
+
+      function kalkulasiProgress() {
+        let jumlahSelesai = 0;
         const listContainer = document.getElementById("mission-list-preview");
         listContainer.innerHTML = "";
 
         daftarMisi.forEach((misi, index) => {
+          // Cek apakah judul misi ini ada di dalam log aktivitas
+          const sudahSelesai = logAktivitas.some((log) => log.misi_selesai === misi.judul_misi);
+
           const li = document.createElement("li");
-          li.innerHTML = `<span class="step-num">${index + 1}</span> <span>${misi.judul_misi}</span>`;
+
+          if (sudahSelesai) {
+            jumlahSelesai++;
+            // Render dengan centang hijau dan dicoret
+            li.innerHTML = `<span class="step-num step-done">✓</span> <span class="text-done">${misi.judul_misi}</span>`;
+          } else {
+            // Render normal
+            li.innerHTML = `<span class="step-num">${index + 1}</span> <span>${misi.judul_misi}</span>`;
+          }
           listContainer.appendChild(li);
         });
 
-        document.getElementById("overview-state").style.display = "block";
+        // Set indeks mulai dari misi pertama yang belum selesai
+        indeksMisiSaatIni = jumlahSelesai;
+
+        const btnStart = document.getElementById("btn-start-action");
+
+        if (jumlahSelesai === 0) {
+          btnStart.innerText = "🚀 MULAI KERJAKAN";
+          document.getElementById("overview-state").style.display = "block";
+        } else if (jumlahSelesai < daftarMisi.length) {
+          btnStart.innerText = `⏯️ LANJUTKAN MISI (${jumlahSelesai + 1}/${daftarMisi.length})`;
+          document.getElementById("overview-state").style.display = "block";
+        } else {
+          // Jika sudah selesai semua, lewati overview dan langsung ke halaman success
+          document.getElementById("page-title").style.display = "none";
+          document.getElementById("success-state").style.display = "block";
+        }
       }
 
       function mulaiEksekusiMisi() {
         document.getElementById("overview-state").style.display = "none";
         document.getElementById("progress-text").style.display = "inline-block";
-
         tampilkanMisi();
       }
 
@@ -504,12 +559,12 @@
         document.getElementById("mission-title").innerText = misiAktif.judul_misi;
         document.getElementById("mission-desc").innerText = misiAktif.deskripsi;
 
-        // Logika Sembunyikan/Tampilkan Tombol Kembali
         const btnPrev = document.getElementById("btn-prev-mission");
+        // Tombol kembali di-disable jika kita berada di misi pertama ATAU jika misi sebelumnya sudah dikunci oleh sistem
         if (indeksMisiSaatIni === 0) {
-          btnPrev.style.display = "none"; // Hilang di misi pertama
+          btnPrev.style.display = "none";
         } else {
-          btnPrev.style.display = "block"; // Muncul di misi kedua dst
+          btnPrev.style.display = "block";
         }
 
         const container = document.getElementById("mission-card-container");
@@ -521,7 +576,6 @@
         card.style.animation = null;
       }
 
-      // FUNGSI BARU: Mundur ke Misi Sebelumnya
       function misiSebelumnya() {
         if (indeksMisiSaatIni > 0) {
           indeksMisiSaatIni--;
@@ -534,7 +588,6 @@
         const btnPrev = document.getElementById("btn-prev-mission");
         const misiAktif = daftarMisi[indeksMisiSaatIni];
 
-        // Kunci kedua tombol saat loading
         btn.disabled = true;
         btnPrev.disabled = true;
         btn.innerText = "⏳ MENGIRIM...";

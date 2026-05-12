@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title> | A/V Mission Control</title>
+    
+    <link rel="stylesheet" href="/style.css">
+    
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title></title>
+
+<link rel="stylesheet" href="/style.css">
+
+<link rel="icon" type="image/png" href="/assets/image_94faf8.png">
+
+<script src="/assets/js/main.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleBtn = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        
+        // 1. Cek simpanan di browser
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+            if(themeIcon) themeIcon.textContent = '☀️';
+        }
+
+        // 2. Fungsi Klik
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                const isDark = document.body.classList.contains('dark-mode');
+                
+                if(themeIcon) themeIcon.textContent = isDark ? '☀️' : '🌙';
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                
+                console.log("Mode saat ini:", isDark ? "Dark" : "Light");
+            });
+        }
+    });
+</script>
+
+</head>
+<body>
+
+    <header>
+  <div class="nav-container">
+    <div class="nav-group-left">
+      <button class="hamburger" id="menu-open-btn"><span></span><span></span><span></span></button>
+      <a href="/" class="logo-link">
+        <img src="/assets/image_94faf8.png" alt="Logo" class="main-logo" />
+        <span class="site-tagline">Technical Guidelines</span>
+      </a>
+
+      <nav class="nav-menu" id="side-menu-drawer">
+        <button class="menu-close" id="menu-close-btn">&times;</button>
+        <div class="menu-content-top">
+          <a href="/" class="nav-link">Home</a>
+          <a href="/ja-01/" class="nav-link">JA-01</a>
+          <a href="/jw-08/" class="nav-link">JW-08</a>
+          <a href="/apendiks/" class="nav-link">Apendiks</a>
+        </div>
+        <div class="menu-content-bottom-mobile">
+          <button class="theme-toggle-mobile" onclick="toggleTheme()"><span class="theme-icon-status">🌙</span> <span>Mode Layar</span></button>
+        </div>
+      </nav>
+    </div>
+
+    <div class="nav-group-right">
+      <div class="search-wrapper-desktop" id="search-desktop-container">
+        <input type="text" id="missionSearch" placeholder="Cari..." onkeyup="filterMissions()" />
+        <button class="search-toggle-btn" id="search-trigger-global">🔍</button>
+      </div>
+
+      <button class="mobile-search-trigger" id="mobile-search-trigger-btn">🔍</button>
+
+      <button class="theme-toggle" onclick="toggleTheme()">
+        <span class="theme-icon-status">🌙</span>
+      </button>
+
+      
+    </div>
+  </div>
+
+  <div class="search-dropdown-mobile" id="search-mobile-dropdown">
+    <div class="search-inner">
+      <span style="opacity: 0.5">🔍</span>
+      <input type="text" id="missionSearchMobile" placeholder="Cari panduan..." onkeyup="filterMissionsMobile()" />
+      <button class="search-close-btn" id="search-close-mobile">&times;</button>
+    </div>
+    <div id="search-results-list-mobile"></div>
+  </div>
+</header>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // === 1. PENGATURAN DARK MODE (SINKRON) ===
+    const body = document.body;
+    const themeIcons = document.querySelectorAll(".theme-icon-status");
+
+    function updateIcons(isDark) {
+      themeIcons.forEach((icon) => {
+        icon.innerText = isDark ? "☀️" : "🌙";
+      });
+    }
+
+    if (localStorage.getItem("theme") === "dark") {
+      body.classList.add("dark-mode");
+      updateIcons(true);
+    }
+
+    window.toggleTheme = function () {
+      body.classList.toggle("dark-mode");
+      const isDarkNow = body.classList.contains("dark-mode");
+      localStorage.setItem("theme", isDarkNow ? "dark" : "light");
+      updateIcons(isDarkNow);
+    };
+
+    // === 2. LOGIKA HAMBURGER MENU ===
+    const menuDrawer = document.getElementById("side-menu-drawer");
+    const openBtn = document.getElementById("menu-open-btn");
+    const closeBtn = document.getElementById("menu-close-btn");
+
+    if (openBtn && menuDrawer) {
+      openBtn.addEventListener("click", () => menuDrawer.classList.add("active"));
+    }
+    if (closeBtn && menuDrawer) {
+      closeBtn.addEventListener("click", () => menuDrawer.classList.remove("active"));
+    }
+
+    // === 3. LOGIKA SEARCH MOBILE & DESKTOP YANG SUDAH DIPERBAIKI ===
+
+    // -- Variabel Desktop --
+    const searchDesktopWrapper = document.getElementById("search-desktop-container");
+    const searchDesktopBtn = document.getElementById("search-trigger-global");
+    const searchDesktopInput = document.getElementById("missionSearch");
+
+    // -- Variabel Mobile --
+    const searchMobileDropdown = document.getElementById("search-mobile-dropdown");
+    const searchMobileBtn = document.getElementById("mobile-search-trigger-btn");
+    const searchMobileClose = document.getElementById("search-close-mobile");
+    const searchMobileInput = document.getElementById("missionSearchMobile");
+
+    // Toggle Desktop
+    if (searchDesktopBtn && searchDesktopWrapper) {
+      searchDesktopBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        searchDesktopWrapper.classList.toggle("active");
+        if (searchDesktopWrapper.classList.contains("active") && searchDesktopInput) {
+          searchDesktopInput.focus();
+        }
+      });
+    }
+
+    // Toggle Mobile (Membuka Dropdown)
+    if (searchMobileBtn && searchMobileDropdown) {
+      searchMobileBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        searchMobileDropdown.classList.add("active"); // Munculkan Dropdown
+        if (searchMobileInput) searchMobileInput.focus();
+      });
+    }
+
+    // Close Mobile (Tutup pakai tombol X)
+    if (searchMobileClose && searchMobileDropdown) {
+      searchMobileClose.addEventListener("click", (e) => {
+        e.stopPropagation();
+        searchMobileDropdown.classList.remove("active");
+      });
+    }
+
+    // === 4. SISTEM TUTUP OTOMATIS (CLICK OUTSIDE) ===
+    window.addEventListener("click", (event) => {
+      // Tutup Search Desktop
+      if (searchDesktopWrapper && !searchDesktopWrapper.contains(event.target)) {
+        searchDesktopWrapper.classList.remove("active");
+      }
+
+      // Tutup Search Mobile (Jika klik di luar kotak dropdown)
+      if (searchMobileDropdown && !searchMobileDropdown.contains(event.target) && event.target !== searchMobileBtn) {
+        searchMobileDropdown.classList.remove("active");
+      }
+
+      // Tutup Side Menu
+      if (menuDrawer && !menuDrawer.contains(event.target) && !openBtn.contains(event.target)) {
+        menuDrawer.classList.remove("active");
+      }
+    });
+  });
+
+  // === 5. FUNGSI FILTER SEARCH ===
+  function filterMissions() {
+    let input = document.getElementById("missionSearch").value.toLowerCase();
+    filterLogic(input);
+  }
+
+  function filterMissionsMobile() {
+    let input = document.getElementById("missionSearchMobile").value.toLowerCase();
+    filterLogic(input);
+  }
+
+  function filterLogic(input) {
+    let cards = document.querySelectorAll(".location-main-card-link, .card-link");
+    cards.forEach((card) => {
+      let title = card.querySelector("h2, h3");
+      let desc = card.querySelector("p");
+      let text = (title ? title.innerText : "") + (desc ? desc.innerText : "");
+      card.style.display = text.toLowerCase().includes(input) ? "" : "none";
+    });
+  }
+</script>
+
+
+    <main>
+        <div class="article-master-container" style="padding-top: 0">
+  <main class="content-container">
+    <div style="padding: 20px 0">
+      <a href="javascript:history.back()" style="text-decoration: none; display: inline-flex; align-items: center; gap: 12px">
+        <span
+          style="
+            background: var(--card-bg);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px var(--border-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-gray);
+          "
+          >←</span
+        >
+        <span style="color: var(--text-gray); font-weight: 800; font-size: 14px; letter-spacing: 0.5px">KEMBALI</span>
+      </a>
+    </div>
+
+    <header class="hero" style="margin: 0 0 30px 0; padding: 0">
+      <h1 id="page-title" style="font-size: 32px; font-weight: 800"><span>MEMUAT...</span></h1>
+      <p id="progress-text" class="hidden" style="margin-top: 10px; font-weight: 700; color: var(--text-gray); font-size: 13px; letter-spacing: 1px">PROGRESS: 0 / 0</p>
+    </header>
+
+    <div id="loading-state" style="text-align: center; padding: 60px 0">
+      <p style="color: var(--text-gray); font-weight: 600">⏳ Sinkronisasi data instruksi...</p>
+    </div>
+
+    <div id="setup-zona" class="hidden">
+      <section class="team-section" style="padding: 25px">
+        <div class="team-header">
+          <span class="team-badge badge-ja">ZONA</span>
+          <h2 style="font-weight: 800; font-size: 18px">PILIH AREA KERJA</h2>
+        </div>
+        <div id="zone-list" class="grid-cards"></div>
+      </section>
+    </div>
+
+    <div id="overview-area" class="hidden">
+      <section class="team-section" style="padding: 25px">
+        <div class="team-header" style="margin-bottom: 20px">
+          <span id="zona-badge" class="team-badge badge-video" style="font-size: 11px">AREA</span>
+          <h2 style="font-weight: 800; font-size: 16px">INSTRUKSI KERJA</h2>
+        </div>
+
+        <div id="mission-list-preview" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px"></div>
+
+        <button
+          onclick="mulaiEksekusi()"
+          class="btn-enter"
+          style="width: 100%; padding: 18px; background: var(--primary-orange); color: white; border: none; justify-content: center; font-size: 15px; font-weight: 800; border-radius: 100px; box-shadow: 0 4px 15px rgba(255, 126, 39, 0.2)"
+        >
+          🚀 MULAI EKSEKUSI
+        </button>
+      </section>
+    </div>
+
+    <div id="execution-area" class="hidden">
+      <div class="mission-card" style="padding: 45px 25px; text-align: center; border: 1px solid var(--border-color)">
+        <div id="meta-info" style="margin-bottom: 20px"></div>
+        <h2 id="exec-title" style="font-size: 24px; font-weight: 600; margin-bottom: 12px; color: var(--text-dark)">Judul Misi</h2>
+        <p id="exec-desc" style="color: var(--text-gray); line-height: 1.7; margin-bottom: 40px; font-size: 15px"></p>
+
+        <div style="display: flex; gap: 15px; justify-content: center; align-items: center">
+          <button
+            onclick="misiSebelumnya()"
+            style="background: var(--soft-blue); border: none; width: 50px; height: 50px; border-radius: 50%; color: var(--primary-blue); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px"
+          >
+            ←
+          </button>
+          <button id="btn-submit" onclick="tandaiSelesai()" class="btn-enter" style="flex: 1; height: 50px; background: var(--primary-blue); color: white; border: none; font-weight: 800; justify-content: center">TANDAI SELESAI</button>
+        </div>
+
+        <button onclick="kembaliKeOverview()" style="margin-top: 30px; background: none; border: none; color: var(--text-gray); text-decoration: underline; font-weight: 700; cursor: pointer; font-size: 13px">Kembali ke Daftar</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzR9sTwg8gWpIQa3zpUfxYHZS5FDNaJr9Bi4rYAZGqxKOXskGpKJ6AVYEdN23FDyAp9/exec";
+  const params = new URLSearchParams(window.location.search);
+  const KODE_HALAMAN = params.get("id");
+
+  let ALL_MISI = [];
+  let LOG_SELESAI = [];
+  let SELECTED_ZONA = "";
+  let CURRENT_IDX = 0;
+  let NAMA_USER = localStorage.getItem("nama_user") || "Petugas";
+
+  if (!NAMA_USER || NAMA_USER === "Petugas") {
+    NAMA_USER = prompt("Siapa namamu hari ini?") || "Petugas";
+    localStorage.setItem("nama_user", NAMA_USER);
+  }
+
+  async function init() {
+    if (!KODE_HALAMAN) {
+      window.location.href = "/";
+      return;
+    }
+    const judul = KODE_HALAMAN.split("-").slice(1).join(" ");
+    document.getElementById("page-title").innerHTML = `<span>${judul.toUpperCase()}</span>`;
+    await loadData();
+  }
+
+  async function loadData() {
+    try {
+      const resp = await fetch(`${SCRIPT_URL}?action=get_data_lengkap`);
+      const data = await resp.json();
+      ALL_MISI = data.misi.filter((m) => m.kode_halaman === KODE_HALAMAN);
+      LOG_SELESAI = data.log.filter((l) => l.halaman_tugas === KODE_HALAMAN).map((l) => l.misi_selesai);
+      document.getElementById("loading-state").classList.add("hidden");
+      setupZona();
+    } catch (e) {
+      console.error("Koneksi Gagal", e);
+    }
+  }
+
+  function setupZona() {
+    const zonaSet = [...new Set(ALL_MISI.map((m) => m.zona).filter((z) => z))];
+    if (zonaSet.length > 0) {
+      const list = document.getElementById("zone-list");
+      zonaSet.forEach((z) => {
+        list.innerHTML += `
+                    <div class="mission-card" onclick="pilihZona('${z}')" style="cursor:pointer; padding: 20px; text-align:center;">
+                        <h3 style="margin:0; font-size: 16px; font-weight:700;">📍 ${z}</h3>
+                    </div>`;
+      });
+      document.getElementById("setup-zona").classList.remove("hidden");
+    } else {
+      pilihZona("Semua");
+    }
+  }
+
+  function pilihZona(z) {
+    SELECTED_ZONA = z;
+    document.getElementById("setup-zona").classList.add("hidden");
+    document.getElementById("overview-area").classList.remove("hidden");
+    document.getElementById("zona-badge").innerText = z.toUpperCase();
+    renderOverview();
+  }
+
+  function renderOverview() {
+    const container = document.getElementById("mission-list-preview");
+    container.innerHTML = "";
+    const filtered = SELECTED_ZONA === "Semua" ? ALL_MISI : ALL_MISI.filter((m) => m.zona === SELECTED_ZONA);
+
+    filtered.forEach((m, i) => {
+      const isDone = LOG_SELESAI.includes(m.judul_misi);
+      container.innerHTML += `
+                <div style="padding: 15px 20px; background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border-color); display: flex; align-items: center; gap: 15px; opacity: ${isDone ? "0.5" : "1"}; transition: 0.3s;">
+                    <span style="background: ${isDone ? "#10b981" : "var(--primary-blue)"}; color:white; width:26px; height:26px; border-radius: 50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0;">
+                        ${isDone ? "✓" : i + 1}
+                    </span>
+                    <div style="flex:1">
+                        <h3 style="margin:0; font-size: 15px; font-weight: 400; color: var(--text-dark); ${isDone ? "text-decoration:line-through; color: var(--text-gray);" : ""}">
+                            ${m.judul_misi}
+                        </h3>
+                    </div>
+                    <span style="font-size:10px; font-weight:600; color:var(--text-gray); opacity:0.6;">
+                        ${m.target_menit}M
+                    </span>
+                </div>`;
+    });
+
+    const doneInZone = LOG_SELESAI.filter((l) => filtered.map((f) => f.judul_misi).includes(l)).length;
+    document.getElementById("progress-text").innerText = `PROGRESS: ${doneInZone} / ${filtered.length}`;
+    document.getElementById("progress-text").classList.remove("hidden");
+
+    CURRENT_IDX = ALL_MISI.findIndex((m) => (SELECTED_ZONA === "Semua" || m.zona === SELECTED_ZONA) && !LOG_SELESAI.includes(m.judul_misi));
+    if (CURRENT_IDX === -1) CURRENT_IDX = 0;
+  }
+
+  function mulaiEksekusi() {
+    document.getElementById("overview-area").classList.add("hidden");
+    document.getElementById("execution-area").classList.remove("hidden");
+    updateCard();
+  }
+
+  function updateCard() {
+    const m = ALL_MISI[CURRENT_IDX];
+    document.getElementById("exec-title").innerText = m.judul_misi;
+    document.getElementById("exec-desc").innerText = m.deskripsi;
+    document.getElementById("meta-info").innerHTML = `
+            <span class="location-label badge-ja" style="font-size:10px; margin:0;">${m.zona}</span>
+            <span class="location-label badge-jw" style="font-size:10px; margin:0; margin-left:8px;">⏱️ ${m.target_menit}M</span>`;
+
+    const isDone = LOG_SELESAI.includes(m.judul_misi);
+    const btn = document.getElementById("btn-submit");
+    btn.disabled = isDone;
+    btn.innerText = isDone ? "SUDAH SELESAI" : "TANDAI SELESAI";
+    document.getElementById("btn-prev-nav").style.visibility = CURRENT_IDX === 0 ? "hidden" : "visible";
+  }
+
+  async function tandaiSelesai() {
+    const m = ALL_MISI[CURRENT_IDX];
+    const btn = document.getElementById("btn-submit");
+    btn.innerText = "MENGIRIM...";
+    try {
+      await fetch(SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify({ nama_petugas: NAMA_USER, halaman_tugas: KODE_HALAMAN, misi_selesai: m.judul_misi, zona_tugas: SELECTED_ZONA }),
+      });
+      LOG_SELESAI.push(m.judul_misi);
+      let nextIdx = ALL_MISI.findIndex((m, idx) => idx > CURRENT_IDX && (SELECTED_ZONA === "Semua" || m.zona === SELECTED_ZONA) && !LOG_SELESAI.includes(m.judul_misi));
+      if (nextIdx !== -1) {
+        CURRENT_IDX = nextIdx;
+        updateCard();
+      } else {
+        window.location.reload();
+      }
+    } catch (e) {
+      alert("Gagal Simpan");
+      btn.innerText = "TANDAI SELESAI";
+    }
+  }
+
+  function misiSebelumnya() {
+    if (CURRENT_IDX > 0) {
+      CURRENT_IDX--;
+      updateCard();
+    }
+  }
+  function kembaliKeOverview() {
+    document.getElementById("execution-area").classList.add("hidden");
+    document.getElementById("overview-area").classList.remove("hidden");
+    renderOverview();
+  }
+
+  init();
+</script>
+
+<style>
+  .hidden {
+    display: none !important;
+  }
+  /* Mematikan Stacking Context agar Hamburger Menu aman */
+  .hero,
+  .team-section,
+  .mission-card,
+  .article-master-container {
+    position: static !important;
+  }
+</style>
+
+    </main>
+
+    
+
+</body>
+</html>

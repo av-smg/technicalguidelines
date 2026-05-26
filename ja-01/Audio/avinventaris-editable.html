@@ -158,10 +158,30 @@
     let userPin = "";
 
     window.onload = () => {
-        userPin = prompt("Masukkan PIN Keamanan:");
-        if(!userPin) { alert("PIN diperlukan!"); window.location.reload(); }
+        // Hapus sisa PIN di sesi sebelumnya (jika ada) saat halaman di-refresh total
+        sessionStorage.removeItem("active_pin");
+        
+        // Minta PIN dan jalankan penarikan data utama
+        checkAndRequestPin();
         loadData();
     };
+
+    function checkAndRequestPin() {
+        // Cek dulu apakah di penyimpanan sementara browser sudah terisi PIN
+        userPin = sessionStorage.getItem("active_pin");
+
+        // Jika belum ada PIN tersimpan, paksa minta melalui dialog prompt
+        if (!userPin) {
+            userPin = prompt("Masukkan PIN Keamanan:");
+            if (!userPin) {
+                alert("PIN diperlukan untuk menggunakan portal!");
+                window.location.reload();
+                return;
+            }
+            // Simpan PIN yang dimasukkan ke session storage browser
+            sessionStorage.setItem("active_pin", userPin);
+        }
+    }
 
     async function loadData() {
         try {
@@ -186,7 +206,7 @@
                     <h4 style="font-weight:800; font-size:15px; margin-bottom:5px;">${item.nama_barang}</h4>
                     <span style="background:var(--navy); color:white; font-size:10px; padding:3px 8px; border-radius:5px;">${item.jumlah}</span>
                 </div>
-                <p style="font-size:12px; color:#888;">${item.tim}</p>
+                <p style="font-size:12px; color:#888;">${item.tim || ''}</p>
                 ${item.terpakai === "TRUE" ? "<p style='color:var(--orange); font-size:11px; font-weight:800; margin-top:10px;'>● SEDANG TERPAKAI</p>" : ""}
             `;
             card.onclick = () => openModal(item);
@@ -220,6 +240,11 @@
     }
 
     document.getElementById("saveBtn").onclick = async function() {
+        // Keamanan ekstra untuk memastikan variabel internal PIN masih ada
+        if (!userPin) {
+            checkAndRequestPin();
+        }
+
         const btn = this;
         btn.disabled = true;
         btn.innerText = "PROSES...";
@@ -233,7 +258,6 @@
         };
 
         try {
-            // Menggunakan method POST dengan mode no-cors untuk kestabilan Google Script
             await fetch(SCRIPT_URL, {
                 method: "POST",
                 mode: "no-cors",
@@ -252,7 +276,10 @@
 
     function filterData() {
         const q = document.getElementById("searchInput").value.toLowerCase();
-        const filtered = allItems.filter(i => i.nama_barang.toLowerCase().includes(q) || i.tim.toLowerCase().includes(q));
+        const filtered = allItems.filter(i => 
+            i.nama_barang.toLowerCase().includes(q) || 
+            (i.tim || "").toLowerCase().includes(q)
+        );
         render(filtered);
     }
 </script>

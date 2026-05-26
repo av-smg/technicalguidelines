@@ -15,7 +15,6 @@ location: "JA-01"
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
         
-        /* VARIASI WARNA (Bisa otomatis menyesuaikan Dark Mode) */
         :root { 
             --navy: #0A192F; 
             --orange: #FF7E27; 
@@ -29,7 +28,6 @@ location: "JA-01"
             --ref-bg: #f8f9fa;
         }
 
-        /* Jika tema dark mode aktif (biasanya dipicu class .dark-mode pada body) */
         body.dark-mode, body.dark-theme, [data-theme="dark"] {
             --navy: #e0e0e0;
             --bg: #121212;
@@ -45,12 +43,28 @@ location: "JA-01"
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: var(--bg); padding: 15px; color: var(--text-main); transition: background 0.3s, color 0.3s; }
 
-        /* HEADER FIX: z-index diturunkan agar tidak menembus overlay navbar hamburger */
-        header { text-align: center; margin: 20px 0 30px; position: relative; z-index: 1; }
-        header h2 { font-weight: 800; letter-spacing: -1px; text-transform: uppercase; color: var(--text-main); }
-        header p { color: var(--text-muted) !important; }
+        /* FIX Z-INDEX NAVBAR: Memastikan menu navigasi dari jekyll include berada di tumpukan tertinggi */
+        nav, .navbar, .menu-overlay, #menu, .sidebar, header.navbar { z-index: 99999 !important; position: relative; }
+
+        /* HEADER */
+        header.page-header { text-align: center; margin: 20px 0 20px; position: relative; z-index: 10; }
+        header.page-header h2 { font-weight: 800; letter-spacing: -1px; text-transform: uppercase; color: var(--text-main); }
+        header.page-header p { color: var(--text-muted) !important; }
         
-        .controls-container { max-width: 1200px; margin: 0 auto 25px; display: flex; flex-direction: column; gap: 15px; position: relative; z-index: 1; }
+        /* STICKY SEARCH & FILTER CONTROLS */
+        .controls-wrapper {
+            position: sticky;
+            top: 0;
+            z-index: 80;
+            background: var(--bg); /* Penting agar item di bawahnya tidak menembus saat di scroll */
+            padding: 15px 0;
+            margin: 0 -15px 20px -15px; 
+            padding-inline: 15px;
+            transition: background 0.3s;
+        }
+        
+        .controls-container { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 15px; }
+        
         .search-bar { 
             width: 100%; padding: 16px 24px; border-radius: 15px; 
             border: 1px solid var(--border-color); outline: none; font-size: 16px;
@@ -81,7 +95,7 @@ location: "JA-01"
         .mission-card { 
             background: var(--white); border-radius: 20px; padding: 15px; 
             cursor: pointer; transition: 0.3s; border: 1px solid var(--border-color);
-            box-shadow: 0 4px 10px var(--card-hover); display: block;
+            box-shadow: 0 4px 10px var(--card-hover); display: flex; flex-direction: column;
         }
         .mission-card:hover { transform: translateY(-5px); border-color: var(--orange); }
         .card-img { width: 100%; height: 180px; object-fit: cover; border-radius: 15px; background: #eee; margin-bottom: 15px; }
@@ -98,15 +112,17 @@ location: "JA-01"
         .list-info { flex: 1; display: flex; flex-direction: column; gap: 4px; color: var(--text-main); }
         .list-meta { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 
+        /* BADGES & TEXT */
         .badge-qty { background: var(--text-main); color: var(--bg); font-size: 10px; padding: 3px 8px; border-radius: 5px; font-weight: 700; }
         .badge-used { color: var(--orange); font-size: 11px; font-weight: 800; }
+        .badge-avail { color: #2ecc71; font-size: 11px; font-weight: 800; }
         .badge-owner { color: var(--text-muted); font-size: 12px; }
 
         /* MODAL */
         .modal-overlay { 
-            position: fixed; inset: 0; background: rgba(0,0,0,0.7); 
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8); 
             display: none; align-items: center; justify-content: center; 
-            z-index: 1000; backdrop-filter: blur(5px); padding: 15px;
+            z-index: 99990; backdrop-filter: blur(5px); padding: 15px;
         }
         .modal-overlay.active { display: flex; }
         
@@ -123,7 +139,7 @@ location: "JA-01"
 
         .modal-body { display: flex; flex-wrap: wrap; padding: 20px; gap: 25px; }
         
-        /* Layout Kiri: Thumbnail Gallery (NEW DESIGN) */
+        /* Thumbnail Gallery */
         .modal-left { flex: 1; min-width: 300px; }
         .main-image-box { width: 100%; height: 280px; border-radius: 15px; overflow: hidden; background: #eee; margin-bottom: 10px; cursor: zoom-in; position: relative; }
         .main-image-box img { width: 100%; height: 100%; object-fit: cover; }
@@ -131,18 +147,25 @@ location: "JA-01"
         .thumb-img { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; cursor: pointer; border: 2px solid transparent; opacity: 0.6; transition: 0.2s; }
         .thumb-img:hover, .thumb-img.active { border-color: var(--orange); opacity: 1; }
         
-        /* Layout Kanan: Info & Form */
+        /* Modal Info */
         .modal-right { flex: 1.2; min-width: 300px; }
         .label-tag { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; display: block; }
         .ref-box { background: var(--ref-bg); padding: 15px; border-radius: 12px; border-left: 4px solid var(--orange); font-size: 14px; color: var(--text-main); margin-bottom: 20px; line-height: 1.5; }
         
-        .status-btn { 
-            display: flex; align-items: center; gap: 12px; background: var(--input-bg); 
-            padding: 16px; border-radius: 15px; margin-bottom: 20px; cursor: pointer; transition: 0.2s;
-            border: 1px solid var(--border-color); color: var(--text-main);
+        /* Input Quantity / Sisa */
+        .qty-control {
+            display: flex; align-items: center; gap: 15px; margin-bottom: 25px;
+            background: var(--input-bg); padding: 15px; border-radius: 15px; border: 1px solid var(--border-color);
         }
-        .status-btn:has(input:checked) { border: 1px solid var(--orange); color: var(--orange); }
-        .status-btn input { width: 22px; height: 22px; accent-color: var(--orange); }
+        .qty-input {
+            width: 80px; padding: 10px; border-radius: 8px; border: 2px solid var(--border-color);
+            font-size: 16px; font-weight: 700; text-align: center; color: var(--text-main); background: var(--bg);
+            outline: none; transition: 0.3s;
+        }
+        .qty-input:focus { border-color: var(--orange); }
+        .qty-info { display: flex; flex-direction: column; }
+        .qty-info strong { color: var(--text-main); font-size: 14px; }
+        .qty-info span { color: var(--text-muted); font-size: 12px; }
 
         .input-text { width: 100%; padding: 15px; border-radius: 12px; border: 2px solid var(--border-color); background: var(--input-bg); color: var(--text-main); font-size: 15px; outline: none; transition: 0.3s; margin-bottom: 20px; }
         .input-text:focus { border-color: var(--orange); }
@@ -159,11 +182,11 @@ location: "JA-01"
         /* FULLSCREEN IMAGE OVERLAY */
         .fs-overlay {
             position: fixed; inset: 0; background: rgba(0, 0, 0, 0.95);
-            display: none; flex-direction: column; z-index: 2000;
+            display: none; flex-direction: column; z-index: 99999;
             justify-content: center; align-items: center; padding: 20px;
         }
         .fs-overlay.active { display: flex; }
-        .fs-header { width: 100%; position: absolute; top: 0; left: 0; padding: 20px; }
+        .fs-header { width: 100%; position: absolute; top: 0; left: 0; padding: 20px; z-index: 100000; }
         .btn-back-fs {
             background: rgba(255, 255, 255, 0.2); color: white; border: 2px solid white;
             padding: 10px 20px; border-radius: 12px; font-weight: 700; cursor: pointer;
@@ -183,31 +206,33 @@ location: "JA-01"
 
     {% include navbar.html %}
 
-    <header>
+    <header class="page-header">
         <h2>Inventory Portal</h2>
         <p style="font-size: 12px; font-weight: 700;">Audio Video & Inventory Team Semarang</p>
     </header>
 
-    <div class="controls-container">
-        <input type="text" id="searchInput" class="search-bar" placeholder="Cari nama barang..." oninput="applyFilters()">
-        
-        <div class="filters">
-            <div class="filter-group">
-                <select id="sortSelect" class="control-element" onchange="applyFilters()">
-                    <option value="default">Urutan Default</option>
-                    <option value="az">A - Z</option>
-                    <option value="za">Z - A</option>
-                </select>
-                <select id="teamSelect" class="control-element" onchange="applyFilters()">
-                    <option value="all">Semua Tim</option>
-                </select>
-                <select id="ownerSelect" class="control-element" onchange="applyFilters()">
-                    <option value="all">Semua Pemilik</option>
-                </select>
-            </div>
-            <div class="view-group">
-                <button onclick="toggleView('gallery')" id="btnGallery" class="control-element btn-view active">Gallery</button>
-                <button onclick="toggleView('list')" id="btnList" class="control-element btn-view">List</button>
+    <div class="controls-wrapper">
+        <div class="controls-container">
+            <input type="text" id="searchInput" class="search-bar" placeholder="Cari nama barang..." oninput="applyFilters()">
+            
+            <div class="filters">
+                <div class="filter-group">
+                    <select id="sortSelect" class="control-element" onchange="applyFilters()">
+                        <option value="default">Urutan Default</option>
+                        <option value="az">A - Z</option>
+                        <option value="za">Z - A</option>
+                    </select>
+                    <select id="teamSelect" class="control-element" onchange="applyFilters()">
+                        <option value="all">Semua Tim</option>
+                    </select>
+                    <select id="ownerSelect" class="control-element" onchange="applyFilters()">
+                        <option value="all">Semua Sumber</option>
+                    </select>
+                </div>
+                <div class="view-group">
+                    <button onclick="toggleView('gallery')" id="btnGallery" class="control-element btn-view active">Gallery</button>
+                    <button onclick="toggleView('list')" id="btnList" class="control-element btn-view">List</button>
+                </div>
             </div>
         </div>
     </div>
@@ -228,22 +253,24 @@ location: "JA-01"
                     <div class="main-image-box" onclick="openFullscreen()">
                         <img id="m-main-img" src="" alt="Main Image">
                     </div>
-                    <div id="m-thumbnails" class="thumb-row">
-                        </div>
+                    <div id="m-thumbnails" class="thumb-row"></div>
                 </div>
 
                 <div class="modal-right">
                     <span class="label-tag">Keterangan Teknis</span>
                     <div id="m-ref" class="ref-box"></div>
 
-                    <span class="label-tag">Status Keberadaan</span>
-                    <label class="status-btn">
-                        <input type="checkbox" id="m-check"> 
-                        <span style="font-weight: 700;">SEDANG DIGUNAKAN / DIPINJAM</span>
-                    </label>
+                    <span class="label-tag">Penggunaan Barang (Pcs)</span>
+                    <div class="qty-control">
+                        <input type="number" id="m-terpakai" class="qty-input" min="0" value="0" oninput="calculateSisa()">
+                        <div class="qty-info">
+                            <strong id="m-sisa-text">Sisa: 0 Pcs</strong>
+                            <span id="m-max-text">Total persediaan: 0 Pcs</span>
+                        </div>
+                    </div>
 
                     <span class="label-tag">Log / Catatan Update</span>
-                    <textarea id="m-desc" class="input-text" rows="4" placeholder="Contoh: Dibawa oleh tim panggung ke lokasi..."></textarea>
+                    <textarea id="m-desc" class="input-text" rows="4" placeholder="Contoh: 2 mic dibawa tim panggung, 1 kabel rusak..."></textarea>
                 </div>
             </div>
 
@@ -309,7 +336,6 @@ location: "JA-01"
             const res = await fetch(SCRIPT_URL + "?action=api");
             const rawData = await res.json();
             
-            // FILTER: Buang item yang nama barangnya "Nama Barang" (Row Header)
             allItems = rawData.filter(item => item.nama_barang.toLowerCase() !== 'nama barang');
             
             document.getElementById("loading").style.display = "none";
@@ -368,19 +394,35 @@ location: "JA-01"
         data.forEach(item => {
             const card = document.createElement("div");
             const imageSrc = item.fotos && item.fotos[0] ? item.fotos[0] : 'https://via.placeholder.com/300x180';
-            const statusBadge = item.terpakai === "TRUE" ? `<span class="badge-used">● SEDANG TERPAKAI</span>` : "";
-            const ownerBadge = item.barang_milik ? `<span class="badge-owner">👤 ${item.barang_milik}</span>` : "";
+            
+            // Logika Sisa Stok (Jumlah total dikurangi yang sedang terpakai)
+            let total = parseInt(item.jumlah) || 0;
+            
+            // Konversi nilai lama ("TRUE"/"FALSE") menjadi angka jika ada, atau baca sebagai angka murni
+            let terpakai = parseInt(item.terpakai);
+            if (isNaN(terpakai)) terpakai = (item.terpakai === "TRUE" ? 1 : 0);
+            
+            let sisa = total - terpakai;
+            if (sisa < 0) sisa = 0; // Hindari minus jika ada salah input
+            
+            let statusBadge = terpakai > 0 
+                ? `<span class="badge-used">● ${terpakai} TERPAKAI (Sisa: ${sisa})</span>` 
+                : `<span class="badge-avail">○ Sisa Lengkap (${sisa})</span>`;
+                
+            const ownerBadge = item.barang_milik ? `<span class="badge-owner">📦 ${item.barang_milik}</span>` : "";
             
             if (currentView === 'gallery') {
                 card.className = "mission-card";
                 card.innerHTML = `
                     <img src="${imageSrc}" class="card-img">
-                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                        <h4 style="font-weight:800; font-size:15px; margin-bottom:5px;">${item.nama_barang}</h4>
-                        <span class="badge-qty">${item.jumlah}</span>
+                    <div style="flex: 1;">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                            <h4 style="font-weight:800; font-size:15px; margin-bottom:5px;">${item.nama_barang}</h4>
+                            <span class="badge-qty">Total: ${total}</span>
+                        </div>
+                        <p style="font-size:12px; color:var(--text-muted); margin-bottom: 12px;">${item.tim || ''}</p>
                     </div>
-                    <p style="font-size:12px; color:var(--text-muted); margin-bottom: 8px;">${item.tim || ''}</p>
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div style="display:flex; flex-direction:column; gap:6px; border-top: 1px solid var(--border-color); padding-top: 10px; margin-top: auto;">
                         ${ownerBadge}
                         ${statusBadge}
                     </div>
@@ -392,11 +434,12 @@ location: "JA-01"
                     <div class="list-info">
                         <h4 class="list-title">${item.nama_barang}</h4>
                         <div class="list-meta">
-                            <span class="badge-qty">${item.jumlah} Pcs</span>
+                            <span class="badge-qty">Total: ${total} Pcs</span>
                             <span style="color:var(--text-muted);">|</span>
                             <span style="color:var(--text-muted);">${item.tim || '-'}</span>
                             ${item.barang_milik ? `<span style="color:var(--text-muted);">|</span> ${ownerBadge}` : ''}
-                            ${item.terpakai === "TRUE" ? `<span style="color:var(--text-muted);">|</span> ${statusBadge}` : ''}
+                            <span style="color:var(--text-muted);">|</span>
+                            ${statusBadge}
                         </div>
                     </div>
                 `;
@@ -407,6 +450,24 @@ location: "JA-01"
         });
     }
 
+    function calculateSisa() {
+        if (!currentItem) return;
+        let total = parseInt(currentItem.jumlah) || 0;
+        let inputTerpakai = parseInt(document.getElementById("m-terpakai").value) || 0;
+        
+        // Memastikan tidak lebih dari total dan tidak kurang dari 0
+        if (inputTerpakai > total) {
+            inputTerpakai = total;
+            document.getElementById("m-terpakai").value = total;
+        } else if (inputTerpakai < 0) {
+            inputTerpakai = 0;
+            document.getElementById("m-terpakai").value = 0;
+        }
+        
+        let sisa = total - inputTerpakai;
+        document.getElementById("m-sisa-text").innerText = `Sisa Tersedia: ${sisa} Pcs`;
+    }
+
     function openModal(item) {
         currentItem = item;
         const mainImg = document.getElementById("m-main-img");
@@ -415,17 +476,12 @@ location: "JA-01"
         
         if(item.fotos && item.fotos.length > 0) {
             mainImg.src = item.fotos[0];
-            
-            // Generate Thumbnails
             item.fotos.forEach((url, index) => {
                 const img = document.createElement("img");
                 img.src = url;
                 img.className = "thumb-img" + (index === 0 ? " active" : "");
-                
-                // Ganti gambar utama saat thumbnail diklik
                 img.onclick = () => {
                     mainImg.src = url;
-                    // Update border orange pada thumbnail yang aktif
                     document.querySelectorAll('.thumb-img').forEach(t => t.classList.remove('active'));
                     img.classList.add('active');
                 };
@@ -435,10 +491,22 @@ location: "JA-01"
             mainImg.src = 'https://via.placeholder.com/300x180';
         }
 
+        let total = parseInt(item.jumlah) || 0;
+        let terpakai = parseInt(item.terpakai);
+        if (isNaN(terpakai)) terpakai = (item.terpakai === "TRUE" ? 1 : 0);
+
         document.getElementById("m-name").innerText = item.nama_barang;
         document.getElementById("m-ref").innerText = item.keterangan_ref || "Tidak ada referensi teknis.";
         document.getElementById("m-desc").value = item.keterangan_edit || "";
-        document.getElementById("m-check").checked = (item.terpakai === "TRUE");
+        
+        // Setup input quantity
+        const inputQty = document.getElementById("m-terpakai");
+        inputQty.max = total;
+        inputQty.value = terpakai;
+        document.getElementById("m-max-text").innerText = `Total persediaan: ${total} Pcs`;
+        
+        calculateSisa(); // Hitung visual pertama kali buka
+        
         document.getElementById("modal").classList.add("active");
     }
 
@@ -462,45 +530,43 @@ location: "JA-01"
         }
 
         const btn = this;
-        const isChecked = document.getElementById("m-check").checked;
+        const qtyTerpakai = parseInt(document.getElementById("m-terpakai").value) || 0;
         const newDesc = document.getElementById("m-desc").value;
 
         btn.disabled = true;
-        btn.innerText = "PROSES...";
+        btn.innerText = "PROSES MENYIMPAN...";
 
         const payload = {
             action: "update_item",
             pin: userPin,
             row_index: currentItem.row_index,
-            terpakai: isChecked ? "TRUE" : "FALSE",
+            terpakai: qtyTerpakai, // Sekarang mengirimkan ANGKA
             keterangan: newDesc
         };
 
         try {
+            // MENGGUNAKAN text/plain agar tidak diblokir CORS preflight Apps Script
             await fetch(SCRIPT_URL, {
                 method: "POST",
-                mode: "no-cors", 
-                cache: "no-cache",
-                headers: { "Content-Type": "application/json" },
+                mode: "no-cors",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
                 body: JSON.stringify(payload)
             });
             
-            // UPDATE DATA SECARA LOKAL (Tanpa perlu Refresh Halaman!)
-            currentItem.terpakai = isChecked ? "TRUE" : "FALSE";
+            // UPDATE DATA LOKAL - TANPA REFRESH HALAMAN
+            currentItem.terpakai = qtyTerpakai;
             currentItem.keterangan_edit = newDesc;
             
-            alert("Berhasil disimpan!");
+            alert("Berhasil disimpan ke Server!");
             
-            // Reset Button
             btn.disabled = false;
             btn.innerText = "SIMPAN PERUBAHAN";
             
-            // Tutup modal dan render ulang grid
             closeModal();
-            applyFilters();
+            applyFilters(); // Render ulang kartu secara mulus
             
         } catch (e) {
-            alert("Ada masalah jaringan. Pastikan internet Anda lancar.");
+            alert("Ada masalah jaringan. Data gagal tersimpan.");
             btn.disabled = false;
             btn.innerText = "SIMPAN PERUBAHAN";
         }

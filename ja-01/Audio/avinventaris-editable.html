@@ -1,9 +1,18 @@
+---
+location: "JA-01"
+---
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Inventaris AV - Semarang Team</title>
+    
+    <link rel="stylesheet" href="../style.css" />
+    
+    {% include head.html %}
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
         
@@ -97,7 +106,7 @@
         /* Layout Kiri: Gallery */
         .modal-left { flex: 1; min-width: 320px; }
         .image-gallery { display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 10px; }
-        .gallery-item { flex: 0 0 100%; scroll-snap-align: start; height: 350px; object-fit: contain; border-radius: 15px; background: #f9f9f9; }
+        .gallery-item { flex: 0 0 100%; scroll-snap-align: start; height: 350px; object-fit: contain; border-radius: 15px; background: #f9f9f9; cursor: zoom-in; }
         
         /* Layout Kanan: Info & Form */
         .modal-right { flex: 1.2; min-width: 320px; }
@@ -123,6 +132,22 @@
 
         #loading { text-align: center; padding: 100px; font-weight: 700; color: #888; }
 
+        /* FULLSCREEN IMAGE OVERLAY */
+        .fs-overlay {
+            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.95);
+            display: none; flex-direction: column; z-index: 2000;
+            justify-content: center; align-items: center; padding: 20px;
+        }
+        .fs-overlay.active { display: flex; }
+        .fs-header { width: 100%; position: absolute; top: 0; left: 0; padding: 20px; }
+        .btn-back-fs {
+            background: rgba(255, 255, 255, 0.2); color: white; border: 2px solid white;
+            padding: 10px 20px; border-radius: 12px; font-weight: 700; cursor: pointer;
+            transition: 0.3s; display: flex; align-items: center; gap: 8px; font-size: 14px;
+        }
+        .btn-back-fs:hover { background: white; color: black; }
+        .fs-image { max-width: 100%; max-height: 85vh; object-fit: contain; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+
         @media (max-width: 768px) {
             .modal-body { flex-direction: column; }
             .gallery-item { height: 250px; }
@@ -132,6 +157,8 @@
     </style>
 </head>
 <body>
+
+    {% include navbar.html %}
 
     <header>
         <h2>Inventory Portal</h2>
@@ -162,7 +189,7 @@
         </div>
     </div>
 
-    <div id="loading">Menghubungkan ke database...</div>
+    <div id="loading">Meminta akses dan mengunduh data...</div>
     <div id="dataContainer" class="grid-cards"></div>
 
     <div id="modal" class="modal-overlay">
@@ -174,7 +201,7 @@
             
             <div class="modal-body">
                 <div class="modal-left">
-                    <span class="label-tag">Galeri Foto (Geser Horizontal)</span>
+                    <span class="label-tag">Galeri Foto (Geser Horizontal | Klik Untuk Perbesar)</span>
                     <div id="m-gallery" class="image-gallery"></div>
                 </div>
 
@@ -200,34 +227,60 @@
         </div>
     </div>
 
+    <div id="fsOverlay" class="fs-overlay">
+        <div class="fs-header">
+            <button onclick="closeFullscreen()" class="btn-back-fs">⬅ Kembali</button>
+        </div>
+        <img id="fsImage" class="fs-image" src="" alt="Fullscreen View">
+    </div>
+
 <script>
     // MASUKKAN URL WEB APP ANDA DI SINI
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxEZq1rZP4b42JQXyanBmSBeB5cl7yTlQZ1l27pTCEoIOxBtdQ65uruHugOXfmmdXP6/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxh3LlBSMYm9Htcq3-4KbruMWP8xdK6BoQcPik9tOYsQPPEaR3iV-60xKHvor9QepSo/exec";
     
+    // Daftar PIN yang valid (Frontend Validation)
+    const VALID_PINS = [
+        "4b2d9e", "5x7z2y", "3f8g1k", "8r2m9p", "2v9w4x", 
+        "7k3n8p", "5a9b3c", "6e2g8q", "9t4v1w", "3d7h2k"
+    ];
+
     let allItems = [];
     let currentItem = null;
-    let userPin = "";
     let currentView = 'gallery';
+    
+    // Variabel PIN hanya tersimpan di runtime JS. 
+    // Jika halaman di-refresh, variabel akan kosong dan minta PIN lagi.
+    let userPin = ""; 
 
     window.onload = () => {
-        // Hapus sisa PIN di sesi sebelumnya saat halaman di-refresh
-        sessionStorage.removeItem("active_pin");
-        
-        checkAndRequestPin();
-        loadData();
+        if (checkAndRequestPin()) {
+            loadData();
+        } else {
+            document.getElementById("loading").innerText = "Akses ditolak. Silakan refresh halaman untuk mencoba lagi.";
+        }
     };
 
     function checkAndRequestPin() {
-        userPin = sessionStorage.getItem("active_pin");
         if (!userPin) {
-            userPin = prompt("Masukkan PIN Keamanan:");
-            if (!userPin) {
-                alert("PIN diperlukan untuk menggunakan portal!");
-                window.location.reload();
-                return;
+            while (true) {
+                let input = prompt("Masukkan PIN Keamanan:");
+                
+                // Jika user menekan batal/cancel
+                if (input === null) {
+                    alert("Akses dibatalkan. Anda memerlukan PIN untuk melihat data.");
+                    return false;
+                }
+                
+                // Cek apakah PIN ada di dalam array
+                if (VALID_PINS.includes(input.trim().toLowerCase())) {
+                    userPin = input.trim().toLowerCase();
+                    break;
+                } else {
+                    alert("PIN Salah! Silakan coba lagi.");
+                }
             }
-            sessionStorage.setItem("active_pin", userPin);
         }
+        return true;
     }
 
     async function loadData() {
@@ -244,28 +297,20 @@
     }
 
     function populateFilters() {
-        // Mendapatkan list Tim unik
         const teams = [...new Set(allItems.map(i => i.tim).filter(Boolean))];
         const teamSelect = document.getElementById("teamSelect");
         teams.forEach(t => teamSelect.innerHTML += `<option value="${t}">${t}</option>`);
 
-        // Mendapatkan list Pemilik unik (asumsi ada kolom `pemilik` di Apps Script JSON)
-        const owners = [...new Set(allItems.map(i => i.pemilik).filter(Boolean))];
+        const owners = [...new Set(allItems.map(i => i.barang_milik).filter(Boolean))];
         const ownerSelect = document.getElementById("ownerSelect");
         owners.forEach(o => ownerSelect.innerHTML += `<option value="${o}">${o}</option>`);
     }
 
     function toggleView(viewType) {
         currentView = viewType;
-        
-        // Atur status class aktif tombol
         document.getElementById("btnGallery").classList.toggle("active", viewType === 'gallery');
         document.getElementById("btnList").classList.toggle("active", viewType === 'list');
-        
-        // Ubah class penampung
         document.getElementById("dataContainer").className = viewType === 'gallery' ? 'grid-cards' : 'list-view';
-        
-        // Render ulang dengan setting tampilan baru
         applyFilters();
     }
 
@@ -275,16 +320,14 @@
         const teamVal = document.getElementById("teamSelect").value;
         const ownerVal = document.getElementById("ownerSelect").value;
 
-        // 1. Proses Filter (Pencarian, Tim, Pemilik)
         let filtered = allItems.filter(i => {
             const matchQ = i.nama_barang.toLowerCase().includes(q) || (i.tim || "").toLowerCase().includes(q);
             const matchTeam = (teamVal === 'all') || (i.tim === teamVal);
-            const matchOwner = (ownerVal === 'all') || (i.pemilik && i.pemilik === ownerVal);
+            const matchOwner = (ownerVal === 'all') || (i.barang_milik && i.barang_milik === ownerVal);
             
             return matchQ && matchTeam && matchOwner;
         });
 
-        // 2. Proses Sorting A-Z atau Z-A
         if (sortVal === 'az') {
             filtered.sort((a, b) => a.nama_barang.localeCompare(b.nama_barang));
         } else if (sortVal === 'za') {
@@ -302,10 +345,9 @@
             const card = document.createElement("div");
             const imageSrc = item.fotos && item.fotos[0] ? item.fotos[0] : 'https://via.placeholder.com/300x180';
             const statusBadge = item.terpakai === "TRUE" ? `<span class="badge-used">● SEDANG TERPAKAI</span>` : "";
-            const ownerBadge = item.pemilik ? `<span class="badge-owner">👤 ${item.pemilik}</span>` : "";
+            const ownerBadge = item.barang_milik ? `<span class="badge-owner">👤 ${item.barang_milik}</span>` : "";
             
             if (currentView === 'gallery') {
-                // HTML UNTUK GALLERY (GRID)
                 card.className = "mission-card";
                 card.innerHTML = `
                     <img src="${imageSrc}" class="card-img">
@@ -320,7 +362,6 @@
                     </div>
                 `;
             } else {
-                // HTML UNTUK LIST (DAFTAR)
                 card.className = "list-item";
                 card.innerHTML = `
                     <img src="${imageSrc}" class="list-img">
@@ -330,7 +371,7 @@
                             <span class="badge-qty">${item.jumlah} Pcs</span>
                             <span>|</span>
                             <span style="color:#888;">${item.tim || '-'}</span>
-                            ${item.pemilik ? `<span>|</span> ${ownerBadge}` : ''}
+                            ${item.barang_milik ? `<span>|</span> ${ownerBadge}` : ''}
                             ${item.terpakai === "TRUE" ? `<span>|</span> ${statusBadge}` : ''}
                         </div>
                     </div>
@@ -352,6 +393,7 @@
                 const img = document.createElement("img");
                 img.src = url;
                 img.className = "gallery-item";
+                img.onclick = () => openFullscreen(url); // Event Listener Fullscreen
                 gallery.appendChild(img);
             });
         } else {
@@ -372,8 +414,22 @@
         document.getElementById("modal").classList.remove("active");
     }
 
+    // --- FUNGSI FULLSCREEN ---
+    function openFullscreen(imgUrl) {
+        document.getElementById("fsImage").src = imgUrl;
+        document.getElementById("fsOverlay").classList.add("active");
+    }
+
+    function closeFullscreen() {
+        document.getElementById("fsOverlay").classList.remove("active");
+    }
+    // -------------------------
+
     document.getElementById("saveBtn").onclick = async function() {
-        if (!userPin) checkAndRequestPin();
+        // Cek PIN sekali lagi di runtime sebagai double security
+        if (!userPin) {
+            if (!checkAndRequestPin()) return; 
+        }
 
         const btn = this;
         btn.disabled = true;
@@ -388,18 +444,20 @@
         };
 
         try {
-            await fetch(SCRIPT_URL, {
+            const response = await fetch(SCRIPT_URL, {
                 method: "POST",
-                mode: "no-cors",
+                mode: "no-cors", 
                 cache: "no-cache",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             });
             
-            alert("Data Berhasil Disimpan!");
+            alert("Sinyal terkirim ke Server (Halaman akan memuat ulang data)");
+            
+            // Reload halaman secara otomatis (PIN akan reset karena direfresh)
             location.reload();
         } catch (e) {
-            alert("Berhasil! (Sistem me-refresh data)");
+            alert("Error/No-CORS Success! (Sistem me-refresh data)");
             location.reload();
         }
     };

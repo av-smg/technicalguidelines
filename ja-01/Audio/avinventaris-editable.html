@@ -20,15 +20,29 @@
         header { text-align: center; margin: 20px 0 30px; }
         header h2 { font-weight: 800; letter-spacing: -1px; text-transform: uppercase; }
         
-        .search-container { max-width: 1000px; margin: 0 auto 25px; }
+        /* CONTROLS (SEARCH & FILTERS) */
+        .controls-container { max-width: 1200px; margin: 0 auto 25px; display: flex; flex-direction: column; gap: 15px; }
         .search-bar { 
             width: 100%; padding: 16px 24px; border-radius: 15px; 
             border: 1px solid #ddd; outline: none; font-size: 16px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: 0.3s;
         }
         .search-bar:focus { border-color: var(--orange); box-shadow: 0 4px 20px rgba(255,126,39,0.15); }
+        
+        .filters { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+        .filter-group { display: flex; gap: 10px; flex-wrap: wrap; flex: 1; }
+        .view-group { display: flex; gap: 10px; }
+        
+        .control-element { 
+            padding: 10px 16px; border-radius: 10px; border: 1px solid #ddd; 
+            background: var(--white); font-size: 14px; font-weight: 600; 
+            color: var(--navy); cursor: pointer; outline: none; transition: 0.2s;
+        }
+        .control-element:focus, .control-element:hover { border-color: var(--orange); }
+        .btn-view { border: 1px solid #ddd; background: white; }
+        .btn-view.active { background: var(--navy); color: white; border-color: var(--navy); }
 
-        /* GRID CARDS */
+        /* GRID CARDS (GALLERY VIEW) */
         .grid-cards { 
             display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
@@ -37,10 +51,27 @@
         .mission-card { 
             background: var(--white); border-radius: 20px; padding: 15px; 
             cursor: pointer; transition: 0.3s; border: 1px solid transparent;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03); display: block;
         }
         .mission-card:hover { transform: translateY(-5px); border-color: var(--orange); }
         .card-img { width: 100%; height: 180px; object-fit: cover; border-radius: 15px; background: #eee; margin-bottom: 15px; }
+
+        /* LIST VIEW */
+        .list-view { display: flex; flex-direction: column; gap: 12px; max-width: 1200px; margin: 0 auto; }
+        .list-item { 
+            display: flex; align-items: center; gap: 15px; background: var(--white); 
+            padding: 15px; border-radius: 15px; cursor: pointer; 
+            border: 1px solid transparent; transition: 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+        .list-item:hover { transform: translateX(5px); border-color: var(--orange); }
+        .list-img { width: 70px; height: 70px; object-fit: cover; border-radius: 10px; background: #eee; flex-shrink: 0; }
+        .list-info { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+        .list-meta { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+        /* BADGES */
+        .badge-qty { background: var(--navy); color: white; font-size: 10px; padding: 3px 8px; border-radius: 5px; font-weight: 700; }
+        .badge-used { color: var(--orange); font-size: 11px; font-weight: 800; }
+        .badge-owner { color: #666; font-size: 12px; }
 
         /* MODAL RESPONSIVE */
         .modal-overlay { 
@@ -65,13 +96,11 @@
         
         /* Layout Kiri: Gallery */
         .modal-left { flex: 1; min-width: 320px; }
-        .gallery-container { position: relative; overflow: hidden; border-radius: 15px; background: #f9f9f9; }
         .image-gallery { display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 10px; }
-        .gallery-item { flex: 0 0 100%; scroll-snap-align: start; height: 350px; object-fit: contain; border-radius: 15px; }
+        .gallery-item { flex: 0 0 100%; scroll-snap-align: start; height: 350px; object-fit: contain; border-radius: 15px; background: #f9f9f9; }
         
         /* Layout Kanan: Info & Form */
         .modal-right { flex: 1.2; min-width: 320px; }
-        
         .label-tag { font-size: 11px; font-weight: 800; color: #888; text-transform: uppercase; margin-bottom: 8px; display: block; }
         .ref-box { background: #f8f9fa; padding: 15px; border-radius: 12px; border-left: 4px solid var(--orange); font-size: 14px; color: #555; margin-bottom: 20px; line-height: 1.5; }
         
@@ -97,6 +126,8 @@
         @media (max-width: 768px) {
             .modal-body { flex-direction: column; }
             .gallery-item { height: 250px; }
+            .filters { flex-direction: column; align-items: stretch; }
+            .view-group { justify-content: space-between; }
         }
     </style>
 </head>
@@ -107,12 +138,32 @@
         <p style="font-size: 12px; font-weight: 700; color: #888;">Audio Video & Inventory Team Semarang</p>
     </header>
 
-    <div class="search-container">
-        <input type="text" id="searchInput" class="search-bar" placeholder="Cari nama barang..." oninput="filterData()">
+    <div class="controls-container">
+        <input type="text" id="searchInput" class="search-bar" placeholder="Cari nama barang..." oninput="applyFilters()">
+        
+        <div class="filters">
+            <div class="filter-group">
+                <select id="sortSelect" class="control-element" onchange="applyFilters()">
+                    <option value="default">Urutan Default</option>
+                    <option value="az">A - Z</option>
+                    <option value="za">Z - A</option>
+                </select>
+                <select id="teamSelect" class="control-element" onchange="applyFilters()">
+                    <option value="all">Semua Tim</option>
+                </select>
+                <select id="ownerSelect" class="control-element" onchange="applyFilters()">
+                    <option value="all">Semua Pemilik</option>
+                </select>
+            </div>
+            <div class="view-group">
+                <button onclick="toggleView('gallery')" id="btnGallery" class="control-element btn-view active">Gallery</button>
+                <button onclick="toggleView('list')" id="btnList" class="control-element btn-view">List</button>
+            </div>
+        </div>
     </div>
 
     <div id="loading">Menghubungkan ke database...</div>
-    <div id="grid" class="grid-cards"></div>
+    <div id="dataContainer" class="grid-cards"></div>
 
     <div id="modal" class="modal-overlay">
         <div class="modal-content">
@@ -156,21 +207,18 @@
     let allItems = [];
     let currentItem = null;
     let userPin = "";
+    let currentView = 'gallery';
 
     window.onload = () => {
-        // Hapus sisa PIN di sesi sebelumnya (jika ada) saat halaman di-refresh total
+        // Hapus sisa PIN di sesi sebelumnya saat halaman di-refresh
         sessionStorage.removeItem("active_pin");
         
-        // Minta PIN dan jalankan penarikan data utama
         checkAndRequestPin();
         loadData();
     };
 
     function checkAndRequestPin() {
-        // Cek dulu apakah di penyimpanan sementara browser sudah terisi PIN
         userPin = sessionStorage.getItem("active_pin");
-
-        // Jika belum ada PIN tersimpan, paksa minta melalui dialog prompt
         if (!userPin) {
             userPin = prompt("Masukkan PIN Keamanan:");
             if (!userPin) {
@@ -178,7 +226,6 @@
                 window.location.reload();
                 return;
             }
-            // Simpan PIN yang dimasukkan ke session storage browser
             sessionStorage.setItem("active_pin", userPin);
         }
     }
@@ -188,29 +235,110 @@
             const res = await fetch(SCRIPT_URL + "?action=api");
             allItems = await res.json();
             document.getElementById("loading").style.display = "none";
-            render(allItems);
+            
+            populateFilters();
+            applyFilters();
         } catch (e) {
             document.getElementById("loading").innerText = "Gagal memuat data. Periksa koneksi Internet.";
         }
     }
 
+    function populateFilters() {
+        // Mendapatkan list Tim unik
+        const teams = [...new Set(allItems.map(i => i.tim).filter(Boolean))];
+        const teamSelect = document.getElementById("teamSelect");
+        teams.forEach(t => teamSelect.innerHTML += `<option value="${t}">${t}</option>`);
+
+        // Mendapatkan list Pemilik unik (asumsi ada kolom `pemilik` di Apps Script JSON)
+        const owners = [...new Set(allItems.map(i => i.pemilik).filter(Boolean))];
+        const ownerSelect = document.getElementById("ownerSelect");
+        owners.forEach(o => ownerSelect.innerHTML += `<option value="${o}">${o}</option>`);
+    }
+
+    function toggleView(viewType) {
+        currentView = viewType;
+        
+        // Atur status class aktif tombol
+        document.getElementById("btnGallery").classList.toggle("active", viewType === 'gallery');
+        document.getElementById("btnList").classList.toggle("active", viewType === 'list');
+        
+        // Ubah class penampung
+        document.getElementById("dataContainer").className = viewType === 'gallery' ? 'grid-cards' : 'list-view';
+        
+        // Render ulang dengan setting tampilan baru
+        applyFilters();
+    }
+
+    function applyFilters() {
+        const q = document.getElementById("searchInput").value.toLowerCase();
+        const sortVal = document.getElementById("sortSelect").value;
+        const teamVal = document.getElementById("teamSelect").value;
+        const ownerVal = document.getElementById("ownerSelect").value;
+
+        // 1. Proses Filter (Pencarian, Tim, Pemilik)
+        let filtered = allItems.filter(i => {
+            const matchQ = i.nama_barang.toLowerCase().includes(q) || (i.tim || "").toLowerCase().includes(q);
+            const matchTeam = (teamVal === 'all') || (i.tim === teamVal);
+            const matchOwner = (ownerVal === 'all') || (i.pemilik && i.pemilik === ownerVal);
+            
+            return matchQ && matchTeam && matchOwner;
+        });
+
+        // 2. Proses Sorting A-Z atau Z-A
+        if (sortVal === 'az') {
+            filtered.sort((a, b) => a.nama_barang.localeCompare(b.nama_barang));
+        } else if (sortVal === 'za') {
+            filtered.sort((a, b) => b.nama_barang.localeCompare(a.nama_barang));
+        }
+
+        render(filtered);
+    }
+
     function render(data) {
-        const grid = document.getElementById("grid");
-        grid.innerHTML = "";
+        const container = document.getElementById("dataContainer");
+        container.innerHTML = "";
+        
         data.forEach(item => {
             const card = document.createElement("div");
-            card.className = "mission-card";
-            card.innerHTML = `
-                <img src="${item.fotos[0] || 'https://via.placeholder.com/300x180'}" class="card-img">
-                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                    <h4 style="font-weight:800; font-size:15px; margin-bottom:5px;">${item.nama_barang}</h4>
-                    <span style="background:var(--navy); color:white; font-size:10px; padding:3px 8px; border-radius:5px;">${item.jumlah}</span>
-                </div>
-                <p style="font-size:12px; color:#888;">${item.tim || ''}</p>
-                ${item.terpakai === "TRUE" ? "<p style='color:var(--orange); font-size:11px; font-weight:800; margin-top:10px;'>● SEDANG TERPAKAI</p>" : ""}
-            `;
+            const imageSrc = item.fotos && item.fotos[0] ? item.fotos[0] : 'https://via.placeholder.com/300x180';
+            const statusBadge = item.terpakai === "TRUE" ? `<span class="badge-used">● SEDANG TERPAKAI</span>` : "";
+            const ownerBadge = item.pemilik ? `<span class="badge-owner">👤 ${item.pemilik}</span>` : "";
+            
+            if (currentView === 'gallery') {
+                // HTML UNTUK GALLERY (GRID)
+                card.className = "mission-card";
+                card.innerHTML = `
+                    <img src="${imageSrc}" class="card-img">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <h4 style="font-weight:800; font-size:15px; margin-bottom:5px;">${item.nama_barang}</h4>
+                        <span class="badge-qty">${item.jumlah}</span>
+                    </div>
+                    <p style="font-size:12px; color:#888; margin-bottom: 8px;">${item.tim || ''}</p>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        ${ownerBadge}
+                        ${statusBadge}
+                    </div>
+                `;
+            } else {
+                // HTML UNTUK LIST (DAFTAR)
+                card.className = "list-item";
+                card.innerHTML = `
+                    <img src="${imageSrc}" class="list-img">
+                    <div class="list-info">
+                        <h4 class="list-title">${item.nama_barang}</h4>
+                        <div class="list-meta">
+                            <span class="badge-qty">${item.jumlah} Pcs</span>
+                            <span>|</span>
+                            <span style="color:#888;">${item.tim || '-'}</span>
+                            ${item.pemilik ? `<span>|</span> ${ownerBadge}` : ''}
+                            ${item.terpakai === "TRUE" ? `<span>|</span> ${statusBadge}` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+
             card.onclick = () => openModal(item);
-            grid.appendChild(card);
+            container.appendChild(card);
         });
     }
 
@@ -226,6 +354,11 @@
                 img.className = "gallery-item";
                 gallery.appendChild(img);
             });
+        } else {
+            const img = document.createElement("img");
+            img.src = 'https://via.placeholder.com/300x180';
+            img.className = "gallery-item";
+            gallery.appendChild(img);
         }
 
         document.getElementById("m-name").innerText = item.nama_barang;
@@ -240,10 +373,7 @@
     }
 
     document.getElementById("saveBtn").onclick = async function() {
-        // Keamanan ekstra untuk memastikan variabel internal PIN masih ada
-        if (!userPin) {
-            checkAndRequestPin();
-        }
+        if (!userPin) checkAndRequestPin();
 
         const btn = this;
         btn.disabled = true;
@@ -273,15 +403,6 @@
             location.reload();
         }
     };
-
-    function filterData() {
-        const q = document.getElementById("searchInput").value.toLowerCase();
-        const filtered = allItems.filter(i => 
-            i.nama_barang.toLowerCase().includes(q) || 
-            (i.tim || "").toLowerCase().includes(q)
-        );
-        render(filtered);
-    }
 </script>
 </body>
 </html>

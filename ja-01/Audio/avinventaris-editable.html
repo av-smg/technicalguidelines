@@ -10,31 +10,52 @@ location: "JA-01"
     <title>Inventaris AV - Semarang Team</title>
     
     <link rel="stylesheet" href="../style.css" />
-    
     {% include head.html %}
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
         
+        /* VARIASI WARNA (Bisa otomatis menyesuaikan Dark Mode) */
         :root { 
             --navy: #0A192F; 
             --orange: #FF7E27; 
             --bg: #F0F2F5; 
             --white: #ffffff;
+            --text-main: #0A192F;
+            --text-muted: #888888;
+            --border-color: #dddddd;
+            --card-hover: rgba(0,0,0,0.03);
+            --input-bg: #ffffff;
+            --ref-bg: #f8f9fa;
+        }
+
+        /* Jika tema dark mode aktif (biasanya dipicu class .dark-mode pada body) */
+        body.dark-mode, body.dark-theme, [data-theme="dark"] {
+            --navy: #e0e0e0;
+            --bg: #121212;
+            --white: #1e1e1e;
+            --text-main: #e0e0e0;
+            --text-muted: #aaaaaa;
+            --border-color: #333333;
+            --card-hover: rgba(255,255,255,0.05);
+            --input-bg: #2a2a2a;
+            --ref-bg: #222222;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: var(--bg); padding: 15px; color: var(--navy); }
+        body { background: var(--bg); padding: 15px; color: var(--text-main); transition: background 0.3s, color 0.3s; }
 
-        header { text-align: center; margin: 20px 0 30px; }
-        header h2 { font-weight: 800; letter-spacing: -1px; text-transform: uppercase; }
+        /* HEADER FIX: z-index diturunkan agar tidak menembus overlay navbar hamburger */
+        header { text-align: center; margin: 20px 0 30px; position: relative; z-index: 1; }
+        header h2 { font-weight: 800; letter-spacing: -1px; text-transform: uppercase; color: var(--text-main); }
+        header p { color: var(--text-muted) !important; }
         
-        /* CONTROLS (SEARCH & FILTERS) */
-        .controls-container { max-width: 1200px; margin: 0 auto 25px; display: flex; flex-direction: column; gap: 15px; }
+        .controls-container { max-width: 1200px; margin: 0 auto 25px; display: flex; flex-direction: column; gap: 15px; position: relative; z-index: 1; }
         .search-bar { 
             width: 100%; padding: 16px 24px; border-radius: 15px; 
-            border: 1px solid #ddd; outline: none; font-size: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: 0.3s;
+            border: 1px solid var(--border-color); outline: none; font-size: 16px;
+            background: var(--input-bg); color: var(--text-main);
+            box-shadow: 0 4px 12px var(--card-hover); transition: 0.3s;
         }
         .search-bar:focus { border-color: var(--orange); box-shadow: 0 4px 20px rgba(255,126,39,0.15); }
         
@@ -43,15 +64,15 @@ location: "JA-01"
         .view-group { display: flex; gap: 10px; }
         
         .control-element { 
-            padding: 10px 16px; border-radius: 10px; border: 1px solid #ddd; 
-            background: var(--white); font-size: 14px; font-weight: 600; 
-            color: var(--navy); cursor: pointer; outline: none; transition: 0.2s;
+            padding: 10px 16px; border-radius: 10px; border: 1px solid var(--border-color); 
+            background: var(--input-bg); font-size: 14px; font-weight: 600; 
+            color: var(--text-main); cursor: pointer; outline: none; transition: 0.2s;
         }
         .control-element:focus, .control-element:hover { border-color: var(--orange); }
-        .btn-view { border: 1px solid #ddd; background: white; }
-        .btn-view.active { background: var(--navy); color: white; border-color: var(--navy); }
+        .btn-view { border: 1px solid var(--border-color); }
+        .btn-view.active { background: var(--orange); color: white; border-color: var(--orange); }
 
-        /* GRID CARDS (GALLERY VIEW) */
+        /* GRID CARDS */
         .grid-cards { 
             display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
@@ -59,8 +80,8 @@ location: "JA-01"
         }
         .mission-card { 
             background: var(--white); border-radius: 20px; padding: 15px; 
-            cursor: pointer; transition: 0.3s; border: 1px solid transparent;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.03); display: block;
+            cursor: pointer; transition: 0.3s; border: 1px solid var(--border-color);
+            box-shadow: 0 4px 10px var(--card-hover); display: block;
         }
         .mission-card:hover { transform: translateY(-5px); border-color: var(--orange); }
         .card-img { width: 100%; height: 180px; object-fit: cover; border-radius: 15px; background: #eee; margin-bottom: 15px; }
@@ -70,21 +91,20 @@ location: "JA-01"
         .list-item { 
             display: flex; align-items: center; gap: 15px; background: var(--white); 
             padding: 15px; border-radius: 15px; cursor: pointer; 
-            border: 1px solid transparent; transition: 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            border: 1px solid var(--border-color); transition: 0.3s; box-shadow: 0 2px 8px var(--card-hover);
         }
         .list-item:hover { transform: translateX(5px); border-color: var(--orange); }
         .list-img { width: 70px; height: 70px; object-fit: cover; border-radius: 10px; background: #eee; flex-shrink: 0; }
-        .list-info { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+        .list-info { flex: 1; display: flex; flex-direction: column; gap: 4px; color: var(--text-main); }
         .list-meta { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 
-        /* BADGES */
-        .badge-qty { background: var(--navy); color: white; font-size: 10px; padding: 3px 8px; border-radius: 5px; font-weight: 700; }
+        .badge-qty { background: var(--text-main); color: var(--bg); font-size: 10px; padding: 3px 8px; border-radius: 5px; font-weight: 700; }
         .badge-used { color: var(--orange); font-size: 11px; font-weight: 800; }
-        .badge-owner { color: #666; font-size: 12px; }
+        .badge-owner { color: var(--text-muted); font-size: 12px; }
 
-        /* MODAL RESPONSIVE */
+        /* MODAL */
         .modal-overlay { 
-            position: fixed; inset: 0; background: rgba(10,25,47,0.85); 
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7); 
             display: none; align-items: center; justify-content: center; 
             z-index: 1000; backdrop-filter: blur(5px); padding: 15px;
         }
@@ -93,44 +113,48 @@ location: "JA-01"
         .modal-content { 
             background: var(--white); border-radius: 25px; width: 100%; 
             max-width: 900px; max-height: 90vh; overflow-y: auto; 
-            position: relative; animation: slideUp 0.4s ease;
+            position: relative; animation: slideUp 0.4s ease; border: 1px solid var(--border-color);
         }
         @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-        .modal-header { padding: 20px 30px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: white; z-index: 10; }
-        .close-x { font-size: 28px; cursor: pointer; border: none; background: none; color: #999; }
+        .modal-header { padding: 20px 30px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--white); z-index: 10; }
+        .close-x { font-size: 28px; cursor: pointer; border: none; background: none; color: var(--text-muted); }
         .close-x:hover { color: var(--orange); }
 
         .modal-body { display: flex; flex-wrap: wrap; padding: 20px; gap: 25px; }
         
-        /* Layout Kiri: Gallery */
-        .modal-left { flex: 1; min-width: 320px; }
-        .image-gallery { display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 10px; }
-        .gallery-item { flex: 0 0 100%; scroll-snap-align: start; height: 350px; object-fit: contain; border-radius: 15px; background: #f9f9f9; cursor: zoom-in; }
+        /* Layout Kiri: Thumbnail Gallery (NEW DESIGN) */
+        .modal-left { flex: 1; min-width: 300px; }
+        .main-image-box { width: 100%; height: 280px; border-radius: 15px; overflow: hidden; background: #eee; margin-bottom: 10px; cursor: zoom-in; position: relative; }
+        .main-image-box img { width: 100%; height: 100%; object-fit: cover; }
+        .thumb-row { display: flex; gap: 8px; flex-wrap: wrap; }
+        .thumb-img { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; cursor: pointer; border: 2px solid transparent; opacity: 0.6; transition: 0.2s; }
+        .thumb-img:hover, .thumb-img.active { border-color: var(--orange); opacity: 1; }
         
         /* Layout Kanan: Info & Form */
-        .modal-right { flex: 1.2; min-width: 320px; }
-        .label-tag { font-size: 11px; font-weight: 800; color: #888; text-transform: uppercase; margin-bottom: 8px; display: block; }
-        .ref-box { background: #f8f9fa; padding: 15px; border-radius: 12px; border-left: 4px solid var(--orange); font-size: 14px; color: #555; margin-bottom: 20px; line-height: 1.5; }
+        .modal-right { flex: 1.2; min-width: 300px; }
+        .label-tag { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; display: block; }
+        .ref-box { background: var(--ref-bg); padding: 15px; border-radius: 12px; border-left: 4px solid var(--orange); font-size: 14px; color: var(--text-main); margin-bottom: 20px; line-height: 1.5; }
         
         .status-btn { 
-            display: flex; align-items: center; gap: 12px; background: #f1f3f5; 
+            display: flex; align-items: center; gap: 12px; background: var(--input-bg); 
             padding: 16px; border-radius: 15px; margin-bottom: 20px; cursor: pointer; transition: 0.2s;
+            border: 1px solid var(--border-color); color: var(--text-main);
         }
-        .status-btn:has(input:checked) { background: #fff4e6; border: 1px solid var(--orange); }
+        .status-btn:has(input:checked) { border: 1px solid var(--orange); color: var(--orange); }
         .status-btn input { width: 22px; height: 22px; accent-color: var(--orange); }
 
-        .input-text { width: 100%; padding: 15px; border-radius: 12px; border: 2px solid #eee; font-size: 15px; outline: none; transition: 0.3s; margin-bottom: 20px; }
+        .input-text { width: 100%; padding: 15px; border-radius: 12px; border: 2px solid var(--border-color); background: var(--input-bg); color: var(--text-main); font-size: 15px; outline: none; transition: 0.3s; margin-bottom: 20px; }
         .input-text:focus { border-color: var(--orange); }
 
         .modal-footer { display: flex; gap: 10px; padding: 0 20px 25px; }
         .btn { flex: 1; padding: 16px; border-radius: 15px; font-weight: 800; border: none; cursor: pointer; transition: 0.3s; font-size: 15px; }
         .btn-save { background: var(--orange); color: white; box-shadow: 0 8px 15px rgba(255,126,39,0.2); }
         .btn-save:hover { transform: translateY(-2px); box-shadow: 0 12px 20px rgba(255,126,39,0.3); }
-        .btn-cancel { background: #eee; color: #666; }
-        .btn-cancel:hover { background: #e0e0e0; }
+        .btn-save:disabled { background: #ccc; cursor: not-allowed; box-shadow: none; transform: none; }
+        .btn-cancel { background: var(--border-color); color: var(--text-main); }
 
-        #loading { text-align: center; padding: 100px; font-weight: 700; color: #888; }
+        #loading { text-align: center; padding: 100px; font-weight: 700; color: var(--text-muted); }
 
         /* FULLSCREEN IMAGE OVERLAY */
         .fs-overlay {
@@ -150,7 +174,6 @@ location: "JA-01"
 
         @media (max-width: 768px) {
             .modal-body { flex-direction: column; }
-            .gallery-item { height: 250px; }
             .filters { flex-direction: column; align-items: stretch; }
             .view-group { justify-content: space-between; }
         }
@@ -162,7 +185,7 @@ location: "JA-01"
 
     <header>
         <h2>Inventory Portal</h2>
-        <p style="font-size: 12px; font-weight: 700; color: #888;">Audio Video & Inventory Team Semarang</p>
+        <p style="font-size: 12px; font-weight: 700;">Audio Video & Inventory Team Semarang</p>
     </header>
 
     <div class="controls-container">
@@ -201,8 +224,12 @@ location: "JA-01"
             
             <div class="modal-body">
                 <div class="modal-left">
-                    <span class="label-tag">Galeri Foto (Geser Horizontal | Klik Untuk Perbesar)</span>
-                    <div id="m-gallery" class="image-gallery"></div>
+                    <span class="label-tag">Foto Barang (Klik gambar untuk perbesar)</span>
+                    <div class="main-image-box" onclick="openFullscreen()">
+                        <img id="m-main-img" src="" alt="Main Image">
+                    </div>
+                    <div id="m-thumbnails" class="thumb-row">
+                        </div>
                 </div>
 
                 <div class="modal-right">
@@ -236,9 +263,8 @@ location: "JA-01"
 
 <script>
     // MASUKKAN URL WEB APP ANDA DI SINI
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxh3LlBSMYm9Htcq3-4KbruMWP8xdK6BoQcPik9tOYsQPPEaR3iV-60xKHvor9QepSo/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxEZq1rZP4b42JQXyanBmSBeB5cl7yTlQZ1l27pTCEoIOxBtdQ65uruHugOXfmmdXP6/exec";
     
-    // Daftar PIN yang valid (Frontend Validation)
     const VALID_PINS = [
         "4b2d9e", "5x7z2y", "3f8g1k", "8r2m9p", "2v9w4x", 
         "7k3n8p", "5a9b3c", "6e2g8q", "9t4v1w", "3d7h2k"
@@ -247,9 +273,6 @@ location: "JA-01"
     let allItems = [];
     let currentItem = null;
     let currentView = 'gallery';
-    
-    // Variabel PIN hanya tersimpan di runtime JS. 
-    // Jika halaman di-refresh, variabel akan kosong dan minta PIN lagi.
     let userPin = ""; 
 
     window.onload = () => {
@@ -265,13 +288,11 @@ location: "JA-01"
             while (true) {
                 let input = prompt("Masukkan PIN Keamanan:");
                 
-                // Jika user menekan batal/cancel
                 if (input === null) {
                     alert("Akses dibatalkan. Anda memerlukan PIN untuk melihat data.");
                     return false;
                 }
                 
-                // Cek apakah PIN ada di dalam array
                 if (VALID_PINS.includes(input.trim().toLowerCase())) {
                     userPin = input.trim().toLowerCase();
                     break;
@@ -286,9 +307,12 @@ location: "JA-01"
     async function loadData() {
         try {
             const res = await fetch(SCRIPT_URL + "?action=api");
-            allItems = await res.json();
-            document.getElementById("loading").style.display = "none";
+            const rawData = await res.json();
             
+            // FILTER: Buang item yang nama barangnya "Nama Barang" (Row Header)
+            allItems = rawData.filter(item => item.nama_barang.toLowerCase() !== 'nama barang');
+            
+            document.getElementById("loading").style.display = "none";
             populateFilters();
             applyFilters();
         } catch (e) {
@@ -355,7 +379,7 @@ location: "JA-01"
                         <h4 style="font-weight:800; font-size:15px; margin-bottom:5px;">${item.nama_barang}</h4>
                         <span class="badge-qty">${item.jumlah}</span>
                     </div>
-                    <p style="font-size:12px; color:#888; margin-bottom: 8px;">${item.tim || ''}</p>
+                    <p style="font-size:12px; color:var(--text-muted); margin-bottom: 8px;">${item.tim || ''}</p>
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                         ${ownerBadge}
                         ${statusBadge}
@@ -369,10 +393,10 @@ location: "JA-01"
                         <h4 class="list-title">${item.nama_barang}</h4>
                         <div class="list-meta">
                             <span class="badge-qty">${item.jumlah} Pcs</span>
-                            <span>|</span>
-                            <span style="color:#888;">${item.tim || '-'}</span>
-                            ${item.barang_milik ? `<span>|</span> ${ownerBadge}` : ''}
-                            ${item.terpakai === "TRUE" ? `<span>|</span> ${statusBadge}` : ''}
+                            <span style="color:var(--text-muted);">|</span>
+                            <span style="color:var(--text-muted);">${item.tim || '-'}</span>
+                            ${item.barang_milik ? `<span style="color:var(--text-muted);">|</span> ${ownerBadge}` : ''}
+                            ${item.terpakai === "TRUE" ? `<span style="color:var(--text-muted);">|</span> ${statusBadge}` : ''}
                         </div>
                     </div>
                 `;
@@ -385,22 +409,30 @@ location: "JA-01"
 
     function openModal(item) {
         currentItem = item;
-        const gallery = document.getElementById("m-gallery");
-        gallery.innerHTML = "";
+        const mainImg = document.getElementById("m-main-img");
+        const thumbs = document.getElementById("m-thumbnails");
+        thumbs.innerHTML = "";
         
         if(item.fotos && item.fotos.length > 0) {
-            item.fotos.forEach(url => {
+            mainImg.src = item.fotos[0];
+            
+            // Generate Thumbnails
+            item.fotos.forEach((url, index) => {
                 const img = document.createElement("img");
                 img.src = url;
-                img.className = "gallery-item";
-                img.onclick = () => openFullscreen(url); // Event Listener Fullscreen
-                gallery.appendChild(img);
+                img.className = "thumb-img" + (index === 0 ? " active" : "");
+                
+                // Ganti gambar utama saat thumbnail diklik
+                img.onclick = () => {
+                    mainImg.src = url;
+                    // Update border orange pada thumbnail yang aktif
+                    document.querySelectorAll('.thumb-img').forEach(t => t.classList.remove('active'));
+                    img.classList.add('active');
+                };
+                thumbs.appendChild(img);
             });
         } else {
-            const img = document.createElement("img");
-            img.src = 'https://via.placeholder.com/300x180';
-            img.className = "gallery-item";
-            gallery.appendChild(img);
+            mainImg.src = 'https://via.placeholder.com/300x180';
         }
 
         document.getElementById("m-name").innerText = item.nama_barang;
@@ -414,24 +446,25 @@ location: "JA-01"
         document.getElementById("modal").classList.remove("active");
     }
 
-    // --- FUNGSI FULLSCREEN ---
-    function openFullscreen(imgUrl) {
-        document.getElementById("fsImage").src = imgUrl;
+    function openFullscreen() {
+        const imgSrc = document.getElementById("m-main-img").src;
+        document.getElementById("fsImage").src = imgSrc;
         document.getElementById("fsOverlay").classList.add("active");
     }
 
     function closeFullscreen() {
         document.getElementById("fsOverlay").classList.remove("active");
     }
-    // -------------------------
 
     document.getElementById("saveBtn").onclick = async function() {
-        // Cek PIN sekali lagi di runtime sebagai double security
         if (!userPin) {
             if (!checkAndRequestPin()) return; 
         }
 
         const btn = this;
+        const isChecked = document.getElementById("m-check").checked;
+        const newDesc = document.getElementById("m-desc").value;
+
         btn.disabled = true;
         btn.innerText = "PROSES...";
 
@@ -439,12 +472,12 @@ location: "JA-01"
             action: "update_item",
             pin: userPin,
             row_index: currentItem.row_index,
-            terpakai: document.getElementById("m-check").checked ? "TRUE" : "FALSE",
-            keterangan: document.getElementById("m-desc").value
+            terpakai: isChecked ? "TRUE" : "FALSE",
+            keterangan: newDesc
         };
 
         try {
-            const response = await fetch(SCRIPT_URL, {
+            await fetch(SCRIPT_URL, {
                 method: "POST",
                 mode: "no-cors", 
                 cache: "no-cache",
@@ -452,13 +485,24 @@ location: "JA-01"
                 body: JSON.stringify(payload)
             });
             
-            alert("Sinyal terkirim ke Server (Halaman akan memuat ulang data)");
+            // UPDATE DATA SECARA LOKAL (Tanpa perlu Refresh Halaman!)
+            currentItem.terpakai = isChecked ? "TRUE" : "FALSE";
+            currentItem.keterangan_edit = newDesc;
             
-            // Reload halaman secara otomatis (PIN akan reset karena direfresh)
-            location.reload();
+            alert("Berhasil disimpan!");
+            
+            // Reset Button
+            btn.disabled = false;
+            btn.innerText = "SIMPAN PERUBAHAN";
+            
+            // Tutup modal dan render ulang grid
+            closeModal();
+            applyFilters();
+            
         } catch (e) {
-            alert("Error/No-CORS Success! (Sistem me-refresh data)");
-            location.reload();
+            alert("Ada masalah jaringan. Pastikan internet Anda lancar.");
+            btn.disabled = false;
+            btn.innerText = "SIMPAN PERUBAHAN";
         }
     };
 </script>

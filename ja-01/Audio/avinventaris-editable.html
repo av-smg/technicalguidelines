@@ -242,6 +242,7 @@ location: "JA-01"
     </div>
 
 <script>
+<script>
     // URL WEBHOOK BARU ANDA
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz8wjoSJfVK9uFh5liGvtFCrZke9itcljbeTJ_Ds7Zqc5VCt6dVqUx4qipnySWgRs_K/exec";
     
@@ -257,9 +258,8 @@ location: "JA-01"
     let currentView = 'gallery';
     let userPin = ""; 
     
-    // Variabel untuk melacak status edit foto
-    let currentFotoIndex = 0; // 0 sampai 3
-    let pendingFotoUpdate = null; // { index: int, base64: string, hapus: boolean }
+    let currentFotoIndex = 0; 
+    let pendingFotoUpdate = null; 
 
     window.onload = () => {
         if (checkAndRequestPin()) {
@@ -273,12 +273,10 @@ location: "JA-01"
         if (!userPin) {
             while (true) {
                 let input = prompt("Masukkan PIN Keamanan:");
-                
                 if (input === null) {
                     alert("Akses dibatalkan. Anda memerlukan PIN untuk melihat data.");
                     return false;
                 }
-                
                 if (VALID_PINS.includes(input.trim().toLowerCase())) {
                     userPin = input.trim().toLowerCase();
                     break;
@@ -295,7 +293,6 @@ location: "JA-01"
             const res = await fetch(SCRIPT_URL + "?action=api");
             const rawData = await res.json();
             
-            // Mengakses struktur data baru: rawData.inventory dan rawData.dropdowns
             allItems = rawData.inventory.filter(item => item.nama_barang && item.nama_barang.toLowerCase() !== 'nama barang');
             optionsData = rawData.dropdowns || { lokasi: ["Gudang", "Gedung"], kepemilikan: [] };
             
@@ -335,7 +332,6 @@ location: "JA-01"
             const matchQ = i.nama_barang.toLowerCase().includes(q) || (i.tim || "").toLowerCase().includes(q);
             const matchTeam = (teamVal === 'all') || (i.tim === teamVal);
             const matchOwner = (ownerVal === 'all') || (i.barang_milik && i.barang_milik === ownerVal);
-            
             return matchQ && matchTeam && matchOwner;
         });
 
@@ -438,8 +434,6 @@ location: "JA-01"
         const thumbs = document.getElementById("m-thumbnails");
         thumbs.innerHTML = "";
         
-        let activeFound = false;
-        
         for(let i=0; i<4; i++) {
             const url = fotos && fotos[i] ? fotos[i] : null;
             const thumbDiv = document.createElement("div");
@@ -447,7 +441,7 @@ location: "JA-01"
             if (url) {
                 thumbDiv.innerHTML = `<img src="${url}" style="width:100%; height:100%; border-radius:6px; object-fit:cover;">`;
             } else {
-                thumbDiv.innerHTML = `<span>+</span>`; // Indikator kosong
+                thumbDiv.innerHTML = `<span>+</span>`; 
             }
             
             thumbDiv.className = "thumb-img";
@@ -461,7 +455,6 @@ location: "JA-01"
                 document.querySelectorAll('.thumb-img').forEach(t => t.classList.remove('active'));
                 thumbDiv.classList.add('active');
                 
-                // Cek apakah ada foto yang tertunda di index ini
                 if(pendingFotoUpdate && pendingFotoUpdate.index === i && !pendingFotoUpdate.hapus) {
                     mainImg.src = pendingFotoUpdate.base64;
                 } else if (pendingFotoUpdate && pendingFotoUpdate.index === i && pendingFotoUpdate.hapus) {
@@ -474,25 +467,42 @@ location: "JA-01"
         }
     }
 
+    // --- FUNGSI KOMPRESI GAMBAR (PENTING AGAR TIDAK ERROR) ---
+    function compressImage(base64, maxDim, quality, callback) {
+        const img = new Image();
+        img.src = base64;
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let w = img.width, h = img.height;
+            if (w > h && w > maxDim) { h *= maxDim / w; w = maxDim; }
+            else if (h > maxDim) { w *= maxDim / h; h = maxDim; }
+            canvas.width = w; canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            callback(canvas.toDataURL('image/jpeg', quality));
+        };
+    }
+
+    // --- PROSES GAMBAR DENGAN KOMPRESI ---
     function prosesGantiFoto(event) {
         const file = event.target.files[0];
         if(!file) return;
         
         const reader = new FileReader();
         reader.onload = (e) => {
-            const base64Str = e.target.result;
+            const base64Raw = e.target.result;
             
-            // Simpan state pending
-            pendingFotoUpdate = {
-                index: currentFotoIndex,
-                base64: base64Str,
-                hapus: false
-            };
-            
-            // Update preview di UI
-            document.getElementById("m-main-img").src = base64Str;
-            const activeThumb = document.querySelectorAll('.thumb-img')[currentFotoIndex];
-            activeThumb.innerHTML = `<img src="${base64Str}" style="width:100%; height:100%; border-radius:6px; object-fit:cover;">`;
+            compressImage(base64Raw, 800, 0.7, (compressedBase64) => {
+                pendingFotoUpdate = {
+                    index: currentFotoIndex,
+                    base64: compressedBase64,
+                    hapus: false
+                };
+                
+                document.getElementById("m-main-img").src = compressedBase64;
+                const activeThumb = document.querySelectorAll('.thumb-img')[currentFotoIndex];
+                activeThumb.innerHTML = `<img src="${compressedBase64}" style="width:100%; height:100%; border-radius:6px; object-fit:cover;">`;
+            });
         };
         reader.readAsDataURL(file);
     }
@@ -521,7 +531,6 @@ location: "JA-01"
         document.getElementById("m-ref").innerText = item.keterangan_ref || "Tidak ada referensi teknis.";
         document.getElementById("m-desc").value = item.keterangan_edit || "";
         
-        // Populasikan Dropdown Lokasi
         const locSelect = document.getElementById("m-lokasi");
         locSelect.innerHTML = "";
         optionsData.lokasi.forEach(loc => {
@@ -529,11 +538,9 @@ location: "JA-01"
         });
         if(item.lokasi) locSelect.value = item.lokasi;
 
-        // Set Checkbox Status Digunakan
         const statusCheckbox = document.getElementById("m-status-digunakan");
         statusCheckbox.checked = (item.status_digunakan === true || item.status_digunakan === "TRUE");
 
-        // Set Qty Controls
         let total = parseInt(item.jumlah) || 0;
         let terpakai = parseInt(item.terpakai) || 0;
         
@@ -549,12 +556,12 @@ location: "JA-01"
 
     function closeModal() {
         document.getElementById("modal").classList.remove("active");
-        document.getElementById("img-upload").value = ""; // Reset input file
+        document.getElementById("img-upload").value = ""; 
     }
 
     function openFullscreen() {
         const imgSrc = document.getElementById("m-main-img").src;
-        if(!imgSrc.includes('text=')) { // Jangan fullscreen placeholder
+        if(!imgSrc.includes('text=')) { 
             document.getElementById("fsImage").src = imgSrc;
             document.getElementById("fsOverlay").classList.add("active");
         }
@@ -564,6 +571,7 @@ location: "JA-01"
         document.getElementById("fsOverlay").classList.remove("active");
     }
 
+    // --- PROSES SIMPAN YANG SUDAH DILENGKAPI BACA ERROR ---
     document.getElementById("saveBtn").onclick = async function() {
         if (!userPin) {
             if (!checkAndRequestPin()) return; 
@@ -588,39 +596,52 @@ location: "JA-01"
             keterangan: newDesc
         };
 
-        // Jika ada perubahan foto (ganti/hapus), sertakan dalam payload
         if(pendingFotoUpdate) {
             payload.update_foto = pendingFotoUpdate;
         }
 
         try {
-            await fetch(SCRIPT_URL, {
+            const response = await fetch(SCRIPT_URL, {
                 method: "POST",
-                mode: "no-cors",
                 headers: { "Content-Type": "text/plain;charset=utf-8" },
                 body: JSON.stringify(payload)
             });
             
-            // Perbarui Data Lokal agar UI langsung berubah tanpa refresh
-            currentItem.terpakai = qtyTerpakai;
-            currentItem.keterangan_edit = newDesc;
-            currentItem.lokasi = newLokasi;
-            currentItem.status_digunakan = newStatus;
+            const responseText = await response.text();
             
-            if(pendingFotoUpdate) {
-                if(!currentItem.fotos) currentItem.fotos = ["", "", "", ""];
-                if(pendingFotoUpdate.hapus) {
-                    currentItem.fotos[pendingFotoUpdate.index] = "";
-                } else {
-                    currentItem.fotos[pendingFotoUpdate.index] = pendingFotoUpdate.base64;
+            if (responseText === "SUCCESS") {
+                currentItem.terpakai = qtyTerpakai;
+                currentItem.keterangan_edit = newDesc;
+                currentItem.lokasi = newLokasi;
+                currentItem.status_digunakan = newStatus;
+                
+                if(pendingFotoUpdate) {
+                    if(!currentItem.fotos) currentItem.fotos = ["", "", "", ""];
+                    if(pendingFotoUpdate.hapus) {
+                        currentItem.fotos[pendingFotoUpdate.index] = "";
+                    } else {
+                        currentItem.fotos[pendingFotoUpdate.index] = pendingFotoUpdate.base64;
+                    }
                 }
+                
+                alert("✅ Data & Foto berhasil tersimpan di sistem!");
+                btn.disabled = false;
+                btn.innerText = "SIMPAN PERUBAHAN";
+                closeModal();
+                applyFilters(); 
+            } else {
+                alert("⚠️ Gagal menyimpan. Balasan Server: " + responseText);
+                btn.disabled = false;
+                btn.innerText = "SIMPAN PERUBAHAN";
             }
             
-            alert("✅ Data berhasil tersimpan di sistem!");
-            
+        } catch (e) {
+            alert("⚠️ Gagal terhubung ke server (Error Jaringan). Coba lagi.\nDetail: " + e.message);
             btn.disabled = false;
             btn.innerText = "SIMPAN PERUBAHAN";
-            
+        }
+    };
+</script>
             closeModal();
             applyFilters(); 
             

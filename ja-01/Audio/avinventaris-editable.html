@@ -349,7 +349,8 @@ location: "JA-01"
         
         data.forEach(item => {
             const card = document.createElement("div");
-            const imageSrc = item.fotos && item.fotos[0] ? item.fotos[0] : 'https://via.placeholder.com/300x180?text=NO+IMAGE';
+            // MENGGANTI PLACEHOLDER
+            const imageSrc = item.fotos && item.fotos[0] ? item.fotos[0] : 'https://placehold.co/300x180/EEEEEE/999999?text=NO+IMAGE';
             
             let total = parseInt(item.jumlah) || 0;
             let terpakai = parseInt(item.terpakai) || 0;
@@ -446,7 +447,8 @@ location: "JA-01"
             thumbDiv.className = "thumb-img";
             if (i === currentFotoIndex) {
                 thumbDiv.classList.add("active");
-                mainImg.src = url || 'https://via.placeholder.com/300x180?text=KOSONG';
+                // MENGGANTI PLACEHOLDER
+                mainImg.src = url || 'https://placehold.co/300x180/EEEEEE/999999?text=KOSONG';
             }
             
             thumbDiv.onclick = () => {
@@ -457,16 +459,17 @@ location: "JA-01"
                 if(pendingFotoUpdate && pendingFotoUpdate.index === i && !pendingFotoUpdate.hapus) {
                     mainImg.src = pendingFotoUpdate.base64;
                 } else if (pendingFotoUpdate && pendingFotoUpdate.index === i && pendingFotoUpdate.hapus) {
-                    mainImg.src = 'https://via.placeholder.com/300x180?text=DIHAPUS';
+                    // MENGGANTI PLACEHOLDER
+                    mainImg.src = 'https://placehold.co/300x180/EEEEEE/999999?text=DIHAPUS';
                 } else {
-                    mainImg.src = url || 'https://via.placeholder.com/300x180?text=KOSONG';
+                    // MENGGANTI PLACEHOLDER
+                    mainImg.src = url || 'https://placehold.co/300x180/EEEEEE/999999?text=KOSONG';
                 }
             };
             thumbs.appendChild(thumbDiv);
         }
     }
 
-    // --- FUNGSI KOMPRESI GAMBAR (PENTING AGAR TIDAK ERROR) ---
     function compressImage(base64, maxDim, quality, callback) {
         const img = new Image();
         img.src = base64;
@@ -482,7 +485,6 @@ location: "JA-01"
         };
     }
 
-    // --- PROSES GAMBAR DENGAN KOMPRESI ---
     function prosesGantiFoto(event) {
         const file = event.target.files[0];
         if(!file) return;
@@ -513,7 +515,8 @@ location: "JA-01"
                 base64: null,
                 hapus: true
             };
-            document.getElementById("m-main-img").src = 'https://via.placeholder.com/300x180?text=DIHAPUS';
+            // MENGGANTI PLACEHOLDER
+            document.getElementById("m-main-img").src = 'https://placehold.co/300x180/EEEEEE/999999?text=DIHAPUS';
             const activeThumb = document.querySelectorAll('.thumb-img')[currentFotoIndex];
             activeThumb.innerHTML = `<span>+</span>`;
         }
@@ -570,7 +573,6 @@ location: "JA-01"
         document.getElementById("fsOverlay").classList.remove("active");
     }
 
-    // --- PROSES SIMPAN YANG SUDAH DILENGKAPI BACA ERROR ---
     document.getElementById("saveBtn").onclick = async function() {
         if (!userPin) {
             if (!checkAndRequestPin()) return; 
@@ -607,8 +609,6 @@ location: "JA-01"
                 body: JSON.stringify(payload)
             });
             
-            // Karena pakai no-cors, browser tidak bisa membaca balasan server.
-            // Kita asumsikan sukses jika script berhasil melewati blok fetch di atas.
             currentItem.terpakai = qtyTerpakai;
             currentItem.keterangan_edit = newDesc;
             currentItem.lokasi = newLokasi;

@@ -242,7 +242,7 @@ location: "JA-01"
     </div>
 
 <script>
-    // URL WEBHOOK BARU ANDA - Typo "execs" sudah diperbaiki menjadi "exec"
+    // URL WEBHOOK BARU ANDA
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz8wjoSJfVK9uFh5liGvtFCrZke9itcljbeTJ_Ds7Zqc5VCt6dVqUx4qipnySWgRs_K/exec";
     
     const VALID_PINS = [
@@ -349,7 +349,6 @@ location: "JA-01"
         
         data.forEach(item => {
             const card = document.createElement("div");
-            // MENGGANTI PLACEHOLDER
             const imageSrc = item.fotos && item.fotos[0] ? item.fotos[0] : 'https://placehold.co/300x180/EEEEEE/999999?text=NO+IMAGE';
             
             let total = parseInt(item.jumlah) || 0;
@@ -447,7 +446,6 @@ location: "JA-01"
             thumbDiv.className = "thumb-img";
             if (i === currentFotoIndex) {
                 thumbDiv.classList.add("active");
-                // MENGGANTI PLACEHOLDER
                 mainImg.src = url || 'https://placehold.co/300x180/EEEEEE/999999?text=KOSONG';
             }
             
@@ -459,10 +457,8 @@ location: "JA-01"
                 if(pendingFotoUpdate && pendingFotoUpdate.index === i && !pendingFotoUpdate.hapus) {
                     mainImg.src = pendingFotoUpdate.base64;
                 } else if (pendingFotoUpdate && pendingFotoUpdate.index === i && pendingFotoUpdate.hapus) {
-                    // MENGGANTI PLACEHOLDER
                     mainImg.src = 'https://placehold.co/300x180/EEEEEE/999999?text=DIHAPUS';
                 } else {
-                    // MENGGANTI PLACEHOLDER
                     mainImg.src = url || 'https://placehold.co/300x180/EEEEEE/999999?text=KOSONG';
                 }
             };
@@ -470,38 +466,21 @@ location: "JA-01"
         }
     }
 
-    function compressImage(base64, maxDim, quality, callback) {
-        const img = new Image();
-        img.src = base64;
-        img.onload = () => {
-            const canvas = document.createElement('canvas');
-            let w = img.width, h = img.height;
-            if (w > h && w > maxDim) { h *= maxDim / w; w = maxDim; }
-            else if (h > maxDim) { w *= maxDim / h; h = maxDim; }
-            canvas.width = w; canvas.height = h;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, w, h);
-            callback(canvas.toDataURL('image/jpeg', quality));
-        };
-    }
-
-   // --- KOMPRESI FOTO TINGKAT TINGGI (ANTI-LEMOT) ---
+    // --- KOMPRESI FOTO TINGKAT TINGGI ---
     function prosesGantiFoto(event) {
         const file = event.target.files[0];
         if(!file) return;
         
-        // Menggunakan ObjectURL jauh lebih hemat memori dibanding FileReader untuk foto 15MB
         const imgUrl = URL.createObjectURL(file);
         const img = new Image();
         
         img.onload = () => {
-            URL.revokeObjectURL(imgUrl); // Segera bersihkan memori setelah foto dimuat
+            URL.revokeObjectURL(imgUrl); 
 
             const canvas = document.createElement('canvas');
-            let maxDim = 800; // Batasi ukuran sisi terpanjang maksimal 800 pixel
+            let maxDim = 800; 
             let w = img.width, h = img.height;
 
-            // Proses hitung rasio agar proporsional
             if (w > h && w > maxDim) { h *= maxDim / w; w = maxDim; }
             else if (h > maxDim) { w *= maxDim / h; h = maxDim; }
 
@@ -511,23 +490,19 @@ location: "JA-01"
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, w, h);
 
-            // Eksekusi Kompresi: Ubah ke JPEG dan tekan kualitasnya jadi 60%
             const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6);
 
-            // Simpan hasil kompresi (sekarang ukurannya sangat kecil)
             pendingFotoUpdate = {
                 index: currentFotoIndex,
                 base64: compressedBase64,
                 hapus: false
             };
             
-            // Tampilkan di layar
             document.getElementById("m-main-img").src = compressedBase64;
             const activeThumb = document.querySelectorAll('.thumb-img')[currentFotoIndex];
             activeThumb.innerHTML = `<img src="${compressedBase64}" style="width:100%; height:100%; border-radius:6px; object-fit:cover;">`;
         };
         
-        // Pemicu loading gambar
         img.src = imgUrl;
     }
 
@@ -538,7 +513,6 @@ location: "JA-01"
                 base64: null,
                 hapus: true
             };
-            // MENGGANTI PLACEHOLDER
             document.getElementById("m-main-img").src = 'https://placehold.co/300x180/EEEEEE/999999?text=DIHAPUS';
             const activeThumb = document.querySelectorAll('.thumb-img')[currentFotoIndex];
             activeThumb.innerHTML = `<span>+</span>`;
@@ -596,7 +570,7 @@ location: "JA-01"
         document.getElementById("fsOverlay").classList.remove("active");
     }
 
-    // --- PROSES SIMPAN YANG SUDAH DILENGKAPI BACA ERROR ---
+    // --- PROSES SIMPAN (KEMBALI MENGGUNAKAN NO-CORS) ---
     document.getElementById("saveBtn").onclick = async function() {
         if (!userPin) {
             if (!checkAndRequestPin()) return; 
@@ -626,42 +600,37 @@ location: "JA-01"
         }
 
         try {
-            const response = await fetch(SCRIPT_URL, {
+            // MENGGUNAKAN MODE NO-CORS AGAR TIDAK DIBLOKIR GOOGLE
+            await fetch(SCRIPT_URL, {
                 method: "POST",
+                mode: "no-cors", 
                 headers: { "Content-Type": "text/plain;charset=utf-8" },
                 body: JSON.stringify(payload)
             });
             
-            const responseText = await response.text();
+            // Karena no-cors, kita anggap sukses jika request berhasil dikirim
+            currentItem.terpakai = qtyTerpakai;
+            currentItem.keterangan_edit = newDesc;
+            currentItem.lokasi = newLokasi;
+            currentItem.status_digunakan = newStatus;
             
-            if (responseText === "SUCCESS") {
-                currentItem.terpakai = qtyTerpakai;
-                currentItem.keterangan_edit = newDesc;
-                currentItem.lokasi = newLokasi;
-                currentItem.status_digunakan = newStatus;
-                
-                if(pendingFotoUpdate) {
-                    if(!currentItem.fotos) currentItem.fotos = ["", "", "", ""];
-                    if(pendingFotoUpdate.hapus) {
-                        currentItem.fotos[pendingFotoUpdate.index] = "";
-                    } else {
-                        currentItem.fotos[pendingFotoUpdate.index] = pendingFotoUpdate.base64;
-                    }
+            if(pendingFotoUpdate) {
+                if(!currentItem.fotos) currentItem.fotos = ["", "", "", ""];
+                if(pendingFotoUpdate.hapus) {
+                    currentItem.fotos[pendingFotoUpdate.index] = "";
+                } else {
+                    currentItem.fotos[pendingFotoUpdate.index] = pendingFotoUpdate.base64;
                 }
-                
-                alert("✅ Data & Foto berhasil tersimpan di sistem!");
-                btn.disabled = false;
-                btn.innerText = "SIMPAN PERUBAHAN";
-                closeModal();
-                applyFilters(); 
-            } else {
-                alert("⚠️ Gagal menyimpan. Balasan Server: " + responseText);
-                btn.disabled = false;
-                btn.innerText = "SIMPAN PERUBAHAN";
             }
             
+            alert("✅ Data & Foto berhasil dikirim ke sistem!");
+            btn.disabled = false;
+            btn.innerText = "SIMPAN PERUBAHAN";
+            closeModal();
+            applyFilters(); 
+            
         } catch (e) {
-            alert("⚠️ Gagal terhubung ke server (Error Jaringan). Coba lagi.\nDetail: " + e.message);
+            alert("⚠️ Ada masalah jaringan, data mungkin gagal terkirim.\nDetail: " + e.message);
             btn.disabled = false;
             btn.innerText = "SIMPAN PERUBAHAN";
         }

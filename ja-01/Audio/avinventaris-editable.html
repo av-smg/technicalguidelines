@@ -570,7 +570,7 @@ location: "JA-01"
         document.getElementById("fsOverlay").classList.remove("active");
     }
 
-    // --- PROSES SIMPAN (KEMBALI MENGGUNAKAN NO-CORS) ---
+   // --- PROSES SIMPAN YANG 100% TRANSPARAN MENDETEKSI ERROR ---
     document.getElementById("saveBtn").onclick = async function() {
         if (!userPin) {
             if (!checkAndRequestPin()) return; 
@@ -595,42 +595,55 @@ location: "JA-01"
             keterangan: newDesc
         };
 
-        if(pendingFotoUpdate) {
+        if (pendingFotoUpdate) {
             payload.update_foto = pendingFotoUpdate;
         }
 
         try {
-            // MENGGUNAKAN MODE NO-CORS AGAR TIDAK DIBLOKIR GOOGLE
-            await fetch(SCRIPT_URL, {
+            // MENGGUNAKAN MODE STANDARD (TANPA NO-CORS) AGAR ERROR TERBACA
+            const response = await fetch(SCRIPT_URL, {
+                redirect: "follow",
                 method: "POST",
-                mode: "no-cors", 
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                headers: {
+                    "Content-Type": "text/plain;charset=utf-8",
+                },
                 body: JSON.stringify(payload)
             });
             
-            // Karena no-cors, kita anggap sukses jika request berhasil dikirim
-            currentItem.terpakai = qtyTerpakai;
-            currentItem.keterangan_edit = newDesc;
-            currentItem.lokasi = newLokasi;
-            currentItem.status_digunakan = newStatus;
+            // Membaca jawaban asli dari Google
+            const responseText = await response.text();
             
-            if(pendingFotoUpdate) {
-                if(!currentItem.fotos) currentItem.fotos = ["", "", "", ""];
-                if(pendingFotoUpdate.hapus) {
-                    currentItem.fotos[pendingFotoUpdate.index] = "";
-                } else {
-                    currentItem.fotos[pendingFotoUpdate.index] = pendingFotoUpdate.base64;
+            if (responseText === "SUCCESS") {
+                currentItem.terpakai = qtyTerpakai;
+                currentItem.keterangan_edit = newDesc;
+                currentItem.lokasi = newLokasi;
+                currentItem.status_digunakan = newStatus;
+                
+                if(pendingFotoUpdate) {
+                    if(!currentItem.fotos) currentItem.fotos = ["", "", "", ""];
+                    if(pendingFotoUpdate.hapus) {
+                        currentItem.fotos[pendingFotoUpdate.index] = "";
+                    } else {
+                        currentItem.fotos[pendingFotoUpdate.index] = pendingFotoUpdate.base64;
+                    }
                 }
+                
+                alert("✅ Perubahan berhasil disinkronkan ke Spreadsheet!");
+                btn.disabled = false;
+                btn.innerText = "SIMPAN PERUBAHAN";
+                closeModal();
+                applyFilters(); 
+                
+            } else {
+                // MUNCULKAN ERROR DARI GOOGLE APPS SCRIPT
+                alert("⚠️ Gagal menyinkronkan! Server membalas: " + responseText);
+                console.error("Server Error:", responseText);
+                btn.disabled = false;
+                btn.innerText = "SIMPAN PERUBAHAN";
             }
             
-            alert("✅ Data & Foto berhasil dikirim ke sistem!");
-            btn.disabled = false;
-            btn.innerText = "SIMPAN PERUBAHAN";
-            closeModal();
-            applyFilters(); 
-            
         } catch (e) {
-            alert("⚠️ Ada masalah jaringan, data mungkin gagal terkirim.\nDetail: " + e.message);
+            alert("⚠️ Gagal terhubung ke Google. Detail: " + e.message);
             btn.disabled = false;
             btn.innerText = "SIMPAN PERUBAHAN";
         }

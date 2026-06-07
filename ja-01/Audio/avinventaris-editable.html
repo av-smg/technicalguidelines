@@ -242,7 +242,7 @@ location: "JA-01"
     </div>
 
 <script>
-    // URL WEBHOOK BARU ANDA
+    // URL WEBHOOK BARU ANDA - Typo "execs" sudah diperbaiki menjadi "exec"
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz8wjoSJfVK9uFh5liGvtFCrZke9itcljbeTJ_Ds7Zqc5VCt6dVqUx4qipnySWgRs_K/exec";
     
     const VALID_PINS = [
@@ -596,6 +596,7 @@ location: "JA-01"
         document.getElementById("fsOverlay").classList.remove("active");
     }
 
+    // --- PROSES SIMPAN YANG SUDAH DILENGKAPI BACA ERROR ---
     document.getElementById("saveBtn").onclick = async function() {
         if (!userPin) {
             if (!checkAndRequestPin()) return; 
@@ -625,32 +626,39 @@ location: "JA-01"
         }
 
         try {
-            await fetch(SCRIPT_URL, {
+            const response = await fetch(SCRIPT_URL, {
                 method: "POST",
-                mode: "no-cors",
                 headers: { "Content-Type": "text/plain;charset=utf-8" },
                 body: JSON.stringify(payload)
             });
             
-            currentItem.terpakai = qtyTerpakai;
-            currentItem.keterangan_edit = newDesc;
-            currentItem.lokasi = newLokasi;
-            currentItem.status_digunakan = newStatus;
+            const responseText = await response.text();
             
-            if(pendingFotoUpdate) {
-                if(!currentItem.fotos) currentItem.fotos = ["", "", "", ""];
-                if(pendingFotoUpdate.hapus) {
-                    currentItem.fotos[pendingFotoUpdate.index] = "";
-                } else {
-                    currentItem.fotos[pendingFotoUpdate.index] = pendingFotoUpdate.base64;
+            if (responseText === "SUCCESS") {
+                currentItem.terpakai = qtyTerpakai;
+                currentItem.keterangan_edit = newDesc;
+                currentItem.lokasi = newLokasi;
+                currentItem.status_digunakan = newStatus;
+                
+                if(pendingFotoUpdate) {
+                    if(!currentItem.fotos) currentItem.fotos = ["", "", "", ""];
+                    if(pendingFotoUpdate.hapus) {
+                        currentItem.fotos[pendingFotoUpdate.index] = "";
+                    } else {
+                        currentItem.fotos[pendingFotoUpdate.index] = pendingFotoUpdate.base64;
+                    }
                 }
+                
+                alert("✅ Data & Foto berhasil tersimpan di sistem!");
+                btn.disabled = false;
+                btn.innerText = "SIMPAN PERUBAHAN";
+                closeModal();
+                applyFilters(); 
+            } else {
+                alert("⚠️ Gagal menyimpan. Balasan Server: " + responseText);
+                btn.disabled = false;
+                btn.innerText = "SIMPAN PERUBAHAN";
             }
-            
-            alert("✅ Data & Foto berhasil tersimpan di sistem!");
-            btn.disabled = false;
-            btn.innerText = "SIMPAN PERUBAHAN";
-            closeModal();
-            applyFilters(); 
             
         } catch (e) {
             alert("⚠️ Gagal terhubung ke server (Error Jaringan). Coba lagi.\nDetail: " + e.message);

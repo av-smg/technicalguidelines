@@ -5,57 +5,112 @@ title: Daftar Apendiks
 
 <link rel="stylesheet" href="style_apendiks.css">
 
+<style>
+    /* CSS Tambahan untuk Fitur Dropdown */
+    .dropdown-menu {
+        display: none;
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid rgba(125, 125, 125, 0.2) !important;
+        animation: fadeIn 0.3s ease;
+    }
+
+    .dropdown-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .dropdown-list li { margin-bottom: 8px !important; }
+
+    .dropdown-list a {
+        display: block;
+        padding: 10px 14px;
+        text-decoration: none;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        font-size: 0.9rem;
+        transition: 0.2s all ease;
+
+        /* WARNA ADAPTIF: Otomatis menyesuaikan Light/Dark Mode */
+        background-color: rgba(125, 125, 125, 0.1) !important;
+        color: var(--text-main, #1a202c) !important;
+    }
+
+    .dropdown-list a:hover {
+        background: #2563eb;
+        color: white;
+    }
+
+    .btn-go {
+        display: inline-block;
+        margin-top: 10px;
+        font-weight: bold;
+        color: #60a5fa;
+        cursor: pointer;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-5px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
 <div class="content-container">
     <section class="hero">
         <div class="badge-group" style="display: flex; gap: 10px; margin-bottom: 15px;">
             <span class="team-badge badge-it">REFERENSI</span>
-            <span class="team-badge" style="background: #4b5563;">DOKUMEN</span>
+            <span class="team-badge" style="background: #4b5563;color: white">DOKUMEN</span>
         </div>
-        <h1>Daftar <span>Apendiks</span> ⚡</h1>
-        <p>Kumpulan dokumen pendukung, aset visual, dan referensi teknis proyek av-smg.</p>
+        <h1>Daftar <span>Apendiks</span> 📜 </h1>
+        <p>Kumpulan dokumen pendukung, aset visual, dan referensi teknis proyek AV-SMG.</p>
     </section>
-
-    <div class="search-wrapper" style="margin-bottom: 40px;">
-        <input type="text" id="appendixSearch" class="search-input" placeholder="Cari lampiran...">
-    </div>
 
     <section class="team-section">
         <div class="team-header">
             <span class="team-badge badge-audio">A. DOKUMEN TEKNIS</span>
         </div>
         <div class="grid-cards">
-            <a href="skema-jalur-audio-toa.html" class="card-link audio-link">
+            <div class="card-link audio-link">
                 <div class="mission-card">
-                    <div class="card-emoji">🔌</div>
-                    <h3>Skema Jalur Audio TOA DIY</h3>
-                    <p>Diagram teknis instalasi dan jalur kabel audio khusus sistem TOA.</p>
-                    <span class="btn-go">Buka &rarr;</span>
+                    <div class="card-emoji">📢</div>
+                    <h3>Tim Audio</h3>
+                    <p>Dokumen pendukung dan referensi teknis Tim Audio.</p>
+                    
+                    <div class="btn-go" onclick="toggleDropdown('toaDropdown', 'toaBtnText')">
+                        <span id="toaBtnText">Buka &darr;</span>
+                    </div>
+                    
+                    <div id="toaDropdown" class="dropdown-menu">
+                        <ul class="dropdown-list">
+                            <li><a href="Tim Audio.html">📄 Diagram Utama</a></li>
+                            <li><a href="#">🔌 Konfigurasi Kabel XLR/TS</a></li>
+                            <li><a href="#">🔊 Setting Gain & Leveling</a></li>
+                            <li><a href="#">📥 Download PDF</a></li>
+                        </ul>
+                    </div>
                 </div>
-            </a>
-            <a href="manual-canon-1200d.html" class="card-link audio-link">
-                <div class="mission-card">
-                    <div class="card-emoji">📸</div>
-                    <h3>Manual Canon 1200D</h3>
-                    <p>Panduan konfigurasi kamera untuk produksi video.</p>
-                    <span class="btn-go">Buka &rarr;</span>
-                </div>
-            </a>
-        </div>
-    </section>
+            </div>
 
-    <section class="team-section" style="margin-top: 40px;">
-        <div class="team-header">
-            <span class="team-badge badge-it">B. ASET & MEDIA</span>
-        </div>
-        <div class="grid-cards">
-            <a href="prompt-ghibli-ai.html" class="card-link it-link">
+            <div class="card-link audio-link">
                 <div class="mission-card">
-                    <div class="card-emoji">🎨</div>
-                    <h3>Prompt Ghibli Style AI</h3>
-                    <p>Koleksi keyword prompt gaya Studio Ghibli.</p>
-                    <span class="btn-go">Buka &rarr;</span>
+                    <div class="card-emoji">🎥</div>
+                    <h3>Tim Video</h3>
+                    <p>Dokumen pendukung dan referensi teknis Tim Video.</p>
+                    
+                    <div class="btn-go" onclick="toggleDropdown('canonDropdown', 'canonBtnText')">
+                        <span id="canonBtnText">Buka &darr;</span>
+                    </div>
+                    
+                    <div id="canonDropdown" class="dropdown-menu">
+                        <ul class="dropdown-list">
+                            <li><a href="Tim Video.html">📺 Apendiks A - Panduan Kalibrasi</a></li>
+                            <li><a href="#">🗺️ Apendiks B - Layout Tim Video</a></li>
+                            <li><a href="#">📋 Apendiks C - Panduan Peralatan</a></li>
+                        </ul>
+                    </div>
                 </div>
-            </a>
+            </div>
         </div>
     </section>
 
@@ -65,6 +120,18 @@ title: Daftar Apendiks
 </div>
 
 <script>
+    // Fungsi Baru untuk Mengontrol Dropdown
+    function toggleDropdown(dropdownId, textId) {
+        const dropdown = document.getElementById(dropdownId);
+        const btnText = document.getElementById(textId);
+        const isHidden = dropdown.style.display === "none" || dropdown.style.display === "";
+        
+        dropdown.style.display = isHidden ? "block" : "none";
+        btnText.innerHTML = isHidden ? "Tutup &uarr;" : "Buka &darr;";
+    }
+    
+
+    // Fungsi Search asli tetap dipertahankan
     const searchInput = document.getElementById('appendixSearch');
     const cards = document.querySelectorAll('.card-link');
     if(searchInput) {

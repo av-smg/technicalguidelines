@@ -13,6 +13,12 @@
     margin-top: 20px;
 }
 
+/* CSS Tambahan untuk ukuran badge di bagian Hero */
+    .hero .badge-group .team-badge {
+        font-size: 1.1rem !important;
+        padding: 8px 16px !important; /* Menyesuaikan padding agar proporsional dengan font besar */
+        line-height: 1.2 !important;
+    }
 /* Memperbaiki warna teks di mode gelap agar tidak 'hilang' */
 .mission-card h3 {
     color: #60a5fa !important;

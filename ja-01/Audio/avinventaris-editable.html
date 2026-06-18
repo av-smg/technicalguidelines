@@ -197,7 +197,22 @@ location: "JA-01"
                     <p style="font-size: 11px; color: var(--text-gray); margin-top: 5px;">Pilih thumbnail di atas lalu klik Ganti/Hapus.</p>
                 </div>
 
-                <div class="modal-right">
+               <div class="modal-right">
+                    <div style="display: flex; gap: 10px; margin-bottom: 20px; background: var(--bg-color); padding: 15px; border-radius: 12px; border: 1px solid var(--border-color);">
+                        <div style="flex: 1;">
+                            <span style="font-size: 10px; font-weight: 800; color: var(--text-gray); text-transform: uppercase;">Aset Milik</span>
+                            <div id="m-owner" style="font-size: 14px; font-weight: 700; color: var(--text-dark); margin-top: 4px;">-</div>
+                        </div>
+                        <div style="flex: 1; border-left: 1px solid var(--border-color); padding-left: 10px;">
+                            <span style="font-size: 10px; font-weight: 800; color: var(--text-gray); text-transform: uppercase;">Tim Pengguna</span>
+                            <div id="m-team" style="font-size: 14px; font-weight: 700; color: var(--text-dark); margin-top: 4px;">-</div>
+                        </div>
+                        <div style="flex: 1.2; border-left: 1px solid var(--border-color); padding-left: 10px;">
+                            <span style="font-size: 10px; font-weight: 800; color: var(--text-gray); text-transform: uppercase;">Tgl Input Awal</span>
+                            <div id="m-date" style="font-size: 13px; font-weight: 600; color: var(--text-dark); margin-top: 4px;">-</div>
+                        </div>
+                    </div>
+                    <span class="label-tag">Keterangan Teknis</span>
                     <span class="label-tag">Keterangan Teknis</span>
                     <div id="m-ref" class="ref-box"></div>
 
@@ -530,6 +545,13 @@ location: "JA-01"
         buildThumbnails(item.fotos);
 
         document.getElementById("m-name").innerText = item.nama_barang;
+        
+        // --- 3 BARIS KODE BARU UNTUK INFO HEADER ---
+        document.getElementById("m-owner").innerText = item.barang_milik || "Tidak ada data";
+        document.getElementById("m-team").innerText = item.tim || "Tidak ada data";
+        document.getElementById("m-date").innerText = item.timestamp ? item.timestamp.split("T")[0] : "Tidak ada data";
+        // -------------------------------------------
+
         document.getElementById("m-ref").innerText = item.keterangan_ref || "Tidak ada referensi teknis.";
         document.getElementById("m-desc").value = item.keterangan_edit || "";
         

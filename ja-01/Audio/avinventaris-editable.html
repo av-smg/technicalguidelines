@@ -187,9 +187,12 @@ location: "JA-01"
                     <div id="m-thumbnails" class="thumb-row">
                     </div>
                     <div class="img-edit-controls">
-                        <button class="btn-img" onclick="document.getElementById('img-upload').click()">Ganti Foto</button>
-                        <button class="btn-img btn-img-danger" onclick="hapusFotoAktif()">Hapus Foto</button>
-                        <input type="file" id="img-upload" class="d-none" accept="image/*" style="display:none;" onchange="prosesGantiFoto(event)">
+                        <button class="btn-img" onclick="document.getElementById('img-camera').click()">📷 Kamera</button>
+                        <button class="btn-img" onclick="document.getElementById('img-gallery').click()">🖼️ Galeri</button>
+                        <button class="btn-img btn-img-danger" onclick="hapusFotoAktif()">🗑️ Hapus</button>
+                        
+                        <input type="file" id="img-camera" accept="image/*" capture="environment" style="display:none;" onchange="prosesGantiFoto(event)">
+                        <input type="file" id="img-gallery" accept="image/*" style="display:none;" onchange="prosesGantiFoto(event)">
                     </div>
                     <p style="font-size: 11px; color: var(--text-gray); margin-top: 5px;">Pilih thumbnail di atas lalu klik Ganti/Hapus.</p>
                 </div>
@@ -555,7 +558,8 @@ location: "JA-01"
 
     function closeModal() {
         document.getElementById("modal").classList.remove("active");
-        document.getElementById("img-upload").value = ""; 
+        document.getElementById("img-camera").value = ""; 
+        document.getElementById("img-gallery").value = ""; 
     }
 
     function openFullscreen() {

@@ -602,8 +602,10 @@ location: "JA-01"
             // MENGGUNAKAN MODE STANDARD (TANPA NO-CORS) AGAR ERROR TERBACA
            const response = await fetch(SCRIPT_URL, {
     method: "POST",
-    mode: "no-cors", // Gunakan no-cors
-    // HAPUS bagian headers agar tidak diblokir browser
+    mode: "cors", // WAJIB cors sekarang karena kita sudah tambah header di GAS
+    headers: {
+        "Content-Type": "application/json"
+    },
     body: JSON.stringify(payload)
 });
             

@@ -288,7 +288,8 @@ location: "JA-01"
 
     async function loadData() {
         try {
-            const res = await fetch(SCRIPT_URL + "?action=api");
+            // TAMBAHKAN KODE ANTI-CACHE DI AKHIR URL (?action=api&nocache=...)
+            const res = await fetch(SCRIPT_URL + "?action=api&nocache=" + new Date().getTime());
             const rawData = await res.json();
             
             allItems = rawData.inventory.filter(item => item.nama_barang && item.nama_barang.toLowerCase() !== 'nama barang');

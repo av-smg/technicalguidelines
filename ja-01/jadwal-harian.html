@@ -9,6 +9,10 @@ title: "Jadwal Tugas Harian"
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="../assets/style.css?v=2" />
     {% include head.html %}
 
@@ -19,11 +23,12 @@ title: "Jadwal Tugas Harian"
       :root {
         --local-card-bg: #ffffff;
         --local-border: #e2e8f0;
-        --local-text: #1e293b;
+        --local-text: #0f172a;
         --local-text-muted: #64748b;
         --local-hover: #f8fafc;
         --local-tag-bg: #f1f5f9;
         --local-header-bg: #f8fafc;
+        --local-glass-bg: rgba(255, 255, 255, 0.85); /* Background transparan untuk sticky tabs */
       }
 
       /* Mendeteksi Mode Gelap secara otomatis */
@@ -35,12 +40,18 @@ title: "Jadwal Tugas Harian"
         --local-hover: #0f172a;
         --local-tag-bg: #334155;
         --local-header-bg: #0f172a;
+        --local-glass-bg: rgba(15, 23, 42, 0.85); /* Sesuaikan dengan warna gelap background Anda */
+      }
+
+      /* Terapkan font baru ke seluruh elemen dalam wrap ini */
+      body {
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
       }
 
       .wrap { max-width: 1050px; margin: auto; padding: 40px 20px; }
 
       .title {
-        font-size: 34px;
+        font-size: 36px;
         font-weight: 800;
         text-align: center;
         letter-spacing: -0.5px;
@@ -49,7 +60,7 @@ title: "Jadwal Tugas Harian"
       }
       .subtitle {
         text-align: center;
-        font-size: 14px;
+        font-size: 15px;
         font-weight: 700;
         color: var(--local-text-muted);
         letter-spacing: 3px;
@@ -57,21 +68,34 @@ title: "Jadwal Tugas Harian"
         text-transform: uppercase;
       }
 
-      /* Tabs Navigation */
+      /* Tabs Navigation - DIBUAT STICKY / MENGAMBANG */
       .tabs {
         display: flex;
         justify-content: center;
         gap: 12px;
         margin-bottom: 40px;
+        
+        /* Properti Sticky */
+        position: sticky;
+        top: 60px; /* Sesuaikan angka ini jika tertutup navbar Anda (misal 80px) */
+        z-index: 100;
+        padding: 15px 0;
+        background: var(--local-glass-bg);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-radius: 0 0 16px 16px;
+        margin-left: -10px;
+        margin-right: -10px;
       }
       .tab-btn {
-        padding: 10px 24px;
+        padding: 12px 28px;
         border-radius: 8px;
         border: 1px solid var(--local-border);
         background: var(--local-card-bg);
         cursor: pointer;
+        font-family: inherit;
         font-weight: 700;
-        font-size: 14px;
+        font-size: 15px;
         transition: all 0.3s ease;
         color: var(--local-text-muted);
       }
@@ -90,7 +114,7 @@ title: "Jadwal Tugas Harian"
         background: var(--local-card-bg);
         border-radius: 12px;
         border: 1px solid var(--local-border);
-        box-shadow: 0 2px 15px rgba(0,0,0,0.03);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.04);
         margin-bottom: 30px;
         overflow: hidden;
       }
@@ -99,62 +123,74 @@ title: "Jadwal Tugas Harian"
         display: flex;
         align-items: center;
         gap: 12px;
-        padding: 18px 24px;
+        padding: 20px 24px;
         font-weight: 800;
-        font-size: 16px;
+        font-size: 18px;
         background: var(--local-header-bg);
         border-bottom: 1px solid var(--local-border);
       }
 
+      .bar-teknis { color: #8b5cf6; } /* Ungu untuk Teknis Utama */
       .bar-video { color: #3b82f6; } 
       .bar-audio { color: #f97316; } 
-      .bar-it { color: #8b5cf6; } /* Ungu untuk IT */
+      .bar-it { color: #0ea5e9; } /* Biru muda untuk IT */
       .bar-stage { color: #10b981; }
       .bar-makeup { color: #ec4899; }
 
       .overseer {
         margin-left: auto;
-        padding: 6px 14px;
+        padding: 8px 16px;
         border-radius: 6px;
         background: var(--local-card-bg);
         border: 1px solid var(--local-border);
-        font-size: 12px;
+        font-size: 13px;
         font-weight: 600;
         color: var(--local-text-muted);
       }
       .overseer .value { color: var(--local-text); font-weight: 700; }
 
-      /* Table Styles - Fixed Spacing */
+      /* Table Styles - Fixed Spacing & Larger Padding */
       table { width: 100%; border-collapse: collapse; table-layout: fixed; }
       th:nth-child(1), td:nth-child(1) { width: 40%; } 
       th:nth-child(2), td:nth-child(2) { width: 30%; } 
       th:nth-child(3), td:nth-child(3) { width: 30%; } 
 
       th, td {
-        padding: 14px 24px;
+        padding: 18px 24px;
         border-bottom: 1px solid var(--local-border);
-        font-size: 14px;
+        font-size: 15px;
         color: var(--local-text);
       }
       th {
-        font-size: 11px;
+        font-size: 12px;
         text-transform: uppercase;
-        letter-spacing: 1px;
+        letter-spacing: 1.5px;
         color: var(--local-text-muted);
         text-align: left;
+        font-weight: 700;
       }
       
       .role-tag {
         display: inline-block;
-        padding: 4px 10px;
-        border-radius: 4px;
-        font-weight: 600;
-        font-size: 12px;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-weight: 700;
+        font-size: 13px;
         background: var(--local-tag-bg);
         color: var(--local-text);
       }
+      /* Custom tag style untuk Direktur Teknis */
+      .tag-teknis {
+        background: rgba(139, 92, 246, 0.1);
+        color: #8b5cf6;
+      }
 
-      .name-val { font-weight: 500; }
+      /* NAMA PERSONIL DIBESARKAN & DIPERTEGAS */
+      .name-val { 
+        font-size: 16px;
+        font-weight: 600; 
+        letter-spacing: 0.3px;
+      }
 
       @keyframes fadeIn {
         from { opacity: 0; transform: translateY(10px); }
@@ -177,15 +213,29 @@ title: "Jadwal Tugas Harian"
       </div>
 
       <section id="fri" class="day active">
+        
+        <div class="team-card">
+          <div class="team-bar bar-teknis">⏱️ Direktur Teknis</div>
+          <table>
+            <thead><tr><th>Tugas</th><th>Shift Pagi</th><th>Shift Siang</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><span class="role-tag tag-teknis">Direktur Teknis</span></td>
+                <td class="name-val">Johan</td>
+                <td class="name-val">Angga</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
         <div class="team-card">
           <div class="team-bar bar-video">🎥 Tim Visual
             <span class="overseer">Pengawas: <span class="value">Johan Kristy & Okita Nanda</span></span>
           </div>
           <table>
-            <thead><tr><th>Posisi</th><th>Shift Pagi</th><th>Shift Siang</th></tr></thead>
+            <thead><tr><th>Tugas</th><th>Shift Pagi</th><th>Shift Siang</th></tr></thead>
             <tbody>
-              <tr><td><span class="role-tag">Technical Director</span></td><td class="name-val">Johan</td><td class="name-val">Angga</td></tr>
-              <tr><td><span class="role-tag">Operator Media</span></td><td class="name-val">Kya</td><td class="name-val">-</td></tr>
+              <tr><td><span class="role-tag">Operator Media</span></td><td class="name-val">Kiya</td><td class="name-val">-</td></tr>
               <tr><td><span class="role-tag">Operator Media Backup</span></td><td class="name-val">Tian</td><td class="name-val">-</td></tr>
               <tr><td><span class="role-tag">Operator Media AD</span></td><td class="name-val">Dixcy</td><td class="name-val">-</td></tr>
               <tr><td><span class="role-tag">Operator Media AD Backup</span></td><td class="name-val">-</td><td class="name-val">-</td></tr>
@@ -201,7 +251,7 @@ title: "Jadwal Tugas Harian"
             <span class="overseer">Pengawas: <span class="value">Angga Kusuma & Ayub Evan</span></span>
           </div>
           <table>
-            <thead><tr><th>Posisi</th><th>Shift Pagi</th><th>Shift Siang</th></tr></thead>
+            <thead><tr><th>Tugas</th><th>Shift Pagi</th><th>Shift Siang</th></tr></thead>
             <tbody>
               <tr><td><span class="role-tag">Mixer Operator</span></td><td class="name-val">Evan</td><td class="name-val">Truna</td></tr>
               <tr><td><span class="role-tag">Mixer Assistant</span></td><td class="name-val">Truna</td><td class="name-val">Malkhiel</td></tr>
@@ -214,7 +264,7 @@ title: "Jadwal Tugas Harian"
             <span class="overseer">Pengawas: <span class="value">Johan Kristy</span></span>
           </div>
           <table>
-            <thead><tr><th>Posisi</th><th>Shift Pagi</th><th>Shift Siang</th></tr></thead>
+            <thead><tr><th>Tugas</th><th>Shift Pagi</th><th>Shift Siang</th></tr></thead>
             <tbody>
               <tr><td><span class="role-tag">Operator Stream Out</span></td><td class="name-val">Leon</td><td class="name-val">-</td></tr>
               <tr><td><span class="role-tag">Operator Stream Backup</span></td><td class="name-val">-</td><td class="name-val">-</td></tr>
@@ -228,7 +278,7 @@ title: "Jadwal Tugas Harian"
             <span class="overseer">Pengawas: <span class="value">Isac Lestari</span></span>
           </div>
           <table>
-            <thead><tr><th>Posisi</th><th>Shift Pagi</th><th>Shift Siang</th></tr></thead>
+            <thead><tr><th>Tugas</th><th>Shift Pagi</th><th>Shift Siang</th></tr></thead>
             <tbody>
               <tr><td><span class="role-tag">Podium 1 / Pembicara</span></td><td class="name-val">Michael</td><td class="name-val">Danar</td></tr>
               <tr><td><span class="role-tag">Podium 2 / Partisipan</span></td><td class="name-val">-</td><td class="name-val">-</td></tr>
@@ -242,7 +292,7 @@ title: "Jadwal Tugas Harian"
             <span class="overseer">Pengawas: <span class="value">Siska</span></span>
           </div>
           <table>
-            <thead><tr><th>Posisi</th><th>Shift Pagi</th><th>Shift Siang</th></tr></thead>
+            <thead><tr><th>Tugas</th><th>Shift Pagi</th><th>Shift Siang</th></tr></thead>
             <tbody>
               <tr><td><span class="role-tag">Tata Rias 1</span></td><td class="name-val">Siska</td><td class="name-val">Maria</td></tr>
               <tr><td><span class="role-tag">Tata Rias 2</span></td><td class="name-val">Listra</td><td class="name-val">Lutvi</td></tr>
@@ -253,16 +303,30 @@ title: "Jadwal Tugas Harian"
       </section>
 
       <section id="sat" class="day">
+        
+        <div class="team-card">
+          <div class="team-bar bar-teknis">⏱️ Direktur Teknis</div>
+          <table>
+            <thead><tr><th>Tugas</th><th>Shift Pagi</th><th>Shift Siang</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><span class="role-tag tag-teknis">Direktur Teknis</span></td>
+                <td class="name-val">Angga</td>
+                <td class="name-val">Truna</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
         <div class="team-card">
           <div class="team-bar bar-video">🎥 Tim Visual
             <span class="overseer">Pengawas: <span class="value">Johan Kristy & Okita Nanda</span></span>
           </div>
           <table>
-            <thead><tr><th>Posisi</th><th>Shift Pagi</th><th>Shift Siang</th></tr></thead>
+            <thead><tr><th>Tugas</th><th>Shift Pagi</th><th>Shift Siang</th></tr></thead>
             <tbody>
-              <tr><td><span class="role-tag">Technical Director</span></td><td class="name-val">Angga</td><td class="name-val">Truna</td></tr>
               <tr><td><span class="role-tag">Operator Media</span></td><td class="name-val">Priyanto</td><td class="name-val">-</td></tr>
-              <tr><td><span class="role-tag">Operator Media Backup</span></td><td class="name-val">-</td><td class="name-val">-</td></tr>
+              <tr><td><span class="role-tag">Operator Media Backup</span></td><td class="name-val">Tian</td><td class="name-val">-</td></tr>
               <tr><td><span class="role-tag">Operator Media AD</span></td><td class="name-val">Agus</td><td class="name-val">-</td></tr>
               <tr><td><span class="role-tag">Operator Media AD Backup</span></td><td class="name-val">-</td><td class="name-val">-</td></tr>
               <tr><td><span class="role-tag">Operator PTZ</span></td><td class="name-val">Oki</td><td class="name-val">-</td></tr>
@@ -277,7 +341,7 @@ title: "Jadwal Tugas Harian"
             <span class="overseer">Pengawas: <span class="value">Angga Kusuma & Ayub Evan</span></span>
           </div>
           <table>
-            <thead><tr><th>Posisi</th><th>Shift Pagi</th><th>Shift Siang</th></tr></thead>
+            <thead><tr><th>Tugas</th><th>Shift Pagi</th><th>Shift Siang</th></tr></thead>
             <tbody>
               <tr><td><span class="role-tag">Mixer Operator</span></td><td class="name-val">Evan</td><td class="name-val">Malkhiel</td></tr>
               <tr><td><span class="role-tag">Mixer Assistant</span></td><td class="name-val">Edo</td><td class="name-val">Evan</td></tr>
@@ -290,10 +354,10 @@ title: "Jadwal Tugas Harian"
             <span class="overseer">Pengawas: <span class="value">Johan Kristy</span></span>
           </div>
           <table>
-            <thead><tr><th>Posisi</th><th>Shift Pagi</th><th>Shift Siang</th></tr></thead>
+            <thead><tr><th>Tugas</th><th>Shift Pagi</th><th>Shift Siang</th></tr></thead>
             <tbody>
               <tr><td><span class="role-tag">Operator Stream Out</span></td><td class="name-val">-</td><td class="name-val">-</td></tr>
-              <tr><td><span class="role-tag">Operator Stream Backup</span></td><td class="name-val">Kya</td><td class="name-val">-</td></tr>
+              <tr><td><span class="role-tag">Operator Stream Backup</span></td><td class="name-val">Kiya</td><td class="name-val">-</td></tr>
               <tr><td><span class="role-tag">Monitor Streaming</span></td><td class="name-val">Dixcy</td><td class="name-val">-</td></tr>
             </tbody>
           </table>
@@ -304,7 +368,7 @@ title: "Jadwal Tugas Harian"
             <span class="overseer">Pengawas: <span class="value">Isac Lestari</span></span>
           </div>
           <table>
-            <thead><tr><th>Posisi</th><th>Shift Pagi</th><th>Shift Siang</th></tr></thead>
+            <thead><tr><th>Tugas</th><th>Shift Pagi</th><th>Shift Siang</th></tr></thead>
             <tbody>
               <tr><td><span class="role-tag">Podium 1 / Pembicara</span></td><td class="name-val">Jonathan</td><td class="name-val">Denny</td></tr>
               <tr><td><span class="role-tag">Podium 2 / Partisipan</span></td><td class="name-val">Gideon</td><td class="name-val">-</td></tr>
@@ -318,7 +382,7 @@ title: "Jadwal Tugas Harian"
             <span class="overseer">Pengawas: <span class="value">Siska</span></span>
           </div>
           <table>
-            <thead><tr><th>Posisi</th><th>Shift Pagi</th><th>Shift Siang</th></tr></thead>
+            <thead><tr><th>Tugas</th><th>Shift Pagi</th><th>Shift Siang</th></tr></thead>
             <tbody>
               <tr><td><span class="role-tag">Tata Rias 1</span></td><td class="name-val">Titi</td><td class="name-val">Vani</td></tr>
               <tr><td><span class="role-tag">Tata Rias 2</span></td><td class="name-val">Arum</td><td class="name-val">Celin</td></tr>
@@ -329,19 +393,33 @@ title: "Jadwal Tugas Harian"
       </section>
 
       <section id="sun" class="day">
+        
+        <div class="team-card">
+          <div class="team-bar bar-teknis">⏱️ Direktur Teknis</div>
+          <table>
+            <thead><tr><th>Tugas</th><th>Shift Pagi</th><th>Shift Siang</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><span class="role-tag tag-teknis">Direktur Teknis</span></td>
+                <td class="name-val">Johan</td>
+                <td class="name-val">Oki</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
         <div class="team-card">
           <div class="team-bar bar-video">🎥 Tim Visual
             <span class="overseer">Pengawas: <span class="value">Truna & Johan</span></span>
           </div>
           <table>
-            <thead><tr><th>Posisi</th><th>Shift Pagi</th><th>Shift Siang</th></tr></thead>
+            <thead><tr><th>Tugas</th><th>Shift Pagi</th><th>Shift Siang</th></tr></thead>
             <tbody>
-              <tr><td><span class="role-tag">Technical Director</span></td><td class="name-val">Johan</td><td class="name-val">Oki</td></tr>
               <tr><td><span class="role-tag">Operator Media</span></td><td class="name-val">Dixcy</td><td class="name-val">-</td></tr>
               <tr><td><span class="role-tag">Operator Media Backup</span></td><td class="name-val">-</td><td class="name-val">-</td></tr>
               <tr><td><span class="role-tag">Operator Media AD</span></td><td class="name-val">Priyanto</td><td class="name-val">-</td></tr>
               <tr><td><span class="role-tag">Operator Media AD Backup</span></td><td class="name-val">-</td><td class="name-val">-</td></tr>
-              <tr><td><span class="role-tag">Operator PTZ</span></td><td class="name-val">Kya</td><td class="name-val">-</td></tr>
+              <tr><td><span class="role-tag">Operator PTZ</span></td><td class="name-val">Kiya</td><td class="name-val">-</td></tr>
               <tr><td><span class="role-tag">Operator PTZ Backup</span></td><td class="name-val">Bagas</td><td class="name-val">-</td></tr>
               <tr><td><span class="role-tag">Operator Switcher</span></td><td class="name-val">Oki</td><td class="name-val">-</td></tr>
             </tbody>
@@ -353,7 +431,7 @@ title: "Jadwal Tugas Harian"
             <span class="overseer">Pengawas: <span class="value">Truna & Johan</span></span>
           </div>
           <table>
-            <thead><tr><th>Posisi</th><th>Shift Pagi</th><th>Shift Siang</th></tr></thead>
+            <thead><tr><th>Tugas</th><th>Shift Pagi</th><th>Shift Siang</th></tr></thead>
             <tbody>
               <tr><td><span class="role-tag">Mixer Operator</span></td><td class="name-val">Evan</td><td class="name-val">Truna</td></tr>
               <tr><td><span class="role-tag">Mixer Assistant</span></td><td class="name-val">Malkhiel</td><td class="name-val">Edo</td></tr>
@@ -366,7 +444,7 @@ title: "Jadwal Tugas Harian"
             <span class="overseer">Pengawas: <span class="value">Truna & Johan</span></span>
           </div>
           <table>
-            <thead><tr><th>Posisi</th><th>Shift Pagi</th><th>Shift Siang</th></tr></thead>
+            <thead><tr><th>Tugas</th><th>Shift Pagi</th><th>Shift Siang</th></tr></thead>
             <tbody>
               <tr><td><span class="role-tag">Operator Stream Out</span></td><td class="name-val">Priyanto</td><td class="name-val">-</td></tr>
               <tr><td><span class="role-tag">Operator Stream Backup</span></td><td class="name-val">-</td><td class="name-val">-</td></tr>
@@ -380,7 +458,7 @@ title: "Jadwal Tugas Harian"
             <span class="overseer">Pengawas: <span class="value">Isac Lestari</span></span>
           </div>
           <table>
-            <thead><tr><th>Posisi</th><th>Shift Pagi</th><th>Shift Siang</th></tr></thead>
+            <thead><tr><th>Tugas</th><th>Shift Pagi</th><th>Shift Siang</th></tr></thead>
             <tbody>
               <tr><td><span class="role-tag">Podium 1 / Pembicara</span></td><td class="name-val">Dimas</td><td class="name-val">Jonathan</td></tr>
               <tr><td><span class="role-tag">Podium 2 / Partisipan</span></td><td class="name-val">-</td><td class="name-val">-</td></tr>
@@ -395,7 +473,7 @@ title: "Jadwal Tugas Harian"
             <span class="overseer">Pengawas: <span class="value">Cynthia</span></span>
           </div>
           <table>
-            <thead><tr><th>Posisi</th><th>Shift Pagi</th><th>Shift Siang</th></tr></thead>
+            <thead><tr><th>Tugas</th><th>Shift Pagi</th><th>Shift Siang</th></tr></thead>
             <tbody>
               <tr><td><span class="role-tag">Tata Rias 1</span></td><td class="name-val">Cynthia, Trisna</td><td class="name-val">Lutvi</td></tr>
               <tr><td><span class="role-tag">Tata Rias 2</span></td><td class="name-val">Rianti, Sheren</td><td class="name-val">Celin</td></tr>

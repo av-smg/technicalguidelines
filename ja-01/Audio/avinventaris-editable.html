@@ -213,7 +213,6 @@ location: "JA-01"
                         </div>
                     </div>
                     <span class="label-tag">Keterangan Teknis</span>
-                    <span class="label-tag">Keterangan Teknis</span>
                     <div id="m-ref" class="ref-box"></div>
 
                     <div class="flex-row-input">
@@ -240,8 +239,11 @@ location: "JA-01"
                         </div>
                     </div>
 
-                    <span class="label-tag">Log / Catatan Update</span>
+                    <span class="label-tag">Catatan</span>
                     <textarea id="m-desc" class="input-text" rows="3" placeholder="Contoh: Dipindahkan ke gedung A, atau 1 kabel rusak..."></textarea>
+
+                    <span class="label-tag">Histori Update Terakhir (Sistem)</span>
+                    <div id="m-system-log" style="font-size: 12px; color: var(--text-gray); background: var(--bg-color); padding: 12px; border-radius: 12px; border: 1px dashed var(--border-color); max-height: 100px; overflow-y: auto; white-space: pre-wrap; line-height: 1.6; margin-bottom: 20px;">Belum ada histori.</div>
                 </div>
             </div>
 
@@ -549,11 +551,13 @@ location: "JA-01"
         // --- 3 BARIS KODE BARU UNTUK INFO HEADER ---
         document.getElementById("m-owner").innerText = item.barang_milik || "Tidak ada data";
         document.getElementById("m-team").innerText = item.tim || "Tidak ada data";
-        document.getElementById("m-date").innerText = item.timestamp ? item.timestamp.split("T")[0] : "Tidak ada data";
+        
+        // Memperbaiki pemotongan tanggal (Google Sheets biasanya menggunakan spasi "DD/MM/YYYY HH:MM:SS")
+        document.getElementById("m-date").innerText = item.timestamp ? item.timestamp.toString().split(" ")[0] : "Tidak ada data";
         // -------------------------------------------
 
-        document.getElementById("m-ref").innerText = item.keterangan_ref || "Tidak ada referensi teknis.";
-        document.getElementById("m-desc").value = item.keterangan_edit || "";
+        // Memasukkan Log History dari Cell P
+        document.getElementById("m-system-log").innerText = item.log_history || "Belum ada histori update.";
         
         const locSelect = document.getElementById("m-lokasi");
         locSelect.innerHTML = "";

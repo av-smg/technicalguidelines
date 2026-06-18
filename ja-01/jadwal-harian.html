@@ -1,0 +1,371 @@
+---
+location: "JA-01"
+title: "Jadwal Tugas Harian"
+---
+
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    
+    <link rel="stylesheet" href="../assets/style.css?v=2" />
+    {% include head.html %}
+
+    <style>
+      /* =====================
+         PAGE PREMIUM STYLE
+      ====================== */
+      .wrap { max-width:1050px; margin:auto; padding:30px 20px; }
+
+      .title {
+        font-size:42px;
+        font-weight:900;
+        text-align:center;
+        letter-spacing:-1px;
+      }
+      .subtitle {
+        text-align:center;
+        opacity:.7;
+        margin-top:4px;
+        margin-bottom:26px;
+      }
+
+      /* Tabs */
+      .tabs {
+        display:flex;
+        justify-content:center;
+        gap:12px;
+        margin-bottom:30px;
+      }
+
+      .tab-btn {
+        padding:8px 18px;
+        border-radius:999px;
+        border:1px solid var(--line, #cbd5e1);
+        background:var(--card, #ffffff);
+        cursor:pointer;
+        font-weight:700;
+        transition:.25s;
+        color:var(--text, #1e293b);
+      }
+      .tab-btn:hover { background:rgba(125,125,125,0.1); }
+      .tab-btn.active {
+        background:var(--text, #1e293b);
+        color:var(--bg, #ffffff);
+        border-color:var(--text, #1e293b);
+      }
+
+      .day { display:none; animation: fadeIn 0.3s ease; }
+      .day.active { display:block; }
+
+      /* TEAM CARD */
+      .team-card {
+        background:var(--card, #ffffff);
+        border-radius:18px;
+        border:1px solid var(--line, #e2e8f0);
+        box-shadow:0 8px 26px rgba(0,0,0,.05);
+        margin-bottom:34px;
+        overflow:hidden;
+        transition:.25s ease;
+      }
+      .team-card:hover { transform:translateY(-3px); box-shadow:0 12px 30px rgba(0,0,0,.1); }
+
+      /* BAR */
+      .team-bar {
+        display:flex;
+        align-items:center;
+        gap:12px;
+        padding:16px 20px;
+        font-weight:900;
+        font-size:18px;
+        letter-spacing:.3px;
+        background: rgba(125,125,125,0.05);
+      }
+
+      .bar-video { color:var(--video, #3b82f6); }
+      .bar-audio { color:var(--audio, #f97316); }
+      .bar-stage { color:var(--stage, #10b981); }
+      .bar-it    { color:var(--it, #8b5cf6); }
+
+      .overseer {
+        margin-left:auto;
+        padding:6px 12px;
+        border-radius:999px;
+        background:var(--bg, #ffffff);
+        border:1px solid var(--line, #e2e8f0);
+        font-size:13px;
+        font-weight:700;
+        color: var(--text, #1e293b);
+      }
+
+      .value[contenteditable] {
+        padding:2px 4px;
+        border-radius:4px;
+      }
+      .value[contenteditable]:focus {
+        outline:2px solid #facc15;
+        background:rgba(255,255,200,0.4);
+      }
+
+      /* TABLE */
+      table { width:100%; border-collapse:collapse; }
+      th,td {
+        padding:14px 18px;
+        border-top:1px solid var(--line, #e2e8f0);
+        font-size:14px;
+        color: var(--text, #1e293b);
+      }
+
+      /* FIX: ROLE ke kiri mentok */
+      table th:first-child,
+      table td:first-child {
+        text-align:left !important;
+        padding-left:24px !important;
+      }
+
+      th.time,td.time { text-align:center; }
+
+      td[contenteditable] {
+        cursor:text;
+        transition:.25s;
+        border-radius:6px;
+      }
+      td[contenteditable]:hover {
+        background:rgba(125,125,125,0.05);
+      }
+      td[contenteditable]:focus {
+        outline:2px solid #facc15;
+        background:rgba(255,255,200,0.4);
+      }
+
+      /* ROLE TAG */
+      .role-tag {
+        display:inline-block;
+        padding:6px 12px;
+        border-radius:999px;
+        font-weight:700;
+        background:rgba(125,125,125,0.1);
+        border:1px solid var(--line, #e2e8f0);
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(5px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+    </style>
+  </head>
+  <body>
+    
+    {% include navbar.html %}
+
+    <main class="wrap">
+      <div class="title">Pembagian Tugas Hari Acara</div>
+      <div class="subtitle" id="day-title">JUMAT</div>
+
+      <div class="tabs">
+        <button class="tab-btn active" data-day="fri">Jumat</button>
+        <button class="tab-btn" data-day="sat">Sabtu</button>
+        <button class="tab-btn" data-day="sun">Minggu</button>
+      </div>
+
+      <section id="fri" class="day active">
+        <div class="team-card">
+          <div class="team-bar bar-video">
+            🎥 Video
+            <span class="overseer">Pengawas: <span class="value" contenteditable="true">Johan Kristy & Okita Nanda</span></span>
+          </div>
+          <table>
+            <thead>
+              <tr><th>Role</th><th class="time">Pagi</th><th class="time">Siang</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="role-tag">Technical Director</span></td><td contenteditable></td><td contenteditable></td></tr>
+              <tr><td><span class="role-tag">Operator Switcher</span></td><td contenteditable></td><td contenteditable></td></tr>
+              <tr><td><span class="role-tag">Operator PTZ Utama</span></td><td contenteditable></td><td contenteditable></td></tr>
+              <tr><td><span class="role-tag">Operator PTZ Kedua</span></td><td contenteditable></td><td contenteditable></td></tr>
+              <tr><td><span class="role-tag">Operator Media Utama</span></td><td contenteditable></td><td contenteditable></td></tr>
+              <tr><td><span class="role-tag">Operator Media Backup</span></td><td contenteditable></td><td contenteditable></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="team-card">
+          <div class="team-bar bar-audio">
+            🎚️ Audio
+            <span class="overseer">Pengawas: <span class="value" contenteditable="true">Angga Kusuma & Ayub Evan</span></span>
+          </div>
+          <table>
+            <thead>
+              <tr><th>Role</th><th class="time">Pagi</th><th class="time">Siang</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="role-tag">Mixer Operator</span></td><td contenteditable></td><td contenteditable></td></tr>
+              <tr><td><span class="role-tag">Mixer Assistant</span></td><td contenteditable></td><td contenteditable></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="team-card">
+          <div class="team-bar bar-stage">
+            🎛️ Stage
+            <span class="overseer">Pengawas: <span class="value" contenteditable="true">Isac Lestari</span></span>
+          </div>
+          <table>
+            <thead>
+              <tr><th>Role</th><th class="time">Pagi</th><th class="time">Siang</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="role-tag">Podium 1</span></td><td contenteditable></td><td contenteditable></td></tr>
+              <tr><td><span class="role-tag">Podium 2</span></td><td contenteditable></td><td contenteditable></td></tr>
+              <tr><td><span class="role-tag">Tata Rias 1</span></td><td contenteditable></td><td contenteditable></td></tr>
+              <tr><td><span class="role-tag">Tata Rias 2</span></td><td contenteditable></td><td contenteditable></td></tr>
+              <tr><td><span class="role-tag">Final Check</span></td><td contenteditable></td><td contenteditable></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="sat" class="day">
+        <div class="team-card">
+          <div class="team-bar bar-video">
+            🎥 Video
+            <span class="overseer">Pengawas: <span class="value" contenteditable="true">Johan Kristy & Okita Nanda</span></span>
+          </div>
+          <table>
+            <thead>
+              <tr><th>Role</th><th class="time">Pagi</th><th class="time">Siang</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="role-tag">Technical Director</span></td><td contenteditable></td><td contenteditable></td></tr>
+              <tr><td><span class="role-tag">Operator Switcher</span></td><td contenteditable></td><td contenteditable></td></tr>
+              <tr><td><span class="role-tag">Operator PTZ Utama</span></td><td contenteditable></td><td contenteditable></td></tr>
+              <tr><td><span class="role-tag">Operator PTZ Kedua</span></td><td contenteditable></td><td contenteditable></td></tr>
+              <tr><td><span class="role-tag">Operator Media Utama</span></td><td contenteditable></td><td contenteditable></td></tr>
+              <tr><td><span class="role-tag">Operator Media Backup</span></td><td contenteditable></td><td contenteditable></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="team-card">
+          <div class="team-bar bar-audio">
+            🎚️ Audio
+            <span class="overseer">Pengawas: <span class="value" contenteditable="true">Angga Kusuma & Ayub Evan</span></span>
+          </div>
+          <table>
+            <thead>
+              <tr><th>Role</th><th class="time">Pagi</th><th class="time">Siang</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="role-tag">Mixer Operator</span></td><td contenteditable></td><td contenteditable></td></tr>
+              <tr><td><span class="role-tag">Mixer Assistant</span></td><td contenteditable></td><td contenteditable></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="team-card">
+          <div class="team-bar bar-stage">
+            🎛️ Stage
+            <span class="overseer">Pengawas: <span class="value" contenteditable="true">Isac Lestari</span></span>
+          </div>
+          <table>
+            <thead>
+              <tr><th>Role</th><th class="time">Pagi</th><th class="time">Siang</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="role-tag">Podium 1</span></td><td contenteditable></td><td contenteditable></td></tr>
+              <tr><td><span class="role-tag">Podium 2</span></td><td contenteditable></td><td contenteditable></td></tr>
+              <tr><td><span class="role-tag">Tata Rias 1</span></td><td contenteditable></td><td contenteditable></td></tr>
+              <tr><td><span class="role-tag">Tata Rias 2</span></td><td contenteditable></td><td contenteditable></td></tr>
+              <tr><td><span class="role-tag">Final Check</span></td><td contenteditable></td><td contenteditable></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="sun" class="day">
+        <div class="team-card">
+          <div class="team-bar bar-video">
+            🎥 Video
+            <span class="overseer">Pengawas: <span class="value" contenteditable="true">Johan Kristy & Okita Nanda</span></span>
+          </div>
+          <table>
+            <thead>
+              <tr><th>Role</th><th class="time">Pagi</th><th class="time">Siang</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="role-tag">Technical Director</span></td><td contenteditable></td><td contenteditable></td></tr>
+              <tr><td><span class="role-tag">Operator Switcher</span></td><td contenteditable></td><td contenteditable></td></tr>
+              <tr><td><span class="role-tag">Operator PTZ Utama</span></td><td contenteditable></td><td contenteditable></td></tr>
+              <tr><td><span class="role-tag">Operator PTZ Kedua</span></td><td contenteditable></td><td contenteditable></td></tr>
+              <tr><td><span class="role-tag">Operator Media Utama</span></td><td contenteditable></td><td contenteditable></td></tr>
+              <tr><td><span class="role-tag">Operator Media Backup</span></td><td contenteditable></td><td contenteditable></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="team-card">
+          <div class="team-bar bar-audio">
+            🎚️ Audio
+            <span class="overseer">Pengawas: <span class="value" contenteditable="true">Angga Kusuma & Ayub Evan</span></span>
+          </div>
+          <table>
+            <thead>
+              <tr><th>Role</th><th class="time">Pagi</th><th class="time">Siang</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="role-tag">Mixer Operator</span></td><td contenteditable></td><td contenteditable></td></tr>
+              <tr><td><span class="role-tag">Mixer Assistant</span></td><td contenteditable></td><td contenteditable></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="team-card">
+          <div class="team-bar bar-stage">
+            🎛️ Stage
+            <span class="overseer">Pengawas: <span class="value" contenteditable="true">Isac Lestari</span></span>
+          </div>
+          <table>
+            <thead>
+              <tr><th>Role</th><th class="time">Pagi</th><th class="time">Siang</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="role-tag">Podium 1</span></td><td contenteditable></td><td contenteditable></td></tr>
+              <tr><td><span class="role-tag">Podium 2</span></td><td contenteditable></td><td contenteditable></td></tr>
+              <tr><td><span class="role-tag">Tata Rias 1</span></td><td contenteditable></td><td contenteditable></td></tr>
+              <tr><td><span class="role-tag">Tata Rias 2</span></td><td contenteditable></td><td contenteditable></td></tr>
+              <tr><td><span class="role-tag">Final Check</span></td><td contenteditable></td><td contenteditable></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer class="simple-footer" style="text-align: center; padding: 20px; opacity: 0.7; font-size: 14px;">
+      <p>&copy; 2026 Tim Teknis A/V. All rights reserved.</p>
+    </footer>
+
+    <script src="../assets/theme.js?v=2"></script>
+    <script>
+      const tabs = document.querySelectorAll('.tab-btn');
+      const days = document.querySelectorAll('.day');
+      const label = { fri:'JUMAT', sat:'SABTU', sun:'MINGGU' };
+      const title = document.getElementById('day-title');
+
+      tabs.forEach(btn => {
+        btn.addEventListener('click', () => {
+          // Reset tabs
+          tabs.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+
+          // Reset content
+          days.forEach(d => d.classList.remove('active'));
+          document.getElementById(btn.dataset.day).classList.add('active');
+
+          // Update Title
+          title.textContent = label[btn.dataset.day];
+        });
+      });
+    </script>
+  </body>
+</html>

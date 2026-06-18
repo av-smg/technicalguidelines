@@ -599,15 +599,15 @@ location: "JA-01"
         }
 
         try {
-            // MENGGUNAKAN MODE STANDARD (TANPA NO-CORS) AGAR ERROR TERBACA
-           const response = await fetch(SCRIPT_URL, {
-    method: "POST",
-    mode: "cors", // WAJIB cors sekarang karena kita sudah tambah header di GAS
-    headers: {
-        "Content-Type": "application/json"
-    },
-    body: JSON.stringify(payload)
-});
+            const response = await fetch(SCRIPT_URL, {
+                redirect: "follow", // Sangat penting untuk Google Apps Script
+                method: "POST",
+                headers: {
+                    // Menggunakan text/plain memotong proses preflight OPTIONS CORS
+                    "Content-Type": "text/plain;charset=utf-8",
+                },
+                body: JSON.stringify(payload)
+            });
             
             // Membaca jawaban asli dari Google
             const responseText = await response.text();

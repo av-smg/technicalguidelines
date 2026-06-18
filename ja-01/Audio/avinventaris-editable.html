@@ -601,13 +601,13 @@ location: "JA-01"
         try {
             // MENGGUNAKAN MODE STANDARD (TANPA NO-CORS) AGAR ERROR TERBACA
             const response = await fetch(SCRIPT_URL, {
-                redirect: "follow",
                 method: "POST",
-                headers: {
-                    "Content-Type": "text/plain;charset=utf-8",
-                },
-                body: JSON.stringify(payload)
-            });
+    mode: "no-cors", // Coba mode no-cors agar tidak terblokir firewall browser
+    headers: {
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+});
             
             // Membaca jawaban asli dari Google
             const responseText = await response.text();

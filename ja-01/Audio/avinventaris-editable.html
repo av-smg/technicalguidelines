@@ -600,13 +600,10 @@ location: "JA-01"
 
         try {
             // MENGGUNAKAN MODE STANDARD (TANPA NO-CORS) AGAR ERROR TERBACA
-            const response = await fetch(SCRIPT_URL, {
+           const response = await fetch(SCRIPT_URL, {
     method: "POST",
-    // Gunakan 'no-cors' agar browser tidak memblokir akses ke URL Google
-    mode: "no-cors", 
-    headers: {
-        "Content-Type": "application/x-www-form-urlencoded" // Ubah ke ini!
-    },
+    mode: "no-cors", // Gunakan no-cors
+    // HAPUS bagian headers agar tidak diblokir browser
     body: JSON.stringify(payload)
 });
             

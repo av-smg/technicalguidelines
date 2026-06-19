@@ -600,24 +600,27 @@ location: "JA-01"
         document.getElementById("fsOverlay").classList.remove("active");
     }
 
-   // --- PROSES SIMPAN YANG 100% TRANSPARAN MENDETEKSI ERROR ---
+   // --- PROSES SIMPAN YANG LEBIH FLEKSIBEL TERHADAP CACHE GOOGLE ---
     document.getElementById("saveBtn").onclick = async function() {
         if (!userPin) {
             if (!checkAndRequestPin()) return; 
         }
 
         const btn = this;
-        
-        // Proteksi elemen agar kebal error 'null'
-        const elTerpakai = document.getElementById("m-terpakai");
-        const elDesc = document.getElementById("m-desc");
-        const elLokasi = document.getElementById("m-lokasi");
-        const elStatus = document.getElementById("m-status-digunakan");
+        const qtyTerpakai = parseInt(document.getElementById("m-terpakai")?.value || 0);
+        const newDesc = document.getElementById("m-desc")?.value || "";
+        const newLokasi = document.getElementById("m-lokasi")?.value || "";
+        const newStatus = document.getElementById("m-status-digunakan")?.checked || false;
 
-        const qtyTerpakai = elTerpakai ? (parseInt(elTerpakai.value) || 0) : 0;
-        const newDesc = elDesc ? elDesc.value : "";
-        const newLokasi = elLokasi ? elLokasi.value : "";
-        const newStatus = elStatus ? elStatus.checked : false;
+        // Mendeteksi apakah user benar-benar melakukan perubahan data di web portal
+        let daftarPerubahan = [];
+        if (qtyTerpakai !== (parseInt(currentItem.terpakai) || 0)) daftarPerubahan.push("Ubah terpakai jadi " + qtyTerpakai);
+        if (newDesc !== (currentItem.keterangan_edit || "")) daftarPerubahan.push("Ubah catatan");
+        if (newLokasi !== (currentItem.lokasi || "")) daftarPerubahan.push("Pindah ke " + newLokasi);
+        
+        let statusLama = (currentItem.status_digunakan === true || currentItem.status_digunakan === "TRUE");
+        if (newStatus !== statusLama) daftarPerubahan.push("Status jadi " + (newStatus ? "Aktif" : "Standby"));
+        if (pendingFotoUpdate) daftarPerubahan.push("Update Foto " + (pendingFotoUpdate.index + 1));
 
         btn.disabled = true;
         btn.innerText = "PROSES MENYIMPAN...";
@@ -646,7 +649,8 @@ location: "JA-01"
             
             const responseText = await response.text();
             
-            if (responseText === "SUCCESS") {
+            // JALUR TOLERANSI: Menggunakan .includes() untuk mengabaikan karakter tersembunyi dari Google
+            if (responseText.includes("SUCCESS")) {
                 currentItem.terpakai = qtyTerpakai;
                 currentItem.keterangan_edit = newDesc;
                 currentItem.lokasi = newLokasi;
@@ -661,14 +665,16 @@ location: "JA-01"
                     }
                 }
 
-                // Memperbarui Log Sementara di Layar secara Real-Time
-                let tgl = new Date().toLocaleString("id-ID").replace(/\./g, ':');
-                let logSimulasi = "[" + tgl + "] Anda ; Melakukan update";
-                let historiLama = (currentItem.log_history && currentItem.log_history !== "undefined") ? currentItem.log_history : "";
-                currentItem.log_history = historiLama ? logSimulasi + "\n" + historiLama : logSimulasi;
+                // Menulis tampilan log tiruan langsung secara real-time HANYA jika ada perubahan nyata
+                if (daftarPerubahan.length > 0) {
+                    let waktuLokal = new Date().toLocaleDateString("id-ID") + " " + new Date().toLocaleTimeString("id-ID", {hour: '2-digit', minute:'2-digit'}).replace(/\./g, ':');
+                    let logSimulasi = "[" + waktuLokal + "] Anda ; " + daftarPerubahan.join(", ");
+                    let historiLama = (currentItem.log_history && currentItem.log_history !== "undefined") ? currentItem.log_history : "";
+                    currentItem.log_history = historiLama ? logSimulasi + "\n" + historiLama : logSimulasi;
+                }
                 
                 let logBox = document.getElementById("m-system-log");
-                if (logBox) logBox.innerText = currentItem.log_history;
+                if (logBox) logBox.innerText = currentItem.log_history || "Belum ada histori update.";
                 
                 alert("✅ Perubahan berhasil disinkronkan ke Spreadsheet!");
                 btn.disabled = false;
@@ -678,7 +684,6 @@ location: "JA-01"
                 
             } else {
                 alert("⚠️ Gagal menyinkronkan! Server membalas: " + responseText);
-                console.error("Server Error:", responseText);
                 btn.disabled = false;
                 btn.innerText = "SIMPAN PERUBAHAN";
             }

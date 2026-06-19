@@ -649,8 +649,10 @@ location: "JA-01"
             
             const responseText = await response.text();
             
-            // JALUR TOLERANSI: Menggunakan .includes() untuk mengabaikan karakter tersembunyi dari Google
-            if (responseText.includes("SUCCESS")) {
+            // JALUR ANTI-ERROR: Membersihkan semua spasi, enter, atau tanda kutip ghaib dari Google
+            const cleanResponse = responseText.replace(/[^a-zA-Z]/g, "").toUpperCase();
+            
+            if (cleanResponse === "SUCCESS" || responseText.includes("SUCCESS")) {
                 currentItem.terpakai = qtyTerpakai;
                 currentItem.keterangan_edit = newDesc;
                 currentItem.lokasi = newLokasi;

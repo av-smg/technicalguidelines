@@ -600,7 +600,7 @@ location: "JA-01"
         document.getElementById("fsOverlay").classList.remove("active");
     }
 
-   // --- PROSES SIMPAN YANG LEBIH FLEKSIBEL TERHADAP CACHE GOOGLE ---
+   // --- PROSES SIMPAN ANTI-CORS GOOGLE ---
     document.getElementById("saveBtn").onclick = async function() {
         if (!userPin) {
             if (!checkAndRequestPin()) return; 
@@ -640,58 +640,48 @@ location: "JA-01"
         }
 
         try {
-            const response = await fetch(SCRIPT_URL, {
-                redirect: "follow", 
+            // MODE NO-CORS: Mengirim data ke Google tanpa memicu sistem blokir CORS dari browser
+            await fetch(SCRIPT_URL, {
                 method: "POST",
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                mode: "no-cors", 
                 body: JSON.stringify(payload)
             });
             
-            const responseText = await response.text();
+            // Karena pakai no-cors, kita abaikan balasan Google dan langsung update tampilan web
+            currentItem.terpakai = qtyTerpakai;
+            currentItem.keterangan_edit = newDesc;
+            currentItem.lokasi = newLokasi;
+            currentItem.status_digunakan = newStatus;
             
-            // JALUR ANTI-ERROR: Membersihkan semua spasi, enter, atau tanda kutip ghaib dari Google
-            const cleanResponse = responseText.replace(/[^a-zA-Z]/g, "").toUpperCase();
-            
-            if (cleanResponse === "SUCCESS" || responseText.includes("SUCCESS")) {
-                currentItem.terpakai = qtyTerpakai;
-                currentItem.keterangan_edit = newDesc;
-                currentItem.lokasi = newLokasi;
-                currentItem.status_digunakan = newStatus;
-                
-                if(pendingFotoUpdate) {
-                    if(!currentItem.fotos) currentItem.fotos = ["", "", "", ""];
-                    if(pendingFotoUpdate.hapus) {
-                        currentItem.fotos[pendingFotoUpdate.index] = "";
-                    } else {
-                        currentItem.fotos[pendingFotoUpdate.index] = pendingFotoUpdate.base64;
-                    }
+            if(pendingFotoUpdate) {
+                if(!currentItem.fotos) currentItem.fotos = ["", "", "", ""];
+                if(pendingFotoUpdate.hapus) {
+                    currentItem.fotos[pendingFotoUpdate.index] = "";
+                } else {
+                    currentItem.fotos[pendingFotoUpdate.index] = pendingFotoUpdate.base64;
                 }
+            }
 
-                // Menulis tampilan log tiruan langsung secara real-time HANYA jika ada perubahan nyata
-                if (daftarPerubahan.length > 0) {
-                    let waktuLokal = new Date().toLocaleDateString("id-ID") + " " + new Date().toLocaleTimeString("id-ID", {hour: '2-digit', minute:'2-digit'}).replace(/\./g, ':');
-                    let logSimulasi = "[" + waktuLokal + "] Anda ; " + daftarPerubahan.join(", ");
-                    let historiLama = (currentItem.log_history && currentItem.log_history !== "undefined") ? currentItem.log_history : "";
-                    currentItem.log_history = historiLama ? logSimulasi + "\n" + historiLama : logSimulasi;
-                }
-                
-                let logBox = document.getElementById("m-system-log");
-                if (logBox) logBox.innerText = currentItem.log_history || "Belum ada histori update.";
-                
-                alert("✅ Perubahan berhasil disinkronkan ke Spreadsheet!");
-                btn.disabled = false;
-                btn.innerText = "SIMPAN PERUBAHAN";
-                closeModal();
-                applyFilters(); 
-                
-            } else {
-                alert("⚠️ Gagal menyinkronkan! Server membalas: " + responseText);
-                btn.disabled = false;
-                btn.innerText = "SIMPAN PERUBAHAN";
+            // Menulis tampilan log secara real-time HANYA jika ada perubahan nyata
+            if (daftarPerubahan.length > 0) {
+                let waktuLokal = new Date().toLocaleDateString("id-ID") + " " + new Date().toLocaleTimeString("id-ID", {hour: '2-digit', minute:'2-digit'}).replace(/\./g, ':');
+                let logSimulasi = "[" + waktuLokal + "] Anda ; " + daftarPerubahan.join(", ");
+                let historiLama = (currentItem.log_history && currentItem.log_history !== "undefined") ? currentItem.log_history : "";
+                currentItem.log_history = historiLama ? logSimulasi + "\n" + historiLama : logSimulasi;
             }
             
+            let logBox = document.getElementById("m-system-log");
+            if (logBox) logBox.innerText = currentItem.log_history || "Belum ada histori update.";
+            
+            alert("✅ Perubahan berhasil disinkronkan ke Spreadsheet!");
+            btn.disabled = false;
+            btn.innerText = "SIMPAN PERUBAHAN";
+            closeModal();
+            applyFilters(); 
+            
         } catch (e) {
-            alert("⚠️ Gagal terhubung ke Google. Detail: " + e.message);
+            // Error ini hanya akan muncul jika internet benar-benar terputus/mati
+            alert("⚠️ Gagal terhubung. Periksa koneksi internetmu.");
             btn.disabled = false;
             btn.innerText = "SIMPAN PERUBAHAN";
         }

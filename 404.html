@@ -1,97 +1,91 @@
 ---
+layout: default
+title: 404 - Misi Tidak Ditemukan 🚀
 permalink: /404.html
 ---
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>404 - Misi Tidak Ditemukan 🚀</title>
-    {% include head.html %}
-    <link rel="stylesheet" href="../style.css">
-    <style>
-        /* Style tambahan khusus untuk halaman 404 */
-        .error-container {
-            height: 80vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 20px;
-        }
 
-        .error-code {
-            font-size: 100px;
-            font-weight: 800;
-            background: linear-gradient(90deg, var(--primary-orange), var(--primary-blue));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            line-height: 1;
-            margin-bottom: 10px;
-        }
+<style>
+    /* Style tambahan khusus untuk halaman 404 bergaya Modern */
+    .error-container {
+        min-height: 75vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 40px 20px;
+    }
 
-        .error-emoji {
-            font-size: 60px;
-            margin-bottom: 20px;
-        }
+    /* Animasi mengambang untuk satelit */
+    .error-emoji {
+        font-size: 70px;
+        margin-bottom: 15px;
+        animation: float 3s ease-in-out infinite;
+    }
 
-        .error-msg {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 15px;
-            color: var(--text-dark);
-        }
+    @keyframes float {
+        0% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-15px) rotate(5deg); }
+        100% { transform: translateY(0px) rotate(0deg); }
+    }
 
-        .error-sub {
-            color: var(--text-gray);
-            max-width: 400px;
-            margin-bottom: 30px;
-            line-height: 1.6;
-        }
+    .error-code {
+        font-size: 130px;
+        font-weight: 900;
+        background: linear-gradient(135deg, var(--primary-orange, #f97316), var(--primary-blue, #3b82f6));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        line-height: 1;
+        margin-bottom: 10px;
+        letter-spacing: -3px;
+        text-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
 
-        .btn-home {
-            background-color: var(--primary-blue);
-            color: white;
-            padding: 14px 28px;
-            border-radius: 100px;
-            text-decoration: none;
-            font-weight: 700;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(58, 112, 226, 0.3);
-        }
+    .error-msg {
+        font-size: 26px;
+        font-weight: 800;
+        margin-bottom: 15px;
+        color: var(--text-dark, inherit);
+    }
 
-        .btn-home:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(58, 112, 226, 0.4);
-            filter: brightness(1.1);
-        }
-    </style>
-</head>
-<body>
+    .error-sub {
+        font-size: 16px;
+        color: var(--text-gray, #6b7280);
+        max-width: 450px;
+        margin-bottom: 35px;
+        line-height: 1.6;
+    }
 
-<header>
-    <div class="nav-container">
-        <a href="index.html" class="logo-combined">
-            <div class="logo-part logo-audio">A</div>
-            <div class="logo-part logo-video">V</div>
-        </a>
-        <div class="site-title">A/V Mission Control</div>
-    </div>
-</header>
+    .btn-home {
+        display: inline-flex;
+        align-items: center;
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        color: #ffffff !important;
+        padding: 16px 32px;
+        border-radius: 100px;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 16px;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 10px 20px rgba(59, 130, 246, 0.25);
+    }
 
-<main class="error-container">
+    .btn-home:hover {
+        transform: translateY(-5px) scale(1.02);
+        box-shadow: 0 15px 25px rgba(59, 130, 246, 0.4);
+        background: linear-gradient(135deg, #2563eb, #1e40af);
+    }
+</style>
+
+<div class="error-container">
     <div class="error-emoji">📡</div>
     <div class="error-code">404</div>
-    <p class="error-msg">Sinyal Terputus!</p>
+    <div class="error-msg">Sinyal Terputus!</div>
     <p class="error-sub">
         Maaf, koordinat misi yang kamu cari tidak ditemukan atau kabelnya sedang dicabut. Silakan kembali ke markas utama.
     </p>
     
-    <a href="index.html" class="btn-home">
+    <a href="{{ '/' | relative_url }}" class="btn-home">
         Kembali ke Beranda 🚀
     </a>
-</main>
-
-</body>
-</html>
+</div>

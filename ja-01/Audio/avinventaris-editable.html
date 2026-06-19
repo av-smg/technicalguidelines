@@ -548,18 +548,13 @@ location: "JA-01"
 
         document.getElementById("m-name").innerText = item.nama_barang;
         
-        // --- 3 BARIS KODE BARU UNTUK INFO HEADER ---
         document.getElementById("m-owner").innerText = item.barang_milik || "Tidak ada data";
         document.getElementById("m-team").innerText = item.tim || "Tidak ada data";
-        
-        // Memperbaiki pemotongan tanggal (Google Sheets biasanya menggunakan spasi "DD/MM/YYYY HH:MM:SS")
         document.getElementById("m-date").innerText = item.timestamp ? item.timestamp.toString().split(" ")[0] : "Tidak ada data";
-        // -------------------------------------------
-
-        // Memasukkan Log History dari Cell P
-        document.getElementById("m-system-log").innerText = item.log_history || "Belum ada histori update.";
-        // Menyesuaikan isi kotak catatan dengan data barang yang diklik
-        document.getElementById("m-desc").value = item.keterangan_edit || "";
+        
+        // Mencegah error 'undefined' menjadi teks
+        let historiValid = (item.log_history && item.log_history !== "undefined") ? item.log_history : "Belum ada histori update.";
+        document.getElementById("m-system-log").innerText = historiValid;
         
         const locSelect = document.getElementById("m-lokasi");
         locSelect.innerHTML = "";
@@ -578,6 +573,9 @@ location: "JA-01"
         inputQty.max = total;
         inputQty.value = terpakai;
         document.getElementById("m-max-text").innerText = `Total persediaan: ${total} Pcs`;
+        
+        // Memastikan kotak catatan sesuai dengan barang yang diklik (tidak nyangkut)
+        document.getElementById("m-desc").value = item.keterangan_edit || "";
         
         calculateSisa(); 
         
@@ -609,10 +607,17 @@ location: "JA-01"
         }
 
         const btn = this;
-        const qtyTerpakai = parseInt(document.getElementById("m-terpakai").value) || 0;
-        const newDesc = document.getElementById("m-desc").value;
-        const newLokasi = document.getElementById("m-lokasi").value;
-        const newStatus = document.getElementById("m-status-digunakan").checked;
+        
+        // Proteksi elemen agar kebal error 'null'
+        const elTerpakai = document.getElementById("m-terpakai");
+        const elDesc = document.getElementById("m-desc");
+        const elLokasi = document.getElementById("m-lokasi");
+        const elStatus = document.getElementById("m-status-digunakan");
+
+        const qtyTerpakai = elTerpakai ? (parseInt(elTerpakai.value) || 0) : 0;
+        const newDesc = elDesc ? elDesc.value : "";
+        const newLokasi = elLokasi ? elLokasi.value : "";
+        const newStatus = elStatus ? elStatus.checked : false;
 
         btn.disabled = true;
         btn.innerText = "PROSES MENYIMPAN...";
@@ -633,16 +638,12 @@ location: "JA-01"
 
         try {
             const response = await fetch(SCRIPT_URL, {
-                redirect: "follow", // Sangat penting untuk Google Apps Script
+                redirect: "follow", 
                 method: "POST",
-                headers: {
-                    // Menggunakan text/plain memotong proses preflight OPTIONS CORS
-                    "Content-Type": "text/plain;charset=utf-8",
-                },
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
                 body: JSON.stringify(payload)
             });
             
-            // Membaca jawaban asli dari Google
             const responseText = await response.text();
             
             if (responseText === "SUCCESS") {
@@ -650,11 +651,6 @@ location: "JA-01"
                 currentItem.keterangan_edit = newDesc;
                 currentItem.lokasi = newLokasi;
                 currentItem.status_digunakan = newStatus;
-                // --- KODE BARU UNTUK PREVIEW LOG SEMENTARA ---
-                let tgl = new Date().toLocaleString("id-ID").replace(/\./g, ':');
-                let logSimulasi = "[" + tgl + "] Anda ; Melakukan update";
-                currentItem.log_history = currentItem.log_history ? logSimulasi + "\n" + currentItem.log_history : logSimulasi;
-                // ---------------------------------------------
                 
                 if(pendingFotoUpdate) {
                     if(!currentItem.fotos) currentItem.fotos = ["", "", "", ""];
@@ -664,6 +660,15 @@ location: "JA-01"
                         currentItem.fotos[pendingFotoUpdate.index] = pendingFotoUpdate.base64;
                     }
                 }
+
+                // Memperbarui Log Sementara di Layar secara Real-Time
+                let tgl = new Date().toLocaleString("id-ID").replace(/\./g, ':');
+                let logSimulasi = "[" + tgl + "] Anda ; Melakukan update";
+                let historiLama = (currentItem.log_history && currentItem.log_history !== "undefined") ? currentItem.log_history : "";
+                currentItem.log_history = historiLama ? logSimulasi + "\n" + historiLama : logSimulasi;
+                
+                let logBox = document.getElementById("m-system-log");
+                if (logBox) logBox.innerText = currentItem.log_history;
                 
                 alert("✅ Perubahan berhasil disinkronkan ke Spreadsheet!");
                 btn.disabled = false;
@@ -672,7 +677,6 @@ location: "JA-01"
                 applyFilters(); 
                 
             } else {
-                // MUNCULKAN ERROR DARI GOOGLE APPS SCRIPT
                 alert("⚠️ Gagal menyinkronkan! Server membalas: " + responseText);
                 console.error("Server Error:", responseText);
                 btn.disabled = false;

@@ -11,7 +11,7 @@ title: Daftar Apendiks
         display: none;
         margin-top: 15px;
         padding-top: 15px;
-        border-top: 1px solid rgba(125, 125, 125, 0.2) !important;
+        border-top: 1px solid var(--border-color, rgba(125, 125, 125, 0.2));
         animation: fadeIn 0.3s ease;
     }
 
@@ -27,14 +27,13 @@ title: Daftar Apendiks
         display: block;
         padding: 10px 14px;
         text-decoration: none;
-        background: rgba(255, 255, 255, 0.05);
+        background: rgba(125, 125, 125, 0.1);
         border-radius: 8px;
         font-size: 0.9rem;
+        font-weight: 500;
         transition: 0.2s all ease;
-
-        /* WARNA ADAPTIF: Otomatis menyesuaikan Light/Dark Mode */
-        background-color: rgba(125, 125, 125, 0.1) !important;
-        color: var(--text-main, #1a202c) !important;
+        /* Menggunakan variabel agar menyesuaikan Dark/Light mode secara otomatis */
+        color: var(--text-dark, inherit); 
     }
 
     .dropdown-list a:hover {
@@ -45,9 +44,32 @@ title: Daftar Apendiks
     .btn-go {
         display: inline-block;
         margin-top: 10px;
-        font-weight: bold;
+        font-weight: 700;
         color: #60a5fa;
         cursor: pointer;
+        font-size: 0.9rem;
+        transition: color 0.2s ease;
+    }
+    
+    .btn-go:hover {
+        color: #3b82f6;
+    }
+
+    /* TYPOGRAPHY MODERN UNTUK CARD */
+    .mission-card h3 {
+        font-size: 1.15rem;
+        font-weight: 800;
+        margin: 12px 0 6px 0;
+        letter-spacing: -0.3px;
+        color: var(--text-dark, inherit);
+    }
+
+    .mission-card p {
+        font-size: 0.85rem;
+        line-height: 1.6;
+        font-weight: 400;
+        color: var(--text-gray, #6b7280); /* Warna lebih soft agar tidak bertabrakan dengan judul */
+        margin-bottom: 15px;
     }
 
     @keyframes fadeIn {
@@ -80,7 +102,7 @@ title: Daftar Apendiks
                 <div class="mission-card">
                     <div class="card-emoji">📢</div>
                     <h3>Tim Audio (Indonesia)</h3>
-                    <p>Dokumen pendukung dan referensi teknis Tim Audio wilayah Indonesia - Semarang.</p>
+                    <p>Panduan teknis, diagram utama, dan standar operasional audio.</p>
                     
                     <div class="btn-go" onclick="toggleDropdown('toaDropdownIndo', 'toaBtnTextIndo')">
                         <span id="toaBtnTextIndo">Buka &darr;</span>
@@ -101,7 +123,7 @@ title: Daftar Apendiks
                 <div class="mission-card">
                     <div class="card-emoji">🎥</div>
                     <h3>Tim Video (Indonesia)</h3>
-                    <p>Dokumen pendukung dan referensi teknis Tim Video wilayah Indonesia - Semarang.</p>
+                    <p>Panduan kalibrasi kamera, tata letak, dan operasional alat video.</p>
                     
                     <div class="btn-go" onclick="toggleDropdown('canonDropdownIndo', 'canonBtnTextIndo')">
                         <span id="canonBtnTextIndo">Buka &darr;</span>
@@ -128,7 +150,7 @@ title: Daftar Apendiks
                 <div class="mission-card">
                     <div class="card-emoji">📢</div>
                     <h3>Tim Audio (Jawa)</h3>
-                    <p>Dokumen pendukung dan referensi teknis Tim Audio wilayah Jawa - Semarang.</p>
+                    <p>Diagram routing booth, penempatan speaker, dan jadwal tim.</p>
                     
                     <div class="btn-go" onclick="toggleDropdown('toaDropdownJawa', 'toaBtnTextJawa')">
                         <span id="toaBtnTextJawa">Buka &darr;</span>
@@ -153,7 +175,7 @@ title: Daftar Apendiks
                 <div class="mission-card">
                     <div class="card-emoji">🎥</div>
                     <h3>Tim Video (Jawa)</h3>
-                    <p>Dokumen pendukung dan referensi teknis Tim Video wilayah Jawa - Semarang.</p>
+                    <p>Acuan kalibrasi visual, manajemen switching, dan fungsi alat.</p>
                     
                     <div class="btn-go" onclick="toggleDropdown('canonDropdownJawa', 'canonBtnTextJawa')">
                         <span id="canonBtnTextJawa">Buka &darr;</span>

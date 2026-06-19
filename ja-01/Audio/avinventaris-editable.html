@@ -558,6 +558,8 @@ location: "JA-01"
 
         // Memasukkan Log History dari Cell P
         document.getElementById("m-system-log").innerText = item.log_history || "Belum ada histori update.";
+        // Menyesuaikan isi kotak catatan dengan data barang yang diklik
+        document.getElementById("m-desc").value = item.keterangan_edit || "";
         
         const locSelect = document.getElementById("m-lokasi");
         locSelect.innerHTML = "";
@@ -648,6 +650,11 @@ location: "JA-01"
                 currentItem.keterangan_edit = newDesc;
                 currentItem.lokasi = newLokasi;
                 currentItem.status_digunakan = newStatus;
+                // --- KODE BARU UNTUK PREVIEW LOG SEMENTARA ---
+                let tgl = new Date().toLocaleString("id-ID").replace(/\./g, ':');
+                let logSimulasi = "[" + tgl + "] Anda ; Melakukan update";
+                currentItem.log_history = currentItem.log_history ? logSimulasi + "\n" + currentItem.log_history : logSimulasi;
+                // ---------------------------------------------
                 
                 if(pendingFotoUpdate) {
                     if(!currentItem.fotos) currentItem.fotos = ["", "", "", ""];

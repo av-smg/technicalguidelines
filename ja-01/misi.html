@@ -1,144 +1,138 @@
+---
+location: "JA-01"
+---
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Detail Tugas Tim</title>
+  <link rel="stylesheet" href="../style.css" />
+  {% include head.html %}
   <style>
-    /* Styling dasar agar senada dengan UI Vibe Check kamu */
-    body { font-family: sans-serif; background-color: #f8fafc; margin: 0; padding: 20px; color: #333; }
-    .header { margin-bottom: 20px; }
-    .header h1 { margin: 0; font-size: 24px; text-transform: capitalize; }
-    .task-list { display: flex; flex-direction: column; gap: 15px; }
-    .task-card { 
-      background: white; padding: 15px; border-radius: 12px; 
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-      display: flex; align-items: flex-start; gap: 15px;
-    }
-    .task-info { flex: 1; }
-    .task-info h3 { margin: 0 0 5px 0; font-size: 16px; }
-    .task-info p { margin: 0; font-size: 14px; color: #64748b; }
-    .badge { display: inline-block; padding: 4px 8px; font-size: 12px; border-radius: 6px; background: #e2e8f0; margin-top: 8px; font-weight: bold;}
-    
-    /* Styling Checkbox Custom */
-    input[type="checkbox"] {
-      width: 24px; height: 24px; cursor: pointer; accent-color: #059669;
-    }
-    .loading { text-align: center; color: #64748b; padding: 20px; }
-    .back-btn { display: inline-block; margin-bottom: 15px; text-decoration: none; color: #2563eb; font-weight: bold; }
+    /* Tambahan styling khusus untuk checklist agar rapi */
+    .back-btn { display: inline-block; margin-bottom: 20px; font-weight: bold; color: #e67e22; text-decoration: none; }
+    .task-item { display: flex; align-items: flex-start; gap: 15px; text-align: left; cursor: default; }
+    .task-item input[type="checkbox"] { width: 22px; height: 22px; margin-top: 4px; accent-color: #e67e22; cursor: pointer; }
+    .task-content { flex: 1; }
+    .task-content h3 { margin: 0 0 8px 0; font-size: 1.1rem; }
+    .task-content p { margin: 0 0 10px 0; font-size: 0.9rem; line-height: 1.4; color: #555; }
+    .task-meta { display: inline-block; padding: 4px 10px; background: #f1f5f9; color: #475569; border-radius: 6px; font-size: 0.8rem; font-weight: bold; }
+    .loading-text { text-align: center; padding: 40px; color: #666; font-weight: bold; }
   </style>
 </head>
 <body>
+  {% include navbar.html %}
 
   <main>
-    <a href="index.html" class="back-btn">&larr; Kembali ke Daftar Tim</a>
-    
-    <div class="header">
-      <h1 id="team-title">Memuat data tim...</h1>
-      <p>Checklist tugas operasional untuk zona ini.</p>
+    <div class="content-container">
+      <a href="index.html" class="back-btn">&larr; Kembali ke Daftar Tim</a>
+      
+      <section class="team-section">
+        <div class="team-header">
+          <span class="team-badge" style="background: #e67e22; color: #fff;">CHECKLIST</span>
+          <h2 id="team-title">Memuat data...</h2>
+        </div>
+        
+        <div id="loading" class="loading-text">Sedang menyinkronkan data dengan server... ⏳</div>
+        
+        <div id="task-container" class="grid-cards" style="display: flex; flex-direction: column;">
+          </div>
+      </section>
     </div>
-
-    <div id="loading" class="loading">Mengambil data tugas dari server... ⏳</div>
-    
-    <div id="task-container" class="task-list">
-      </div>
   </main>
 
+  <footer class="simple-footer">
+    <p>&copy; 2026 Tim Teknis A/V. All rights reserved.</p>
+  </footer>
+
   <script>
-    // --- 1. KONFIGURASI URL APPS SCRIPT ---
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwYkzFEfLuWTbIRKZgQTciFrfhRV9tqkNWzeYnq79AV4mlpy6OXk8YdUSM25e7BFtp_5w/exec"; 
+    // --- MASUKKAN URL APPS SCRIPT KAMU DI SINI ---
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx48weXwYDomgoRo02hh-yXXHd-EdiexmYY3Rxg6SUC_ptGJKHYIPSv6kD96NFvLt7oOg/exec"; 
 
-    // --- 2. AMBIL ID DARI URL ---
     const urlParams = new URLSearchParams(window.location.search);
-    const currentTeamId = urlParams.get('id'); // contoh output: "ja01-audio-booth"
+    const currentTeamId = urlParams.get('id');
 
-    // Set judul halaman sementara berdasarkan ID
     if(currentTeamId) {
       document.getElementById('team-title').innerText = "Tugas: " + currentTeamId.replace(/-/g, ' ').toUpperCase();
     } else {
-      document.getElementById('team-title').innerText = "Kode Tim Tidak Ditemukan";
+      document.getElementById('team-title').innerText = "Kode Tim Tidak Valid";
       document.getElementById('loading').style.display = 'none';
     }
 
-    // --- 3. FUNGSI FETCH DATA TUGAS ---
     async function fetchTasks() {
       if (!currentTeamId) return;
-
       try {
-        const response = await fetch(APPS_SCRIPT_URL);
-        const allTasks = await response.json();
-
-        // Filter tugas hanya untuk ID tim yang sedang dibuka
-        const teamTasks = allTasks.filter(task => task.kode === currentTeamId);
+        // Menggunakan redirect: "follow" penting untuk Google Apps Script
+        const response = await fetch(APPS_SCRIPT_URL, {
+          method: "GET",
+          redirect: "follow" 
+        });
         
+        const allTasks = await response.json();
+        const teamTasks = allTasks.filter(task => task.kode === currentTeamId);
         renderTasks(teamTasks);
       } catch (error) {
-        console.error("Gagal memuat data:", error);
-        document.getElementById('loading').innerText = "⚠️ Gagal memuat data. Cek koneksi internetmu.";
+        console.error("Fetch Error:", error);
+        document.getElementById('loading').innerText = "⚠️ Gagal terhubung ke database. Cek koneksimu.";
       }
     }
 
-    // --- 4. FUNGSI RENDER HTML ---
     function renderTasks(tasks) {
       const container = document.getElementById('task-container');
-      const loading = document.getElementById('loading');
-      
-      loading.style.display = 'none';
+      document.getElementById('loading').style.display = 'none';
       container.innerHTML = '';
 
       if (tasks.length === 0) {
-        container.innerHTML = '<p style="text-align:center; color:#64748b;">Belum ada tugas untuk tim ini.</p>';
+        container.innerHTML = '<div class="mission-card"><p style="text-align:center; margin:0;">Tidak ada tugas untuk tim ini.</p></div>';
         return;
       }
 
-      // Sortir berdasarkan urutan
       tasks.sort((a, b) => parseInt(a.urutan) - parseInt(b.urutan));
 
       tasks.forEach(task => {
         const isChecked = task.selesai ? 'checked' : '';
         const card = document.createElement('div');
-        card.className = 'task-card';
+        // Pakai class mission-card dari style.css milikmu
+        card.className = 'mission-card task-item'; 
         
         card.innerHTML = `
           <input type="checkbox" id="task-${task.row}" ${isChecked} onchange="updateTaskStatus(${task.row}, this.checked)">
-          <div class="task-info">
+          <div class="task-content">
             <h3>${task.urutan}. ${task.judul}</h3>
-            <p>${task.deskripsi}</p>
-            <span class="badge">⏱️ ${task.target_menit} Menit</span>
+            <p>${task.deskripsi.replace(/\n/g, '<br>')}</p>
+            <span class="task-meta">⏱️ Target: ${task.target_menit} Menit | Zona: ${task.zona}</span>
           </div>
         `;
         container.appendChild(card);
       });
     }
 
-    // --- 5. FUNGSI UPDATE STATUS KE GOOGLE SHEETS ---
     async function updateTaskStatus(rowNumber, isCompleted) {
-      // Nonaktifkan checkbox sementara agar user tidak spam klik
       const checkbox = document.getElementById(`task-${rowNumber}`);
       checkbox.disabled = true;
 
-      const payload = {
-        row: rowNumber,
-        selesai: isCompleted
-      };
+      const payload = { row: rowNumber, selesai: isCompleted };
 
       try {
+        // Mengubah mode request menjadi text/plain untuk menghindari CORS Preflight (OPTIONS request) yang sering ditolak Google
         await fetch(APPS_SCRIPT_URL, {
           method: 'POST',
-          body: JSON.stringify(payload)
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8", 
+          },
+          body: JSON.stringify(payload),
+          redirect: "follow"
         });
-        // Berhasil update, aktifkan kembali checkbox
         checkbox.disabled = false;
       } catch (error) {
-        console.error("Gagal mengupdate status:", error);
-        alert("Gagal menyimpan perubahan. Periksa koneksi internet.");
-        // Kembalikan status checkbox jika gagal
+        console.error("Update Error:", error);
+        alert("Gagal mengupdate status ke server.");
         checkbox.checked = !isCompleted; 
         checkbox.disabled = false;
       }
     }
 
-    // --- 6. JALANKAN SAAT HALAMAN DIBUKA ---
     fetchTasks();
   </script>
 </body>

@@ -1,1 +1,86 @@
-Edit here
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    {% include head.html %}
+    <style>
+        /* Gaya minimalis untuk Read-Only */
+        .page-title-section { text-align: center; margin: 20px 0 30px; }
+        .controls-wrapper { position: sticky; top: 0; z-index: 900; background: var(--bg-color); padding: 15px; border-bottom: 1px solid var(--border-color); }
+        .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .mission-card { background: var(--card-bg); border-radius: 20px; padding: 15px; cursor: pointer; border: 1px solid var(--border-color); }
+        .card-img { width: 100%; height: 180px; object-fit: cover; border-radius: 15px; margin-bottom: 15px; }
+        .badge-status-on { background: #e8f8f5; color: #1abc9c; padding: 3px 8px; border-radius: 5px; font-size: 10px; font-weight: 800; }
+        .badge-status-off { background: #fdf2e9; color: #e67e22; padding: 3px 8px; border-radius: 5px; font-size: 10px; font-weight: 800; }
+    </style>
+</head>
+<body>
+    <main>
+        <div class="page-title-section">
+            <h2>Inventory View (Read-Only)</h2>
+        </div>
+        <div class="controls-wrapper">
+            <input type="text" id="searchInput" class="search-bar-inv" placeholder="Cari barang..." oninput="applyFilters()">
+        </div>
+        <div id="dataContainer" class="grid-cards"></div>
+    </main>
+
+    <div id="modal" class="modal-overlay" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3 id="m-name">DETAIL BARANG</h3>
+                <button onclick="closeModal()" class="close-x">✕</button>
+            </div>
+            <div class="modal-body">
+                <img id="m-main-img" src="" style="width:100%; border-radius:15px;">
+                <p id="m-desc" style="margin-top:15px;"></p>
+                <div id="m-system-log" style="font-size:11px; color:#666; margin-top:20px; border-top:1px solid #ccc; padding-top:10px;"></div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbznJ953TFJLU8juKc-z-xoBUn1ZH4hYNVlPDcW50rTfa4eLmhoxIgnirXBKbELwz0T5/exec";
+    let allItems = [];
+
+    window.onload = loadData;
+
+    async function loadData() {
+        const res = await fetch(SCRIPT_URL + "?action=api");
+        const rawData = await res.json();
+        allItems = rawData.inventory;
+        render(allItems);
+    }
+
+    function applyFilters() {
+        const q = document.getElementById("searchInput").value.toLowerCase();
+        render(allItems.filter(i => i.nama_barang.toLowerCase().includes(q)));
+    }
+
+    function render(data) {
+        const container = document.getElementById("dataContainer");
+        container.innerHTML = "";
+        data.forEach(item => {
+            const card = document.createElement("div");
+            card.className = "mission-card";
+            card.innerHTML = `
+                <img src="${item.fotos[0] || ''}" class="card-img">
+                <h4>${item.nama_barang}</h4>
+                <p>Stok: ${item.jumlah} | Lokasi: ${item.lokasi}</p>
+            `;
+            card.onclick = () => openModal(item);
+            container.appendChild(card);
+        });
+    }
+
+    function openModal(item) {
+        document.getElementById("m-name").innerText = item.nama_barang;
+        document.getElementById("m-main-img").src = item.fotos[0] || '';
+        document.getElementById("m-desc").innerText = item.keterangan_edit || "Tidak ada catatan.";
+        document.getElementById("m-system-log").innerText = "Histori: \n" + (item.log_history || "-");
+        document.getElementById("modal").classList.add("active");
+    }
+
+    function closeModal() { document.getElementById("modal").classList.remove("active"); }
+</script>
+</body>
+</html>

@@ -136,7 +136,9 @@ location: "JA-01"
 
       tasks.sort((a, b) => parseInt(a.urutan) - parseInt(b.urutan));
       
-      let apdSet = new Set(); // Menyimpan APD unik
+      let apdSet = new Set(); 
+      // SEPATU SAFETY SELALU WAJIB UNTUK SEMUA TIM
+      apdSet.add('🥾 Sepatu Safety'); 
 
       tasks.forEach(task => {
         const isChecked = task.selesai ? 'checked' : '';
@@ -147,31 +149,35 @@ location: "JA-01"
         
         let desc = task.deskripsi;
         
-        // --- 1. RENDER GAMBAR (Mengubah [img: url] jadi gambar HTML) ---
+        // --- 1. RENDER GAMBAR ---
         desc = desc.replace(/\[img:\s*(.+?)\]/gi, '<img src="$1" class="task-img">');
 
         // --- 2. PEMISAHAN PERALATAN & LANGKAH PINTAR ---
         let toolsHtml = '';
         let stepsHtml = desc.replace(/\n/g, '<br>'); 
         
-        // Deteksi bagian Peralatan dan sisa teksnya (bisa Langkah, Jalur, atau Instruksi)
         let splitRegex = /Peralatan:([\s\S]*?)(Langkah:|Jalur:|Instruksi:|$)/i;
         let match = desc.match(splitRegex);
         
         if (match && match[1].trim() !== '') {
           let alatRaw = match[1].trim();
-          let keywordSelanjutnya = match[2]; // Menyimpan apakah dia pakai "Langkah:" atau "Jalur:"
+          let keywordSelanjutnya = match[2]; 
           
           if (alatRaw.endsWith('.')) alatRaw = alatRaw.slice(0, -1);
           
-          // --- DETEKSI KEBUTUHAN APD GLOBAL ---
           let alatLower = alatRaw.toLowerCase();
           if (alatLower.includes('helm')) apdSet.add('👷 Helm');
           if (alatLower.includes('sarung tangan')) apdSet.add('🧤 Sarung Tangan');
-          if (alatLower.includes('sepatu') || alatLower.includes('safety')) apdSet.add('🥾 Sepatu Safety');
 
-          // Ciptakan Badge Alat
-          const alatArray = alatRaw.split(',').map(item => item.trim()).filter(item => item !== "");
+          // MEMBUAT BADGE ALAT SEKALIGUS MENGHAPUS APD DARI DAFTAR
+          const alatArray = alatRaw.split(',')
+            .map(item => item.trim())
+            .filter(item => {
+              let itemLower = item.toLowerCase();
+              // Jangan masukkan ke badge abu-abu jika mengandung kata helm, sarung tangan, atau sepatu
+              return item !== "" && !itemLower.includes('helm') && !itemLower.includes('sarung tangan') && !itemLower.includes('sepatu');
+            });
+
           const badgesHtml = alatArray.map(item => {
             let icon = '🛠️';
             let lowerItem = item.toLowerCase();
@@ -182,12 +188,12 @@ location: "JA-01"
             return `<span class="tool-badge">${icon} ${item}</span>`;
           }).join('');
           
-          toolsHtml = `<div class="tools-container">${badgesHtml}</div>`;
+          if (badgesHtml) {
+            toolsHtml = `<div class="tools-container">${badgesHtml}</div>`;
+          }
           
-          // Tampilkan teks Langkah/Jalur di bawahnya
           if (keywordSelanjutnya) {
             let textSetelahAlat = desc.substring(desc.indexOf(keywordSelanjutnya));
-            // Hapus keywordnya karena kita mau bikin label terpisah
             let isiLangkah = textSetelahAlat.replace(new RegExp(keywordSelanjutnya, 'i'), '').trim();
             stepsHtml = `<span class="steps-label">${keywordSelanjutnya}</span><div class="steps-container">${isiLangkah.replace(/\n/g, '<br>')}</div>`;
           } else {
@@ -207,12 +213,12 @@ location: "JA-01"
         container.appendChild(card);
       });
 
-      // --- 3. TAMPILKAN BANNER APD JIKA DIPERLUKAN ---
+      // --- 3. TAMPILKAN BANNER APD ---
       if (apdSet.size > 0) {
         safetyBanner.style.display = 'flex';
         apdItemsContainer.innerHTML = Array.from(apdSet).map(item => `<span class="apd-badge">${item}</span>`).join('');
       } else {
-        safetyBanner.style.display = 'none'; // Kalau tidak ada APD, banner tetap sembunyi!
+        safetyBanner.style.display = 'none'; 
       }
     }
 
@@ -221,7 +227,6 @@ location: "JA-01"
       const card = document.getElementById(`card-${rowNumber}`);
       checkbox.disabled = true;
       
-      // Memberi efek teks dicoret jika selesai
       if (isCompleted) card.classList.add('task-completed');
       else card.classList.remove('task-completed');
 
@@ -241,7 +246,6 @@ location: "JA-01"
         checkbox.checked = !isCompleted; 
         checkbox.disabled = false;
         
-        // Kembalikan efek coret jika gagal
         if (!isCompleted) card.classList.add('task-completed');
         else card.classList.remove('task-completed');
       }

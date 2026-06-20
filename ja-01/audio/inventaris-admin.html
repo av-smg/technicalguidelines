@@ -212,7 +212,7 @@ location: "JA-01"
                             <div id="m-date" style="font-size: 13px; font-weight: 600; color: var(--text-dark); margin-top: 4px;">-</div>
                         </div>
                     </div>
-                    <span class="label-tag">Keterangan Teknis</span>
+                    <span id="m-ref-label" class="label-tag">Keterangan Teknis</span>
                     <div id="m-ref" class="ref-box"></div>
 
                     <div class="flex-row-input">
@@ -551,7 +551,20 @@ location: "JA-01"
         document.getElementById("m-owner").innerText = item.barang_milik || "Tidak ada data";
         document.getElementById("m-team").innerText = item.tim || "Tidak ada data";
         document.getElementById("m-date").innerText = item.timestamp ? item.timestamp.toString().split(" ")[0] : "Tidak ada data";
-        
+        // --- SINKRONISASI & SMART UI KETERANGAN TEKNIS ---
+const refLabel = document.getElementById("m-ref-label");
+const refBox = document.getElementById("m-ref");
+let txtRef = item.keterangan_ref || "";
+
+if (txtRef !== "") {
+    refLabel.style.display = "block";
+    refBox.style.display = "block";
+    refBox.innerText = txtRef;
+} else {
+    refLabel.style.display = "none";
+    refBox.style.display = "none";
+}
+// -------------------------------------------------
         // Mencegah error 'undefined' menjadi teks
         let historiValid = (item.log_history && item.log_history !== "undefined") ? item.log_history : "Belum ada histori update.";
         document.getElementById("m-system-log").innerText = historiValid;

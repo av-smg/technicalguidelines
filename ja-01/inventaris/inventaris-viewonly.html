@@ -103,6 +103,29 @@ location: "JA-01"
         .btn-back-fs { background: rgba(255, 255, 255, 0.2); color: white; border: 2px solid white; padding: 10px 20px; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 14px; display: inline-block; }
         .fs-image { max-width: 100%; max-height: 85vh; object-fit: contain; border-radius: 10px; }
 
+        /* MULTI-SELECT FILTER CUSTOM */
+        .multi-select { position: relative; display: inline-block; flex: 1; min-width: 150px; }
+        .multi-select-btn { 
+            width: 100%; padding: 10px 16px; border-radius: 10px; 
+            border: 1px solid var(--border-color); background: var(--card-bg); 
+            font-size: 14px; font-weight: 600; color: var(--text-dark); 
+            cursor: pointer; text-align: left; display: flex; justify-content: space-between; align-items: center; transition: 0.2s;
+        }
+        .multi-select-btn:hover { border-color: var(--primary-orange); }
+        .multi-select-content { 
+            display: none; position: absolute; background-color: var(--card-bg); 
+            min-width: 100%; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.1); 
+            z-index: 1000; border-radius: 10px; border: 1px solid var(--border-color); 
+            max-height: 250px; overflow-y: auto; top: 110%; left: 0; padding: 5px 0;
+        }
+        .multi-select-content.show { display: flex; flex-direction: column; }
+        .multi-select-label { 
+            padding: 10px 15px; display: flex; align-items: center; gap: 10px; 
+            cursor: pointer; font-size: 13px; color: var(--text-dark); font-weight: 600; margin-bottom: 0;
+        }
+        .multi-select-label:hover { background-color: var(--bg-color); }
+        .multi-select-label input[type="checkbox"] { accent-color: var(--primary-orange); width: 16px; height: 16px; cursor: pointer;}
+
         @media (max-width: 768px) {
             .modal-body { flex-direction: column; }
             .filters { flex-direction: column; align-items: stretch; }
@@ -125,17 +148,23 @@ location: "JA-01"
                 <input type="text" id="searchInput" class="search-bar-inv" placeholder="Cari nama barang..." oninput="applyFilters()">
                 <div class="filters">
                     <div class="filter-group">
-                        <select id="sortSelect" class="control-element" onchange="applyFilters()">
+                        <select id="sortSelect" class="control-element" onchange="applyFilters()" style="min-width: 140px;">
                             <option value="default">Urutan Default</option>
                             <option value="az">A - Z</option>
                             <option value="za">Z - A</option>
                         </select>
-                        <select id="teamSelect" class="control-element" onchange="applyFilters()">
-                            <option value="all">Semua Tim</option>
-                        </select>
-                        <select id="ownerSelect" class="control-element" onchange="applyFilters()">
-                            <option value="all">Semua Sumber</option>
-                        </select>
+                        
+                        <div class="multi-select" id="teamSelectWrapper">
+                            <button class="multi-select-btn" onclick="toggleMultiSelect('teamSelectContent', event)">Pilih Tim ▼</button>
+                            <div class="multi-select-content" id="teamSelectContent">
+                                </div>
+                        </div>
+
+                        <div class="multi-select" id="ownerSelectWrapper">
+                            <button class="multi-select-btn" onclick="toggleMultiSelect('ownerSelectContent', event)">Pilih Sumber ▼</button>
+                            <div class="multi-select-content" id="ownerSelectContent">
+                                </div>
+                        </div>
                     </div>
                     <div class="view-group">
                         <button onclick="toggleView('gallery')" id="btnGallery" class="control-element btn-view active">Gallery</button>
@@ -232,6 +261,22 @@ location: "JA-01"
     let allItems = [];
     let currentView = 'gallery';
 
+    // FUNGSI UNTUK TOGGLE DROPDOWN CHECKBOX
+    function toggleMultiSelect(id, event) {
+        event.stopPropagation();
+        document.getElementById(id).classList.toggle("show");
+    }
+
+    // Menutup dropdown jika user klik di luar area
+    window.onclick = function(event) {
+        if (!event.target.closest('.multi-select')) {
+            const dropdowns = document.getElementsByClassName("multi-select-content");
+            for (let i = 0; i < dropdowns.length; i++) {
+                dropdowns[i].classList.remove('show');
+            }
+        }
+    }
+
     window.onload = () => {
         loadData(); // Langsung tarik data tanpa minta PIN
     };
@@ -252,13 +297,21 @@ location: "JA-01"
     }
 
     function populateFilters() {
+        // --- Populate Multi-select Tim ---
         const teams = [...new Set(allItems.map(i => i.tim).filter(Boolean))];
-        const teamSelect = document.getElementById("teamSelect");
-        teams.forEach(t => teamSelect.innerHTML += `<option value="${t}">${t}</option>`);
+        const teamContent = document.getElementById("teamSelectContent");
+        teamContent.innerHTML = ""; 
+        teams.forEach(t => {
+            teamContent.innerHTML += `<label class="multi-select-label"><input type="checkbox" value="${t}" onchange="applyFilters()"> ${t}</label>`;
+        });
 
+        // --- Populate Multi-select Sumber ---
         const owners = [...new Set(allItems.map(i => i.barang_milik).filter(Boolean))];
-        const ownerSelect = document.getElementById("ownerSelect");
-        owners.forEach(o => ownerSelect.innerHTML += `<option value="${o}">${o}</option>`);
+        const ownerContent = document.getElementById("ownerSelectContent");
+        ownerContent.innerHTML = ""; 
+        owners.forEach(o => {
+            ownerContent.innerHTML += `<label class="multi-select-label"><input type="checkbox" value="${o}" onchange="applyFilters()"> ${o}</label>`;
+        });
     }
 
     function toggleView(viewType) {
@@ -272,13 +325,25 @@ location: "JA-01"
     function applyFilters() {
         const q = document.getElementById("searchInput").value.toLowerCase();
         const sortVal = document.getElementById("sortSelect").value;
-        const teamVal = document.getElementById("teamSelect").value;
-        const ownerVal = document.getElementById("ownerSelect").value;
+
+        // Ambil array dari semua checkbox yang sedang dicentang
+        const selectedTeams = Array.from(document.querySelectorAll('#teamSelectContent input:checked')).map(cb => cb.value);
+        const selectedOwners = Array.from(document.querySelectorAll('#ownerSelectContent input:checked')).map(cb => cb.value);
+
+        // Update teks tombol agar user tahu berapa filter yang aktif
+        const btnTeam = document.querySelector('#teamSelectWrapper .multi-select-btn');
+        btnTeam.innerText = selectedTeams.length > 0 ? `${selectedTeams.length} Tim Dipilih ▼` : `Semua Tim ▼`;
+
+        const btnOwner = document.querySelector('#ownerSelectWrapper .multi-select-btn');
+        btnOwner.innerText = selectedOwners.length > 0 ? `${selectedOwners.length} Sumber Dipilih ▼` : `Semua Sumber ▼`;
 
         let filtered = allItems.filter(i => {
             const matchQ = i.nama_barang.toLowerCase().includes(q) || (i.tim || "").toLowerCase().includes(q);
-            const matchTeam = (teamVal === 'all') || (i.tim === teamVal);
-            const matchOwner = (ownerVal === 'all') || (i.barang_milik && i.barang_milik === ownerVal);
+            
+            // Jika tidak ada yang dicentang (length === 0), anggap user ingin melihat semua (ALL)
+            const matchTeam = selectedTeams.length === 0 || selectedTeams.includes(i.tim);
+            const matchOwner = selectedOwners.length === 0 || selectedOwners.includes(i.barang_milik);
+            
             return matchQ && matchTeam && matchOwner;
         });
 
@@ -399,6 +464,7 @@ location: "JA-01"
         document.getElementById("m-owner").innerText = item.barang_milik || "Tidak ada data";
         document.getElementById("m-team").innerText = item.tim || "Tidak ada data";
         document.getElementById("m-date").innerText = item.timestamp ? item.timestamp.toString().split(" ")[0] : "Tidak ada data";
+        
         // --- SMART UI KETERANGAN TEKNIS ---
         const refLabel = document.getElementById("m-ref-label");
         const refBox = document.getElementById("m-ref");
@@ -412,7 +478,7 @@ location: "JA-01"
             refLabel.style.display = "none";
             refBox.style.display = "none";
         }
-// ----------------------------------
+        // ----------------------------------
         
         // Data Statis untuk Read-Only
         document.getElementById("m-lokasi-text").innerText = item.lokasi || "Belum ditentukan";

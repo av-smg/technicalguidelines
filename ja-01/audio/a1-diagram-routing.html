@@ -1,22 +1,15 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    {% include head.html %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Audio Diagram Interaktif & Profesional</title>
+    
     <style>
-        /* TEMA WARNA: CSS Variables untuk Dark/Light Mode */
+        /* KHUSUS DIAGRAM AUDIO - Menggunakan Variable Bawaan Web */
         :root {
-            /* Mode Gelap (Default) */
-            --bg-canvas: #0f111a;
-            --dot-grid: #ffffff1a;
-            --node-bg: #1e212b;
-            --border-color: #3b3d46;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --shadow-color: rgba(0, 0, 0, 0.5);
-            
-            /* Warna Kategori Badge & Header */
+            /* Warna Kategori (Tetap dipertahankan karena spesifik diagram) */
             --cat-mic: linear-gradient(135deg, #10b981, #059669);
             --cat-media: linear-gradient(135deg, #0ea5e9, #0284c7);
             --cat-mixer: linear-gradient(135deg, #8b5cf6, #6d28d9);
@@ -25,55 +18,14 @@
             --cat-spk: linear-gradient(135deg, #ec4899, #be185d);
         }
 
-        [data-theme="light"] {
-            --bg-canvas: #f1f5f9;
-            --dot-grid: #0000001a;
-            --node-bg: #ffffff;
-            --border-color: #cbd5e1;
-            --text-main: #0f172a;
-            --text-muted: #475569;
-            --shadow-color: rgba(0, 0, 0, 0.1);
-        }
-
-        body { 
-            margin: 0; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background: var(--bg-canvas); 
-            overflow: hidden; 
-            transition: background 0.3s ease;
-        }
-
-        /* TOMBOL TEMA */
-        .theme-toggle {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: var(--node-bg);
-            color: var(--text-main);
-            border: 2px solid var(--border-color);
-            padding: 10px 20px;
-            border-radius: 30px;
-            font-weight: bold;
-            cursor: pointer;
-            z-index: 9999;
-            box-shadow: 0 4px 6px var(--shadow-color);
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .theme-toggle:hover {
-            transform: scale(1.05);
-            border-color: #8b5cf6;
-        }
-
         /* AREA KANVAS / WORKSPACE RESPONSIVE */
         .diagram-wrapper {
             position: relative;
             width: 100vw;
             height: 100vh;
-            background-color: var(--bg-canvas);
-            background-image: radial-gradient(var(--dot-grid) 1.5px, transparent 1.5px);
+            background-color: var(--bg-color);
+            /* Dot grid menggunakan warna border agar menyatu di dark/light mode */
+            background-image: radial-gradient(var(--border-color) 1.5px, transparent 1.5px);
             background-size: 25px 25px;
             overflow: auto; 
             cursor: grab;
@@ -85,9 +37,9 @@
         #svg-canvas {
             position: absolute;
             top: 0; left: 0;
-            width: 5500px; /* Diperlebar karena item banyak */
+            width: 5500px; 
             height: 3500px;
-            pointer-events: none; /* Penting! Agar node di bawahnya tetap bisa diklik */
+            pointer-events: none; 
             z-index: 50; 
         }
 
@@ -105,7 +57,7 @@
         .node-grid {
             display: flex;
             flex-direction: row;
-            gap: 260px; /* Jarak Horizontal antar kolom */
+            gap: 260px; 
             padding: 100px 120px;
             position: relative;
             z-index: 10;
@@ -115,26 +67,26 @@
         .node-column {
             display: flex;
             flex-direction: column;
-            gap: 40px; /* Jarak Vertikal antar alat */
+            gap: 40px; 
             justify-content: center;
         }
 
         /* DESAIN NODE CARD (ALAT) */
         .node {
             width: 290px;
-            background: var(--node-bg);
+            background: var(--card-bg);
             border-radius: 12px;
             border: 1px solid var(--border-color);
-            box-shadow: 0 4px 15px var(--shadow-color);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             position: relative;
             transition: all 0.3s ease;
         }
         
         .node:hover {
-            border-color: #8b5cf6;
-            box-shadow: 0 8px 25px var(--shadow-color);
+            border-color: var(--primary-orange, #8b5cf6);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
             transform: translateY(-3px);
-            z-index: 60; /* Naik ke atas agar tidak tertimpa kabel saat hover */
+            z-index: 60; 
         }
         
         .node.mixer-node { width: 340px; border-width: 2px; }
@@ -173,7 +125,7 @@
         .node-body {
             padding: 15px;
             font-size: 12px;
-            color: var(--text-muted);
+            color: var(--text-gray);
             line-height: 1.6;
             display: block; 
         }
@@ -185,13 +137,14 @@
             padding-bottom: 4px; 
         }
         .node-body p:last-child { margin: 0; border-bottom: none; padding-bottom: 0; }
-        .node-body strong { color: var(--text-main); font-weight: 600; }
+        .node-body strong { color: var(--text-dark); font-weight: 600; }
 
         /* TITIK KONEKSI (PORTS) */
         .port {
-            width: 14px; height: 14px; background: #fff; border: 3px solid #333;
+            width: 14px; height: 14px; 
+            background: var(--bg-color); 
+            border: 3px solid var(--text-dark);
             border-radius: 50%; position: absolute; top: 50%; transform: translateY(-50%); z-index: 5;
-            box-shadow: 0 0 5px rgba(0,0,0,0.5);
         }
         .port-in { left: -9px; }
         .port-out { right: -9px; }
@@ -199,9 +152,9 @@
         /* Label Khusus HP */
         .mobile-hint {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            background: var(--text-main); color: var(--node-bg); padding: 10px 20px; border-radius: 20px;
+            background: var(--text-dark); color: var(--bg-color); padding: 10px 20px; border-radius: 20px;
             font-size: 12px; font-weight: bold; z-index: 9999; pointer-events: none;
-            box-shadow: 0 4px 10px var(--shadow-color); display: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2); display: none;
         }
 
         @media (max-width: 768px) {
@@ -213,9 +166,8 @@
         @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
     </style>
 </head>
-<body data-theme="dark">
+<body>
 
-<button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">☀️ Light Mode</button>
 <div class="mobile-hint">👆 Geser layar untuk menjelajah diagram</div>
 
 <div class="diagram-wrapper" id="diagram-container">
@@ -454,40 +406,40 @@
 <script>
     // Konfigurasi Sambungan Kabel
     const cables = [
-        // Mic Routing (Warna Hijau)
+        // Mic Routing 
         { from: 'in-mic1', to: 'mix-main', label: 'XLR CH 1', color: '#10b981' },
         { from: 'in-mic2', to: 'mix-main', label: 'XLR CH 2', color: '#10b981' },
         { from: 'in-mic3', to: 'mix-main', label: 'XLR CH 3', color: '#10b981' },
         { from: 'in-mic4', to: 'mix-main', label: 'XLR CH 4', color: '#10b981' },
         
-        // Media Routing (Warna Biru)
+        // Media Routing 
         { from: 'in-med1', to: 'mix-main', label: 'Jack 3.5mm to TRS (CH 9-10)', color: '#0ea5e9' },
         { from: 'in-med2', to: 'mix-main', label: 'Jack 3.5mm to TRS (CH 11-12)', color: '#0ea5e9' },
         { from: 'in-med3', to: 'mix-main', label: 'Jack 3.5mm to TRS (CH 13-14)', color: '#0ea5e9' },
         { from: 'in-med4', to: 'mix-main', label: 'Jack 3.5mm to TRS (CH 15-16)', color: '#0ea5e9' },
         
-        // Mixer ke Processor (Warna Ungu)
+        // Mixer ke Processor 
         { from: 'mix-main', to: 'proc-geq', label: 'Stereo Out L/R', color: '#d946ef' },
         { from: 'proc-geq', to: 'proc-split', label: 'XLR Out L/R', color: '#d946ef' },
         
-        // Splitter ke FOH Amplifiers (Warna Orange & Merah)
+        // Splitter ke FOH Amplifiers 
         { from: 'proc-split', to: 'amp-protea1', label: 'Out 1 & 2', color: '#ef4444' },
         { from: 'proc-split', to: 'amp-protea2', label: 'Out 3 & 4', color: '#ef4444' },
         
-        // Splitter ke DLMS (Warna Kuning)
+        // Splitter ke DLMS 
         { from: 'proc-split', to: 'proc-dlms', label: 'Out L/R (Master Zona)', color: '#eab308' },
         
-        // DLMS ke Ampli ZA (Warna Biru/Indigo)
+        // DLMS ke Ampli ZA 
         { from: 'proc-dlms', to: 'amp-za1', label: 'Zone 1 (Belakang Pnggng)', color: '#3b82f6' },
         { from: 'proc-dlms', to: 'amp-za2', label: 'Zone 2 (Samping Pnggng)', color: '#3b82f6' },
         { from: 'proc-dlms', to: 'amp-za3', label: 'Zone 3 (Panggung)', color: '#3b82f6' },
         { from: 'proc-dlms', to: 'amp-za4', label: 'Zone 4 (Delay)', color: '#3b82f6' },
 
-        // Ampli FOH ke Speaker Array (Warna Merah Tua)
+        // Ampli FOH ke Speaker Array 
         { from: 'amp-protea1', to: 'spk-hx5-1', label: 'Kabel Speaker (L)', color: '#be123c' },
         { from: 'amp-protea2', to: 'spk-hx5-2', label: 'Kabel Speaker (R)', color: '#be123c' },
 
-        // Ampli ZA ke Speaker F2000 (Warna Abu-Abu Terang)
+        // Ampli ZA ke Speaker F2000 
         { from: 'amp-za1', to: 'spk-za1', label: 'High-Z (Com/100V)', color: '#64748b' },
         { from: 'amp-za2', to: 'spk-za2', label: 'High-Z (Com/100V)', color: '#64748b' },
         { from: 'amp-za3', to: 'spk-za3', label: 'High-Z (Com/100V)', color: '#64748b' },
@@ -498,11 +450,6 @@
         const svg = document.getElementById('svg-canvas');
         const container = document.getElementById('diagram-container');
         const cRect = container.getBoundingClientRect();
-        
-        // Menyesuaikan warna label box dengan tema saat ini
-        const isLight = document.body.getAttribute('data-theme') === 'light';
-        const labelBg = isLight ? '#ffffff' : '#0f172a';
-        const labelText = isLight ? '#0f172a' : '#f8fafc';
         
         let svgContent = '';
 
@@ -515,7 +462,6 @@
             const rectFrom = elFrom.getBoundingClientRect();
             const rectTo = elTo.getBoundingClientRect();
             
-            // Perhitungan koordinat garis kabel
             const x1 = rectFrom.left + rectFrom.width/2 - cRect.left + container.scrollLeft;
             const y1 = rectFrom.top + rectFrom.height/2 - cRect.top + container.scrollTop;
             const x2 = rectTo.left + rectTo.width/2 - cRect.left + container.scrollLeft;
@@ -530,14 +476,14 @@
             // Garis Animasi (Flowing Signal)
             svgContent += `<path d="${pathD}" fill="none" stroke="${cableColor}" stroke-width="3" class="cable-flow" />`;
                         
-            // Posisi Kotak Label
             const midX = (x1 + x2) / 2;
             const midY = (y1 + y2) / 2;
             const labelWidth = link.label.length * 7 + 25; 
             
+            // Penggunaan CSS Variables bawaan untuk SVG Elements
             svgContent += `
-                <rect x="${midX - labelWidth/2}" y="${midY - 12}" width="${labelWidth}" height="24" fill="${labelBg}" rx="12" stroke="${cableColor}" stroke-width="2" />
-                <text x="${midX}" y="${midY + 4}" fill="${labelText}" font-size="11" font-family="sans-serif" text-anchor="middle" font-weight="bold">${link.label}</text>
+                <rect x="${midX - labelWidth/2}" y="${midY - 12}" width="${labelWidth}" height="24" fill="var(--card-bg)" rx="12" stroke="${cableColor}" stroke-width="2" />
+                <text x="${midX}" y="${midY + 4}" fill="var(--text-dark)" font-size="11" font-family="sans-serif" text-anchor="middle" font-weight="bold">${link.label}</text>
             `;
         });
         
@@ -557,21 +503,7 @@
             body.style.display = "none";
             icon.innerText = "+";
         }
-        setTimeout(drawConnections, 50); // Redraw garis kabel setelah animasi
-    }
-
-    // Toggle Tema Gelap / Terang
-    function toggleTheme() {
-        const body = document.body;
-        const btn = document.getElementById('themeBtn');
-        if (body.getAttribute('data-theme') === 'dark') {
-            body.setAttribute('data-theme', 'light');
-            btn.innerHTML = '🌙 Dark Mode';
-        } else {
-            body.setAttribute('data-theme', 'dark');
-            btn.innerHTML = '☀️ Light Mode';
-        }
-        drawConnections(); 
+        setTimeout(drawConnections, 50); 
     }
 
     // Logika Drag Layar (Pan Canvas)
@@ -599,7 +531,6 @@
         slider.scrollTop = scrollTop - walkY;
     });
 
-    // Jalankan render garis saat pertama kali dimuat dan diresize
     window.onload = drawConnections;
     window.onresize = drawConnections;
     slider.onscroll = drawConnections; 

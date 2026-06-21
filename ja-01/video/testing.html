@@ -1,0 +1,281 @@
+---
+location: "JA-01"
+---
+
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <link rel="stylesheet" href="../style.css" />
+    {% include head.html %}
+    <style>
+      /* Tambahan CSS khusus agar list dan tabel dari manual teknis tampil rapi di dalam card */
+      .mission-card ul, .mission-card ol { padding-left: 20px; margin-top: 10px; color: #4b5563; font-size: 0.95rem; }
+      .mission-card li { margin-bottom: 8px; }
+      .table-wrapper { overflow-x: auto; margin-top: 10px; border-radius: 8px; border: 1px solid #e5e7eb; }
+      .mission-card table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+      .mission-card th, .mission-card td { padding: 10px; border-bottom: 1px solid #e5e7eb; text-align: left; }
+      .mission-card th { background: #f9fafb; font-weight: 600; color: #374151; }
+      .role-tag { font-size: 0.8rem; color: #6b7280; font-style: italic; margin-left: 4px; }
+      .time-badge { display: inline-block; background: #e0f2fe; color: #0284c7; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; margin-bottom: 4px; margin-right: 5px; }
+      .cap-badge { background: #fee2e2; color: #dc2626; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; margin-left: 4px; vertical-align: middle; }
+    </style>
+  </head>
+  <body>
+    {% include navbar.html %}
+
+    <main>
+      <section class="hero">
+        <h1>Manual Teknis: <br /><span>Tim Visual & LED Wall</span> ⚡</h1>
+        <p>Regional Semarang - Susunan tim, instruksi kerja, dan panduan instalasi lengkap.</p>
+      </section>
+
+      <div class="content-container">
+
+        <section class="team-section">
+          <div class="team-header">
+            <span class="team-badge" style="background: #e67e22; color: #fff;">SCHEDULE</span>
+            <h2>Jadwal Rapat & Pelatihan</h2>
+          </div>
+          <div class="grid-cards">
+            <div class="mission-card">
+              <div class="card-emoji">📅</div>
+              <h3>Rapat via Zoom (19.00)</h3>
+              <ul>
+                <li><strong>Minggu, 12-04-26:</strong> Pertemuan Tim Inti Visual (Pengawas & Kapten Tim)</li>
+                <li><strong>Minggu, 19-04-26:</strong> Pertemuan Semua Tim Visual</li>
+              </ul>
+            </div>
+            <div class="mission-card">
+              <div class="card-emoji">👷</div>
+              <h3>Pelatihan Relawan</h3>
+              <ul>
+                <li><strong>Minggu, 26-04-26:</strong> Pelatihan LED & TA 1 (Relawan LED Wall & Inventaris)</li>
+                <li><strong>Minggu, 03-05-26:</strong> Pelatihan LED & TA 2 (Relawan LED Wall & Inventaris)</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="team-section">
+          <div class="team-header">
+            <span class="team-badge badge-video" style="background: #ef4444; color: white;">VIDEO</span>
+            <h2>Pembagian Tim Visual</h2>
+          </div>
+          <div class="grid-cards">
+            
+            <div class="mission-card">
+              <div class="card-emoji">📺</div>
+              <h3>Tim Visual 1: LED Wall & TA</h3>
+              <ul>
+                <li><strong>Team LED Wall:</strong> OKITA <span class="cap-badge">CAPTAIN</span>, BAGAS (Asisten)</li>
+                <li><strong>Technical Assistant (TA):</strong> YOKA, ANDREAS, DIXCY, MARIO, FARREL, JOJO, LEON, KYA, RINDAR, CELIN, VENA, ARUM</li>
+                <li><strong>Inventaris LED Wall:</strong> YULIANA <span class="cap-badge">CAPTAIN</span>, CUPU</li>
+                <li><strong>Pendukung TV:</strong> PRIYANTO <span class="cap-badge">CAPTAIN</span>, CATUR, TIAN</li>
+              </ul>
+            </div>
+            
+            <div class="mission-card">
+              <div class="card-emoji">👉</div>
+              <h3>Tim Visual 2: Kanan</h3>
+              <ul>
+                <li><strong>OKITA</strong> <span class="cap-badge">CAPTAIN</span> <span class="role-tag">- AV</span></li>
+                <li>BAGAS <span class="role-tag">- Kebersihan (Asisten)</span></li>
+                <li>YOKA <span class="role-tag">- AV (TA)</span></li>
+                <li>CATUR, TIAN <span class="role-tag">- Kebersihan/Podium</span></li>
+                <li>JOJO, LEON, CELIN, VENA <span class="role-tag">- Kebersihan</span></li>
+                <li>RINDAR <span class="role-tag">- Instalasi</span></li>
+              </ul>
+            </div>
+            
+            <div class="mission-card">
+              <div class="card-emoji">👈</div>
+              <h3>Tim Visual 2: Kiri</h3>
+              <ul>
+                <li><strong>PRIYANTO</strong> <span class="cap-badge">CAPTAIN</span> <span class="role-tag">- AV</span></li>
+                <li>FARREL <span class="role-tag">- Kebersihan (Asisten)</span></li>
+                <li>KALOS <span class="role-tag">- AV (TA)</span></li>
+                <li>AGUS TRI, ARUM, SHAREEN <span class="role-tag">- Kebersihan</span></li>
+                <li>MARIO <span class="role-tag">- P3K</span> | LEA <span class="role-tag">- Panggung</span></li>
+                <li>ALIT, SIAM <span class="role-tag">- Instalasi</span></li>
+              </ul>
+            </div>
+            
+            <div class="mission-card" style="grid-column: 1 / -1;">
+              <div class="card-emoji">🎛️</div>
+              <h3>Jadwal Operator Visual</h3>
+              <div class="table-wrapper">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>HARI / TUGAS</th>
+                      <th>CAM PTZ 1</th>
+                      <th>CAM PTZ 2</th>
+                      <th>AUDIO DESC</th>
+                      <th>SWITCHER</th>
+                      <th>MEDIA UTAMA</th>
+                      <th>MEDIA BACKUP</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td><strong>JUMAT</strong></td><td>BAGAS</td><td>PRIYANTO</td><td>DIXCY</td><td>OKI</td><td>KYA</td><td>KYA</td></tr>
+                    <tr><td><strong>SABTU</strong></td><td>OKI</td><td>BAGAS</td><td>AGUS</td><td>DIXCY</td><td>PRIYANTO</td><td>TIAN</td></tr>
+                    <tr><td><strong>MINGGU</strong></td><td>KYA</td><td>BAGAS</td><td>PRIYANTO</td><td>OKI</td><td>DIXCY</td><td>DIXCY</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="team-section">
+          <div class="team-header">
+            <span class="team-badge" style="background: #10b981; color: white;">JOB DESK</span>
+            <h2>Alur Kerja & Timeline Harian</h2>
+          </div>
+          <div class="grid-cards">
+            <div class="mission-card">
+              <div class="card-emoji">📝</div>
+              <h3>Tim Inventaris</h3>
+              <ul>
+                <li><span class="time-badge">09.15</span> Susun semua peralatan. Cek barang di container box. Catat/foto barang yang diambil tim.</li>
+                <li><span class="time-badge">10.45</span> Hitung sisa barang, sesuaikan jumlah dgn kantor cabang.</li>
+                <li><span class="time-badge">13.00</span> Standby melayani tim yang butuh barang utama.</li>
+                <li><span class="time-badge">16.00</span> Simpan barang tak terpakai, catat kerusakan. Amankan ke lokasi permanen.</li>
+              </ul>
+            </div>
+            <div class="mission-card">
+              <div class="card-emoji">🔌</div>
+              <h3>Tim TV & Kabel</h3>
+              <ul>
+                <li><span class="time-badge">09.15</span> Siapkan power socket, cek TV, pasang speedbump memanjang.</li>
+                <li><span class="time-badge">10.45</span> Tarik kabel TV (jangan dicolok dulu), pasang LAN LED, LAN & SDI PTZ.</li>
+                <li><span class="time-badge">13.00</span> Naikkan TV & nyalakan. Colok ke distributor berurutan. Lakban kabel permanen.</li>
+                <li><span class="time-badge">16.00</span> Kalibrasi warna/volume, matikan timer, pasang pengunci door TV. Rapikan kabel.</li>
+              </ul>
+            </div>
+            <div class="mission-card">
+              <div class="card-emoji">🎥</div>
+              <h3>Tim Booth & Kamera</h3>
+              <ul>
+                <li><span class="time-badge">09.15</span> Pasang tiang & police line. Minta 4 meja booth & dipan kamera (terdepan >2.5m dari kursi).</li>
+                <li><span class="time-badge">10.45</span> Setup switcher, controller, monitor, laptop. Susun kabel SDI, LAN, HDMI, Audio Jack.</li>
+                <li><span class="time-badge">13.00</span> Cek file kalibrasi laptop, kalibrasi kamera PTZ.</li>
+                <li><span class="time-badge">14.00</span> Konfigurasi selesai. Jam 15.00 semua kabel dipastikan rapi.</li>
+              </ul>
+            </div>
+            <div class="mission-card">
+              <div class="card-emoji">🧱</div>
+              <h3>Tim LED Wall</h3>
+              <ul>
+                <li><span class="time-badge">09.15</span> Ukur panggung. Rakit pondasi & tiang level paralel. Pastikan pondasi water-level.</li>
+                <li><span class="time-badge">10.45</span> Naikkan tiang level (pakai safety harness), pasang stud & joint score.</li>
+                <li><span class="time-badge">13.00</span> Pasang panel ke rangka dari bagian tengah, kunci kupu-kupu. Pilah kabel.</li>
+                <li><span class="time-badge">16.00</span> Pasang kabel power & LAN. Tutup pondasi dgn kain. (Target 17.00 kalibrasi selesai).</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="team-section">
+          <div class="team-header">
+            <span class="team-badge" style="background: #8b5cf6; color: white;">SOP TEKNIS</span>
+            <h2>Instruksi Pemasangan & Pembongkaran LED</h2>
+          </div>
+          <div class="grid-cards">
+            <div class="mission-card">
+              <div class="card-emoji">🛠️</div>
+              <h3>Tahap Pemasangan: Rangka & Fondasi</h3>
+              <ol>
+                <li>Bongkar BOX 1-4, 1-5, 1-6 dan kelompokkan. Urutkan baut (25, 45, 65, 80, 130mm).</li>
+                <li>Letakkan 4 fondasi bawah (jarak 0,5m). Pasang kaki panjang/pendek (baut 65/80mm) dan spacer (baut 45mm). <em>Jangan kencangkan penuh dulu.</em></li>
+                <li>Pasang tiang fondasi (130mm) & fondasi atas (100mm). Atur tinggi dengan waterpass, kencangkan.</li>
+                <li>Susun 11 tiang level (Level 1, 2, 3) dgn baut 80mm. Naikkan dan hubungkan ke fondasi (baut 100mm).</li>
+                <li>Pasang penyangga belakang/stud (65/80mm) & joint score selang-seling (80mm).</li>
+              </ol>
+            </div>
+            <div class="mission-card">
+              <div class="card-emoji">💡</div>
+              <h3>Tahap Pemasangan: Panel & Kabel</h3>
+              <ol>
+                <li>Urutkan panel LED (Lvl 1: A1-A10, Lvl 2: B1-B10, Lvl 3: C1-C10).</li>
+                <li>Sejajarkan panel tengah A5-A6, naikkan ke Lvl 1 tengah, kunci dgn kupu-kupu (baut 25mm). Lanjutkan sisa panel A.</li>
+                <li>Ulangi untuk Lvl 2. Lvl 3 dipasang dari ujung (C1 ke C10).</li>
+                <li><strong>Kabel (Listrik MATI):</strong> Sambung LAN bentuk rute ular mulai dari prosesor. Sambung power antar panel horizontal.</li>
+                <li>Sambung kabel panel ke PDU, lalu dari Stabilizer ke PDU.</li>
+              </ol>
+            </div>
+            <div class="mission-card" style="grid-column: 1 / -1; border-top: 4px solid #ef4444;">
+              <div class="card-emoji">🛑</div>
+              <h3>Tahap Pembongkaran</h3>
+              <ol>
+                <li><strong>Pemutusan Arus:</strong> Pastikan listrik MATI. Cabut colokan dari PLN ke Stabilizer. Lepas kabel PDU, power antar panel, dan LAN.</li>
+                <li><strong>Pelepasan Panel:</strong> Gunakan Harness. Mulai dari Lvl 3 (C10 ke C1). Lalu Lvl 2 & 1 dari pinggir ke tengah (A10 ke A7, A1 ke A4, terakhir A6-A5).</li>
+                <li><strong>Pembongkaran Rangka:</strong> Lepas joint score, penyangga belakang, dan tiang level (baut 100mm). Urai fondasi dan kaki.</li>
+                <li><strong>Pengemasan:</strong> Kumpulkan baut sesuai ukuran. Masukkan ke BOX 1-4, 1-5, 1-6 sesuai daftar inventaris awal.</li>
+              </ol>
+            </div>
+          </div>
+        </section>
+
+        <section class="team-section">
+          <div class="team-header">
+            <span class="team-badge" style="background: #0284c7; color: white; font-weight: 800;">INVENTARIS SYSTEM</span>
+            <h2>Daftar Kebutuhan Peralatan Visual</h2>
+          </div>
+          
+          <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+            <a href="https://docs.google.com/spreadsheets/d/1o47uEEe3c_q_2x15hCq7hGTN6WiTvtYKApBZz8Di2Bg/edit" target="_blank" style="flex: 1; min-width: 200px; display: flex; align-items: center; justify-content: center; gap: 8px; background: #ecfdf5; color: #059669; padding: 14px 20px; border-radius: 15px; text-decoration: none; font-weight: 700; border: 1px solid #a7f3d0; transition: 0.3s; font-size: 14px;">
+              📊 Database Spreadsheet
+            </a>
+            <a href="https://t.me/invenav_bot" target="_blank" style="flex: 1; min-width: 200px; display: flex; align-items: center; justify-content: center; gap: 8px; background: #eff6ff; color: #2563eb; padding: 14px 20px; border-radius: 15px; text-decoration: none; font-weight: 700; border: 1px solid #bfdbfe; transition: 0.3s; font-size: 14px;">
+              🤖 Bot Telegram System
+            </a>
+          </div>
+
+          <div class="grid-cards">
+            <div class="mission-card" style="border-top: 4px solid #0284c7;">
+              <div class="card-emoji">📹</div>
+              <h3>Perangkat Kamera & Video</h3>
+              <div class="table-wrapper">
+                <table>
+                  <thead><tr><th>NAMA PERALATAN</th><th>JUMLAH</th></tr></thead>
+                  <tbody>
+                    <tr><td>SET KAMERA PTZ (V60CL, Tripod, dll)</td><td>2 SET</td></tr>
+                    <tr><td>KAMERA PTZ BAPTISAN (V60CL)</td><td>1 UNIT</td></tr>
+                    <tr><td>SWITCHER VIDEO (ATEM Studio HD)</td><td>1 UNIT</td></tr>
+                    <tr><td>VIDEO BOOTH SET B</td><td>2 UNIT</td></tr>
+                    <tr><td>LAPTOP (HP 14s)</td><td>2 UNIT</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            
+            <div class="mission-card" style="border-top: 4px solid #e11d48;">
+              <div class="card-emoji">🖥️</div>
+              <h3>Layar Display & Pengabelan</h3>
+              <div class="table-wrapper">
+                <table>
+                  <thead><tr><th>NAMA PERALATAN</th><th>JUMLAH</th></tr></thead>
+                  <tbody>
+                    <tr><td>LED WALL INDOOR (Set 5x3m)</td><td>2 SET</td></tr>
+                    <tr><td>TV CASE 65" (Termasuk Lifter)</td><td>7 UNIT*</td></tr>
+                    <tr><td>TV SET 40" (MTC40)</td><td>2 UNIT</td></tr>
+                    <tr><td>BOX VIDEO CABLES (SDI, HDMI, LAN)</td><td>2 BOX</td></tr>
+                    <tr><td>KABEL SDI RG6 (Range 50m / 11-30m / 3-5m)</td><td>22 UNIT</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+    <footer class="simple-footer" style="text-align: center; padding: 20px; color: #6b7280; font-size: 0.9rem; border-top: 1px solid #e5e7eb; margin-top: 40px;">
+      <p>&copy; 2026 Tim Teknis A/V. All rights reserved.</p>
+    </footer>
+  </body>
+</html>

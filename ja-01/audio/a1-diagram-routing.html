@@ -1,3 +1,7 @@
+---
+location: "JA-01"
+---
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -23,9 +27,9 @@
             position: relative;
             width: 100vw;
             height: 100vh;
-            background-color: var(--bg-color);
+            background-color: var(--bg-color, #f1f5f9);
             /* Dot grid menggunakan warna border agar menyatu di dark/light mode */
-            background-image: radial-gradient(var(--border-color) 1.5px, transparent 1.5px);
+            background-image: radial-gradient(var(--border-color, #cbd5e1) 1.5px, transparent 1.5px);
             background-size: 25px 25px;
             overflow: auto; 
             cursor: grab;
@@ -53,6 +57,16 @@
             to { stroke-dashoffset: 0; }
         }
 
+        /* CLASS UNTUK LABEL SVG AGAR TIDAK ERROR HITAM */
+        .cable-label-bg {
+            fill: var(--card-bg, #ffffff);
+            transition: fill 0.3s ease;
+        }
+        .cable-label-text {
+            fill: var(--text-dark, #0f172a);
+            transition: fill 0.3s ease;
+        }
+
         /* GRID LAYOUT UNTUK NODE */
         .node-grid {
             display: flex;
@@ -74,9 +88,9 @@
         /* DESAIN NODE CARD (ALAT) */
         .node {
             width: 290px;
-            background: var(--card-bg);
+            background: var(--card-bg, #ffffff);
             border-radius: 12px;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--border-color, #cbd5e1);
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             position: relative;
             transition: all 0.3s ease;
@@ -99,7 +113,7 @@
             border-radius: 11px 11px 0 0;
             cursor: pointer;
             user-select: none;
-            color: #ffffff; /* Selalu putih agar kontras dengan gradient */
+            color: #ffffff;
         }
         .bg-mic { background: var(--cat-mic); }
         .bg-media { background: var(--cat-media); }
@@ -125,7 +139,7 @@
         .node-body {
             padding: 15px;
             font-size: 12px;
-            color: var(--text-gray);
+            color: var(--text-gray, #475569);
             line-height: 1.6;
             display: block; 
         }
@@ -133,17 +147,17 @@
             margin: 0 0 6px 0; 
             display: flex; 
             justify-content: space-between; 
-            border-bottom: 1px dashed var(--border-color); 
+            border-bottom: 1px dashed var(--border-color, #cbd5e1); 
             padding-bottom: 4px; 
         }
         .node-body p:last-child { margin: 0; border-bottom: none; padding-bottom: 0; }
-        .node-body strong { color: var(--text-dark); font-weight: 600; }
+        .node-body strong { color: var(--text-dark, #0f172a); font-weight: 600; }
 
         /* TITIK KONEKSI (PORTS) */
         .port {
             width: 14px; height: 14px; 
-            background: var(--bg-color); 
-            border: 3px solid var(--text-dark);
+            background: var(--bg-color, #f1f5f9); 
+            border: 3px solid var(--text-dark, #0f172a);
             border-radius: 50%; position: absolute; top: 50%; transform: translateY(-50%); z-index: 5;
         }
         .port-in { left: -9px; }
@@ -152,7 +166,7 @@
         /* Label Khusus HP */
         .mobile-hint {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            background: var(--text-dark); color: var(--bg-color); padding: 10px 20px; border-radius: 20px;
+            background: var(--text-dark, #0f172a); color: var(--bg-color, #f1f5f9); padding: 10px 20px; border-radius: 20px;
             font-size: 12px; font-weight: bold; z-index: 9999; pointer-events: none;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2); display: none;
         }
@@ -480,10 +494,10 @@
             const midY = (y1 + y2) / 2;
             const labelWidth = link.label.length * 7 + 25; 
             
-            // Penggunaan CSS Variables bawaan untuk SVG Elements
+            // Penggunaan CSS Class agar mewarisi dari parent CSS yang benar tanpa error hitam
             svgContent += `
-                <rect x="${midX - labelWidth/2}" y="${midY - 12}" width="${labelWidth}" height="24" fill="var(--card-bg)" rx="12" stroke="${cableColor}" stroke-width="2" />
-                <text x="${midX}" y="${midY + 4}" fill="var(--text-dark)" font-size="11" font-family="sans-serif" text-anchor="middle" font-weight="bold">${link.label}</text>
+                <rect class="cable-label-bg" x="${midX - labelWidth/2}" y="${midY - 12}" width="${labelWidth}" height="24" rx="12" stroke="${cableColor}" stroke-width="2" />
+                <text class="cable-label-text" x="${midX}" y="${midY + 4}" font-size="11" font-family="sans-serif" text-anchor="middle" font-weight="bold">${link.label}</text>
             `;
         });
         

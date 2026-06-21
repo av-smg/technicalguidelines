@@ -14,24 +14,55 @@ location: "JA-01"
         --cat-spk: linear-gradient(135deg, #ec4899, #be185d);
     }
 
-    /* KANVAS DIAGRAM - Dibuat menjadi "Kotak" di dalam halaman, bukan menimpa full screen */
+    /* KANVAS DIAGRAM */
     .diagram-wrapper {
         position: relative;
         width: 100%;
-        height: 80vh; /* Tinggi menyesuaikan agar Header Web tetap terlihat */
+        height: 80vh; 
         min-height: 600px;
         background-color: var(--bg-color, #f1f5f9);
         background-image: radial-gradient(var(--border-color, #cbd5e1) 1.5px, transparent 1.5px);
         background-size: 25px 25px;
         overflow: auto; 
         cursor: grab;
-        border-radius: 20px; /* Sudut melengkung agar terlihat seperti card interaktif */
+        border-radius: 20px; 
         border: 2px solid var(--border-color, #cbd5e1);
         box-shadow: 0 10px 30px rgba(0,0,0,0.05);
         transition: background-color 0.3s ease, border-color 0.3s ease;
         margin-bottom: 30px;
     }
     .diagram-wrapper:active { cursor: grabbing; }
+
+    /* TOMBOL KONTROL (Expand/Collapse) */
+    .diagram-controls {
+        position: sticky;
+        top: 20px;
+        left: 20px;
+        width: fit-content;
+        z-index: 1000;
+        display: flex;
+        gap: 10px;
+    }
+    .btn-action {
+        padding: 10px 18px;
+        background: var(--card-bg, #ffffff);
+        color: var(--text-dark, #0f172a);
+        border: 2px solid var(--border-color, #cbd5e1);
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 13px;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .btn-action:hover {
+        border-color: var(--primary-orange, #8b5cf6);
+        color: var(--primary-orange, #8b5cf6);
+        transform: translateY(-2px);
+    }
 
     /* LAYER SVG */
     #svg-canvas {
@@ -53,7 +84,7 @@ location: "JA-01"
         to { stroke-dashoffset: 0; }
     }
 
-    /* CLASS UNTUK LABEL KABEL AGAR MENGIKUTI TEMA WEB (TIDAK HITAM) */
+    /* CLASS UNTUK LABEL KABEL */
     .cable-label-bg {
         fill: var(--card-bg, #ffffff);
         transition: fill 0.3s ease;
@@ -68,7 +99,7 @@ location: "JA-01"
         display: flex;
         flex-direction: row;
         gap: 260px; 
-        padding: 80px 100px;
+        padding: 100px 100px;
         position: relative;
         z-index: 10;
         min-width: max-content;
@@ -156,17 +187,15 @@ location: "JA-01"
     }
     .port-in { left: -9px; }
     .port-out { right: -9px; }
-
-    /* Hint Interaksi */
-    .interaction-hint {
-        position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
-        background: var(--text-dark, #0f172a); color: var(--bg-color, #ffffff); 
-        padding: 10px 20px; border-radius: 20px; font-size: 12px; font-weight: bold; 
-        z-index: 9999; pointer-events: none; opacity: 0.8;
-    }
 </style>
 
 <div class="diagram-wrapper" id="diagram-container">
+    
+    <div class="diagram-controls">
+        <button class="btn-action" onclick="setAllNodes(true)">🔽 Expand All</button>
+        <button class="btn-action" onclick="setAllNodes(false)">▶️ Collapse All</button>
+    </div>
+
     <svg id="svg-canvas"></svg>
 
     <div class="node-grid">
@@ -315,23 +344,37 @@ location: "JA-01"
         </div>
 
         <div class="node-column">
-            <div class="node" id="spk-hx5-1">
-                <div class="node-header bg-spk" onclick="toggleNode('spk-hx5-1')">
-                    <span class="node-badge">SPK</span><div class="node-title">Speaker FOH (Kiri)</div><div class="node-toggle">−</div>
+            <div class="node" id="spk-hx5-l1">
+                <div class="node-header bg-spk" onclick="toggleNode('spk-hx5-l1')">
+                    <span class="node-badge">SPK</span><div class="node-title">FOH Kiri (Atas)</div><div class="node-toggle">−</div>
+                </div>
+                <div class="node-body"><p><strong>Tipe:</strong> Array TOA HX-5</p><p><strong>Area:</strong> Hadirin Kiri</p></div>
+                <div class="port port-in"></div>
+            </div>
+            <div class="node" id="spk-hx5-l2">
+                <div class="node-header bg-spk" onclick="toggleNode('spk-hx5-l2')">
+                    <span class="node-badge">SPK</span><div class="node-title">FOH Kiri (Bawah)</div><div class="node-toggle">−</div>
                 </div>
                 <div class="node-body"><p><strong>Tipe:</strong> Array TOA HX-5</p><p><strong>Area:</strong> Hadirin Kiri</p></div>
                 <div class="port port-in"></div>
             </div>
 
-            <div class="node" id="spk-hx5-2">
-                <div class="node-header bg-spk" onclick="toggleNode('spk-hx5-2')">
-                    <span class="node-badge">SPK</span><div class="node-title">Speaker FOH (Kanan)</div><div class="node-toggle">−</div>
+            <div class="node" id="spk-hx5-r1">
+                <div class="node-header bg-spk" onclick="toggleNode('spk-hx5-r1')">
+                    <span class="node-badge">SPK</span><div class="node-title">FOH Kanan (Atas)</div><div class="node-toggle">−</div>
+                </div>
+                <div class="node-body"><p><strong>Tipe:</strong> Array TOA HX-5</p><p><strong>Area:</strong> Hadirin Kanan</p></div>
+                <div class="port port-in"></div>
+            </div>
+            <div class="node" id="spk-hx5-r2">
+                <div class="node-header bg-spk" onclick="toggleNode('spk-hx5-r2')">
+                    <span class="node-badge">SPK</span><div class="node-title">FOH Kanan (Bawah)</div><div class="node-toggle">−</div>
                 </div>
                 <div class="node-body"><p><strong>Tipe:</strong> Array TOA HX-5</p><p><strong>Area:</strong> Hadirin Kanan</p></div>
                 <div class="port port-in"></div>
             </div>
 
-            <div class="node" id="amp-za1">
+            <div class="node" id="amp-za1" style="margin-top: 30px;">
                 <div class="node-header bg-amp" onclick="toggleNode('amp-za1')">
                     <span class="node-badge">AMP</span><div class="node-title">TOA ZA 2240 (1)</div><div class="node-toggle">−</div>
                 </div>
@@ -365,34 +408,53 @@ location: "JA-01"
             </div>
         </div>
 
-        <div class="node-column" style="margin-top: 310px;">
-            <div class="node" id="spk-za1">
-                <div class="node-header bg-spk" onclick="toggleNode('spk-za1')">
-                    <span class="node-badge">SPK</span><div class="node-title">Speaker Zone 1</div><div class="node-toggle">−</div>
-                </div>
-                <div class="node-body"><p><strong>Tipe:</strong> F2000B / F2000BM</p><p><strong>Area:</strong> Belakang Panggung</p></div>
-                <div class="port port-in"></div>
+        <div class="node-column" style="margin-top: 550px;">
+            <div class="node" id="spk-za1-1">
+                <div class="node-header bg-spk" onclick="toggleNode('spk-za1-1')"><span class="node-badge">SPK</span><div class="node-title">Belakang Panggung 1</div><div class="node-toggle">−</div></div>
+                <div class="node-body"><p><strong>Tipe:</strong> TOA F2000</p></div><div class="port port-in"></div>
             </div>
-            <div class="node" id="spk-za2">
-                <div class="node-header bg-spk" onclick="toggleNode('spk-za2')">
-                    <span class="node-badge">SPK</span><div class="node-title">Speaker Zone 2</div><div class="node-toggle">−</div>
-                </div>
-                <div class="node-body"><p><strong>Tipe:</strong> F2000B / F2000BM</p><p><strong>Area:</strong> Samping Panggung</p></div>
-                <div class="port port-in"></div>
+            <div class="node" id="spk-za1-2">
+                <div class="node-header bg-spk" onclick="toggleNode('spk-za1-2')"><span class="node-badge">SPK</span><div class="node-title">Belakang Panggung 2</div><div class="node-toggle">−</div></div>
+                <div class="node-body"><p><strong>Tipe:</strong> TOA F2000</p></div><div class="port port-in"></div>
             </div>
-            <div class="node" id="spk-za3">
-                <div class="node-header bg-spk" onclick="toggleNode('spk-za3')">
-                    <span class="node-badge">SPK</span><div class="node-title">Speaker Zone 3</div><div class="node-toggle">−</div>
-                </div>
-                <div class="node-body"><p><strong>Tipe:</strong> F2000B / F2000BM</p><p><strong>Area:</strong> Panggung Monitor</p></div>
-                <div class="port port-in"></div>
+
+            <div class="node" id="spk-za2-1" style="margin-top: 20px;">
+                <div class="node-header bg-spk" onclick="toggleNode('spk-za2-1')"><span class="node-badge">SPK</span><div class="node-title">Samping Panggung 1</div><div class="node-toggle">−</div></div>
+                <div class="node-body"><p><strong>Tipe:</strong> TOA F2000</p></div><div class="port port-in"></div>
             </div>
-            <div class="node" id="spk-za4">
-                <div class="node-header bg-spk" onclick="toggleNode('spk-za4')">
-                    <span class="node-badge">SPK</span><div class="node-title">Speaker Zone 4</div><div class="node-toggle">−</div>
-                </div>
-                <div class="node-body"><p><strong>Tipe:</strong> F2000B / F2000BM</p><p><strong>Area:</strong> Tower Delay Hadirin</p></div>
-                <div class="port port-in"></div>
+            <div class="node" id="spk-za2-2">
+                <div class="node-header bg-spk" onclick="toggleNode('spk-za2-2')"><span class="node-badge">SPK</span><div class="node-title">Samping Panggung 2</div><div class="node-toggle">−</div></div>
+                <div class="node-body"><p><strong>Tipe:</strong> TOA F2000</p></div><div class="port port-in"></div>
+            </div>
+
+            <div class="node" id="spk-za3-1" style="margin-top: 20px;">
+                <div class="node-header bg-spk" onclick="toggleNode('spk-za3-1')"><span class="node-badge">SPK</span><div class="node-title">Panggung Monitor 1</div><div class="node-toggle">−</div></div>
+                <div class="node-body"><p><strong>Tipe:</strong> TOA F2000</p></div><div class="port port-in"></div>
+            </div>
+            <div class="node" id="spk-za3-2">
+                <div class="node-header bg-spk" onclick="toggleNode('spk-za3-2')"><span class="node-badge">SPK</span><div class="node-title">Panggung Monitor 2</div><div class="node-toggle">−</div></div>
+                <div class="node-body"><p><strong>Tipe:</strong> TOA F2000</p></div><div class="port port-in"></div>
+            </div>
+            <div class="node" id="spk-za3-3">
+                <div class="node-header bg-spk" onclick="toggleNode('spk-za3-3')"><span class="node-badge">SPK</span><div class="node-title">Panggung Monitor 3</div><div class="node-toggle">−</div></div>
+                <div class="node-body"><p><strong>Tipe:</strong> TOA F2000</p></div><div class="port port-in"></div>
+            </div>
+
+            <div class="node" id="spk-za4-1" style="margin-top: 20px;">
+                <div class="node-header bg-spk" onclick="toggleNode('spk-za4-1')"><span class="node-badge">SPK</span><div class="node-title">Tower Delay 1</div><div class="node-toggle">−</div></div>
+                <div class="node-body"><p><strong>Tipe:</strong> TOA F2000</p></div><div class="port port-in"></div>
+            </div>
+            <div class="node" id="spk-za4-2">
+                <div class="node-header bg-spk" onclick="toggleNode('spk-za4-2')"><span class="node-badge">SPK</span><div class="node-title">Tower Delay 2</div><div class="node-toggle">−</div></div>
+                <div class="node-body"><p><strong>Tipe:</strong> TOA F2000</p></div><div class="port port-in"></div>
+            </div>
+            <div class="node" id="spk-za4-3">
+                <div class="node-header bg-spk" onclick="toggleNode('spk-za4-3')"><span class="node-badge">SPK</span><div class="node-title">Tower Delay 3</div><div class="node-toggle">−</div></div>
+                <div class="node-body"><p><strong>Tipe:</strong> TOA F2000</p></div><div class="port port-in"></div>
+            </div>
+            <div class="node" id="spk-za4-4">
+                <div class="node-header bg-spk" onclick="toggleNode('spk-za4-4')"><span class="node-badge">SPK</span><div class="node-title">Tower Delay 4</div><div class="node-toggle">−</div></div>
+                <div class="node-body"><p><strong>Tipe:</strong> TOA F2000</p></div><div class="port port-in"></div>
             </div>
         </div>
 
@@ -402,6 +464,7 @@ location: "JA-01"
 <script>
     // Konfigurasi Sambungan Kabel
     const cables = [
+        // Mic & Media
         { from: 'in-mic1', to: 'mix-main', label: 'XLR CH 1', color: '#10b981' },
         { from: 'in-mic2', to: 'mix-main', label: 'XLR CH 2', color: '#10b981' },
         { from: 'in-mic3', to: 'mix-main', label: 'XLR CH 3', color: '#10b981' },
@@ -412,25 +475,43 @@ location: "JA-01"
         { from: 'in-med3', to: 'mix-main', label: 'Jack 3.5mm to TRS (CH 13-14)', color: '#0ea5e9' },
         { from: 'in-med4', to: 'mix-main', label: 'Jack 3.5mm to TRS (CH 15-16)', color: '#0ea5e9' },
         
+        // Processing Core
         { from: 'mix-main', to: 'proc-geq', label: 'Stereo Out L/R', color: '#d946ef' },
         { from: 'proc-geq', to: 'proc-split', label: 'XLR Out L/R', color: '#d946ef' },
         
+        // Distribusi Signal
         { from: 'proc-split', to: 'amp-protea1', label: 'Out 1 & 2', color: '#ef4444' },
         { from: 'proc-split', to: 'amp-protea2', label: 'Out 3 & 4', color: '#ef4444' },
         { from: 'proc-split', to: 'proc-dlms', label: 'Out L/R (Master Zona)', color: '#eab308' },
         
+        // Distribusi DLMS ke Ampli Zona
         { from: 'proc-dlms', to: 'amp-za1', label: 'Zone 1 (Belakang Pnggng)', color: '#3b82f6' },
         { from: 'proc-dlms', to: 'amp-za2', label: 'Zone 2 (Samping Pnggng)', color: '#3b82f6' },
         { from: 'proc-dlms', to: 'amp-za3', label: 'Zone 3 (Panggung)', color: '#3b82f6' },
         { from: 'proc-dlms', to: 'amp-za4', label: 'Zone 4 (Delay)', color: '#3b82f6' },
 
-        { from: 'amp-protea1', to: 'spk-hx5-1', label: 'Kabel Speaker (L)', color: '#be123c' },
-        { from: 'amp-protea2', to: 'spk-hx5-2', label: 'Kabel Speaker (R)', color: '#be123c' },
+        // --- SPEAKER FOH OUTPUTS ---
+        { from: 'amp-protea1', to: 'spk-hx5-l1', label: 'Speakon L1', color: '#be123c' },
+        { from: 'amp-protea1', to: 'spk-hx5-l2', label: 'Speakon L2', color: '#be123c' },
+        { from: 'amp-protea2', to: 'spk-hx5-r1', label: 'Speakon R1', color: '#be123c' },
+        { from: 'amp-protea2', to: 'spk-hx5-r2', label: 'Speakon R2', color: '#be123c' },
 
-        { from: 'amp-za1', to: 'spk-za1', label: 'High-Z (Com/100V)', color: '#64748b' },
-        { from: 'amp-za2', to: 'spk-za2', label: 'High-Z (Com/100V)', color: '#64748b' },
-        { from: 'amp-za3', to: 'spk-za3', label: 'High-Z (Com/100V)', color: '#64748b' },
-        { from: 'amp-za4', to: 'spk-za4', label: 'High-Z (Com/100V)', color: '#64748b' }
+        // --- SPEAKER ZONA OUTPUTS (FAN-OUT 100V LINE) ---
+        // Zone 1
+        { from: 'amp-za1', to: 'spk-za1-1', label: '100V Line', color: '#64748b' },
+        { from: 'amp-za1', to: 'spk-za1-2', label: '100V Line', color: '#64748b' },
+        // Zone 2
+        { from: 'amp-za2', to: 'spk-za2-1', label: '100V Line', color: '#64748b' },
+        { from: 'amp-za2', to: 'spk-za2-2', label: '100V Line', color: '#64748b' },
+        // Zone 3
+        { from: 'amp-za3', to: 'spk-za3-1', label: '100V Line', color: '#64748b' },
+        { from: 'amp-za3', to: 'spk-za3-2', label: '100V Line', color: '#64748b' },
+        { from: 'amp-za3', to: 'spk-za3-3', label: '100V Line', color: '#64748b' },
+        // Zone 4
+        { from: 'amp-za4', to: 'spk-za4-1', label: '100V Line', color: '#64748b' },
+        { from: 'amp-za4', to: 'spk-za4-2', label: '100V Line', color: '#64748b' },
+        { from: 'amp-za4', to: 'spk-za4-3', label: '100V Line', color: '#64748b' },
+        { from: 'amp-za4', to: 'spk-za4-4', label: '100V Line', color: '#64748b' }
     ];
 
     function drawConnections() {
@@ -465,7 +546,6 @@ location: "JA-01"
             const midY = (y1 + y2) / 2;
             const labelWidth = link.label.length * 7 + 25; 
             
-            // Penggunaan CSS Class agar mewarisi warna otomatis tanpa render error
             svgContent += `
                 <rect class="cable-label-bg" x="${midX - labelWidth/2}" y="${midY - 12}" width="${labelWidth}" height="24" rx="12" stroke="${cableColor}" stroke-width="2" />
                 <text class="cable-label-text" x="${midX}" y="${midY + 4}" font-size="11" font-family="sans-serif" text-anchor="middle" font-weight="bold">${link.label}</text>
@@ -475,7 +555,7 @@ location: "JA-01"
         svg.innerHTML = svgContent;
     }
 
-    // Toggle Tampil/Sembunyikan Deskripsi Body
+    // Toggle Tampil/Sembunyikan Individual
     function toggleNode(nodeId) {
         const node = document.getElementById(nodeId);
         const body = node.querySelector('.node-body');
@@ -491,12 +571,32 @@ location: "JA-01"
         setTimeout(drawConnections, 50); 
     }
 
+    // Expand / Collapse Seluruh Node Sekaligus
+    function setAllNodes(expand) {
+        const nodes = document.querySelectorAll('.node');
+        nodes.forEach(node => {
+            const body = node.querySelector('.node-body');
+            const icon = node.querySelector('.node-toggle');
+            if (expand) {
+                body.style.display = "block";
+                icon.innerText = "−";
+            } else {
+                body.style.display = "none";
+                icon.innerText = "+";
+            }
+        });
+        setTimeout(drawConnections, 50);
+    }
+
     // Logika Drag Layar (Pan Canvas)
     const slider = document.getElementById('diagram-container');
     let isDown = false;
     let startX, startY, scrollLeft, scrollTop;
 
     slider.addEventListener('mousedown', (e) => {
+        // Abaikan drag jika mengklik tombol kontrol
+        if(e.target.closest('.diagram-controls')) return;
+        
         isDown = true;
         startX = e.pageX - slider.offsetLeft;
         startY = e.pageY - slider.offsetTop;

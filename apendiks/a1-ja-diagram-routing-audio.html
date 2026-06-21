@@ -1,190 +1,173 @@
 ---
+layout: default
 location: "JA-01"
 ---
 
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    {% include head.html %}
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Audio Diagram Interaktif & Profesional</title>
-    
-    <style>
-        /* KHUSUS DIAGRAM AUDIO - Menggunakan Variable Bawaan Web */
-        :root {
-            /* Warna Kategori (Tetap dipertahankan karena spesifik diagram) */
-            --cat-mic: linear-gradient(135deg, #10b981, #059669);
-            --cat-media: linear-gradient(135deg, #0ea5e9, #0284c7);
-            --cat-mixer: linear-gradient(135deg, #8b5cf6, #6d28d9);
-            --cat-proc: linear-gradient(135deg, #f59e0b, #d97706);
-            --cat-amp: linear-gradient(135deg, #ef4444, #b91c1c);
-            --cat-spk: linear-gradient(135deg, #ec4899, #be185d);
-        }
+<style>
+    /* KHUSUS DIAGRAM AUDIO - Terintegrasi dengan Web */
+    :root {
+        --cat-mic: linear-gradient(135deg, #10b981, #059669);
+        --cat-media: linear-gradient(135deg, #0ea5e9, #0284c7);
+        --cat-mixer: linear-gradient(135deg, #8b5cf6, #6d28d9);
+        --cat-proc: linear-gradient(135deg, #f59e0b, #d97706);
+        --cat-amp: linear-gradient(135deg, #ef4444, #b91c1c);
+        --cat-spk: linear-gradient(135deg, #ec4899, #be185d);
+    }
 
-        /* AREA KANVAS / WORKSPACE RESPONSIVE */
-        .diagram-wrapper {
-            position: relative;
-            width: 100vw;
-            height: 100vh;
-            background-color: var(--bg-color, #f1f5f9);
-            /* Dot grid menggunakan warna border agar menyatu di dark/light mode */
-            background-image: radial-gradient(var(--border-color, #cbd5e1) 1.5px, transparent 1.5px);
-            background-size: 25px 25px;
-            overflow: auto; 
-            cursor: grab;
-            transition: background-color 0.3s ease;
-        }
-        .diagram-wrapper:active { cursor: grabbing; }
+    /* KANVAS DIAGRAM - Dibuat menjadi "Kotak" di dalam halaman, bukan menimpa full screen */
+    .diagram-wrapper {
+        position: relative;
+        width: 100%;
+        height: 80vh; /* Tinggi menyesuaikan agar Header Web tetap terlihat */
+        min-height: 600px;
+        background-color: var(--bg-color, #f1f5f9);
+        background-image: radial-gradient(var(--border-color, #cbd5e1) 1.5px, transparent 1.5px);
+        background-size: 25px 25px;
+        overflow: auto; 
+        cursor: grab;
+        border-radius: 20px; /* Sudut melengkung agar terlihat seperti card interaktif */
+        border: 2px solid var(--border-color, #cbd5e1);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+        margin-bottom: 30px;
+    }
+    .diagram-wrapper:active { cursor: grabbing; }
 
-        /* LAYER SVG UNTUK MENGGAMBAR KABEL */
-        #svg-canvas {
-            position: absolute;
-            top: 0; left: 0;
-            width: 5500px; 
-            height: 3500px;
-            pointer-events: none; 
-            z-index: 50; 
-        }
+    /* LAYER SVG */
+    #svg-canvas {
+        position: absolute;
+        top: 0; left: 0;
+        width: 5500px; 
+        height: 3500px;
+        pointer-events: none; 
+        z-index: 50; 
+    }
 
-        /* ANIMASI KABEL */
-        .cable-flow {
-            stroke-dasharray: 8, 8;
-            animation: flowAnimation 1s linear infinite;
-        }
-        @keyframes flowAnimation {
-            from { stroke-dashoffset: 16; }
-            to { stroke-dashoffset: 0; }
-        }
+    /* ANIMASI KABEL */
+    .cable-flow {
+        stroke-dasharray: 8, 8;
+        animation: flowAnimation 1s linear infinite;
+    }
+    @keyframes flowAnimation {
+        from { stroke-dashoffset: 16; }
+        to { stroke-dashoffset: 0; }
+    }
 
-        /* CLASS UNTUK LABEL SVG AGAR TIDAK ERROR HITAM */
-        .cable-label-bg {
-            fill: var(--card-bg, #ffffff);
-            transition: fill 0.3s ease;
-        }
-        .cable-label-text {
-            fill: var(--text-dark, #0f172a);
-            transition: fill 0.3s ease;
-        }
+    /* CLASS UNTUK LABEL KABEL AGAR MENGIKUTI TEMA WEB (TIDAK HITAM) */
+    .cable-label-bg {
+        fill: var(--card-bg, #ffffff);
+        transition: fill 0.3s ease;
+    }
+    .cable-label-text {
+        fill: var(--text-dark, #0f172a);
+        transition: fill 0.3s ease;
+    }
 
-        /* GRID LAYOUT UNTUK NODE */
-        .node-grid {
-            display: flex;
-            flex-direction: row;
-            gap: 260px; 
-            padding: 100px 120px;
-            position: relative;
-            z-index: 10;
-            min-width: max-content;
-        }
+    /* GRID LAYOUT */
+    .node-grid {
+        display: flex;
+        flex-direction: row;
+        gap: 260px; 
+        padding: 80px 100px;
+        position: relative;
+        z-index: 10;
+        min-width: max-content;
+    }
 
-        .node-column {
-            display: flex;
-            flex-direction: column;
-            gap: 40px; 
-            justify-content: center;
-        }
+    .node-column {
+        display: flex;
+        flex-direction: column;
+        gap: 40px; 
+        justify-content: center;
+    }
 
-        /* DESAIN NODE CARD (ALAT) */
-        .node {
-            width: 290px;
-            background: var(--card-bg, #ffffff);
-            border-radius: 12px;
-            border: 1px solid var(--border-color, #cbd5e1);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            position: relative;
-            transition: all 0.3s ease;
-        }
-        
-        .node:hover {
-            border-color: var(--primary-orange, #8b5cf6);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-            transform: translateY(-3px);
-            z-index: 60; 
-        }
-        
-        .node.mixer-node { width: 340px; border-width: 2px; }
+    /* DESAIN NODE CARD (ALAT) */
+    .node {
+        width: 290px;
+        background: var(--card-bg, #ffffff);
+        border-radius: 12px;
+        border: 1px solid var(--border-color, #cbd5e1);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        position: relative;
+        transition: all 0.3s ease;
+    }
+    .node:hover {
+        border-color: var(--primary-orange, #8b5cf6);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        transform: translateY(-3px);
+        z-index: 60; 
+    }
+    .node.mixer-node { width: 340px; border-width: 2px; }
 
-        /* HEADER NODE */
-        .node-header {
-            display: flex;
-            align-items: center;
-            padding: 12px 15px;
-            border-radius: 11px 11px 0 0;
-            cursor: pointer;
-            user-select: none;
-            color: #ffffff;
-        }
-        .bg-mic { background: var(--cat-mic); }
-        .bg-media { background: var(--cat-media); }
-        .bg-mixer { background: var(--cat-mixer); }
-        .bg-proc { background: var(--cat-proc); }
-        .bg-amp { background: var(--cat-amp); }
-        .bg-spk { background: var(--cat-spk); }
+    /* HEADER NODE */
+    .node-header {
+        display: flex;
+        align-items: center;
+        padding: 12px 15px;
+        border-radius: 11px 11px 0 0;
+        cursor: pointer;
+        user-select: none;
+        color: #ffffff;
+    }
+    .bg-mic { background: var(--cat-mic); }
+    .bg-media { background: var(--cat-media); }
+    .bg-mixer { background: var(--cat-mixer); }
+    .bg-proc { background: var(--cat-proc); }
+    .bg-amp { background: var(--cat-amp); }
+    .bg-spk { background: var(--cat-spk); }
 
-        .node-badge {
-            background: rgba(0,0,0,0.3);
-            font-size: 10px;
-            padding: 3px 6px;
-            border-radius: 6px;
-            margin-right: 10px;
-            font-weight: bold;
-            letter-spacing: 0.5px;
-        }
+    .node-badge {
+        background: rgba(0,0,0,0.3);
+        font-size: 10px;
+        padding: 3px 6px;
+        border-radius: 6px;
+        margin-right: 10px;
+        font-weight: bold;
+        letter-spacing: 0.5px;
+    }
 
-        .node-title { flex: 1; font-size: 14px; font-weight: 700; }
-        .node-toggle { font-size: 18px; font-weight: bold; line-height: 1; }
+    .node-title { flex: 1; font-size: 14px; font-weight: 700; }
+    .node-toggle { font-size: 18px; font-weight: bold; line-height: 1; }
 
-        /* BODY NODE */
-        .node-body {
-            padding: 15px;
-            font-size: 12px;
-            color: var(--text-gray, #475569);
-            line-height: 1.6;
-            display: block; 
-        }
-        .node-body p { 
-            margin: 0 0 6px 0; 
-            display: flex; 
-            justify-content: space-between; 
-            border-bottom: 1px dashed var(--border-color, #cbd5e1); 
-            padding-bottom: 4px; 
-        }
-        .node-body p:last-child { margin: 0; border-bottom: none; padding-bottom: 0; }
-        .node-body strong { color: var(--text-dark, #0f172a); font-weight: 600; }
+    /* BODY NODE */
+    .node-body {
+        padding: 15px;
+        font-size: 12px;
+        color: var(--text-gray, #475569);
+        line-height: 1.6;
+        display: block; 
+    }
+    .node-body p { 
+        margin: 0 0 6px 0; 
+        display: flex; 
+        justify-content: space-between; 
+        border-bottom: 1px dashed var(--border-color, #cbd5e1); 
+        padding-bottom: 4px; 
+    }
+    .node-body p:last-child { margin: 0; border-bottom: none; padding-bottom: 0; }
+    .node-body strong { color: var(--text-dark, #0f172a); font-weight: 600; }
 
-        /* TITIK KONEKSI (PORTS) */
-        .port {
-            width: 14px; height: 14px; 
-            background: var(--bg-color, #f1f5f9); 
-            border: 3px solid var(--text-dark, #0f172a);
-            border-radius: 50%; position: absolute; top: 50%; transform: translateY(-50%); z-index: 5;
-        }
-        .port-in { left: -9px; }
-        .port-out { right: -9px; }
+    /* TITIK KONEKSI (PORTS) */
+    .port {
+        width: 14px; height: 14px; 
+        background: var(--bg-color, #f1f5f9); 
+        border: 3px solid var(--text-dark, #0f172a);
+        border-radius: 50%; position: absolute; top: 50%; transform: translateY(-50%); z-index: 5;
+    }
+    .port-in { left: -9px; }
+    .port-out { right: -9px; }
 
-        /* Label Khusus HP */
-        .mobile-hint {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            background: var(--text-dark, #0f172a); color: var(--bg-color, #f1f5f9); padding: 10px 20px; border-radius: 20px;
-            font-size: 12px; font-weight: bold; z-index: 9999; pointer-events: none;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2); display: none;
-        }
-
-        @media (max-width: 768px) {
-            .mobile-hint { display: block; animation: fadeOut 4s forwards 2s; }
-            .node { width: 250px; }
-            .node-grid { gap: 100px; padding: 40px; }
-        }
-
-        @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
-    </style>
-</head>
-<body>
-
-<div class="mobile-hint">👆 Geser layar untuk menjelajah diagram</div>
+    /* Hint Interaksi */
+    .interaction-hint {
+        position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+        background: var(--text-dark, #0f172a); color: var(--bg-color, #ffffff); 
+        padding: 10px 20px; border-radius: 20px; font-size: 12px; font-weight: bold; 
+        z-index: 9999; pointer-events: none; opacity: 0.8;
+    }
+</style>
 
 <div class="diagram-wrapper" id="diagram-container">
+    <div class="interaction-hint">👆 Tahan & Geser (Drag) untuk melihat diagram</div>
     <svg id="svg-canvas"></svg>
 
     <div class="node-grid">
@@ -420,40 +403,31 @@ location: "JA-01"
 <script>
     // Konfigurasi Sambungan Kabel
     const cables = [
-        // Mic Routing 
         { from: 'in-mic1', to: 'mix-main', label: 'XLR CH 1', color: '#10b981' },
         { from: 'in-mic2', to: 'mix-main', label: 'XLR CH 2', color: '#10b981' },
         { from: 'in-mic3', to: 'mix-main', label: 'XLR CH 3', color: '#10b981' },
         { from: 'in-mic4', to: 'mix-main', label: 'XLR CH 4', color: '#10b981' },
         
-        // Media Routing 
         { from: 'in-med1', to: 'mix-main', label: 'Jack 3.5mm to TRS (CH 9-10)', color: '#0ea5e9' },
         { from: 'in-med2', to: 'mix-main', label: 'Jack 3.5mm to TRS (CH 11-12)', color: '#0ea5e9' },
         { from: 'in-med3', to: 'mix-main', label: 'Jack 3.5mm to TRS (CH 13-14)', color: '#0ea5e9' },
         { from: 'in-med4', to: 'mix-main', label: 'Jack 3.5mm to TRS (CH 15-16)', color: '#0ea5e9' },
         
-        // Mixer ke Processor 
         { from: 'mix-main', to: 'proc-geq', label: 'Stereo Out L/R', color: '#d946ef' },
         { from: 'proc-geq', to: 'proc-split', label: 'XLR Out L/R', color: '#d946ef' },
         
-        // Splitter ke FOH Amplifiers 
         { from: 'proc-split', to: 'amp-protea1', label: 'Out 1 & 2', color: '#ef4444' },
         { from: 'proc-split', to: 'amp-protea2', label: 'Out 3 & 4', color: '#ef4444' },
-        
-        // Splitter ke DLMS 
         { from: 'proc-split', to: 'proc-dlms', label: 'Out L/R (Master Zona)', color: '#eab308' },
         
-        // DLMS ke Ampli ZA 
         { from: 'proc-dlms', to: 'amp-za1', label: 'Zone 1 (Belakang Pnggng)', color: '#3b82f6' },
         { from: 'proc-dlms', to: 'amp-za2', label: 'Zone 2 (Samping Pnggng)', color: '#3b82f6' },
         { from: 'proc-dlms', to: 'amp-za3', label: 'Zone 3 (Panggung)', color: '#3b82f6' },
         { from: 'proc-dlms', to: 'amp-za4', label: 'Zone 4 (Delay)', color: '#3b82f6' },
 
-        // Ampli FOH ke Speaker Array 
         { from: 'amp-protea1', to: 'spk-hx5-1', label: 'Kabel Speaker (L)', color: '#be123c' },
         { from: 'amp-protea2', to: 'spk-hx5-2', label: 'Kabel Speaker (R)', color: '#be123c' },
 
-        // Ampli ZA ke Speaker F2000 
         { from: 'amp-za1', to: 'spk-za1', label: 'High-Z (Com/100V)', color: '#64748b' },
         { from: 'amp-za2', to: 'spk-za2', label: 'High-Z (Com/100V)', color: '#64748b' },
         { from: 'amp-za3', to: 'spk-za3', label: 'High-Z (Com/100V)', color: '#64748b' },
@@ -485,16 +459,14 @@ location: "JA-01"
             const pathD = `M ${x1} ${y1} C ${x1 + curveFactor} ${y1}, ${x2 - curveFactor} ${y2}, ${x2} ${y2}`;
             const cableColor = link.color || '#475569';
 
-            // Garis Background (Pudar)
             svgContent += `<path d="${pathD}" fill="none" stroke="${cableColor}" stroke-width="4" opacity="0.2" />`;
-            // Garis Animasi (Flowing Signal)
             svgContent += `<path d="${pathD}" fill="none" stroke="${cableColor}" stroke-width="3" class="cable-flow" />`;
                         
             const midX = (x1 + x2) / 2;
             const midY = (y1 + y2) / 2;
             const labelWidth = link.label.length * 7 + 25; 
             
-            // Penggunaan CSS Class agar mewarisi dari parent CSS yang benar tanpa error hitam
+            // Penggunaan CSS Class agar mewarisi warna otomatis tanpa render error
             svgContent += `
                 <rect class="cable-label-bg" x="${midX - labelWidth/2}" y="${midY - 12}" width="${labelWidth}" height="24" rx="12" stroke="${cableColor}" stroke-width="2" />
                 <text class="cable-label-text" x="${midX}" y="${midY + 4}" font-size="11" font-family="sans-serif" text-anchor="middle" font-weight="bold">${link.label}</text>
@@ -548,6 +520,8 @@ location: "JA-01"
     window.onload = drawConnections;
     window.onresize = drawConnections;
     slider.onscroll = drawConnections; 
+    
+    // Observer opsional agar kanvas mere-render saat dark mode berganti
+    const observer = new MutationObserver(() => drawConnections());
+    observer.observe(document.body, { attributes: true, attributeFilter: ['data-theme', 'class'] });
 </script>
-</body>
-</html>

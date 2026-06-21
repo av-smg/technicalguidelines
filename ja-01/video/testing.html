@@ -10,16 +10,29 @@ location: "JA-01"
     <link rel="stylesheet" href="../style.css" />
     {% include head.html %}
     <style>
-      /* Tambahan CSS khusus agar list dan tabel dari manual teknis tampil rapi di dalam card */
-      .mission-card ul, .mission-card ol { padding-left: 20px; margin-top: 10px; color: #4b5563; font-size: 0.95rem; }
+      /* CSS Pendukung untuk integrasi detail PDF ke dalam Card Style */
+      .mission-card ul, .mission-card ol { padding-left: 20px; margin-top: 10px; color: #4b5563; font-size: 0.95rem; line-height: 1.6; }
       .mission-card li { margin-bottom: 8px; }
-      .table-wrapper { overflow-x: auto; margin-top: 10px; border-radius: 8px; border: 1px solid #e5e7eb; }
+      .mission-card h4 { color: #0284c7; margin-top: 15px; margin-bottom: 5px; }
+      
+      .table-wrapper { overflow-x: auto; margin-top: 15px; border-radius: 8px; border: 1px solid #e5e7eb; }
       .mission-card table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-      .mission-card th, .mission-card td { padding: 10px; border-bottom: 1px solid #e5e7eb; text-align: left; }
+      .mission-card th, .mission-card td { padding: 10px; border-bottom: 1px solid #e5e7eb; text-align: left; vertical-align: top; }
       .mission-card th { background: #f9fafb; font-weight: 600; color: #374151; }
+      
       .role-tag { font-size: 0.8rem; color: #6b7280; font-style: italic; margin-left: 4px; }
-      .time-badge { display: inline-block; background: #e0f2fe; color: #0284c7; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; margin-bottom: 4px; margin-right: 5px; }
       .cap-badge { background: #fee2e2; color: #dc2626; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; margin-left: 4px; vertical-align: middle; }
+      .note-box { background-color: #fffbeb; border-left: 4px solid #f59e0b; padding: 12px; margin: 15px 0; border-radius: 4px; font-size: 0.9rem; }
+      
+      /* Timeline Styling inside Card */
+      .timeline { border-left: 3px solid #38bdf8; padding-left: 20px; margin-left: 10px; margin-top: 15px; }
+      .timeline-item { position: relative; margin-bottom: 20px; }
+      .timeline-item::before { content: ''; position: absolute; left: -28px; top: 0; width: 12px; height: 12px; border-radius: 50%; background: #38bdf8; border: 3px solid #fff; }
+      .time-label { font-weight: bold; color: #0369a1; font-size: 1rem; display: block; margin-bottom: 5px; }
+      
+      /* Box List Styling */
+      .box-list { background: #f0f9ff; padding: 15px; border-radius: 6px; border: 1px solid #bae6fd; margin-bottom: 15px; }
+      .box-list h5 { margin-top: 0; color: #0284c7; font-size: 0.95rem; margin-bottom: 8px; }
     </style>
   </head>
   <body>
@@ -36,12 +49,12 @@ location: "JA-01"
         <section class="team-section">
           <div class="team-header">
             <span class="team-badge" style="background: #e67e22; color: #fff;">SCHEDULE</span>
-            <h2>Jadwal Rapat & Pelatihan</h2>
+            <h2>Jadwal Rapat & Pelatihan (Via Zoom 19.00)</h2>
           </div>
           <div class="grid-cards">
             <div class="mission-card">
               <div class="card-emoji">📅</div>
-              <h3>Rapat via Zoom (19.00)</h3>
+              <h3>Rapat Tim</h3>
               <ul>
                 <li><strong>Minggu, 12-04-26:</strong> Pertemuan Tim Inti Visual (Pengawas & Kapten Tim)</li>
                 <li><strong>Minggu, 19-04-26:</strong> Pertemuan Semua Tim Visual</li>
@@ -51,8 +64,8 @@ location: "JA-01"
               <div class="card-emoji">👷</div>
               <h3>Pelatihan Relawan</h3>
               <ul>
-                <li><strong>Minggu, 26-04-26:</strong> Pelatihan LED & TA 1 (Relawan LED Wall & Inventaris)</li>
-                <li><strong>Minggu, 03-05-26:</strong> Pelatihan LED & TA 2 (Relawan LED Wall & Inventaris)</li>
+                <li><strong>Minggu, 26-04-26:</strong> Pelatihan Relawan LED & TA (1) - <em>Relawan LED Wall & Inventaris</em></li>
+                <li><strong>Minggu, 03-05-26:</strong> Pelatihan Relawan LED & TA (2) - <em>Relawan LED Wall & Inventaris</em></li>
               </ul>
             </div>
           </div>
@@ -60,29 +73,50 @@ location: "JA-01"
 
         <section class="team-section">
           <div class="team-header">
-            <span class="team-badge badge-video" style="background: #ef4444; color: white;">VIDEO</span>
+            <span class="team-badge badge-video" style="background: #ef4444; color: white;">TEAM 1 & 2</span>
             <h2>Pembagian Tim Visual</h2>
           </div>
           <div class="grid-cards">
             
-            <div class="mission-card">
+            <div class="mission-card" style="grid-column: 1 / -1; border-top: 4px solid #ef4444;">
               <div class="card-emoji">📺</div>
-              <h3>Tim Visual 1: LED Wall & TA</h3>
-              <ul>
-                <li><strong>Team LED Wall:</strong> OKITA <span class="cap-badge">CAPTAIN</span>, BAGAS (Asisten)</li>
-                <li><strong>Technical Assistant (TA):</strong> YOKA, ANDREAS, DIXCY, MARIO, FARREL, JOJO, LEON, KYA, RINDAR, CELIN, VENA, ARUM</li>
-                <li><strong>Inventaris LED Wall:</strong> YULIANA <span class="cap-badge">CAPTAIN</span>, CUPU</li>
-                <li><strong>Pendukung TV:</strong> PRIYANTO <span class="cap-badge">CAPTAIN</span>, CATUR, TIAN</li>
-              </ul>
+              <h3>TIM VISUAL 1 LED WALL</h3>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                <div>
+                  <h4>Team LED Wall</h4>
+                  <ul>
+                    <li><strong>OKITA</strong> <span class="cap-badge">CAPTAIN</span></li>
+                    <li><strong>BAGAS</strong> (ASISTEN)</li>
+                  </ul>
+                  <h4>Technical Assistant (TA)</h4>
+                  <p style="font-size: 0.9rem; color: #4b5563;">YOKA, ANDREAS, DIXCY, MARIO, FARREL, JOJO, LEON, KYA, RINDAR, CELIN, VENA, ARUM</p>
+                </div>
+                <div>
+                  <h4>Inventaris</h4>
+                  <ul>
+                    <li><strong>LED WALL:</strong> YULIANA <span class="cap-badge">CAPTAIN</span>, CUPU</li>
+                    <li><strong>TV & BOOTH:</strong> SHAREEN</li>
+                    <li><strong>KABEL & KAMERA:</strong> ALIT</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4>Tim Pendukung</h4>
+                  <ul>
+                    <li><strong>TV:</strong> PRIYANTO <span class="cap-badge">CAPTAIN</span>, CATUR, TIAN</li>
+                    <li><strong>BOOTH KABEL/KAMERA:</strong> JOHAN, EDO <span class="cap-badge">CAPTAIN</span></li>
+                    <li><strong>OPERATOR VISUAL:</strong> CALDERA, SINTA, LEA</li>
+                  </ul>
+                </div>
+              </div>
             </div>
             
             <div class="mission-card">
               <div class="card-emoji">👉</div>
-              <h3>Tim Visual 2: Kanan</h3>
+              <h3>TIM VISUAL 2 (KANAN)</h3>
               <ul>
                 <li><strong>OKITA</strong> <span class="cap-badge">CAPTAIN</span> <span class="role-tag">- AV</span></li>
-                <li>BAGAS <span class="role-tag">- Kebersihan (Asisten)</span></li>
-                <li>YOKA <span class="role-tag">- AV (TA)</span></li>
+                <li><strong>BAGAS</strong> (ASISTEN) <span class="role-tag">- Kebersihan</span></li>
+                <li><strong>YOKA</strong> (TA) <span class="role-tag">- AV</span></li>
                 <li>CATUR, TIAN <span class="role-tag">- Kebersihan/Podium</span></li>
                 <li>JOJO, LEON, CELIN, VENA <span class="role-tag">- Kebersihan</span></li>
                 <li>RINDAR <span class="role-tag">- Instalasi</span></li>
@@ -91,15 +125,48 @@ location: "JA-01"
             
             <div class="mission-card">
               <div class="card-emoji">👈</div>
-              <h3>Tim Visual 2: Kiri</h3>
+              <h3>TIM VISUAL 2 (KIRI)</h3>
               <ul>
                 <li><strong>PRIYANTO</strong> <span class="cap-badge">CAPTAIN</span> <span class="role-tag">- AV</span></li>
-                <li>FARREL <span class="role-tag">- Kebersihan (Asisten)</span></li>
-                <li>KALOS <span class="role-tag">- AV (TA)</span></li>
+                <li><strong>FARREL</strong> (ASISTEN) <span class="role-tag">- Kebersihan</span></li>
+                <li><strong>KALOS</strong> (TA) <span class="role-tag">- AV</span></li>
                 <li>AGUS TRI, ARUM, SHAREEN <span class="role-tag">- Kebersihan</span></li>
                 <li>MARIO <span class="role-tag">- P3K</span> | LEA <span class="role-tag">- Panggung</span></li>
                 <li>ALIT, SIAM <span class="role-tag">- Instalasi</span></li>
               </ul>
+            </div>
+
+            <div class="mission-card" style="grid-column: 1 / -1;">
+              <div class="card-emoji">📋</div>
+              <h3>Matriks Inventaris & TA</h3>
+              <div class="table-wrapper">
+                <table>
+                  <thead>
+                    <tr><th colspan="2" style="text-align:center;">INVENTARIS</th><th colspan="2" style="text-align:center;">TECHNICAL ASSISTANT (TA)</th></tr>
+                    <tr><th>LED KANAN</th><th>LED KIRI</th><th>KANAN</th><th>KIRI</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>YULIANA</strong> <span class="cap-badge">CAPT</span><br>CINDY</td>
+                      <td><strong>SINTA</strong> <span class="cap-badge">CAPT</span><br>LEA</td>
+                      <td>YOKA</td>
+                      <td>KALOS</td>
+                    </tr>
+                    <tr>
+                      <td><strong>TV & BOOTH:</strong></td><td>CUPU</td>
+                      <td><strong>TV:</strong></td><td>DIXCY & KYA</td>
+                    </tr>
+                    <tr>
+                      <td><strong>KABEL/KAMERA:</strong></td><td>ATIK</td>
+                      <td><strong>KABEL/KAMERA:</strong></td><td>EDO, CALDERA</td>
+                    </tr>
+                    <tr>
+                      <td><strong>BOOTH:</strong></td><td>JOHAN, JOJO</td>
+                      <td>-</td><td>-</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
             
             <div class="mission-card" style="grid-column: 1 / -1;">
@@ -108,15 +175,7 @@ location: "JA-01"
               <div class="table-wrapper">
                 <table>
                   <thead>
-                    <tr>
-                      <th>HARI / TUGAS</th>
-                      <th>CAM PTZ 1</th>
-                      <th>CAM PTZ 2</th>
-                      <th>AUDIO DESC</th>
-                      <th>SWITCHER</th>
-                      <th>MEDIA UTAMA</th>
-                      <th>MEDIA BACKUP</th>
-                    </tr>
+                    <tr><th>HARI / TUGAS</th><th>CAM PTZ 1</th><th>CAM PTZ 2</th><th>AUDIO DESC</th><th>SWITCHER</th><th>MEDIA UTAMA</th><th>MEDIA BACKUP</th></tr>
                   </thead>
                   <tbody>
                     <tr><td><strong>JUMAT</strong></td><td>BAGAS</td><td>PRIYANTO</td><td>DIXCY</td><td>OKI</td><td>KYA</td><td>KYA</td></tr>
@@ -135,87 +194,237 @@ location: "JA-01"
             <h2>Alur Kerja & Timeline Harian</h2>
           </div>
           <div class="grid-cards">
-            <div class="mission-card">
-              <div class="card-emoji">📝</div>
+            
+            <div class="mission-card" style="grid-column: 1 / -1;">
+              <div class="card-emoji">📦</div>
               <h3>Tim Inventaris</h3>
-              <ul>
-                <li><span class="time-badge">09.15</span> Susun semua peralatan. Cek barang di container box. Catat/foto barang yang diambil tim.</li>
-                <li><span class="time-badge">10.45</span> Hitung sisa barang, sesuaikan jumlah dgn kantor cabang.</li>
-                <li><span class="time-badge">13.00</span> Standby melayani tim yang butuh barang utama.</li>
-                <li><span class="time-badge">16.00</span> Simpan barang tak terpakai, catat kerusakan. Amankan ke lokasi permanen.</li>
-              </ul>
+              <div class="timeline">
+                <div class="timeline-item">
+                  <span class="time-label">09.15 - Susun Semua Peralatan Sesuai Kebutuhan</span>
+                  <ul>
+                    <li>Kumpulkan dan letakkan barang di tempat yang sudah disetujui.</li>
+                    <li>Cek semua barang di dalam container box, khususnya jika ada barang dua tim yg dijadikan satu container.</li>
+                    <li>Catat dan ambil foto barang yang diambil tim. Tim tidak boleh mengambil barang sendiri tanpa sepengetahuan inventarian.</li>
+                  </ul>
+                </div>
+                <div class="timeline-item">
+                  <span class="time-label">10.45 - Barang Sudah Sesuai Pos & Siap Dibagikan</span>
+                  <ul>
+                    <li>Hitung barang tersisa di dalam box. Jumlahkan dengan barang yang dipinjam tim.</li>
+                    <li>Satukan dengan inventaris kantor cabang, sesuaikan angkanya. Beritahu pengawas jika tidak sesuai.</li>
+                    <li>Terus layani tim yang butuh barang.</li>
+                  </ul>
+                </div>
+                <div class="timeline-item">
+                  <span class="time-label">13.00 - Barang Utama Selesai Dibagikan</span>
+                  <ul><li>Tetap berjaga di area barang untuk melayani tim.</li></ul>
+                </div>
+                <div class="timeline-item">
+                  <span class="time-label">16.00 - Semua Barang Disimpan di Lokasi Permanen</span>
+                  <ul>
+                    <li>Semua barang yang tidak terpakai disimpan, catat barang yg tersimpan/rusak.</li>
+                    <li>Bawa semua barang ke area penyimpanan selama acara regional.</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="note-box"><strong>CATATAN:</strong> Memastikan barang komplit, tidak salah taruh box, dan menjaga tempat penyimpanan.</div>
             </div>
-            <div class="mission-card">
+
+            <div class="mission-card" style="grid-column: 1 / -1;">
               <div class="card-emoji">🔌</div>
               <h3>Tim TV & Kabel</h3>
-              <ul>
-                <li><span class="time-badge">09.15</span> Siapkan power socket, cek TV, pasang speedbump memanjang.</li>
-                <li><span class="time-badge">10.45</span> Tarik kabel TV (jangan dicolok dulu), pasang LAN LED, LAN & SDI PTZ.</li>
-                <li><span class="time-badge">13.00</span> Naikkan TV & nyalakan. Colok ke distributor berurutan. Lakban kabel permanen.</li>
-                <li><span class="time-badge">16.00</span> Kalibrasi warna/volume, matikan timer, pasang pengunci door TV. Rapikan kabel.</li>
-              </ul>
+              <div class="timeline">
+                <div class="timeline-item">
+                  <span class="time-label">09.15 - Taruh TV, Speedbump & Power Socket</span>
+                  <ul>
+                    <li>Siapkan semua titik power socket, hubungi tim instalasi.</li>
+                    <li>Cek TV sebelum dibawa keluar (pastikan menyala). Keluarkan ke titik yg ditentukan.</li>
+                    <li>Pasang speedbump dari kamera ke booth AV dan memanjang di pilar depan meja departemen.</li>
+                  </ul>
+                </div>
+                <div class="timeline-item">
+                  <span class="time-label">10.45 - TV & Speedbump Siap (Penarikan Kabel)</span>
+                  <ul>
+                    <li>Tarik kabel TV sesuai layout <strong>(jangan pasang ke TV atau distributor dulu)</strong>.</li>
+                    <li>Pasang kabel LAN LED Wall, serta LAN & SDI kamera PTZ.</li>
+                    <li>Pastikan power socket tersedia sebelum istirahat makan siang.</li>
+                  </ul>
+                </div>
+                <div class="timeline-item">
+                  <span class="time-label">13.00 - Kabel & Power Socket TV Selesai</span>
+                  <ul>
+                    <li>Naikkan TV dan nyalakan. Pasang kabel ke distributor berurutan dari booth ke TV.</li>
+                    <li>TV yg menyala dirapikan kabelnya dan dilakban permanen.</li>
+                  </ul>
+                </div>
+                <div class="timeline-item">
+                  <span class="time-label">16.00 - Kalibrasi Selesai</span>
+                  <ul>
+                    <li>Kalibrasi warna, volume, matikan timer, pasang pengunci door TV. Rapikan kabel serapi mungkin.</li>
+                  </ul>
+                </div>
+              </div>
             </div>
-            <div class="mission-card">
+
+            <div class="mission-card" style="grid-column: 1 / -1;">
               <div class="card-emoji">🎥</div>
               <h3>Tim Booth & Kamera</h3>
-              <ul>
-                <li><span class="time-badge">09.15</span> Pasang tiang & police line. Minta 4 meja booth & dipan kamera (terdepan >2.5m dari kursi).</li>
-                <li><span class="time-badge">10.45</span> Setup switcher, controller, monitor, laptop. Susun kabel SDI, LAN, HDMI, Audio Jack.</li>
-                <li><span class="time-badge">13.00</span> Cek file kalibrasi laptop, kalibrasi kamera PTZ.</li>
-                <li><span class="time-badge">14.00</span> Konfigurasi selesai. Jam 15.00 semua kabel dipastikan rapi.</li>
-              </ul>
+              <div class="timeline">
+                <div class="timeline-item">
+                  <span class="time-label">09.15 - Pasang Tripod, Ambil Meja Booth & Dipan</span>
+                  <ul>
+                    <li>Minta 4 meja booth dan dipan kamera+tangga ke instalasi (Dipan di as panggung, jarak dipan ke kursi baris pertama > 2,5 meter).</li>
+                    <li>Pasang tiang & police line, pasang ballhead & kamera PTZ di tripod.</li>
+                  </ul>
+                </div>
+                <div class="timeline-item">
+                  <span class="time-label">10.45 - Instalasi Alat Booth</span>
+                  <ul>
+                    <li>Minta extension power. Pasang dan hidupkan switcher, controller, monitor, laptop.</li>
+                    <li>Terima kabel video/audio. Susun kabel video processor, HDMI, Audio Jack, SDI & LAN dari PTZ ke Switcher.</li>
+                  </ul>
+                </div>
+                <div class="timeline-item">
+                  <span class="time-label">13.00 - Cek Sistem & Kalibrasi</span>
+                  <ul><li>Periksa file laptop, siapkan file kalibrasi TV & LED, kalibrasi kamera.</li></ul>
+                </div>
+                <div class="timeline-item">
+                  <span class="time-label">14.00 - 15.00 - Finalisasi</span>
+                  <ul><li>Konfigurasi selesai. Jam 15.00 pastikan semua kabel rapi total di booth.</li></ul>
+                </div>
+              </div>
             </div>
-            <div class="mission-card">
+
+            <div class="mission-card" style="grid-column: 1 / -1;">
               <div class="card-emoji">🧱</div>
               <h3>Tim LED Wall</h3>
-              <ul>
-                <li><span class="time-badge">09.15</span> Ukur panggung. Rakit pondasi & tiang level paralel. Pastikan pondasi water-level.</li>
-                <li><span class="time-badge">10.45</span> Naikkan tiang level (pakai safety harness), pasang stud & joint score.</li>
-                <li><span class="time-badge">13.00</span> Pasang panel ke rangka dari bagian tengah, kunci kupu-kupu. Pilah kabel.</li>
-                <li><span class="time-badge">16.00</span> Pasang kabel power & LAN. Tutup pondasi dgn kain. (Target 17.00 kalibrasi selesai).</li>
-              </ul>
+              <div class="timeline">
+                <div class="timeline-item">
+                  <span class="time-label">09.15 - Mengukur Posisi & Merakit Paralel</span>
+                  <ul>
+                    <li>Pisahkan perlengkapan. Rakit tangga dorong. Ukur panggung sesuai layout.</li>
+                    <li>Kerjakan paralel: (A) Merakit pondasi, (B) Merakit tiang level. Pastikan kaki pondasi water-level sebelum lanjut.</li>
+                  </ul>
+                </div>
+                <div class="timeline-item">
+                  <span class="time-label">10.45 - Pondasi & Tiang Level Dirakit</span>
+                  <ul>
+                    <li>Naikkan tiang level ke pondasi (Gunakan safety harness).</li>
+                    <li>Pasang tiang penyangga/stud. Pasang joint/skor (depan & belakang).</li>
+                  </ul>
+                </div>
+                <div class="timeline-item">
+                  <span class="time-label">13.00 - Rangka Selesai, Mulai Pasang Panel</span>
+                  <ul>
+                    <li>Pasang panel ke rangka dari bagian tengah, kunci dengan kupu-kupu.</li>
+                    <li>Pilah panjang kabel LAN dan power.</li>
+                  </ul>
+                </div>
+                <div class="timeline-item">
+                  <span class="time-label">16.00 - 17.00 - Pemasangan Kabel & Kalibrasi</span>
+                  <ul>
+                    <li>Pasang kabel power dan LAN. Tutup tiang pondasi dengan kain, rapikan kabel.</li>
+                    <li>17.00 target LED rapi, kabel terhubung, warna dikalibrasi.</li>
+                  </ul>
+                </div>
+              </div>
             </div>
+
           </div>
         </section>
 
         <section class="team-section">
           <div class="team-header">
             <span class="team-badge" style="background: #8b5cf6; color: white;">SOP TEKNIS</span>
-            <h2>Instruksi Pemasangan & Pembongkaran LED</h2>
+            <h2>Langkah Pemasangan & Pembongkaran LED</h2>
           </div>
           <div class="grid-cards">
-            <div class="mission-card">
+            
+            <div class="mission-card" style="grid-column: 1 / -1;">
               <div class="card-emoji">🛠️</div>
-              <h3>Tahap Pemasangan: Rangka & Fondasi</h3>
+              <h3>LANGKAH PEMASANGAN</h3>
+              
+              <h4>1. Persiapan</h4>
+              <div class="box-list">
+                <h5>Bongkaran Box & Kelompokkan:</h5>
+                <ul>
+                  <li><strong>BOX 1-4:</strong> 8 Tiang Fondasi, 3 Fondasi Panjang Atas, 3 Fondasi Panjang Bawah</li>
+                  <li><strong>BOX 1-5:</strong> Cone Adjusting, 8 Kaki Panjang, 11 Tiang Level, 8 Set Penyangga Belakang</li>
+                  <li><strong>BOX 1-6:</strong> 16 Joint/Score, 6 Spacer, 23 Tiang Level</li>
+                  <li><strong>BOX BAUT:</strong> Urutkan 25, 45, 65, 80, 130 MM. Siapkan Box Mur dan Ring.</li>
+                  <li><strong>ALAT:</strong> 2 Bor, 4 Rachet, 1 Kunci Inggris.</li>
+                  <li>Siapkan 2 Pasang Cone Barble & Safety Line, Susun Scaffolding.</li>
+                </ul>
+              </div>
+
+              <h4>2. Pemasangan Fondasi</h4>
+              <div class="note-box">Saat memasang mur dan baut, jangan dikencangkan sampai penuh sebelum semua fondasi dan rangka lengkap.</div>
               <ol>
-                <li>Bongkar BOX 1-4, 1-5, 1-6 dan kelompokkan. Urutkan baut (25, 45, 65, 80, 130mm).</li>
-                <li>Letakkan 4 fondasi bawah (jarak 0,5m). Pasang kaki panjang/pendek (baut 65/80mm) dan spacer (baut 45mm). <em>Jangan kencangkan penuh dulu.</em></li>
-                <li>Pasang tiang fondasi (130mm) & fondasi atas (100mm). Atur tinggi dengan waterpass, kencangkan.</li>
-                <li>Susun 11 tiang level (Level 1, 2, 3) dgn baut 80mm. Naikkan dan hubungkan ke fondasi (baut 100mm).</li>
-                <li>Pasang penyangga belakang/stud (65/80mm) & joint score selang-seling (80mm).</li>
+                <li>Letakkan 4 fondasi bawah (jarak 0,5m).</li>
+                <li>Pasang kaki panjang/pendek (baut 65/80mm) dan spacer (baut 45mm).</li>
+                <li>Pasang tiang fondasi ke fondasi bawah (130mm), dan fondasi atas ke tiang (100mm).</li>
+                <li>Sambung 3 palang aluminium (1,5m) dan 1 palang (0,5m). Pasang ke fondasi (100mm).</li>
+                <li>Atur ketinggian dengan waterpass, lalu kencangkan dengan bor/kunci inggris.</li>
+              </ol>
+
+              <h4>3. Pemasangan Rangka</h4>
+              <ol>
+                <li>Susun 11 rangkaian tiang: Level 1 (1,15m), Lvl 2 & 3 (1m). Sambung dengan baut 80mm.</li>
+                <li>Naikkan & hubungkan ke fondasi dengan baut 100mm.</li>
+                <li>Sambungkan tiang penyangga belakang/stud dengan baut 65/80mm.</li>
+                <li>Setel kaki panjang/pendek agar water level tercapai. Pasang joint score selang-seling (80mm).</li>
+              </ol>
+
+              <h4>4. Pemasangan Panel LED</h4>
+              <ol>
+                <li>Urutkan: Level 1 (A1-A10), Level 2 (B1-B10), Level 3 (C1-C10).</li>
+                <li>Sejajarkan panel A5-A6, naikkan ke lvl 1 tengah. Kunci kupu-kupu tengah (baut 25mm).</li>
+                <li>Naikkan panel A lainnya (A4-A1, A7-A10). Ulangi untuk level 2.</li>
+                <li>Level 3 dipasang berurutan dari ujung (misal C1 ke C10).</li>
+              </ol>
+
+              <h4>5. Pemasangan Kabel (Pastikan Listrik Mati)</h4>
+              <ol>
+                <li>Sambung kabel LAN dari Video Processor membentuk rute ular.</li>
+                <li>Sambung kabel power antar panel dengan skema horizontal.</li>
+                <li>Sambung kabel dari PDU ke panel, lalu dari Stabilizer ke PDU.</li>
               </ol>
             </div>
-            <div class="mission-card">
-              <div class="card-emoji">💡</div>
-              <h3>Tahap Pemasangan: Panel & Kabel</h3>
-              <ol>
-                <li>Urutkan panel LED (Lvl 1: A1-A10, Lvl 2: B1-B10, Lvl 3: C1-C10).</li>
-                <li>Sejajarkan panel tengah A5-A6, naikkan ke Lvl 1 tengah, kunci dgn kupu-kupu (baut 25mm). Lanjutkan sisa panel A.</li>
-                <li>Ulangi untuk Lvl 2. Lvl 3 dipasang dari ujung (C1 ke C10).</li>
-                <li><strong>Kabel (Listrik MATI):</strong> Sambung LAN bentuk rute ular mulai dari prosesor. Sambung power antar panel horizontal.</li>
-                <li>Sambung kabel panel ke PDU, lalu dari Stabilizer ke PDU.</li>
-              </ol>
-            </div>
-            <div class="mission-card" style="grid-column: 1 / -1; border-top: 4px solid #ef4444;">
+
+            <div class="mission-card" style="grid-column: 1 / -1; border-top: 4px solid #f59e0b;">
               <div class="card-emoji">🛑</div>
-              <h3>Tahap Pembongkaran</h3>
+              <h3>LANGKAH PEMBONGKARAN</h3>
+              
+              <h4>1. Pemutusan Arus</h4>
               <ol>
-                <li><strong>Pemutusan Arus:</strong> Pastikan listrik MATI. Cabut colokan dari PLN ke Stabilizer. Lepas kabel PDU, power antar panel, dan LAN.</li>
-                <li><strong>Pelepasan Panel:</strong> Gunakan Harness. Mulai dari Lvl 3 (C10 ke C1). Lalu Lvl 2 & 1 dari pinggir ke tengah (A10 ke A7, A1 ke A4, terakhir A6-A5).</li>
-                <li><strong>Pembongkaran Rangka:</strong> Lepas joint score, penyangga belakang, dan tiang level (baut 100mm). Urai fondasi dan kaki.</li>
-                <li><strong>Pengemasan:</strong> Kumpulkan baut sesuai ukuran. Masukkan ke BOX 1-4, 1-5, 1-6 sesuai daftar inventaris awal.</li>
+                <li>Pastikan sambungan MATI. Cabut dari PLN ke stabilizer.</li>
+                <li>Lepaskan kabel PDU ke panel, power antar panel, dan LAN. Kelompokkan.</li>
+              </ol>
+
+              <h4>2. Pelepasan Panel LED</h4>
+              <ol>
+                <li>Gunakan Body Harness. Mulai dari Level 3 dari ujung (C10 ke C1).</li>
+                <li>Level 2 & 1 dilepas dari pinggir ke tengah (A10 ke A7, A1 ke A4, terakhir A6-A5).</li>
+                <li>Lepas pengunci kupu-kupu (25mm). Simpan ke flightcase berurutan.</li>
+              </ol>
+
+              <h4>3. Pembongkaran Rangka & Fondasi</h4>
+              <ol>
+                <li>Lepas joint/score dan penyangga belakang (stud) baut 65/80mm.</li>
+                <li>Turunkan rangkaian tiang level (baut 100mm), urai jadi satuan (baut 45 & 80mm).</li>
+                <li>Lepas fondasi atas/bawah (100 & 130mm), spacer (45mm), kaki panjang/pendek, dan palang aluminium.</li>
+              </ol>
+
+              <h4>4. Pengemasan</h4>
+              <ol>
+                <li>Kumpulkan baut, urutkan (25, 45, 65, 80, 130mm) ke box baut.</li>
+                <li><strong>BOX 1-4:</strong> 8 tiang fondasi, fondasi atas/bawah, 16 joint, 6 spacer, 8 kaki pendek.</li>
+                <li><strong>BOX 1-5:</strong> Kaki panjang, 11 tiang level, 8 set penyangga, fondasi persegi.</li>
+                <li><strong>BOX 1-6:</strong> Sisa 23 tiang level.</li>
+                <li>Pastikan alat kerja (2 bor, 4 rachet, 1 kunci inggris, safety line) lengkap.</li>
               </ol>
             </div>
+
           </div>
         </section>
 
@@ -235,18 +444,21 @@ location: "JA-01"
           </div>
 
           <div class="grid-cards">
+            
             <div class="mission-card" style="border-top: 4px solid #0284c7;">
               <div class="card-emoji">📹</div>
-              <h3>Perangkat Kamera & Video</h3>
+              <h3>Kamera, Video & Konverter</h3>
               <div class="table-wrapper">
                 <table>
-                  <thead><tr><th>NAMA PERALATAN</th><th>JUMLAH</th></tr></thead>
+                  <thead><tr><th>NAMA PERALATAN</th><th>SPESIFIKASI / MODEL</th><th>JML</th></tr></thead>
                   <tbody>
-                    <tr><td>SET KAMERA PTZ (V60CL, Tripod, dll)</td><td>2 SET</td></tr>
-                    <tr><td>KAMERA PTZ BAPTISAN (V60CL)</td><td>1 UNIT</td></tr>
-                    <tr><td>SWITCHER VIDEO (ATEM Studio HD)</td><td>1 UNIT</td></tr>
-                    <tr><td>VIDEO BOOTH SET B</td><td>2 UNIT</td></tr>
-                    <tr><td>LAPTOP (HP 14s)</td><td>2 UNIT</td></tr>
+                    <tr><td>SET KAMERA PTZ</td><td>V60CL, Controller, Tripod, Head Support</td><td>2 SET</td></tr>
+                    <tr><td>KAMERA PTZ (BAPTISAN)</td><td>V60CL, HDMI/SDI Out, 20x Zoom</td><td>1 UNIT</td></tr>
+                    <tr><td>SWITCHER VIDEO</td><td>ATEM Television Studio HD (Blackmagic)</td><td>1 UNIT</td></tr>
+                    <tr><td>VIDEO BOOTH SET B</td><td>Switcher, Media Player, Monitor, Distributor</td><td>2 UNIT</td></tr>
+                    <tr><td>LAPTOP</td><td>HP 14s (HDMI, USB-C, SD Card)</td><td>2 UNIT</td></tr>
+                    <tr><td>VIDEO CONVERTER BOX</td><td>SDI Distributor, SDI to HDMI, HDMI to SDI</td><td>2 BOX</td></tr>
+                    <tr><td>AUDIO TO SDI CONVERTER</td><td>Blackmagic Mini Converter (4x TRS In)</td><td>2 UNIT</td></tr>
                   </tbody>
                 </table>
               </div>
@@ -257,17 +469,23 @@ location: "JA-01"
               <h3>Layar Display & Pengabelan</h3>
               <div class="table-wrapper">
                 <table>
-                  <thead><tr><th>NAMA PERALATAN</th><th>JUMLAH</th></tr></thead>
+                  <thead><tr><th>NAMA PERALATAN</th><th>SPESIFIKASI / MODEL</th><th>JML</th></tr></thead>
                   <tbody>
-                    <tr><td>LED WALL INDOOR (Set 5x3m)</td><td>2 SET</td></tr>
-                    <tr><td>TV CASE 65" (Termasuk Lifter)</td><td>7 UNIT*</td></tr>
-                    <tr><td>TV SET 40" (MTC40)</td><td>2 UNIT</td></tr>
-                    <tr><td>BOX VIDEO CABLES (SDI, HDMI, LAN)</td><td>2 BOX</td></tr>
-                    <tr><td>KABEL SDI RG6 (Range 50m / 11-30m / 3-5m)</td><td>22 UNIT</td></tr>
+                    <tr><td>LED WALL INDOOR</td><td>Set 5x3m (DICOLOR D-481) + PDU & Tools</td><td>2 SET</td></tr>
+                    <tr><td>TV CASE 65"</td><td>Termasuk Lifter, SDI & Power Cable</td><td>7 UNIT*</td></tr>
+                    <tr><td>TV SET 40"</td><td>TV MTC40 dengan SDI Loop & Case</td><td>2 UNIT</td></tr>
+                    <tr><td>MONITOR MULTIVIEW</td><td>ASUS 24" (HDMI, DVI-D, D-Sub)</td><td>2 UNIT</td></tr>
+                    <tr><td>BOX VIDEO CABLES</td><td>SDI (100m, 40m, 5m), HDMI, LAN 100m</td><td>2 BOX</td></tr>
+                    <tr><td>KABEL SDI RG6</td><td>Panjang 50m</td><td>10 UNIT</td></tr>
+                    <tr><td>KABEL SDI RG6</td><td>Range 11-30m</td><td>4 UNIT</td></tr>
+                    <tr><td>KABEL SDI RG6</td><td>Range 3-5m</td><td>8 UNIT</td></tr>
+                    <tr><td>KABEL HDMI</td><td>FTH5003 (3m, Hitam)</td><td>8 UNIT</td></tr>
                   </tbody>
                 </table>
               </div>
+              <p style="font-size: 0.8rem; color: #6b7280; margin-top: 10px;"><em>*Catatan: Dokumen menyebutkan 7 unit cukup untuk Regional Semarang.</em></p>
             </div>
+
           </div>
         </section>
 

@@ -8,409 +8,301 @@ location: "JA-01"
     {% include head.html %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Audio Diagram Interaktif & Profesional</title>
+    <title>Audio Routing Diagram Matrix - Pro Version</title>
     
     <style>
-        /* KHUSUS DIAGRAM AUDIO - Menggunakan Variable Bawaan Web */
+        /* ====================================================
+           SISTEM WARNA (LIGHT & DARK MODE SUPPORT)
+           ==================================================== */
         :root {
-            /* Warna Kategori (Tetap dipertahankan karena spesifik diagram) */
-            --cat-mic: linear-gradient(135deg, #10b981, #059669);
-            --cat-media: linear-gradient(135deg, #0ea5e9, #0284c7);
-            --cat-mixer: linear-gradient(135deg, #8b5cf6, #6d28d9);
-            --cat-proc: linear-gradient(135deg, #f59e0b, #d97706);
-            --cat-amp: linear-gradient(135deg, #ef4444, #b91c1c);
-            --cat-spk: linear-gradient(135deg, #ec4899, #be185d);
+            --bg-canvas: #f8fafc;
+            --grid-dot: #cbd5e1;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --card-bg: #ffffff;
+            --card-border: #94a3b8; /* Dipertegas */
+            
+            --cable-lbl-bg: #ffffff;
+            --cable-lbl-text: #0f172a;
+            
+            --c-mic: #10b981;
+            --c-media: #0ea5e9;
+            --c-mix: #d946ef;
+            --c-tx: #f59e0b;
+            --c-split: #ef4444;
+            --c-dlms: #3b82f6;
+            --c-spk: #64748b;
         }
 
-        /* AREA KANVAS / WORKSPACE RESPONSIVE */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-canvas: #0b1120;
+                --grid-dot: #334155;
+                --text-main: #f8fafc;
+                --text-muted: #94a3b8;
+                --card-bg: #1e293b;
+                --card-border: #475569; /* Dipertegas */
+                
+                --cable-lbl-bg: #1e293b;
+                --cable-lbl-text: #f8fafc;
+            }
+        }
+
+        body { margin: 0; font-family: 'Segoe UI', system-ui, sans-serif; overflow: hidden; color: var(--text-main); }
+
+        /* KANVAS DRAG & DROP */
         .diagram-wrapper {
-            position: relative;
-            width: 100vw;
-            height: 100vh;
-            background-color: var(--bg-color, #f1f5f9);
-            /* Dot grid menggunakan warna border agar menyatu di dark/light mode */
-            background-image: radial-gradient(var(--border-color, #cbd5e1) 1.5px, transparent 1.5px);
-            background-size: 25px 25px;
-            overflow: auto; 
-            cursor: grab;
-            transition: background-color 0.3s ease;
+            position: relative; width: 100vw; height: 100vh;
+            background-color: var(--bg-canvas);
+            background-image: radial-gradient(var(--grid-dot) 1.5px, transparent 1.5px);
+            background-size: 30px 30px; overflow: auto; cursor: grab;
+            transition: background-color 0.3s ease, background-image 0.3s ease;
         }
         .diagram-wrapper:active { cursor: grabbing; }
 
-        /* LAYER SVG UNTUK MENGGAMBAR KABEL */
-        #svg-canvas {
-            position: absolute;
-            top: 0; left: 0;
-            width: 5500px; 
-            height: 3500px;
-            pointer-events: none; 
-            z-index: 50; 
-        }
+        /* LAYER SVG KABEL */
+        #svg-canvas { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 10; }
+        
+        .cable-flow { stroke-dasharray: 10, 10; animation: flowAnim 1s linear infinite; }
+        @keyframes flowAnim { from { stroke-dashoffset: 20; } to { stroke-dashoffset: 0; } }
+        
+        /* Label Teks Super Jelas */
+        .cable-label-bg { fill: var(--cable-lbl-bg); stroke-width: 2; transition: fill 0.3s; }
+        .cable-label-text { fill: var(--cable-lbl-text); font-size: 12px; font-weight: 800; text-anchor: middle; transition: fill 0.3s; }
 
-        /* ANIMASI KABEL */
-        .cable-flow {
-            stroke-dasharray: 8, 8;
-            animation: flowAnimation 1s linear infinite;
-        }
-        @keyframes flowAnimation {
-            from { stroke-dashoffset: 16; }
-            to { stroke-dashoffset: 0; }
-        }
-
-        /* CLASS UNTUK LABEL SVG AGAR TIDAK ERROR HITAM */
-        .cable-label-bg {
-            fill: var(--card-bg, #ffffff);
-            transition: fill 0.3s ease;
-        }
-        .cable-label-text {
-            fill: var(--text-dark, #0f172a);
-            transition: fill 0.3s ease;
-        }
-
-        /* GRID LAYOUT UNTUK NODE */
-        .node-grid {
-            display: flex;
-            flex-direction: row;
-            gap: 260px; 
-            padding: 100px 120px;
+        /* CSS GRID MATRIX LAYOUT */
+        .diagram-grid {
+            display: grid;
+            grid-template-columns: 240px 240px 240px 260px 240px 320px minmax(500px, max-content);
+            grid-auto-rows: minmax(80px, auto);
+            gap: 40px 180px; 
+            padding: 100px 150px;
             position: relative;
-            z-index: 10;
-            min-width: max-content;
+            z-index: 20;
+            width: max-content;
+            align-items: center; 
         }
 
-        .node-column {
-            display: flex;
-            flex-direction: column;
-            gap: 40px; 
-            justify-content: center;
+        /* Grouping Input agar rapat */
+        .input-group {
+            display: flex; flex-direction: column; gap: 20px; justify-content: center;
         }
 
-        /* DESAIN NODE CARD (ALAT) */
+        /* DESAIN NODE: HARDWARE / RACK EQUIPMENT STYLE */
         .node {
-            width: 290px;
-            background: var(--card-bg, #ffffff);
-            border-radius: 12px;
-            border: 1px solid var(--border-color, #cbd5e1);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            position: relative;
-            transition: all 0.3s ease;
+            position: relative; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            display: flex; align-items: center; padding: 12px 16px; gap: 15px;
+            transition: transform 0.2s, box-shadow 0.2s, background 0.3s, border-color 0.3s;
+            background: var(--card-bg); border: 2px solid var(--card-border);
         }
+        .node:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.3); z-index: 30; }
+
+        .style-input { border-left: 6px solid var(--c-mic); }
+        .style-media { border-left: 6px solid var(--c-media); }
         
-        .node:hover {
-            border-color: var(--primary-orange, #8b5cf6);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-            transform: translateY(-3px);
-            z-index: 60; 
+        .style-rack {
+            background: #1e293b !important; color: #f8fafc !important; border: 2px solid #0f172a !important;
+            border-left: 14px solid #334155 !important; border-right: 14px solid #334155 !important;
         }
+        .style-rack::before, .style-rack::after {
+            content: ''; position: absolute; left: -9px; width: 4px; height: 4px; background: #0f172a; border-radius: 50%;
+        }
+        .style-rack::before { top: 12px; } .style-rack::after { bottom: 12px; }
+
+        .node-icon { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 8px; flex-shrink: 0; }
+        .node-info { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+        .node-info h4 { margin: 0; font-size: 13.5px; font-weight: 700; letter-spacing: 0.5px; }
+        .node-info p { margin: 0; font-size: 11px; opacity: 0.8; font-family: monospace; }
         
-        .node.mixer-node { width: 340px; border-width: 2px; }
+        .style-input .node-info p, .style-media .node-info p { color: var(--text-muted); }
 
-        /* HEADER NODE */
-        .node-header {
-            display: flex;
-            align-items: center;
-            padding: 12px 15px;
-            border-radius: 11px 11px 0 0;
-            cursor: pointer;
-            user-select: none;
-            color: #ffffff;
-        }
-        .bg-mic { background: var(--cat-mic); }
-        .bg-media { background: var(--cat-media); }
-        .bg-mixer { background: var(--cat-mixer); }
-        .bg-proc { background: var(--cat-proc); }
-        .bg-amp { background: var(--cat-amp); }
-        .bg-spk { background: var(--cat-spk); }
-
-        .node-badge {
-            background: rgba(0,0,0,0.3);
-            font-size: 10px;
-            padding: 3px 6px;
-            border-radius: 6px;
-            margin-right: 10px;
-            font-weight: bold;
-            letter-spacing: 0.5px;
-        }
-
-        .node-title { flex: 1; font-size: 14px; font-weight: 700; }
-        .node-toggle { font-size: 18px; font-weight: bold; line-height: 1; }
-
-        /* BODY NODE */
-        .node-body {
-            padding: 15px;
-            font-size: 12px;
-            color: var(--text-gray, #475569);
-            line-height: 1.6;
-            display: block; 
-        }
-        .node-body p { 
-            margin: 0 0 6px 0; 
-            display: flex; 
-            justify-content: space-between; 
-            border-bottom: 1px dashed var(--border-color, #cbd5e1); 
-            padding-bottom: 4px; 
-        }
-        .node-body p:last-child { margin: 0; border-bottom: none; padding-bottom: 0; }
-        .node-body strong { color: var(--text-dark, #0f172a); font-weight: 600; }
-
-        /* TITIK KONEKSI (PORTS) */
+        /* Titik Port */
         .port {
-            width: 14px; height: 14px; 
-            background: var(--bg-color, #f1f5f9); 
-            border: 3px solid var(--text-dark, #0f172a);
+            width: 12px; height: 12px; background: var(--bg-canvas); border: 3px solid #0f172a;
             border-radius: 50%; position: absolute; top: 50%; transform: translateY(-50%); z-index: 5;
         }
-        .port-in { left: -9px; }
-        .port-out { right: -9px; }
+        .port-in { left: -22px; } 
+        .port-out { right: -22px; }
+        .style-input .port-out, .style-media .port-out { right: -8px; } 
 
-        /* Label Khusus HP */
-        .mobile-hint {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            background: var(--text-dark, #0f172a); color: var(--bg-color, #f1f5f9); padding: 10px 20px; border-radius: 20px;
-            font-size: 12px; font-weight: bold; z-index: 9999; pointer-events: none;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2); display: none;
+        /* DESAIN SPEAKER ZONES & LINE ARRAY */
+        .zone-group {
+            display: flex; flex-direction: column; gap: 15px; background: rgba(100,116,139,0.05);
+            padding: 20px 25px; border-radius: 12px; border: 1px dashed var(--text-muted); position: relative;
         }
-
-        @media (max-width: 768px) {
-            .mobile-hint { display: block; animation: fadeOut 4s forwards 2s; }
-            .node { width: 250px; }
-            .node-grid { gap: 100px; padding: 40px; }
+        .zone-title { 
+            font-size: 13px; font-weight: 800; color: var(--text-main); text-transform: uppercase; 
+            border-bottom: 2px solid var(--c-spk); padding-bottom: 5px; display: inline-block; 
         }
+        .speaker-row { display: flex; flex-direction: row; gap: 45px; align-items: center; position: relative; }
 
-        @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
+        .spk-unit {
+            width: 48px; height: 70px; background: #1e293b; border-radius: 6px; position: relative;
+            box-shadow: 3px 4px 10px rgba(0,0,0,0.2); border: 2px solid #475569;
+            display: flex; flex-direction: column; align-items: center; justify-content: space-evenly; z-index: 20;
+        }
+        .spk-unit::before { content: ''; width: 14px; height: 14px; background: #0f172a; border-radius: 50%; } 
+        .spk-unit::after { content: ''; width: 28px; height: 28px; background: #0f172a; border-radius: 50%; border: 1px solid #334155; } 
+
+        .foh-array-stack {
+            display: flex; flex-direction: column; gap: 2px; align-items: center; background: #1e293b; padding: 6px;
+            border-radius: 8px; border: 2px solid #be123c; box-shadow: 0 5px 15px rgba(226, 29, 72, 0.2); position: relative; z-index: 20;
+        }
+        .array-module { width: 65px; height: 22px; background: #0f172a; border-radius: 3px; border-bottom: 2px solid #334155; display: flex; justify-content: center; align-items: center; }
+        .array-module::before { content: ''; width: 9px; height: 9px; background: #475569; border-radius: 50%; }
+
+        svg { width: 24px; height: 24px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
     </style>
 </head>
 <body>
 
-<div class="mobile-hint">👆 Geser layar untuk menjelajah diagram</div>
-
 <div class="diagram-wrapper" id="diagram-container">
     <svg id="svg-canvas"></svg>
 
-    <div class="node-grid">
+    <div class="diagram-grid">
         
-        <div class="node-column">
-            <div class="node" id="in-mic1">
-                <div class="node-header bg-mic" onclick="toggleNode('in-mic1')">
-                    <span class="node-badge">MIC</span><div class="node-title">Mic 1 - Ketua</div><div class="node-toggle">−</div>
-                </div>
-                <div class="node-body"><p><strong>Tipe:</strong> Shure SM58</p><p><strong>Channel:</strong> CH 01</p></div>
-                <div class="port port-out"></div>
+        <div class="input-group" style="grid-area: 1 / 1 / 10 / 2;">
+            <div class="node style-input" id="in-mic1">
+                <div class="node-icon"><svg><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg></div>
+                <div class="node-info"><h4>Mic 1 - Ketua</h4><p>Shure SM58 • CH 01</p></div><div class="port port-out"></div>
             </div>
-            <div class="node" id="in-mic2">
-                <div class="node-header bg-mic" onclick="toggleNode('in-mic2')">
-                    <span class="node-badge">MIC</span><div class="node-title">Mic 2 - Mimbar</div><div class="node-toggle">−</div>
-                </div>
-                <div class="node-body"><p><strong>Tipe:</strong> Sennheiser e835</p><p><strong>Channel:</strong> CH 02</p></div>
-                <div class="port port-out"></div>
+            <div class="node style-input" id="in-mic2">
+                <div class="node-icon"><svg><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg></div>
+                <div class="node-info"><h4>Mic 2 - Mimbar</h4><p>Sennheiser • CH 02</p></div><div class="port port-out"></div>
             </div>
-            <div class="node" id="in-mic3">
-                <div class="node-header bg-mic" onclick="toggleNode('in-mic3')">
-                    <span class="node-badge">MIC</span><div class="node-title">Mic 3 - Partisipan 1</div><div class="node-toggle">−</div>
-                </div>
-                <div class="node-body"><p><strong>Tipe:</strong> Shure SM58</p><p><strong>Channel:</strong> CH 03</p></div>
-                <div class="port port-out"></div>
+            <div class="node style-input" id="in-mic3">
+                <div class="node-icon"><svg><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg></div>
+                <div class="node-info"><h4>Mic 3 - Peserta 1</h4><p>Shure SM58 • CH 03</p></div><div class="port port-out"></div>
             </div>
-            <div class="node" id="in-mic4">
-                <div class="node-header bg-mic" onclick="toggleNode('in-mic4')">
-                    <span class="node-badge">MIC</span><div class="node-title">Mic 4 - Partisipan 2</div><div class="node-toggle">−</div>
-                </div>
-                <div class="node-body"><p><strong>Tipe:</strong> Shure SM58</p><p><strong>Channel:</strong> CH 04</p></div>
-                <div class="port port-out"></div>
+            <div class="node style-input" id="in-mic4">
+                <div class="node-icon"><svg><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg></div>
+                <div class="node-info"><h4>Mic 4 - Peserta 2</h4><p>Shure SM58 • CH 04</p></div><div class="port port-out"></div>
             </div>
 
-            <div class="node" id="in-med1">
-                <div class="node-header bg-media" onclick="toggleNode('in-med1')">
-                    <span class="node-badge">LAPTOP</span><div class="node-title">Media Utama</div><div class="node-toggle">−</div>
-                </div>
-                <div class="node-body"><p><strong>Channel:</strong> CH 09-10</p><p><strong>Format:</strong> Stereo Audio</p></div>
-                <div class="port port-out"></div>
+            <div class="node style-media" id="in-med1" style="margin-top: 30px;">
+                <div class="node-icon"><svg><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="2" y1="20" x2="22" y2="20"/></svg></div>
+                <div class="node-info"><h4>Media Utama</h4><p>Laptop • CH 09-10</p></div><div class="port port-out"></div>
             </div>
-            <div class="node" id="in-med2">
-                <div class="node-header bg-media" onclick="toggleNode('in-med2')">
-                    <span class="node-badge">LAPTOP</span><div class="node-title">Media AD Utama</div><div class="node-toggle">−</div>
-                </div>
-                <div class="node-body"><p><strong>Channel:</strong> CH 11-12</p><p><strong>Format:</strong> Stereo Audio</p></div>
-                <div class="port port-out"></div>
+            <div class="node style-media" id="in-med2">
+                <div class="node-icon"><svg><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="2" y1="20" x2="22" y2="20"/></svg></div>
+                <div class="node-info"><h4>Media AD Utama</h4><p>Laptop • CH 11-12</p></div><div class="port port-out"></div>
             </div>
-            <div class="node" id="in-med3">
-                <div class="node-header bg-media" onclick="toggleNode('in-med3')">
-                    <span class="node-badge">LAPTOP</span><div class="node-title">Media Backup</div><div class="node-toggle">−</div>
-                </div>
-                <div class="node-body"><p><strong>Channel:</strong> CH 13-14</p><p><strong>Format:</strong> Stereo Audio</p></div>
-                <div class="port port-out"></div>
+            <div class="node style-media" id="in-med3">
+                <div class="node-icon"><svg><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="2" y1="20" x2="22" y2="20"/></svg></div>
+                <div class="node-info"><h4>Media Backup</h4><p>Laptop • CH 13-14</p></div><div class="port port-out"></div>
             </div>
-            <div class="node" id="in-med4">
-                <div class="node-header bg-media" onclick="toggleNode('in-med4')">
-                    <span class="node-badge">LAPTOP</span><div class="node-title">Media AD Backup</div><div class="node-toggle">−</div>
-                </div>
-                <div class="node-body"><p><strong>Channel:</strong> CH 15-16</p><p><strong>Format:</strong> Stereo Audio</p></div>
-                <div class="port port-out"></div>
+            <div class="node style-media" id="in-med4">
+                <div class="node-icon"><svg><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="2" y1="20" x2="22" y2="20"/></svg></div>
+                <div class="node-info"><h4>Media AD Backup</h4><p>Laptop • CH 15-16</p></div><div class="port port-out"></div>
             </div>
         </div>
 
-        <div class="node-column">
-            <div class="node mixer-node" id="mix-main">
-                <div class="node-header bg-mixer" onclick="toggleNode('mix-main')">
-                    <span class="node-badge">MIXER</span><div class="node-title">Yamaha MG16XU</div><div class="node-toggle">−</div>
-                </div>
-                <div class="node-body">
-                    <p><strong>Fungsi:</strong> Audio Console Utama</p>
-                    <p><strong>Total In:</strong> 8 Source Active</p>
-                    <p><strong>Routing Out:</strong> Stereo Out L & R</p>
-                </div>
-                <div class="port port-in"></div>
-                <div class="port port-out"></div>
-            </div>
+        <div class="node style-rack" id="mix-main" style="grid-area: 4 / 2; transform: translateY(40px);">
+            <div class="node-icon" style="color:#d946ef;"><svg><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></div>
+            <div class="node-info"><h4>Yamaha MG16XU</h4><p>Audio Console Utama</p></div>
+            <div class="port port-in"></div><div class="port port-out"></div>
         </div>
 
-        <div class="node-column">
-            <div class="node" id="proc-geq">
-                <div class="node-header bg-proc" onclick="toggleNode('proc-geq')">
-                    <span class="node-badge">EQ</span><div class="node-title">GEQ DBX 231</div><div class="node-toggle">−</div>
-                </div>
-                <div class="node-body">
-                    <p><strong>Fungsi:</strong> Tonal Master / RTA</p>
-                    <p><strong>Input:</strong> Stereo Out Mixer</p>
-                </div>
-                <div class="port port-in"></div>
-                <div class="port port-out"></div>
-            </div>
-
-            <div class="node" id="proc-split">
-                <div class="node-header bg-proc" onclick="toggleNode('proc-split')">
-                    <span class="node-badge">SPLIT</span><div class="node-title">Splitter Behringer</div><div class="node-toggle">−</div>
-                </div>
-                <div class="node-body">
-                    <p><strong>Input:</strong> Out GEQ L & R</p>
-                    <p><strong>Out L & R:</strong> Ke DLMS (Zona)</p>
-                    <p><strong>Out 1-2:</strong> Ke PROTEA Unit 1</p>
-                    <p><strong>Out 3-4:</strong> Ke PROTEA Unit 2</p>
-                </div>
-                <div class="port port-in"></div>
-                <div class="port port-out"></div>
-            </div>
+        <div class="node style-rack" id="tx-fm" style="grid-area: 2 / 3;">
+            <div class="node-icon" style="color:#f59e0b;"><svg><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48 0a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/></svg></div>
+            <div class="node-info"><h4>FM Transmitter</h4><p>Broadcast Area Radio</p></div>
+            <div class="port port-in"></div>
+        </div>
+        <div class="node style-rack" id="proc-geq" style="grid-area: 4 / 3; transform: translateY(40px);">
+            <div class="node-icon" style="color:#10b981;"><svg><rect x="2" y="4" width="20" height="16" rx="2" ry="2"/><line x1="6" y1="8" x2="6" y2="8"/><line x1="10" y1="8" x2="18" y2="8"/><line x1="6" y1="12" x2="6" y2="12"/><line x1="10" y1="12" x2="18" y2="12"/><line x1="6" y1="16" x2="6" y2="16"/><line x1="10" y1="16" x2="18" y2="16"/></svg></div>
+            <div class="node-info"><h4>GEQ DBX 231</h4><p>Tonal Master / RTA</p></div>
+            <div class="port port-in"></div><div class="port port-out"></div>
         </div>
 
-        <div class="node-column">
-            <div class="node" id="amp-protea1">
-                <div class="node-header bg-amp" onclick="toggleNode('amp-protea1')">
-                    <span class="node-badge">AMP</span><div class="node-title">Ampli Utama 1 (PROTEA)</div><div class="node-toggle">−</div>
-                </div>
-                <div class="node-body">
-                    <p><strong>Spesifikasi:</strong> 2 Channel</p>
-                    <p><strong>Target:</strong> Speaker Array HX-5 (L)</p>
-                    <p><strong>Source:</strong> Splitter Out 1 & 2</p>
-                </div>
-                <div class="port port-in"></div>
-                <div class="port port-out"></div>
-            </div>
-
-            <div class="node" id="amp-protea2">
-                <div class="node-header bg-amp" onclick="toggleNode('amp-protea2')">
-                    <span class="node-badge">AMP</span><div class="node-title">Ampli Utama 2 (PROTEA)</div><div class="node-toggle">−</div>
-                </div>
-                <div class="node-body">
-                    <p><strong>Spesifikasi:</strong> 2 Channel</p>
-                    <p><strong>Target:</strong> Speaker Array HX-5 (R)</p>
-                    <p><strong>Source:</strong> Splitter Out 3 & 4</p>
-                </div>
-                <div class="port port-in"></div>
-                <div class="port port-out"></div>
-            </div>
-
-            <div class="node" id="proc-dlms">
-                <div class="node-header bg-proc" onclick="toggleNode('proc-dlms')">
-                    <span class="node-badge">DSP</span><div class="node-title">DLMS</div><div class="node-toggle">−</div>
-                </div>
-                <div class="node-body">
-                    <p><strong>Fungsi:</strong> Manajemen Delay & EQ Zone</p>
-                    <p><strong>Distribusi:</strong> 4 Zona TOA ZA</p>
-                </div>
-                <div class="port port-in"></div>
-                <div class="port port-out"></div>
-            </div>
+        <div class="node style-rack" id="proc-split" style="grid-area: 4 / 4; transform: translateY(40px);">
+            <div class="node-icon" style="color:#ef4444;"><svg><rect x="2" y="4" width="20" height="16" rx="2" ry="2"/><circle cx="8" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="16" cy="12" r="1"/></svg></div>
+            <div class="node-info"><h4>MX882 Splitter</h4><p>Distribusi Utama</p></div>
+            <div class="port port-in"></div><div class="port port-out"></div>
         </div>
 
-        <div class="node-column">
-            <div class="node" id="spk-hx5-1">
-                <div class="node-header bg-spk" onclick="toggleNode('spk-hx5-1')">
-                    <span class="node-badge">SPK</span><div class="node-title">Speaker FOH (Kiri)</div><div class="node-toggle">−</div>
-                </div>
-                <div class="node-body"><p><strong>Tipe:</strong> Array TOA HX-5</p><p><strong>Area:</strong> Hadirin Kiri</p></div>
-                <div class="port port-in"></div>
-            </div>
-
-            <div class="node" id="spk-hx5-2">
-                <div class="node-header bg-spk" onclick="toggleNode('spk-hx5-2')">
-                    <span class="node-badge">SPK</span><div class="node-title">Speaker FOH (Kanan)</div><div class="node-toggle">−</div>
-                </div>
-                <div class="node-body"><p><strong>Tipe:</strong> Array TOA HX-5</p><p><strong>Area:</strong> Hadirin Kanan</p></div>
-                <div class="port port-in"></div>
-            </div>
-
-            <div class="node" id="amp-za1">
-                <div class="node-header bg-amp" onclick="toggleNode('amp-za1')">
-                    <span class="node-badge">AMP</span><div class="node-title">TOA ZA 2240 (1)</div><div class="node-toggle">−</div>
-                </div>
-                <div class="node-body"><p><strong>Area:</strong> Ruangan Blkng Panggung</p></div>
-                <div class="port port-in"></div>
-                <div class="port port-out"></div>
-            </div>
-            <div class="node" id="amp-za2">
-                <div class="node-header bg-amp" onclick="toggleNode('amp-za2')">
-                    <span class="node-badge">AMP</span><div class="node-title">TOA ZA 2240 (2)</div><div class="node-toggle">−</div>
-                </div>
-                <div class="node-body"><p><strong>Area:</strong> Samping Panggung</p></div>
-                <div class="port port-in"></div>
-                <div class="port port-out"></div>
-            </div>
-            <div class="node" id="amp-za3">
-                <div class="node-header bg-amp" onclick="toggleNode('amp-za3')">
-                    <span class="node-badge">AMP</span><div class="node-title">TOA ZA 2240 (3)</div><div class="node-toggle">−</div>
-                </div>
-                <div class="node-body"><p><strong>Area:</strong> Panggung</p></div>
-                <div class="port port-in"></div>
-                <div class="port port-out"></div>
-            </div>
-            <div class="node" id="amp-za4">
-                <div class="node-header bg-amp" onclick="toggleNode('amp-za4')">
-                    <span class="node-badge">AMP</span><div class="node-title">TOA ZA 2240 (4)</div><div class="node-toggle">−</div>
-                </div>
-                <div class="node-body"><p><strong>Area:</strong> Tower Delay (Hadirin)</p></div>
-                <div class="port port-in"></div>
-                <div class="port port-out"></div>
-            </div>
+        <div class="node style-rack" id="proc-dlms" style="grid-area: 5 / 5;">
+            <div class="node-icon" style="color:#3b82f6;"><svg><rect x="2" y="4" width="20" height="16" rx="2" ry="2"/><path d="M6 12h4m4 0h4m-8-4v8"/></svg></div>
+            <div class="node-info"><h4>DLMS DSP</h4><p>Manajemen Delay Zona</p></div>
+            <div class="port port-in"></div><div class="port port-out"></div>
         </div>
 
-        <div class="node-column" style="margin-top: 310px;">
-            <div class="node" id="spk-za1">
-                <div class="node-header bg-spk" onclick="toggleNode('spk-za1')">
-                    <span class="node-badge">SPK</span><div class="node-title">Speaker Zone 1</div><div class="node-toggle">−</div>
-                </div>
-                <div class="node-body"><p><strong>Tipe:</strong> F2000B / F2000BM</p><p><strong>Area:</strong> Belakang Panggung</p></div>
-                <div class="port port-in"></div>
+        <div class="node style-rack" id="amp-protea1" style="grid-area: 1 / 6;"><div class="node-info"><h4>Ampli PROTEA 1</h4><p>FOH Kiri (Ch A & B)</p></div><div class="port port-in"></div><div class="port port-out"></div></div>
+        <div class="node style-rack" id="amp-protea2" style="grid-area: 2 / 6;"><div class="node-info"><h4>Ampli PROTEA 2</h4><p>FOH Kanan (Ch A & B)</p></div><div class="port port-in"></div><div class="port port-out"></div></div>
+        
+        <div class="node style-rack" id="amp-za1" style="grid-area: 3 / 6;"><div class="node-info"><h4>TOA ZA 2240 (1)</h4><p>Belakang Panggung</p></div><div class="port port-in"></div><div class="port port-out"></div></div>
+        <div class="node style-rack" id="amp-za2" style="grid-area: 4 / 6;"><div class="node-info"><h4>TOA ZA 2240 (2)</h4><p>Samping Panggung</p></div><div class="port port-in"></div><div class="port port-out"></div></div>
+        <div class="node style-rack" id="amp-za3" style="grid-area: 5 / 6;"><div class="node-info"><h4>TOA ZA 2240 (3)</h4><p>Panggung Monitor</p></div><div class="port port-in"></div><div class="port port-out"></div></div>
+        <div class="node style-rack" id="amp-za4" style="grid-area: 6 / 6;"><div class="node-info"><h4>TOA ZA 2240 (4)</h4><p>Tower Delay 1</p></div><div class="port port-in"></div><div class="port port-out"></div></div>
+        <div class="node style-rack" id="amp-za5" style="grid-area: 7 / 6;"><div class="node-info"><h4>TOA ZA 2240 (5)</h4><p>Tower Delay 2</p></div><div class="port port-in"></div><div class="port port-out"></div></div>
+        <div class="node style-rack" id="amp-za6" style="grid-area: 8 / 6;"><div class="node-info"><h4>TOA ZA 2240 (6)</h4><p>Ruang Media</p></div><div class="port port-in"></div><div class="port port-out"></div></div>
+        <div class="node style-rack" id="amp-za7" style="grid-area: 9 / 6;"><div class="node-info"><h4>TOA ZA 2240 (7)</h4><p>Ruang P3K</p></div><div class="port port-in"></div><div class="port port-out"></div></div>
+
+        <div class="zone-group" style="grid-area: 1 / 7; border-color: #be123c;">
+            <div class="zone-title" style="border-color: #be123c;">FOH Kiri (TOA HX-5 x 2 Set)</div>
+            <div class="speaker-row" style="gap: 60px;">
+                <div class="foh-array-stack" id="foh-L1"><div class="port port-in"></div><div class="array-module"></div><div class="array-module"></div><div class="array-module"></div><div class="array-module"></div></div>
+                <div class="foh-array-stack" id="foh-L2"><div class="port port-in"></div><div class="array-module"></div><div class="array-module"></div><div class="array-module"></div><div class="array-module"></div></div>
             </div>
-            <div class="node" id="spk-za2">
-                <div class="node-header bg-spk" onclick="toggleNode('spk-za2')">
-                    <span class="node-badge">SPK</span><div class="node-title">Speaker Zone 2</div><div class="node-toggle">−</div>
-                </div>
-                <div class="node-body"><p><strong>Tipe:</strong> F2000B / F2000BM</p><p><strong>Area:</strong> Samping Panggung</p></div>
-                <div class="port port-in"></div>
+        </div>
+        <div class="zone-group" style="grid-area: 2 / 7; border-color: #be123c;">
+            <div class="zone-title" style="border-color: #be123c;">FOH Kanan (TOA HX-5 x 2 Set)</div>
+            <div class="speaker-row" style="gap: 60px;">
+                <div class="foh-array-stack" id="foh-R1"><div class="port port-in"></div><div class="array-module"></div><div class="array-module"></div><div class="array-module"></div><div class="array-module"></div></div>
+                <div class="foh-array-stack" id="foh-R2"><div class="port port-in"></div><div class="array-module"></div><div class="array-module"></div><div class="array-module"></div><div class="array-module"></div></div>
             </div>
-            <div class="node" id="spk-za3">
-                <div class="node-header bg-spk" onclick="toggleNode('spk-za3')">
-                    <span class="node-badge">SPK</span><div class="node-title">Speaker Zone 3</div><div class="node-toggle">−</div>
-                </div>
-                <div class="node-body"><p><strong>Tipe:</strong> F2000B / F2000BM</p><p><strong>Area:</strong> Panggung Monitor</p></div>
-                <div class="port port-in"></div>
+        </div>
+        
+        <div class="zone-group" style="grid-area: 3 / 7;">
+            <div class="zone-title">Zone 1: Blkng Panggung (3 Unit)</div>
+            <div class="speaker-row">
+                <div class="spk-unit" id="z1-1"><div class="port port-in"></div><div class="port port-out"></div></div>
+                <div class="spk-unit" id="z1-2"><div class="port port-in"></div><div class="port port-out"></div></div>
+                <div class="spk-unit" id="z1-3"><div class="port port-in"></div></div>
             </div>
-            <div class="node" id="spk-za4">
-                <div class="node-header bg-spk" onclick="toggleNode('spk-za4')">
-                    <span class="node-badge">SPK</span><div class="node-title">Speaker Zone 4</div><div class="node-toggle">−</div>
-                </div>
-                <div class="node-body"><p><strong>Tipe:</strong> F2000B / F2000BM</p><p><strong>Area:</strong> Tower Delay Hadirin</p></div>
-                <div class="port port-in"></div>
+        </div>
+        <div class="zone-group" style="grid-area: 4 / 7;">
+            <div class="zone-title">Zone 2: Samping Panggung (2 Unit)</div>
+            <div class="speaker-row">
+                <div class="spk-unit" id="z2-1"><div class="port port-in"></div><div class="port port-out"></div></div>
+                <div class="spk-unit" id="z2-2"><div class="port port-in"></div></div>
+            </div>
+        </div>
+        <div class="zone-group" style="grid-area: 5 / 7;">
+            <div class="zone-title">Zone 3: Panggung Monitor (2 Unit)</div>
+            <div class="speaker-row">
+                <div class="spk-unit" id="z3-1"><div class="port port-in"></div><div class="port port-out"></div></div>
+                <div class="spk-unit" id="z3-2"><div class="port port-in"></div></div>
+            </div>
+        </div>
+        <div class="zone-group" style="grid-area: 6 / 7;">
+            <div class="zone-title">Zone 4: Tower Delay 1 (5 Unit)</div>
+            <div class="speaker-row">
+                <div class="spk-unit" id="z4-1"><div class="port port-in"></div><div class="port port-out"></div></div>
+                <div class="spk-unit" id="z4-2"><div class="port port-in"></div><div class="port port-out"></div></div>
+                <div class="spk-unit" id="z4-3"><div class="port port-in"></div><div class="port port-out"></div></div>
+                <div class="spk-unit" id="z4-4"><div class="port port-in"></div><div class="port port-out"></div></div>
+                <div class="spk-unit" id="z4-5"><div class="port port-in"></div></div>
+            </div>
+        </div>
+        <div class="zone-group" style="grid-area: 7 / 7;">
+            <div class="zone-title">Zone 5: Tower Delay 2 (2 Unit)</div>
+            <div class="speaker-row">
+                <div class="spk-unit" id="z5-1"><div class="port port-in"></div><div class="port port-out"></div></div>
+                <div class="spk-unit" id="z5-2"><div class="port port-in"></div></div>
+            </div>
+        </div>
+        <div class="zone-group" style="grid-area: 8 / 7;">
+            <div class="zone-title">Zone 6: Ruang Media (2 Unit)</div>
+            <div class="speaker-row">
+                <div class="spk-unit" id="z6-1"><div class="port port-in"></div><div class="port port-out"></div></div>
+                <div class="spk-unit" id="z6-2"><div class="port port-in"></div></div>
+            </div>
+        </div>
+        <div class="zone-group" style="grid-area: 9 / 7;">
+            <div class="zone-title">Zone 7: Ruang P3K (2 Unit)</div>
+            <div class="speaker-row">
+                <div class="spk-unit" id="z7-1"><div class="port port-in"></div><div class="port port-out"></div></div>
+                <div class="spk-unit" id="z7-2"><div class="port port-in"></div></div>
             </div>
         </div>
 
@@ -418,53 +310,70 @@ location: "JA-01"
 </div>
 
 <script>
-    // Konfigurasi Sambungan Kabel
     const cables = [
-        // Mic Routing 
-        { from: 'in-mic1', to: 'mix-main', label: 'XLR CH 1', color: '#10b981' },
-        { from: 'in-mic2', to: 'mix-main', label: 'XLR CH 2', color: '#10b981' },
-        { from: 'in-mic3', to: 'mix-main', label: 'XLR CH 3', color: '#10b981' },
-        { from: 'in-mic4', to: 'mix-main', label: 'XLR CH 4', color: '#10b981' },
+        // Inputs -> Mixer (Kurva Standar)
+        { from: 'in-mic1', to: 'mix-main', label: 'XLR', color: 'var(--c-mic)' },
+        { from: 'in-mic2', to: 'mix-main', label: 'XLR', color: 'var(--c-mic)' },
+        { from: 'in-mic3', to: 'mix-main', label: 'XLR', color: 'var(--c-mic)' },
+        { from: 'in-mic4', to: 'mix-main', label: 'XLR', color: 'var(--c-mic)' },
+        { from: 'in-med1', to: 'mix-main', label: 'TRS', color: 'var(--c-media)' },
+        { from: 'in-med2', to: 'mix-main', label: 'TRS', color: 'var(--c-media)' },
+        { from: 'in-med3', to: 'mix-main', label: 'TRS', color: 'var(--c-media)' },
+        { from: 'in-med4', to: 'mix-main', label: 'TRS', color: 'var(--c-media)' },
         
-        // Media Routing 
-        { from: 'in-med1', to: 'mix-main', label: 'Jack 3.5mm to TRS (CH 9-10)', color: '#0ea5e9' },
-        { from: 'in-med2', to: 'mix-main', label: 'Jack 3.5mm to TRS (CH 11-12)', color: '#0ea5e9' },
-        { from: 'in-med3', to: 'mix-main', label: 'Jack 3.5mm to TRS (CH 13-14)', color: '#0ea5e9' },
-        { from: 'in-med4', to: 'mix-main', label: 'Jack 3.5mm to TRS (CH 15-16)', color: '#0ea5e9' },
+        // Mixer -> Prosesor
+        { from: 'mix-main', to: 'tx-fm', label: 'Group 1-2', color: 'var(--c-tx)' },
+        { from: 'mix-main', to: 'proc-geq', label: 'Stereo L/R', color: 'var(--c-mix)' },
+        { from: 'proc-geq', to: 'proc-split', label: 'XLR L/R', color: 'var(--c-mix)' },
         
-        // Mixer ke Processor 
-        { from: 'mix-main', to: 'proc-geq', label: 'Stereo Out L/R', color: '#d946ef' },
-        { from: 'proc-geq', to: 'proc-split', label: 'XLR Out L/R', color: '#d946ef' },
+        // Splitter -> Distribusi (MENGGUNAKAN ROUTING ELBOW/SIKU ANTI TABRAKAN!)
+        { from: 'proc-split', to: 'amp-protea1', label: 'Out 1-2', color: 'var(--c-split)', route: 'elbow', xOffset: 40 },
+        { from: 'proc-split', to: 'amp-protea2', label: 'Out 3-4', color: 'var(--c-split)', route: 'elbow', xOffset: 65 },
+        { from: 'proc-split', to: 'proc-dlms', label: 'Main L/R', color: '#eab308', route: 'elbow', xOffset: 90 },
+        { from: 'proc-split', to: 'amp-za6', label: 'TRS Out 5', color: '#eab308', route: 'elbow', xOffset: 115 },
+        { from: 'proc-split', to: 'amp-za7', label: 'TRS Out 6', color: '#eab308', route: 'elbow', xOffset: 140 },
         
-        // Splitter ke FOH Amplifiers 
-        { from: 'proc-split', to: 'amp-protea1', label: 'Out 1 & 2', color: '#ef4444' },
-        { from: 'proc-split', to: 'amp-protea2', label: 'Out 3 & 4', color: '#ef4444' },
-        
-        // Splitter ke DLMS 
-        { from: 'proc-split', to: 'proc-dlms', label: 'Out L/R (Master Zona)', color: '#eab308' },
-        
-        // DLMS ke Ampli ZA 
-        { from: 'proc-dlms', to: 'amp-za1', label: 'Zone 1 (Belakang Pnggng)', color: '#3b82f6' },
-        { from: 'proc-dlms', to: 'amp-za2', label: 'Zone 2 (Samping Pnggng)', color: '#3b82f6' },
-        { from: 'proc-dlms', to: 'amp-za3', label: 'Zone 3 (Panggung)', color: '#3b82f6' },
-        { from: 'proc-dlms', to: 'amp-za4', label: 'Zone 4 (Delay)', color: '#3b82f6' },
+        // DLMS -> Ampli ZA
+        { from: 'proc-dlms', to: 'amp-za1', label: 'Zone 1', color: 'var(--c-dlms)' },
+        { from: 'proc-dlms', to: 'amp-za2', label: 'Zone 2', color: 'var(--c-dlms)' },
+        { from: 'proc-dlms', to: 'amp-za3', label: 'Zone 3', color: 'var(--c-dlms)' },
+        { from: 'proc-dlms', to: 'amp-za4', label: 'Zone 4', color: 'var(--c-dlms)' },
+        { from: 'proc-dlms', to: 'amp-za5', label: 'Zone 5', color: 'var(--c-dlms)' },
 
-        // Ampli FOH ke Speaker Array 
-        { from: 'amp-protea1', to: 'spk-hx5-1', label: 'Kabel Speaker (L)', color: '#be123c' },
-        { from: 'amp-protea2', to: 'spk-hx5-2', label: 'Kabel Speaker (R)', color: '#be123c' },
+        // Amps -> INDEPENDENT FOH Arrays (Diatur Offset Y Labelnya)
+        { from: 'amp-protea1', to: 'foh-L1', label: 'SpeakON (Ch A)', color: '#be123c', lblOffsetY: -22, lblOffsetX: -40 },
+        { from: 'amp-protea1', to: 'foh-L2', label: 'SpeakON (Ch B)', color: '#be123c', lblOffsetY: 22, lblOffsetX: 40 },
+        { from: 'amp-protea2', to: 'foh-R1', label: 'SpeakON (Ch A)', color: '#be123c', lblOffsetY: -22, lblOffsetX: -40 },
+        { from: 'amp-protea2', to: 'foh-R2', label: 'SpeakON (Ch B)', color: '#be123c', lblOffsetY: 22, lblOffsetX: 40 },
 
-        // Ampli ZA ke Speaker F2000 
-        { from: 'amp-za1', to: 'spk-za1', label: 'High-Z (Com/100V)', color: '#64748b' },
-        { from: 'amp-za2', to: 'spk-za2', label: 'High-Z (Com/100V)', color: '#64748b' },
-        { from: 'amp-za3', to: 'spk-za3', label: 'High-Z (Com/100V)', color: '#64748b' },
-        { from: 'amp-za4', to: 'spk-za4', label: 'High-Z (Com/100V)', color: '#64748b' }
+        // Amps -> Speakers Master Zona
+        { from: 'amp-za1', to: 'z1-1', label: '100V Hot/Com', color: 'var(--c-spk)' },
+        { from: 'amp-za2', to: 'z2-1', label: '100V Hot/Com', color: 'var(--c-spk)' },
+        { from: 'amp-za3', to: 'z3-1', label: '100V Hot/Com', color: 'var(--c-spk)' },
+        { from: 'amp-za4', to: 'z4-1', label: '100V Hot/Com', color: 'var(--c-spk)' },
+        { from: 'amp-za5', to: 'z5-1', label: '100V Hot/Com', color: 'var(--c-spk)' },
+        { from: 'amp-za6', to: 'z6-1', label: '100V Hot/Com', color: 'var(--c-spk)' },
+        { from: 'amp-za7', to: 'z7-1', label: '100V Hot/Com', color: 'var(--c-spk)' },
+
+        // Jumper Paralel Speaker Internal
+        { from: 'z1-1', to: 'z1-2', color: '#94a3b8' }, { from: 'z1-2', to: 'z1-3', color: '#94a3b8' },
+        { from: 'z2-1', to: 'z2-2', color: '#94a3b8' },
+        { from: 'z3-1', to: 'z3-2', color: '#94a3b8' },
+        { from: 'z4-1', to: 'z4-2', color: '#94a3b8' }, { from: 'z4-2', to: 'z4-3', color: '#94a3b8' }, { from: 'z4-3', to: 'z4-4', color: '#94a3b8' }, { from: 'z4-4', to: 'z4-5', color: '#94a3b8' },
+        { from: 'z5-1', to: 'z5-2', color: '#94a3b8' },
+        { from: 'z6-1', to: 'z6-2', color: '#94a3b8' },
+        { from: 'z7-1', to: 'z7-2', color: '#94a3b8' }
     ];
 
     function drawConnections() {
         const svg = document.getElementById('svg-canvas');
         const container = document.getElementById('diagram-container');
-        const cRect = container.getBoundingClientRect();
+        const grid = document.querySelector('.diagram-grid');
         
+        svg.style.width = Math.max(container.scrollWidth, grid.offsetWidth + 200) + 'px';
+        svg.style.height = Math.max(container.scrollHeight, grid.offsetHeight + 200) + 'px';
+        
+        const cRect = container.getBoundingClientRect();
         let svgContent = '';
 
         cables.forEach(link => {
@@ -481,49 +390,61 @@ location: "JA-01"
             const x2 = rectTo.left + rectTo.width/2 - cRect.left + container.scrollLeft;
             const y2 = rectTo.top + rectTo.height/2 - cRect.top + container.scrollTop;
             
-            const curveFactor = Math.max(Math.abs(x2 - x1) * 0.45, 60); 
-            const pathD = `M ${x1} ${y1} C ${x1 + curveFactor} ${y1}, ${x2 - curveFactor} ${y2}, ${x2} ${y2}`;
-            const cableColor = link.color || '#475569';
+            let pathD = "";
+            let labelX, labelY;
 
-            // Garis Background (Pudar)
-            svgContent += `<path d="${pathD}" fill="none" stroke="${cableColor}" stroke-width="4" opacity="0.2" />`;
-            // Garis Animasi (Flowing Signal)
-            svgContent += `<path d="${pathD}" fill="none" stroke="${cableColor}" stroke-width="3" class="cable-flow" />`;
-                        
-            const midX = (x1 + x2) / 2;
-            const midY = (y1 + y2) / 2;
-            const labelWidth = link.label.length * 7 + 25; 
+            // LOGIKA ORTHOGONAL / ELBOW ROUTING KHUSUS UNTUK SPLITTER (ANTI-TABRAK)
+            if (link.route === 'elbow') {
+                const dropX = x1 + link.xOffset;
+                const r = 15; // Radius lengkungan siku
+                const dirY = y2 > y1 ? 1 : -1; // Arah ke atas atau bawah
+
+                if (Math.abs(y2 - y1) < 10) {
+                    // Jika sejajar, tarik lurus saja
+                    pathD = `M ${x1} ${y1} L ${x2} ${y2}`;
+                    labelX = (x1 + x2) / 2;
+                } else {
+                    pathD = `M ${x1} ${y1} 
+                             L ${dropX - r} ${y1} 
+                             Q ${dropX} ${y1} ${dropX} ${y1 + (r * dirY)} 
+                             L ${dropX} ${y2 - (r * dirY)} 
+                             Q ${dropX} ${y2} ${dropX + r} ${y2} 
+                             L ${x2} ${y2}`;
+                    labelX = dropX; // Posisi label ditaruh pas di garis vertikal
+                }
+                labelY = (y1 + y2) / 2;
+            } else {
+                // Kurva Halus Standar
+                const curveFactor = Math.max(Math.abs(x2 - x1) * 0.45, 40); 
+                pathD = `M ${x1} ${y1} C ${x1 + curveFactor} ${y1}, ${x2 - curveFactor} ${y2}, ${x2} ${y2}`;
+                labelX = (x1 + x2) / 2;
+                labelY = (y1 + y2) / 2;
+            }
             
-            // Penggunaan CSS Class agar mewarisi dari parent CSS yang benar tanpa error hitam
-            svgContent += `
-                <rect class="cable-label-bg" x="${midX - labelWidth/2}" y="${midY - 12}" width="${labelWidth}" height="24" rx="12" stroke="${cableColor}" stroke-width="2" />
-                <text class="cable-label-text" x="${midX}" y="${midY + 4}" font-size="11" font-family="sans-serif" text-anchor="middle" font-weight="bold">${link.label}</text>
-            `;
+            // Garis Background Transparan Dipertebal (opacity dinaikkan menjadi 0.5)
+            svgContent += `<path d="${pathD}" fill="none" stroke="${link.color}" stroke-width="5" opacity="0.5" />`;
+            // Garis Animasi Flowing (Stroke dipertebal menjadi 4)
+            svgContent += `<path d="${pathD}" fill="none" stroke="${link.color}" stroke-width="4" class="cable-flow" />`;
+                        
+            if (link.label) {
+                // Kustomisasi posisi label manual jika dibutuhkan
+                labelX += link.lblOffsetX || 0;
+                labelY += link.lblOffsetY || 0;
+                
+                const labelWidth = link.label.length * 7.5 + 24; 
+                
+                svgContent += `
+                    <rect class="cable-label-bg" x="${labelX - labelWidth/2}" y="${labelY - 12}" width="${labelWidth}" height="24" rx="12" stroke="${link.color}" />
+                    <text class="cable-label-text" x="${labelX}" y="${labelY + 4}">${link.label}</text>
+                `;
+            }
         });
         
         svg.innerHTML = svgContent;
     }
 
-    // Toggle Tampil/Sembunyikan Deskripsi Body
-    function toggleNode(nodeId) {
-        const node = document.getElementById(nodeId);
-        const body = node.querySelector('.node-body');
-        const icon = node.querySelector('.node-toggle');
-
-        if (body.style.display === "none") {
-            body.style.display = "block";
-            icon.innerText = "−";
-        } else {
-            body.style.display = "none";
-            icon.innerText = "+";
-        }
-        setTimeout(drawConnections, 50); 
-    }
-
-    // Logika Drag Layar (Pan Canvas)
     const slider = document.getElementById('diagram-container');
-    let isDown = false;
-    let startX, startY, scrollLeft, scrollTop;
+    let isDown = false, startX, startY, scrollLeft, scrollTop;
 
     slider.addEventListener('mousedown', (e) => {
         isDown = true;
@@ -535,19 +456,13 @@ location: "JA-01"
     slider.addEventListener('mouseleave', () => { isDown = false; });
     slider.addEventListener('mouseup', () => { isDown = false; });
     slider.addEventListener('mousemove', (e) => {
-        if (!isDown) return;
-        e.preventDefault();
-        const x = e.pageX - slider.offsetLeft;
-        const y = e.pageY - slider.offsetTop;
-        const walkX = (x - startX) * 1.5; 
-        const walkY = (y - startY) * 1.5; 
-        slider.scrollLeft = scrollLeft - walkX;
-        slider.scrollTop = scrollTop - walkY;
+        if (!isDown) return; e.preventDefault();
+        slider.scrollLeft = scrollLeft - (e.pageX - slider.offsetLeft - startX) * 1.5;
+        slider.scrollTop = scrollTop - (e.pageY - slider.offsetTop - startY) * 1.5;
     });
 
-    window.onload = drawConnections;
+    window.onload = () => { setTimeout(drawConnections, 100); };
     window.onresize = drawConnections;
-    slider.onscroll = drawConnections; 
 </script>
 </body>
 </html>

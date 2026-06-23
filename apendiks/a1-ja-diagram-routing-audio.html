@@ -61,7 +61,7 @@ location: "JA-01"
         transition: fill 0.3s; 
     }
 
-    /* MATRIX GRID - Jarak Horizontal Ditingkatkan ke 180px agar garis lebih leluasa */
+    /* MATRIX GRID */
     .diagram-wrapper .diagram-grid {
         display: grid;
         grid-template-columns: 240px 240px 240px 240px 240px 280px max-content;
@@ -147,7 +147,6 @@ location: "JA-01"
     .diagram-wrapper .mobile-hint { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--text-dark, #0f172a); color: var(--bg-color, #ffffff); padding: 10px 20px; border-radius: 20px; font-size: 12px; font-weight: bold; z-index: 9999; pointer-events: none; opacity: 0; }
     
     @media (max-width: 768px) { 
-        /* Pada mobile, lebar kolom tetap aman karena bisa di-scroll */
         .diagram-wrapper .diagram-grid { gap: 20px 140px; padding: 40px; }
         .diagram-wrapper .mobile-hint { opacity: 1; animation: fadeOut 5s forwards 2s; } 
     }
@@ -330,12 +329,11 @@ location: "JA-01"
         { from: 'mix-main', to: 'proc-geq', label: 'Stereo L/R', color: 'var(--c-mix)' },
         { from: 'proc-geq', to: 'proc-split', label: 'XLR L/R', color: 'var(--c-mix)' },
         
-        /* Offset Elbow diperlebar lagi untuk ruang vertikal */
         { from: 'proc-split', to: 'amp-protea1', label: 'Out 1-2', color: 'var(--c-split)', route: 'elbow', xOffset: 30 },
-        { from: 'proc-split', to: 'amp-protea2', label: 'Out 3-4', color: 'var(--c-split)', route: 'elbow', xOffset: 55 },
-        { from: 'proc-split', to: 'proc-dlms', label: 'Main L/R', color: '#eab308', route: 'elbow', xOffset: 80 },
-        { from: 'proc-split', to: 'amp-za6', label: 'TRS Out 5', color: '#eab308', route: 'elbow', xOffset: 105 },
-        { from: 'proc-split', to: 'amp-za7', label: 'TRS Out 6', color: '#eab308', route: 'elbow', xOffset: 130 },
+        { from: 'proc-split', to: 'amp-protea2', label: 'Out 3-4', color: 'var(--c-split)', route: 'elbow', xOffset: 60 },
+        { from: 'proc-split', to: 'proc-dlms', label: 'Main L/R', color: '#eab308', route: 'elbow', xOffset: 90 },
+        { from: 'proc-split', to: 'amp-za6', label: 'TRS Out 5', color: '#eab308', route: 'elbow', xOffset: 120 },
+        { from: 'proc-split', to: 'amp-za7', label: 'TRS Out 6', color: '#eab308', route: 'elbow', xOffset: 150 },
         
         { from: 'proc-dlms', to: 'amp-za1', label: 'Zone 1', color: 'var(--c-dlms)' },
         { from: 'proc-dlms', to: 'amp-za2', label: 'Zone 2', color: 'var(--c-dlms)' },
@@ -343,7 +341,6 @@ location: "JA-01"
         { from: 'proc-dlms', to: 'amp-za4', label: 'Zone 4', color: 'var(--c-dlms)' },
         { from: 'proc-dlms', to: 'amp-za5', label: 'Zone 5', color: 'var(--c-dlms)' },
 
-        /* KABEL FOH: Warna diubah menjadi Abu-abu (var(--c-spk)) dan Offset X di-reset ke arah kiri */
         { from: 'amp-protea1', to: 'foh-L1', label: 'SpeakON (Ch A)', color: 'var(--c-spk)', lblOffsetY: -20, lblOffsetX: -20 },
         { from: 'amp-protea1', to: 'foh-L2', label: 'SpeakON (Ch B)', color: 'var(--c-spk)', lblOffsetY: 20, lblOffsetX: -20 },
         { from: 'amp-protea2', to: 'foh-R1', label: 'SpeakON (Ch A)', color: 'var(--c-spk)', lblOffsetY: -20, lblOffsetX: -20 },
@@ -406,12 +403,12 @@ location: "JA-01"
                 } else {
                     pathD = `M ${x1} ${y1} L ${dropX - r} ${y1} Q ${dropX} ${y1} ${dropX} ${y1 + (r * dirY)} L ${dropX} ${y2 - (r * dirY)} Q ${dropX} ${y2} ${dropX + r} ${y2} L ${x2} ${y2}`;
                     
-                    /* PENEMPATAN LABEL BARU:
-                       Label kini ditaruh di tengah-tengah garis VERTIKAL yang turun.
-                       Ini menjamin 100% label tidak akan pernah menyentuh boks DLMS.
+                    /* PERBAIKAN ABSOLUT: 
+                       Menaruh label di garis horizontal AKHIR sebelum masuk ke port tujuan.
+                       Karena setiap tujuan ada di baris (Y) yang berbeda, mustahil bertabrakan!
                     */
-                    labelX = dropX;
-                    labelY = (y1 + y2) / 2;
+                    labelX = dropX + ((x2 - dropX) / 2);
+                    labelY = y2;
                 }
             } else {
                 const curveFactor = Math.max(Math.abs(x2 - x1) * 0.45, 40); 

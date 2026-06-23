@@ -8,22 +8,23 @@ location: "JA-01"
     {% include head.html %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Audio Routing Diagram Matrix</title>
+    <title>Audio Routing Diagram Matrix - Isolated Version</title>
     
     <style>
         /* ====================================================
            SISTEM WARNA (LIGHT & DARK MODE SUPPORT)
+           Variabel hanya disimpan di :root agar tidak bocor
            ==================================================== */
         :root {
-            --bg-canvas: #f8fafc;
-            --grid-dot: #cbd5e1;
-            --text-main: #0f172a;
-            --text-muted: #475569;
-            --card-bg: #ffffff;
-            --card-border: #94a3b8; 
+            --dia-bg-canvas: #f8fafc;
+            --dia-grid-dot: #cbd5e1;
+            --dia-text-main: #0f172a;
+            --dia-text-muted: #475569;
+            --dia-card-bg: #ffffff;
+            --dia-card-border: #94a3b8; 
             
-            --cable-lbl-bg: #ffffff;
-            --cable-lbl-text: #0f172a;
+            --dia-lbl-bg: #ffffff;
+            --dia-lbl-text: #0f172a;
             
             --c-mic: #10b981;
             --c-media: #0ea5e9;
@@ -36,60 +37,66 @@ location: "JA-01"
 
         @media (prefers-color-scheme: dark) {
             :root {
-                --bg-canvas: #0b1120;
-                --grid-dot: #334155;
-                --text-main: #f8fafc;
-                --text-muted: #94a3b8;
-                --card-bg: #1e293b;
-                --card-border: #475569; 
+                --dia-bg-canvas: #0b1120;
+                --dia-grid-dot: #334155;
+                --dia-text-main: #f8fafc;
+                --dia-text-muted: #94a3b8;
+                --dia-card-bg: #1e293b;
+                --dia-card-border: #475569; 
                 
-                --cable-lbl-bg: #1e293b;
-                --cable-lbl-text: #f8fafc;
+                --dia-lbl-bg: #1e293b;
+                --dia-lbl-text: #f8fafc;
             }
         }
 
-        /* PERBAIKAN: Hilangkan pembajakan body layar penuh! 
-           Biarkan CSS website utama Anda yang mengatur body.
+        /* 100% ISOLASI CSS:
+          Semua style HANYA diawali dengan .diagram-wrapper 
+          (Tidak ada lagi pemanggilan tag 'body' atau 'html' yang merusak website Anda!) 
         */
-        
-        /* KANVAS DRAG & DROP EMBEDDED */
+
         .diagram-wrapper {
             position: relative; 
-            width: 100%; /* Mengikuti container website Anda */
-            height: 85vh; /* Menyisakan ruang untuk header web Anda */
-            min-height: 700px;
-            background-color: var(--bg-canvas);
-            background-image: radial-gradient(var(--grid-dot) 1.5px, transparent 1.5px);
+            width: 100%; 
+            height: 75vh; /* Menyisakan 25% layar untuk Header/Footer Website Anda */
+            min-height: 550px;
+            max-height: 800px;
+            background-color: var(--dia-bg-canvas);
+            background-image: radial-gradient(var(--dia-grid-dot) 1.5px, transparent 1.5px);
             background-size: 30px 30px; 
             overflow: auto; 
             cursor: grab;
             transition: background-color 0.3s ease, background-image 0.3s ease;
-            border-radius: 12px; /* Diberi lengkungan agar terlihat seperti frame aplikasi */
-            border: 1px solid var(--card-border);
-            margin: 20px 0; /* Jarak dari header */
+            border-radius: 12px; 
+            border: 1px solid var(--dia-card-border);
+            margin: 20px 0; 
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            color: var(--dia-text-main);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
         }
         .diagram-wrapper:active { cursor: grabbing; }
 
-        /* LAYER SVG KABEL */
-        #svg-canvas { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 10; }
+        .diagram-wrapper #svg-canvas { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 10; }
         
-        .cable-flow { stroke-dasharray: 10, 10; animation: flowAnim 1s linear infinite; }
+        .diagram-wrapper .cable-flow { stroke-dasharray: 10, 10; animation: flowAnim 1s linear infinite; }
         @keyframes flowAnim { from { stroke-dashoffset: 20; } to { stroke-dashoffset: 0; } }
         
-        /* PERBAIKAN TEKS: Matikan efek stroke tebal pada teks SVG */
-        .cable-label-bg { fill: var(--cable-lbl-bg); stroke-width: 2; transition: fill 0.3s; }
-        .cable-label-text { 
-            fill: var(--cable-lbl-text); 
-            stroke: none !important; /* MENCEGAH TEKS JADI GUMPALAN */
-            font-size: 12px; 
+        /* Teks Label Super Tajam & Proporsional */
+        .diagram-wrapper .cable-label-bg { 
+            fill: var(--dia-lbl-bg); 
+            stroke-width: 2; 
+            transition: fill 0.3s; 
+        }
+        .diagram-wrapper .cable-label-text { 
+            fill: var(--dia-lbl-text); 
+            stroke: none !important; 
+            font-size: 13px; /* Diperbesar agar mudah dibaca */
             font-weight: 800; 
             text-anchor: middle; 
             font-family: 'Segoe UI', system-ui, sans-serif;
             transition: fill 0.3s; 
         }
 
-        /* CSS GRID MATRIX LAYOUT */
-        .diagram-grid {
+        .diagram-wrapper .diagram-grid {
             display: grid;
             grid-template-columns: 240px 240px 240px 260px 240px 320px minmax(500px, max-content);
             grid-auto-rows: minmax(80px, auto);
@@ -101,79 +108,74 @@ location: "JA-01"
             align-items: center; 
         }
 
-        .input-group { display: flex; flex-direction: column; gap: 20px; justify-content: center; }
+        .diagram-wrapper .input-group { display: flex; flex-direction: column; gap: 20px; justify-content: center; }
 
-        /* DESAIN NODE: HARDWARE / RACK EQUIPMENT STYLE */
-        .node {
+        .diagram-wrapper .node {
             position: relative; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);
             display: flex; align-items: center; padding: 12px 16px; gap: 15px;
             transition: transform 0.2s, box-shadow 0.2s, background 0.3s, border-color 0.3s;
-            background: var(--card-bg); border: 2px solid var(--card-border);
-            color: var(--text-main); font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--dia-card-bg); border: 2px solid var(--dia-card-border);
         }
-        .node:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.3); z-index: 30; }
+        .diagram-wrapper .node:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.3); z-index: 30; }
 
-        .style-input { border-left: 6px solid var(--c-mic); }
-        .style-media { border-left: 6px solid var(--c-media); }
+        .diagram-wrapper .style-input { border-left: 6px solid var(--c-mic); }
+        .diagram-wrapper .style-media { border-left: 6px solid var(--c-media); }
         
-        .style-rack {
+        .diagram-wrapper .style-rack {
             background: #1e293b !important; color: #f8fafc !important; border: 2px solid #0f172a !important;
             border-left: 14px solid #334155 !important; border-right: 14px solid #334155 !important;
         }
-        .style-rack::before, .style-rack::after { content: ''; position: absolute; left: -9px; width: 4px; height: 4px; background: #0f172a; border-radius: 50%; }
-        .style-rack::before { top: 12px; } .style-rack::after { bottom: 12px; }
+        .diagram-wrapper .style-rack::before, .diagram-wrapper .style-rack::after { content: ''; position: absolute; left: -9px; width: 4px; height: 4px; background: #0f172a; border-radius: 50%; }
+        .diagram-wrapper .style-rack::before { top: 12px; } .diagram-wrapper .style-rack::after { bottom: 12px; }
 
-        .node-icon { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 8px; flex-shrink: 0; }
-        .node-info { display: flex; flex-direction: column; gap: 4px; flex: 1; }
-        .node-info h4 { margin: 0; font-size: 13.5px; font-weight: 700; letter-spacing: 0.5px; }
-        .node-info p { margin: 0; font-size: 11px; opacity: 0.8; font-family: monospace; }
+        .diagram-wrapper .node-icon { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 8px; flex-shrink: 0; }
+        .diagram-wrapper .node-info { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+        .diagram-wrapper .node-info h4 { margin: 0; font-size: 13.5px; font-weight: 700; letter-spacing: 0.5px; }
+        .diagram-wrapper .node-info p { margin: 0; font-size: 11px; opacity: 0.8; font-family: monospace; }
         
-        .style-input .node-info p, .style-media .node-info p { color: var(--text-muted); }
+        .diagram-wrapper .style-input .node-info p, .diagram-wrapper .style-media .node-info p { color: var(--dia-text-muted); }
 
-        .port {
-            width: 12px; height: 12px; background: var(--bg-canvas); border: 3px solid #0f172a;
+        .diagram-wrapper .port {
+            width: 12px; height: 12px; background: var(--dia-bg-canvas); border: 3px solid #0f172a;
             border-radius: 50%; position: absolute; top: 50%; transform: translateY(-50%); z-index: 5;
+            transition: background-color 0.3s;
         }
-        .port-in { left: -22px; } .port-out { right: -22px; }
-        .style-input .port-out, .style-media .port-out { right: -8px; } 
+        .diagram-wrapper .port-in { left: -22px; } .diagram-wrapper .port-out { right: -22px; }
+        .diagram-wrapper .style-input .port-out, .diagram-wrapper .style-media .port-out { right: -8px; } 
 
-        /* DESAIN SPEAKER ZONES & LINE ARRAY */
-        .zone-group {
+        .diagram-wrapper .zone-group {
             display: flex; flex-direction: column; gap: 15px; background: rgba(100,116,139,0.05);
-            padding: 20px 25px; border-radius: 12px; border: 1px dashed var(--text-muted); position: relative;
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            padding: 20px 25px; border-radius: 12px; border: 1px dashed var(--dia-text-muted); position: relative;
         }
-        .zone-title { font-size: 13px; font-weight: 800; color: var(--text-main); text-transform: uppercase; border-bottom: 2px solid var(--c-spk); padding-bottom: 5px; display: inline-block; }
-        .speaker-row { display: flex; flex-direction: row; gap: 45px; align-items: center; position: relative; }
+        .diagram-wrapper .zone-title { font-size: 13px; font-weight: 800; color: var(--dia-text-main); text-transform: uppercase; border-bottom: 2px solid var(--c-spk); padding-bottom: 5px; display: inline-block; }
+        .diagram-wrapper .speaker-row { display: flex; flex-direction: row; gap: 45px; align-items: center; position: relative; }
 
-        .spk-unit {
+        .diagram-wrapper .spk-unit {
             width: 48px; height: 70px; background: #1e293b; border-radius: 6px; position: relative;
             box-shadow: 3px 4px 10px rgba(0,0,0,0.2); border: 2px solid #475569;
             display: flex; flex-direction: column; align-items: center; justify-content: space-evenly; z-index: 20;
         }
-        .spk-unit::before { content: ''; width: 14px; height: 14px; background: #0f172a; border-radius: 50%; } 
-        .spk-unit::after { content: ''; width: 28px; height: 28px; background: #0f172a; border-radius: 50%; border: 1px solid #334155; } 
+        .diagram-wrapper .spk-unit::before { content: ''; width: 14px; height: 14px; background: #0f172a; border-radius: 50%; } 
+        .diagram-wrapper .spk-unit::after { content: ''; width: 28px; height: 28px; background: #0f172a; border-radius: 50%; border: 1px solid #334155; } 
 
-        .foh-array-stack {
+        .diagram-wrapper .foh-array-stack {
             display: flex; flex-direction: column; gap: 2px; align-items: center; background: #1e293b; padding: 6px;
             border-radius: 8px; border: 2px solid #be123c; box-shadow: 0 5px 15px rgba(226, 29, 72, 0.2); position: relative; z-index: 20;
         }
-        .array-module { width: 65px; height: 22px; background: #0f172a; border-radius: 3px; border-bottom: 2px solid #334155; display: flex; justify-content: center; align-items: center; }
-        .array-module::before { content: ''; width: 9px; height: 9px; background: #475569; border-radius: 50%; }
+        .diagram-wrapper .array-module { width: 65px; height: 22px; background: #0f172a; border-radius: 3px; border-bottom: 2px solid #334155; display: flex; justify-content: center; align-items: center; }
+        .diagram-wrapper .array-module::before { content: ''; width: 9px; height: 9px; background: #475569; border-radius: 50%; }
 
-        /* PERBAIKAN: Pastikan gaya ini HANYA teraplikasi ke ikon di dalam node, BUKAN ke kanvas SVG utama */
-        .node-icon svg { width: 24px; height: 24px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+        .diagram-wrapper .node-icon svg { width: 24px; height: 24px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
 
-        .mobile-hint { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #0f172a; color: #fff; padding: 10px 20px; border-radius: 20px; font-size: 12px; font-weight: bold; z-index: 9999; pointer-events: none; display: none; }
-        @media (max-width: 768px) { .mobile-hint { display: block; animation: fadeOut 4s forwards 2s; } }
+        .diagram-wrapper .mobile-hint { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #0f172a; color: #fff; padding: 10px 20px; border-radius: 20px; font-size: 12px; font-weight: bold; z-index: 9999; pointer-events: none; display: none; }
+        @media (max-width: 768px) { .diagram-wrapper .mobile-hint { display: block; animation: fadeOut 4s forwards 2s; } }
         @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
     </style>
 </head>
 <body>
 
-<div class="mobile-hint">👆 Geser area diagram untuk menjelajah</div>
-
 <div class="diagram-wrapper" id="diagram-container">
+    <div class="mobile-hint">👆 Geser area diagram untuk menjelajah</div>
     <svg id="svg-canvas"></svg>
 
     <div class="diagram-grid">
@@ -423,17 +425,17 @@ location: "JA-01"
                 labelY = (y1 + y2) / 2;
             }
             
-            svgContent += `<path d="${pathD}" fill="none" stroke="${link.color}" stroke-width="5" opacity="0.5" />`;
-            svgContent += `<path d="${pathD}" fill="none" stroke="${link.color}" stroke-width="4" class="cable-flow" />`;
+            svgContent += `<path d="${pathD}" fill="none" stroke="${link.color}" stroke-width="5" stroke-linecap="round" opacity="0.5" />`;
+            svgContent += `<path d="${pathD}" fill="none" stroke="${link.color}" stroke-width="4" stroke-linecap="round" class="cable-flow" />`;
                         
             if (link.label) {
                 labelX += link.lblOffsetX || 0;
                 labelY += link.lblOffsetY || 0;
-                const labelWidth = link.label.length * 7.5 + 24; 
+                const labelWidth = link.label.length * 8 + 24; 
                 
                 svgContent += `
-                    <rect class="cable-label-bg" x="${labelX - labelWidth/2}" y="${labelY - 12}" width="${labelWidth}" height="24" rx="12" stroke="${link.color}" />
-                    <text class="cable-label-text" x="${labelX}" y="${labelY + 4}">${link.label}</text>
+                    <rect class="cable-label-bg" x="${labelX - labelWidth/2}" y="${labelY - 14}" width="${labelWidth}" height="28" rx="14" stroke="${link.color}" />
+                    <text class="cable-label-text" x="${labelX}" y="${labelY}" dominant-baseline="central" alignment-baseline="central">${link.label}</text>
                 `;
             }
         });

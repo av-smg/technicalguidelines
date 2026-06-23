@@ -6,7 +6,6 @@ location: "JA-01"
 <style>
     /* ====================================================
        SISTEM WARNA (SINKRONISASI TEMA WEBSITE JEKYLL)
-       Menggunakan variabel native web Anda sebagai prioritas utama
        ==================================================== */
     :root {
         --c-mic: #10b981;
@@ -15,10 +14,10 @@ location: "JA-01"
         --c-tx: #f59e0b;
         --c-split: #ef4444;
         --c-dlms: #3b82f6;
-        --c-spk: #64748b;
+        --c-spk: #64748b; /* Abu-abu untuk kabel Speaker pasif */
     }
 
-    /* KANVAS EMBEDDED - Terpusat, responsif, dan hemat ruang vertikal */
+    /* KANVAS EMBEDDED */
     .diagram-wrapper {
         position: relative; 
         width: 100%; 
@@ -26,7 +25,6 @@ location: "JA-01"
         min-height: 500px;
         max-height: 800px;
         
-        /* Murni mengikuti toggle Dark/Light Mode website Anda */
         background-color: var(--bg-color, #f8fafc);
         background-image: radial-gradient(var(--border-color, #cbd5e1) 1.5px, transparent 1.5px);
         color: var(--text-dark, #0f172a);
@@ -48,7 +46,6 @@ location: "JA-01"
     .diagram-wrapper .cable-flow { stroke-dasharray: 10, 10; animation: flowAnim 1s linear infinite; }
     @keyframes flowAnim { from { stroke-dashoffset: 20; } to { stroke-dashoffset: 0; } }
     
-    /* Label Kabel mengikuti background kartu */
     .diagram-wrapper .cable-label-bg { 
         fill: var(--card-bg, #ffffff); 
         stroke-width: 2; 
@@ -64,12 +61,12 @@ location: "JA-01"
         transition: fill 0.3s; 
     }
 
-    /* MATRIX GRID - Jarak vertikal dipangkas (20px), horizontal diperlebar (150px) */
+    /* MATRIX GRID - Jarak Horizontal Ditingkatkan ke 180px agar garis lebih leluasa */
     .diagram-wrapper .diagram-grid {
         display: grid;
         grid-template-columns: 240px 240px 240px 240px 240px 280px max-content;
         grid-auto-rows: minmax(60px, auto);
-        gap: 20px 150px; 
+        gap: 20px 180px; 
         padding: 60px 100px;
         position: relative;
         z-index: 20;
@@ -129,7 +126,7 @@ location: "JA-01"
     .diagram-wrapper .zone-title { font-size: 12px; font-weight: 800; color: var(--text-dark, #0f172a); text-transform: uppercase; border-bottom: 2px solid var(--c-spk); padding-bottom: 5px; display: inline-block; transition: color 0.3s; }
     .diagram-wrapper .speaker-row { display: flex; flex-direction: row; gap: 30px; align-items: center; position: relative; }
 
-    /* UKURAN SPEAKER DIPERKECIL (Hemat ruang vertikal) */
+    /* UKURAN SPEAKER DIPERKECIL */
     .diagram-wrapper .spk-unit {
         width: 36px; height: 54px; background: #1e293b; border-radius: 5px; position: relative;
         box-shadow: 2px 3px 8px rgba(0,0,0,0.2); border: 2px solid #475569;
@@ -150,7 +147,8 @@ location: "JA-01"
     .diagram-wrapper .mobile-hint { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--text-dark, #0f172a); color: var(--bg-color, #ffffff); padding: 10px 20px; border-radius: 20px; font-size: 12px; font-weight: bold; z-index: 9999; pointer-events: none; opacity: 0; }
     
     @media (max-width: 768px) { 
-        .diagram-wrapper .diagram-grid { gap: 20px 80px; padding: 40px; }
+        /* Pada mobile, lebar kolom tetap aman karena bisa di-scroll */
+        .diagram-wrapper .diagram-grid { gap: 20px 140px; padding: 40px; }
         .diagram-wrapper .mobile-hint { opacity: 1; animation: fadeOut 5s forwards 2s; } 
     }
     @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
@@ -162,6 +160,7 @@ location: "JA-01"
 
     <div class="diagram-grid">
         
+        <!-- KOLOM 1: INPUTS -->
         <div class="input-group" style="grid-area: 1 / 1 / 10 / 2;">
             <div class="node style-input" id="in-mic1">
                 <div class="node-icon"><svg><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg></div>
@@ -198,12 +197,14 @@ location: "JA-01"
             </div>
         </div>
 
+        <!-- KOLOM 2: MIXER -->
         <div class="node style-rack" id="mix-main" style="grid-area: 4 / 2; transform: translateY(30px);">
             <div class="node-icon" style="color:#d946ef;"><svg><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></div>
             <div class="node-info"><h4>Yamaha MG16XU</h4><p>Audio Console Utama</p></div>
             <div class="port port-in"></div><div class="port port-out"></div>
         </div>
 
+        <!-- KOLOM 3: EQ & FM TX -->
         <div class="node style-rack" id="tx-fm" style="grid-area: 2 / 3;">
             <div class="node-icon" style="color:#f59e0b;"><svg><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48 0a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/></svg></div>
             <div class="node-info"><h4>FM Transmitter</h4><p>Broadcast Area Radio</p></div>
@@ -215,18 +216,21 @@ location: "JA-01"
             <div class="port port-in"></div><div class="port port-out"></div>
         </div>
 
+        <!-- KOLOM 4: SPLITTER -->
         <div class="node style-rack" id="proc-split" style="grid-area: 4 / 4; transform: translateY(30px);">
             <div class="node-icon" style="color:#ef4444;"><svg><rect x="2" y="4" width="20" height="16" rx="2" ry="2"/><circle cx="8" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="16" cy="12" r="1"/></svg></div>
             <div class="node-info"><h4>MX882 Splitter</h4><p>Distribusi Utama</p></div>
             <div class="port port-in"></div><div class="port port-out"></div>
         </div>
 
+        <!-- KOLOM 5: DLMS -->
         <div class="node style-rack" id="proc-dlms" style="grid-area: 5 / 5;">
             <div class="node-icon" style="color:#3b82f6;"><svg><rect x="2" y="4" width="20" height="16" rx="2" ry="2"/><path d="M6 12h4m4 0h4m-8-4v8"/></svg></div>
             <div class="node-info"><h4>DLMS DSP</h4><p>Manajemen Delay Zona</p></div>
             <div class="port port-in"></div><div class="port port-out"></div>
         </div>
 
+        <!-- KOLOM 6: AMPLIFIERS -->
         <div class="node style-rack" id="amp-protea1" style="grid-area: 1 / 6;"><div class="node-info"><h4>Ampli PROTEA 1</h4><p>FOH Kiri (Ch A & B)</p></div><div class="port port-in"></div><div class="port port-out"></div></div>
         <div class="node style-rack" id="amp-protea2" style="grid-area: 2 / 6;"><div class="node-info"><h4>Ampli PROTEA 2</h4><p>FOH Kanan (Ch A & B)</p></div><div class="port port-in"></div><div class="port port-out"></div></div>
         
@@ -238,6 +242,7 @@ location: "JA-01"
         <div class="node style-rack" id="amp-za6" style="grid-area: 8 / 6;"><div class="node-info"><h4>TOA ZA 2240 (6)</h4><p>Ruang Media</p></div><div class="port port-in"></div><div class="port port-out"></div></div>
         <div class="node style-rack" id="amp-za7" style="grid-area: 9 / 6;"><div class="node-info"><h4>TOA ZA 2240 (7)</h4><p>Ruang P3K</p></div><div class="port port-in"></div><div class="port port-out"></div></div>
 
+        <!-- KOLOM 7: SPEAKERS -->
         <div class="zone-group" style="grid-area: 1 / 7; border-color: #be123c;">
             <div class="zone-title" style="border-color: #be123c;">FOH Kiri (TOA HX-5 x 2 Set)</div>
             <div class="speaker-row" style="gap: 50px;">
@@ -325,12 +330,12 @@ location: "JA-01"
         { from: 'mix-main', to: 'proc-geq', label: 'Stereo L/R', color: 'var(--c-mix)' },
         { from: 'proc-geq', to: 'proc-split', label: 'XLR L/R', color: 'var(--c-mix)' },
         
-        /* Offset Siku dinaikkan agar garis makin merenggang & tak tumpang tindih */
+        /* Offset Elbow diperlebar lagi untuk ruang vertikal */
         { from: 'proc-split', to: 'amp-protea1', label: 'Out 1-2', color: 'var(--c-split)', route: 'elbow', xOffset: 30 },
-        { from: 'proc-split', to: 'amp-protea2', label: 'Out 3-4', color: 'var(--c-split)', route: 'elbow', xOffset: 60 },
-        { from: 'proc-split', to: 'proc-dlms', label: 'Main L/R', color: '#eab308', route: 'elbow', xOffset: 90 },
-        { from: 'proc-split', to: 'amp-za6', label: 'TRS Out 5', color: '#eab308', route: 'elbow', xOffset: 120 },
-        { from: 'proc-split', to: 'amp-za7', label: 'TRS Out 6', color: '#eab308', route: 'elbow', xOffset: 150 },
+        { from: 'proc-split', to: 'amp-protea2', label: 'Out 3-4', color: 'var(--c-split)', route: 'elbow', xOffset: 55 },
+        { from: 'proc-split', to: 'proc-dlms', label: 'Main L/R', color: '#eab308', route: 'elbow', xOffset: 80 },
+        { from: 'proc-split', to: 'amp-za6', label: 'TRS Out 5', color: '#eab308', route: 'elbow', xOffset: 105 },
+        { from: 'proc-split', to: 'amp-za7', label: 'TRS Out 6', color: '#eab308', route: 'elbow', xOffset: 130 },
         
         { from: 'proc-dlms', to: 'amp-za1', label: 'Zone 1', color: 'var(--c-dlms)' },
         { from: 'proc-dlms', to: 'amp-za2', label: 'Zone 2', color: 'var(--c-dlms)' },
@@ -338,11 +343,11 @@ location: "JA-01"
         { from: 'proc-dlms', to: 'amp-za4', label: 'Zone 4', color: 'var(--c-dlms)' },
         { from: 'proc-dlms', to: 'amp-za5', label: 'Zone 5', color: 'var(--c-dlms)' },
 
-        /* Label FOH digeser menjauh dari kotak speaker */
-        { from: 'amp-protea1', to: 'foh-L1', label: 'SpeakON (Ch A)', color: '#be123c', lblOffsetY: -22, lblOffsetX: -45 },
-        { from: 'amp-protea1', to: 'foh-L2', label: 'SpeakON (Ch B)', color: '#be123c', lblOffsetY: 22, lblOffsetX: 45 },
-        { from: 'amp-protea2', to: 'foh-R1', label: 'SpeakON (Ch A)', color: '#be123c', lblOffsetY: -22, lblOffsetX: -45 },
-        { from: 'amp-protea2', to: 'foh-R2', label: 'SpeakON (Ch B)', color: '#be123c', lblOffsetY: 22, lblOffsetX: 45 },
+        /* KABEL FOH: Warna diubah menjadi Abu-abu (var(--c-spk)) dan Offset X di-reset ke arah kiri */
+        { from: 'amp-protea1', to: 'foh-L1', label: 'SpeakON (Ch A)', color: 'var(--c-spk)', lblOffsetY: -20, lblOffsetX: -20 },
+        { from: 'amp-protea1', to: 'foh-L2', label: 'SpeakON (Ch B)', color: 'var(--c-spk)', lblOffsetY: 20, lblOffsetX: -20 },
+        { from: 'amp-protea2', to: 'foh-R1', label: 'SpeakON (Ch A)', color: 'var(--c-spk)', lblOffsetY: -20, lblOffsetX: -20 },
+        { from: 'amp-protea2', to: 'foh-R2', label: 'SpeakON (Ch B)', color: 'var(--c-spk)', lblOffsetY: 20, lblOffsetX: -20 },
 
         { from: 'amp-za1', to: 'z1-1', label: '100V Hot/Com', color: 'var(--c-spk)' },
         { from: 'amp-za2', to: 'z2-1', label: '100V Hot/Com', color: 'var(--c-spk)' },
@@ -366,7 +371,6 @@ location: "JA-01"
         const container = document.getElementById('diagram-container');
         const grid = document.querySelector('.diagram-grid');
         
-        /* Tinggi SVG dibatasi seukuran konten aktual */
         svg.style.width = Math.max(container.scrollWidth, grid.scrollWidth) + 'px';
         svg.style.height = Math.max(container.scrollHeight, grid.scrollHeight) + 'px';
         
@@ -401,9 +405,13 @@ location: "JA-01"
                     labelY = y2;
                 } else {
                     pathD = `M ${x1} ${y1} L ${dropX - r} ${y1} Q ${dropX} ${y1} ${dropX} ${y1 + (r * dirY)} L ${dropX} ${y2 - (r * dirY)} Q ${dropX} ${y2} ${dropX + r} ${y2} L ${x2} ${y2}`;
-                    /* LOGIKA BARU: Label ditaruh di GARIS HORIZONTAL SEBELUM MASUK KE ALAT. Bebas tumpukan! */
-                    labelX = (dropX + r + x2) / 2;
-                    labelY = y2;
+                    
+                    /* PENEMPATAN LABEL BARU:
+                       Label kini ditaruh di tengah-tengah garis VERTIKAL yang turun.
+                       Ini menjamin 100% label tidak akan pernah menyentuh boks DLMS.
+                    */
+                    labelX = dropX;
+                    labelY = (y1 + y2) / 2;
                 }
             } else {
                 const curveFactor = Math.max(Math.abs(x2 - x1) * 0.45, 40); 

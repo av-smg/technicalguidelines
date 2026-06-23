@@ -8,7 +8,7 @@ location: "JA-01"
     {% include head.html %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Audio Routing Diagram Matrix - Pro Version</title>
+    <title>Audio Routing Diagram Matrix</title>
     
     <style>
         /* ====================================================
@@ -20,7 +20,7 @@ location: "JA-01"
             --text-main: #0f172a;
             --text-muted: #475569;
             --card-bg: #ffffff;
-            --card-border: #94a3b8; /* Dipertegas */
+            --card-border: #94a3b8; 
             
             --cable-lbl-bg: #ffffff;
             --cable-lbl-text: #0f172a;
@@ -41,22 +41,32 @@ location: "JA-01"
                 --text-main: #f8fafc;
                 --text-muted: #94a3b8;
                 --card-bg: #1e293b;
-                --card-border: #475569; /* Dipertegas */
+                --card-border: #475569; 
                 
                 --cable-lbl-bg: #1e293b;
                 --cable-lbl-text: #f8fafc;
             }
         }
 
-        body { margin: 0; font-family: 'Segoe UI', system-ui, sans-serif; overflow: hidden; color: var(--text-main); }
-
-        /* KANVAS DRAG & DROP */
+        /* PERBAIKAN: Hilangkan pembajakan body layar penuh! 
+           Biarkan CSS website utama Anda yang mengatur body.
+        */
+        
+        /* KANVAS DRAG & DROP EMBEDDED */
         .diagram-wrapper {
-            position: relative; width: 100vw; height: 100vh;
+            position: relative; 
+            width: 100%; /* Mengikuti container website Anda */
+            height: 85vh; /* Menyisakan ruang untuk header web Anda */
+            min-height: 700px;
             background-color: var(--bg-canvas);
             background-image: radial-gradient(var(--grid-dot) 1.5px, transparent 1.5px);
-            background-size: 30px 30px; overflow: auto; cursor: grab;
+            background-size: 30px 30px; 
+            overflow: auto; 
+            cursor: grab;
             transition: background-color 0.3s ease, background-image 0.3s ease;
+            border-radius: 12px; /* Diberi lengkungan agar terlihat seperti frame aplikasi */
+            border: 1px solid var(--card-border);
+            margin: 20px 0; /* Jarak dari header */
         }
         .diagram-wrapper:active { cursor: grabbing; }
 
@@ -66,9 +76,17 @@ location: "JA-01"
         .cable-flow { stroke-dasharray: 10, 10; animation: flowAnim 1s linear infinite; }
         @keyframes flowAnim { from { stroke-dashoffset: 20; } to { stroke-dashoffset: 0; } }
         
-        /* Label Teks Super Jelas */
+        /* PERBAIKAN TEKS: Matikan efek stroke tebal pada teks SVG */
         .cable-label-bg { fill: var(--cable-lbl-bg); stroke-width: 2; transition: fill 0.3s; }
-        .cable-label-text { fill: var(--cable-lbl-text); font-size: 12px; font-weight: 800; text-anchor: middle; transition: fill 0.3s; }
+        .cable-label-text { 
+            fill: var(--cable-lbl-text); 
+            stroke: none !important; /* MENCEGAH TEKS JADI GUMPALAN */
+            font-size: 12px; 
+            font-weight: 800; 
+            text-anchor: middle; 
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            transition: fill 0.3s; 
+        }
 
         /* CSS GRID MATRIX LAYOUT */
         .diagram-grid {
@@ -76,17 +94,14 @@ location: "JA-01"
             grid-template-columns: 240px 240px 240px 260px 240px 320px minmax(500px, max-content);
             grid-auto-rows: minmax(80px, auto);
             gap: 40px 180px; 
-            padding: 100px 150px;
+            padding: 80px 120px;
             position: relative;
             z-index: 20;
             width: max-content;
             align-items: center; 
         }
 
-        /* Grouping Input agar rapat */
-        .input-group {
-            display: flex; flex-direction: column; gap: 20px; justify-content: center;
-        }
+        .input-group { display: flex; flex-direction: column; gap: 20px; justify-content: center; }
 
         /* DESAIN NODE: HARDWARE / RACK EQUIPMENT STYLE */
         .node {
@@ -94,6 +109,7 @@ location: "JA-01"
             display: flex; align-items: center; padding: 12px 16px; gap: 15px;
             transition: transform 0.2s, box-shadow 0.2s, background 0.3s, border-color 0.3s;
             background: var(--card-bg); border: 2px solid var(--card-border);
+            color: var(--text-main); font-family: 'Segoe UI', system-ui, sans-serif;
         }
         .node:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.3); z-index: 30; }
 
@@ -104,9 +120,7 @@ location: "JA-01"
             background: #1e293b !important; color: #f8fafc !important; border: 2px solid #0f172a !important;
             border-left: 14px solid #334155 !important; border-right: 14px solid #334155 !important;
         }
-        .style-rack::before, .style-rack::after {
-            content: ''; position: absolute; left: -9px; width: 4px; height: 4px; background: #0f172a; border-radius: 50%;
-        }
+        .style-rack::before, .style-rack::after { content: ''; position: absolute; left: -9px; width: 4px; height: 4px; background: #0f172a; border-radius: 50%; }
         .style-rack::before { top: 12px; } .style-rack::after { bottom: 12px; }
 
         .node-icon { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 8px; flex-shrink: 0; }
@@ -116,24 +130,20 @@ location: "JA-01"
         
         .style-input .node-info p, .style-media .node-info p { color: var(--text-muted); }
 
-        /* Titik Port */
         .port {
             width: 12px; height: 12px; background: var(--bg-canvas); border: 3px solid #0f172a;
             border-radius: 50%; position: absolute; top: 50%; transform: translateY(-50%); z-index: 5;
         }
-        .port-in { left: -22px; } 
-        .port-out { right: -22px; }
+        .port-in { left: -22px; } .port-out { right: -22px; }
         .style-input .port-out, .style-media .port-out { right: -8px; } 
 
         /* DESAIN SPEAKER ZONES & LINE ARRAY */
         .zone-group {
             display: flex; flex-direction: column; gap: 15px; background: rgba(100,116,139,0.05);
             padding: 20px 25px; border-radius: 12px; border: 1px dashed var(--text-muted); position: relative;
+            font-family: 'Segoe UI', system-ui, sans-serif;
         }
-        .zone-title { 
-            font-size: 13px; font-weight: 800; color: var(--text-main); text-transform: uppercase; 
-            border-bottom: 2px solid var(--c-spk); padding-bottom: 5px; display: inline-block; 
-        }
+        .zone-title { font-size: 13px; font-weight: 800; color: var(--text-main); text-transform: uppercase; border-bottom: 2px solid var(--c-spk); padding-bottom: 5px; display: inline-block; }
         .speaker-row { display: flex; flex-direction: row; gap: 45px; align-items: center; position: relative; }
 
         .spk-unit {
@@ -151,10 +161,17 @@ location: "JA-01"
         .array-module { width: 65px; height: 22px; background: #0f172a; border-radius: 3px; border-bottom: 2px solid #334155; display: flex; justify-content: center; align-items: center; }
         .array-module::before { content: ''; width: 9px; height: 9px; background: #475569; border-radius: 50%; }
 
-        svg { width: 24px; height: 24px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+        /* PERBAIKAN: Pastikan gaya ini HANYA teraplikasi ke ikon di dalam node, BUKAN ke kanvas SVG utama */
+        .node-icon svg { width: 24px; height: 24px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+        .mobile-hint { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #0f172a; color: #fff; padding: 10px 20px; border-radius: 20px; font-size: 12px; font-weight: bold; z-index: 9999; pointer-events: none; display: none; }
+        @media (max-width: 768px) { .mobile-hint { display: block; animation: fadeOut 4s forwards 2s; } }
+        @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
     </style>
 </head>
 <body>
+
+<div class="mobile-hint">👆 Geser area diagram untuk menjelajah</div>
 
 <div class="diagram-wrapper" id="diagram-container">
     <svg id="svg-canvas"></svg>
@@ -311,7 +328,6 @@ location: "JA-01"
 
 <script>
     const cables = [
-        // Inputs -> Mixer (Kurva Standar)
         { from: 'in-mic1', to: 'mix-main', label: 'XLR', color: 'var(--c-mic)' },
         { from: 'in-mic2', to: 'mix-main', label: 'XLR', color: 'var(--c-mic)' },
         { from: 'in-mic3', to: 'mix-main', label: 'XLR', color: 'var(--c-mic)' },
@@ -321,32 +337,27 @@ location: "JA-01"
         { from: 'in-med3', to: 'mix-main', label: 'TRS', color: 'var(--c-media)' },
         { from: 'in-med4', to: 'mix-main', label: 'TRS', color: 'var(--c-media)' },
         
-        // Mixer -> Prosesor
         { from: 'mix-main', to: 'tx-fm', label: 'Group 1-2', color: 'var(--c-tx)' },
         { from: 'mix-main', to: 'proc-geq', label: 'Stereo L/R', color: 'var(--c-mix)' },
         { from: 'proc-geq', to: 'proc-split', label: 'XLR L/R', color: 'var(--c-mix)' },
         
-        // Splitter -> Distribusi (MENGGUNAKAN ROUTING ELBOW/SIKU ANTI TABRAKAN!)
         { from: 'proc-split', to: 'amp-protea1', label: 'Out 1-2', color: 'var(--c-split)', route: 'elbow', xOffset: 40 },
         { from: 'proc-split', to: 'amp-protea2', label: 'Out 3-4', color: 'var(--c-split)', route: 'elbow', xOffset: 65 },
         { from: 'proc-split', to: 'proc-dlms', label: 'Main L/R', color: '#eab308', route: 'elbow', xOffset: 90 },
         { from: 'proc-split', to: 'amp-za6', label: 'TRS Out 5', color: '#eab308', route: 'elbow', xOffset: 115 },
         { from: 'proc-split', to: 'amp-za7', label: 'TRS Out 6', color: '#eab308', route: 'elbow', xOffset: 140 },
         
-        // DLMS -> Ampli ZA
         { from: 'proc-dlms', to: 'amp-za1', label: 'Zone 1', color: 'var(--c-dlms)' },
         { from: 'proc-dlms', to: 'amp-za2', label: 'Zone 2', color: 'var(--c-dlms)' },
         { from: 'proc-dlms', to: 'amp-za3', label: 'Zone 3', color: 'var(--c-dlms)' },
         { from: 'proc-dlms', to: 'amp-za4', label: 'Zone 4', color: 'var(--c-dlms)' },
         { from: 'proc-dlms', to: 'amp-za5', label: 'Zone 5', color: 'var(--c-dlms)' },
 
-        // Amps -> INDEPENDENT FOH Arrays (Diatur Offset Y Labelnya)
         { from: 'amp-protea1', to: 'foh-L1', label: 'SpeakON (Ch A)', color: '#be123c', lblOffsetY: -22, lblOffsetX: -40 },
         { from: 'amp-protea1', to: 'foh-L2', label: 'SpeakON (Ch B)', color: '#be123c', lblOffsetY: 22, lblOffsetX: 40 },
         { from: 'amp-protea2', to: 'foh-R1', label: 'SpeakON (Ch A)', color: '#be123c', lblOffsetY: -22, lblOffsetX: -40 },
         { from: 'amp-protea2', to: 'foh-R2', label: 'SpeakON (Ch B)', color: '#be123c', lblOffsetY: 22, lblOffsetX: 40 },
 
-        // Amps -> Speakers Master Zona
         { from: 'amp-za1', to: 'z1-1', label: '100V Hot/Com', color: 'var(--c-spk)' },
         { from: 'amp-za2', to: 'z2-1', label: '100V Hot/Com', color: 'var(--c-spk)' },
         { from: 'amp-za3', to: 'z3-1', label: '100V Hot/Com', color: 'var(--c-spk)' },
@@ -355,7 +366,6 @@ location: "JA-01"
         { from: 'amp-za6', to: 'z6-1', label: '100V Hot/Com', color: 'var(--c-spk)' },
         { from: 'amp-za7', to: 'z7-1', label: '100V Hot/Com', color: 'var(--c-spk)' },
 
-        // Jumper Paralel Speaker Internal
         { from: 'z1-1', to: 'z1-2', color: '#94a3b8' }, { from: 'z1-2', to: 'z1-3', color: '#94a3b8' },
         { from: 'z2-1', to: 'z2-2', color: '#94a3b8' },
         { from: 'z3-1', to: 'z3-2', color: '#94a3b8' },
@@ -393,44 +403,32 @@ location: "JA-01"
             let pathD = "";
             let labelX, labelY;
 
-            // LOGIKA ORTHOGONAL / ELBOW ROUTING KHUSUS UNTUK SPLITTER (ANTI-TABRAK)
             if (link.route === 'elbow') {
                 const dropX = x1 + link.xOffset;
-                const r = 15; // Radius lengkungan siku
-                const dirY = y2 > y1 ? 1 : -1; // Arah ke atas atau bawah
+                const r = 15; 
+                const dirY = y2 > y1 ? 1 : -1; 
 
                 if (Math.abs(y2 - y1) < 10) {
-                    // Jika sejajar, tarik lurus saja
                     pathD = `M ${x1} ${y1} L ${x2} ${y2}`;
                     labelX = (x1 + x2) / 2;
                 } else {
-                    pathD = `M ${x1} ${y1} 
-                             L ${dropX - r} ${y1} 
-                             Q ${dropX} ${y1} ${dropX} ${y1 + (r * dirY)} 
-                             L ${dropX} ${y2 - (r * dirY)} 
-                             Q ${dropX} ${y2} ${dropX + r} ${y2} 
-                             L ${x2} ${y2}`;
-                    labelX = dropX; // Posisi label ditaruh pas di garis vertikal
+                    pathD = `M ${x1} ${y1} L ${dropX - r} ${y1} Q ${dropX} ${y1} ${dropX} ${y1 + (r * dirY)} L ${dropX} ${y2 - (r * dirY)} Q ${dropX} ${y2} ${dropX + r} ${y2} L ${x2} ${y2}`;
+                    labelX = dropX; 
                 }
                 labelY = (y1 + y2) / 2;
             } else {
-                // Kurva Halus Standar
                 const curveFactor = Math.max(Math.abs(x2 - x1) * 0.45, 40); 
                 pathD = `M ${x1} ${y1} C ${x1 + curveFactor} ${y1}, ${x2 - curveFactor} ${y2}, ${x2} ${y2}`;
                 labelX = (x1 + x2) / 2;
                 labelY = (y1 + y2) / 2;
             }
             
-            // Garis Background Transparan Dipertebal (opacity dinaikkan menjadi 0.5)
             svgContent += `<path d="${pathD}" fill="none" stroke="${link.color}" stroke-width="5" opacity="0.5" />`;
-            // Garis Animasi Flowing (Stroke dipertebal menjadi 4)
             svgContent += `<path d="${pathD}" fill="none" stroke="${link.color}" stroke-width="4" class="cable-flow" />`;
                         
             if (link.label) {
-                // Kustomisasi posisi label manual jika dibutuhkan
                 labelX += link.lblOffsetX || 0;
                 labelY += link.lblOffsetY || 0;
-                
                 const labelWidth = link.label.length * 7.5 + 24; 
                 
                 svgContent += `
@@ -447,18 +445,12 @@ location: "JA-01"
     let isDown = false, startX, startY, scrollLeft, scrollTop;
 
     slider.addEventListener('mousedown', (e) => {
-        isDown = true;
-        startX = e.pageX - slider.offsetLeft;
-        startY = e.pageY - slider.offsetTop;
-        scrollLeft = slider.scrollLeft;
-        scrollTop = slider.scrollTop;
+        isDown = true; startX = e.pageX - slider.offsetLeft; startY = e.pageY - slider.offsetTop; scrollLeft = slider.scrollLeft; scrollTop = slider.scrollTop;
     });
     slider.addEventListener('mouseleave', () => { isDown = false; });
     slider.addEventListener('mouseup', () => { isDown = false; });
     slider.addEventListener('mousemove', (e) => {
-        if (!isDown) return; e.preventDefault();
-        slider.scrollLeft = scrollLeft - (e.pageX - slider.offsetLeft - startX) * 1.5;
-        slider.scrollTop = scrollTop - (e.pageY - slider.offsetTop - startY) * 1.5;
+        if (!isDown) return; e.preventDefault(); slider.scrollLeft = scrollLeft - (e.pageX - slider.offsetLeft - startX) * 1.5; slider.scrollTop = scrollTop - (e.pageY - slider.offsetTop - startY) * 1.5;
     });
 
     window.onload = () => { setTimeout(drawConnections, 100); };

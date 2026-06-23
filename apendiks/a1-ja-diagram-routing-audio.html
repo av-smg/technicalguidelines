@@ -61,12 +61,12 @@ location: "JA-01"
         transition: fill 0.3s; 
     }
 
-    /* MATRIX GRID */
+    /* MATRIX GRID - Gap Horizontal Diperlebar menjadi 250px untuk ruang label siku */
     .diagram-wrapper .diagram-grid {
         display: grid;
         grid-template-columns: 240px 240px 240px 240px 240px 280px max-content;
         grid-auto-rows: minmax(60px, auto);
-        gap: 20px 180px; 
+        gap: 20px 250px; 
         padding: 60px 100px;
         position: relative;
         z-index: 20;
@@ -328,11 +328,12 @@ location: "JA-01"
         { from: 'mix-main', to: 'proc-geq', label: 'Stereo L/R', color: 'var(--c-mix)' },
         { from: 'proc-geq', to: 'proc-split', label: 'XLR L/R', color: 'var(--c-mix)' },
         
-        { from: 'proc-split', to: 'amp-protea1', label: 'Out 1-2', color: 'var(--c-split)', route: 'elbow', xOffset: 30 },
-        { from: 'proc-split', to: 'amp-protea2', label: 'Out 3-4', color: 'var(--c-split)', route: 'elbow', xOffset: 60 },
+        /* Jarak sela Offset dipertahankan, karena gap horizontal kini sangat lega (250px) */
+        { from: 'proc-split', to: 'amp-protea1', label: 'Out 1-2', color: 'var(--c-split)', route: 'elbow', xOffset: 40 },
+        { from: 'proc-split', to: 'amp-protea2', label: 'Out 3-4', color: 'var(--c-split)', route: 'elbow', xOffset: 65 },
         { from: 'proc-split', to: 'proc-dlms', label: 'Main L/R', color: '#eab308', route: 'elbow', xOffset: 90 },
-        { from: 'proc-split', to: 'amp-za6', label: 'TRS Out 5', color: '#eab308', route: 'elbow', xOffset: 120 },
-        { from: 'proc-split', to: 'amp-za7', label: 'TRS Out 6', color: '#eab308', route: 'elbow', xOffset: 150 },
+        { from: 'proc-split', to: 'amp-za6', label: 'TRS Out 5', color: '#eab308', route: 'elbow', xOffset: 115 },
+        { from: 'proc-split', to: 'amp-za7', label: 'TRS Out 6', color: '#eab308', route: 'elbow', xOffset: 140 },
         
         { from: 'proc-dlms', to: 'amp-za1', label: 'Zone 1', color: 'var(--c-dlms)' },
         { from: 'proc-dlms', to: 'amp-za2', label: 'Zone 2', color: 'var(--c-dlms)' },
@@ -340,10 +341,10 @@ location: "JA-01"
         { from: 'proc-dlms', to: 'amp-za4', label: 'Zone 4', color: 'var(--c-dlms)' },
         { from: 'proc-dlms', to: 'amp-za5', label: 'Zone 5', color: 'var(--c-dlms)' },
 
-        { from: 'amp-protea1', to: 'foh-L1', label: 'SpeakON (Ch A)', color: 'var(--c-spk)', lblOffsetY: -20, lblOffsetX: -20 },
-        { from: 'amp-protea1', to: 'foh-L2', label: 'SpeakON (Ch B)', color: 'var(--c-spk)', lblOffsetY: 20, lblOffsetX: -20 },
-        { from: 'amp-protea2', to: 'foh-R1', label: 'SpeakON (Ch A)', color: 'var(--c-spk)', lblOffsetY: -20, lblOffsetX: -20 },
-        { from: 'amp-protea2', to: 'foh-R2', label: 'SpeakON (Ch B)', color: 'var(--c-spk)', lblOffsetY: 20, lblOffsetX: -20 },
+        { from: 'amp-protea1', to: 'foh-L1', label: 'SpeakON (Ch A)', color: 'var(--c-spk)', lblOffsetY: -20, lblOffsetX: -30 },
+        { from: 'amp-protea1', to: 'foh-L2', label: 'SpeakON (Ch B)', color: 'var(--c-spk)', lblOffsetY: 20, lblOffsetX: -30 },
+        { from: 'amp-protea2', to: 'foh-R1', label: 'SpeakON (Ch A)', color: 'var(--c-spk)', lblOffsetY: -20, lblOffsetX: -30 },
+        { from: 'amp-protea2', to: 'foh-R2', label: 'SpeakON (Ch B)', color: 'var(--c-spk)', lblOffsetY: 20, lblOffsetX: -30 },
 
         { from: 'amp-za1', to: 'z1-1', label: '100V Hot/Com', color: 'var(--c-spk)' },
         { from: 'amp-za2', to: 'z2-1', label: '100V Hot/Com', color: 'var(--c-spk)' },
@@ -402,13 +403,12 @@ location: "JA-01"
                 } else {
                     pathD = `M ${x1} ${y1} L ${dropX - r} ${y1} Q ${dropX} ${y1} ${dropX} ${y1 + (r * dirY)} L ${dropX} ${y2 - (r * dirY)} Q ${dropX} ${y2} ${dropX + r} ${y2} L ${x2} ${y2}`;
                     
-                    /* PERBAIKAN ABSOLUT: 
-                       Label dihitung mendekati 75% ke arah kanan sebelum masuk ke alat, 
-                       dan dinaikkan 16px ke atas agar tidak memotong garis putus-putus.
-                       Bebas tabrak 100%!
+                    /* PERBAIKAN FINAL (100% BEBAS TABRAKAN): 
+                       - Mengunci label murni 50% di sisa garis horizontal terakhir (antara lekukan vertikal sampai titik colokan alat).
+                       - Label ditaruh kembali menempel sejajar di sumbu Y (tidak melayang) agar konsisten menimpa rapi garisnya.
                     */
-                    labelX = dropX + ((x2 - dropX) * 0.75);
-                    labelY = y2 - 16;
+                    labelX = dropX + ((x2 - dropX) / 2);
+                    labelY = y2;
                 }
             } else {
                 const curveFactor = Math.max(Math.abs(x2 - x1) * 0.45, 40); 

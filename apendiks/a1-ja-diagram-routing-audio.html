@@ -14,7 +14,7 @@ location: "JA-01"
         --c-tx: #f59e0b;
         --c-split: #ef4444;
         --c-dlms: #3b82f6;
-        --c-spk: #64748b; /* Abu-abu untuk kabel Speaker pasif */
+        --c-spk: #64748b; /* Abu-abu Kabel Speaker */
     }
 
     /* KANVAS EMBEDDED */
@@ -54,7 +54,7 @@ location: "JA-01"
     .diagram-wrapper .cable-label-text { 
         fill: var(--text-dark, #0f172a); 
         stroke: none !important; 
-        font-size: 12.5px; 
+        font-size: 12px; 
         font-weight: 800; 
         text-anchor: middle; 
         font-family: 'Segoe UI', system-ui, sans-serif;
@@ -101,7 +101,7 @@ location: "JA-01"
 
     .diagram-wrapper .node-icon { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: rgba(100,116,139,0.1); border-radius: 8px; flex-shrink: 0; }
     .diagram-wrapper .node-info { display: flex; flex-direction: column; gap: 4px; flex: 1; }
-    .diagram-wrapper .node-info h4 { margin: 0; font-size: 13.5px; font-weight: 700; letter-spacing: 0.5px; }
+    .diagram-wrapper .node-info h4 { margin: 0; font-size: 13px; font-weight: 700; letter-spacing: 0.5px; }
     .diagram-wrapper .node-info p { margin: 0; font-size: 11px; opacity: 0.85; font-family: monospace; }
     
     .diagram-wrapper .style-input .node-info p, .diagram-wrapper .style-media .node-info p { color: var(--text-gray, #475569); transition: color 0.3s; }
@@ -126,7 +126,6 @@ location: "JA-01"
     .diagram-wrapper .zone-title { font-size: 12px; font-weight: 800; color: var(--text-dark, #0f172a); text-transform: uppercase; border-bottom: 2px solid var(--c-spk); padding-bottom: 5px; display: inline-block; transition: color 0.3s; }
     .diagram-wrapper .speaker-row { display: flex; flex-direction: row; gap: 30px; align-items: center; position: relative; }
 
-    /* UKURAN SPEAKER DIPERKECIL */
     .diagram-wrapper .spk-unit {
         width: 36px; height: 54px; background: #1e293b; border-radius: 5px; position: relative;
         box-shadow: 2px 3px 8px rgba(0,0,0,0.2); border: 2px solid #475569;
@@ -404,11 +403,12 @@ location: "JA-01"
                     pathD = `M ${x1} ${y1} L ${dropX - r} ${y1} Q ${dropX} ${y1} ${dropX} ${y1 + (r * dirY)} L ${dropX} ${y2 - (r * dirY)} Q ${dropX} ${y2} ${dropX + r} ${y2} L ${x2} ${y2}`;
                     
                     /* PERBAIKAN ABSOLUT: 
-                       Menaruh label di garis horizontal AKHIR sebelum masuk ke port tujuan.
-                       Karena setiap tujuan ada di baris (Y) yang berbeda, mustahil bertabrakan!
+                       Label dihitung mendekati 75% ke arah kanan sebelum masuk ke alat, 
+                       dan dinaikkan 16px ke atas agar tidak memotong garis putus-putus.
+                       Bebas tabrak 100%!
                     */
-                    labelX = dropX + ((x2 - dropX) / 2);
-                    labelY = y2;
+                    labelX = dropX + ((x2 - dropX) * 0.75);
+                    labelY = y2 - 16;
                 }
             } else {
                 const curveFactor = Math.max(Math.abs(x2 - x1) * 0.45, 40); 

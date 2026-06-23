@@ -5,11 +5,10 @@ location: "JA-01"
 
 <style>
     /* ====================================================
-       SISTEM WARNA (MENGGUNAKAN VARIABEL TEMA JEKYLL ANDA)
-       Diagram ini kini 100% tunduk pada tombol toggle web Anda!
+       SISTEM WARNA (SINKRONISASI TEMA WEBSITE JEKYLL)
+       Menggunakan variabel native web Anda sebagai prioritas utama
        ==================================================== */
     :root {
-        /* Warna Kabel / Routing Tetap Dipertahankan */
         --c-mic: #10b981;
         --c-media: #0ea5e9;
         --c-mix: #d946ef;
@@ -19,15 +18,15 @@ location: "JA-01"
         --c-spk: #64748b;
     }
 
-    /* KANVAS EMBEDDED - Dinamis mengikuti tinggi layar dan margin web */
+    /* KANVAS EMBEDDED - Terpusat, responsif, dan hemat ruang vertikal */
     .diagram-wrapper {
         position: relative; 
         width: 100%; 
-        height: calc(100vh - 140px); /* Menyisakan ruang presisi untuk header web Anda */
+        height: calc(100vh - 120px); 
         min-height: 500px;
-        max-height: 850px;
+        max-height: 800px;
         
-        /* MENGAMBIL VARIABEL TEMA WEBSITE ANDA: */
+        /* Murni mengikuti toggle Dark/Light Mode website Anda */
         background-color: var(--bg-color, #f8fafc);
         background-image: radial-gradient(var(--border-color, #cbd5e1) 1.5px, transparent 1.5px);
         color: var(--text-dark, #0f172a);
@@ -38,9 +37,9 @@ location: "JA-01"
         transition: background-color 0.3s ease, background-image 0.3s ease, color 0.3s ease;
         border-radius: 12px; 
         border: 1px solid var(--border-color, #cbd5e1);
-        margin: 10px auto 40px auto; 
+        margin: 20px auto; 
         font-family: 'Segoe UI', system-ui, sans-serif;
-        box-shadow: inset 0 0 20px rgba(0,0,0,0.02);
+        box-shadow: inset 0 0 20px rgba(0,0,0,0.03);
     }
     .diagram-wrapper:active { cursor: grabbing; }
 
@@ -49,7 +48,7 @@ location: "JA-01"
     .diagram-wrapper .cable-flow { stroke-dasharray: 10, 10; animation: flowAnim 1s linear infinite; }
     @keyframes flowAnim { from { stroke-dashoffset: 20; } to { stroke-dashoffset: 0; } }
     
-    /* Label Kabel mengikuti tema kartu web Anda */
+    /* Label Kabel mengikuti background kartu */
     .diagram-wrapper .cable-label-bg { 
         fill: var(--card-bg, #ffffff); 
         stroke-width: 2; 
@@ -65,29 +64,28 @@ location: "JA-01"
         transition: fill 0.3s; 
     }
 
-    /* MATRIX GRID - Dirapatkan agar lebih terpusat dan rapi di HP */
+    /* MATRIX GRID - Jarak vertikal dipangkas (20px), horizontal diperlebar (150px) */
     .diagram-wrapper .diagram-grid {
         display: grid;
-        grid-template-columns: 240px 240px 240px 240px 240px 300px max-content;
-        grid-auto-rows: minmax(80px, auto);
-        gap: 35px 110px; /* Lebar ditarik rapat, tidak melebar berlebihan */
-        padding: 60px 80px;
+        grid-template-columns: 240px 240px 240px 240px 240px 280px max-content;
+        grid-auto-rows: minmax(60px, auto);
+        gap: 20px 150px; 
+        padding: 60px 100px;
         position: relative;
         z-index: 20;
         width: max-content;
         align-items: center; 
-        margin: auto; /* Membantu menengahkan saat di-zoom out */
+        margin: auto; 
     }
 
-    .diagram-wrapper .input-group { display: flex; flex-direction: column; gap: 18px; justify-content: center; }
+    .diagram-wrapper .input-group { display: flex; flex-direction: column; gap: 15px; justify-content: center; }
 
-    /* NODE KARTU (Mic, Laptop, dl) */
+    /* NODE KARTU */
     .diagram-wrapper .node {
-        position: relative; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        position: relative; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         display: flex; align-items: center; padding: 12px 16px; gap: 15px;
         transition: transform 0.2s, box-shadow 0.2s, background 0.3s, border-color 0.3s;
         
-        /* Sinkronisasi dengan Tema: */
         background: var(--card-bg, #ffffff); 
         border: 2px solid var(--border-color, #cbd5e1);
         color: var(--text-dark, #0f172a);
@@ -97,7 +95,6 @@ location: "JA-01"
     .diagram-wrapper .style-input { border-left: 6px solid var(--c-mic); }
     .diagram-wrapper .style-media { border-left: 6px solid var(--c-media); }
     
-    /* HARDWARE RACK - Tetap gelap agar visualisasinya realistis bak alat asli */
     .diagram-wrapper .style-rack {
         background: #1e293b !important; color: #f8fafc !important; border: 2px solid #0f172a !important;
         border-left: 14px solid #334155 !important; border-right: 14px solid #334155 !important;
@@ -110,8 +107,7 @@ location: "JA-01"
     .diagram-wrapper .node-info h4 { margin: 0; font-size: 13.5px; font-weight: 700; letter-spacing: 0.5px; }
     .diagram-wrapper .node-info p { margin: 0; font-size: 11px; opacity: 0.85; font-family: monospace; }
     
-    /* Sinkronisasi Sub-teks dengan Tema */
-    .diagram-wrapper .style-input .node-info p, .diagram-wrapper .style-media .node-info p { color: var(--text-gray, #475569); }
+    .diagram-wrapper .style-input .node-info p, .diagram-wrapper .style-media .node-info p { color: var(--text-gray, #475569); transition: color 0.3s; }
 
     .diagram-wrapper .port {
         width: 12px; height: 12px; 
@@ -124,38 +120,37 @@ location: "JA-01"
     .diagram-wrapper .style-input .port-out, .diagram-wrapper .style-media .port-out { right: -8px; } 
 
     .diagram-wrapper .zone-group {
-        display: flex; flex-direction: column; gap: 15px; 
+        display: flex; flex-direction: column; gap: 10px; 
         background: rgba(100,116,139,0.03);
-        padding: 20px 25px; border-radius: 12px; 
+        padding: 15px 25px; border-radius: 12px; 
         border: 1px dashed var(--text-gray, #94a3b8); 
         position: relative;
     }
-    .diagram-wrapper .zone-title { font-size: 13px; font-weight: 800; color: var(--text-dark, #0f172a); text-transform: uppercase; border-bottom: 2px solid var(--c-spk); padding-bottom: 5px; display: inline-block; }
-    .diagram-wrapper .speaker-row { display: flex; flex-direction: row; gap: 45px; align-items: center; position: relative; }
+    .diagram-wrapper .zone-title { font-size: 12px; font-weight: 800; color: var(--text-dark, #0f172a); text-transform: uppercase; border-bottom: 2px solid var(--c-spk); padding-bottom: 5px; display: inline-block; transition: color 0.3s; }
+    .diagram-wrapper .speaker-row { display: flex; flex-direction: row; gap: 30px; align-items: center; position: relative; }
 
-    /* SPEAKER UNITS (Tetap dominan gelap seperti speaker fisik) */
+    /* UKURAN SPEAKER DIPERKECIL (Hemat ruang vertikal) */
     .diagram-wrapper .spk-unit {
-        width: 48px; height: 70px; background: #1e293b; border-radius: 6px; position: relative;
-        box-shadow: 3px 4px 10px rgba(0,0,0,0.2); border: 2px solid #475569;
+        width: 36px; height: 54px; background: #1e293b; border-radius: 5px; position: relative;
+        box-shadow: 2px 3px 8px rgba(0,0,0,0.2); border: 2px solid #475569;
         display: flex; flex-direction: column; align-items: center; justify-content: space-evenly; z-index: 20;
     }
-    .diagram-wrapper .spk-unit::before { content: ''; width: 14px; height: 14px; background: #0f172a; border-radius: 50%; } 
-    .diagram-wrapper .spk-unit::after { content: ''; width: 28px; height: 28px; background: #0f172a; border-radius: 50%; border: 1px solid #334155; } 
+    .diagram-wrapper .spk-unit::before { content: ''; width: 10px; height: 10px; background: #0f172a; border-radius: 50%; } 
+    .diagram-wrapper .spk-unit::after { content: ''; width: 20px; height: 20px; background: #0f172a; border-radius: 50%; border: 1px solid #334155; } 
 
     .diagram-wrapper .foh-array-stack {
-        display: flex; flex-direction: column; gap: 2px; align-items: center; background: #1e293b; padding: 6px;
-        border-radius: 8px; border: 2px solid #be123c; box-shadow: 0 5px 15px rgba(226, 29, 72, 0.2); position: relative; z-index: 20;
+        display: flex; flex-direction: column; gap: 2px; align-items: center; background: #1e293b; padding: 5px;
+        border-radius: 6px; border: 2px solid #be123c; box-shadow: 0 4px 12px rgba(226, 29, 72, 0.2); position: relative; z-index: 20;
     }
-    .diagram-wrapper .array-module { width: 65px; height: 22px; background: #0f172a; border-radius: 3px; border-bottom: 2px solid #334155; display: flex; justify-content: center; align-items: center; }
-    .diagram-wrapper .array-module::before { content: ''; width: 9px; height: 9px; background: #475569; border-radius: 50%; }
+    .diagram-wrapper .array-module { width: 50px; height: 16px; background: #0f172a; border-radius: 3px; border-bottom: 2px solid #334155; display: flex; justify-content: center; align-items: center; }
+    .diagram-wrapper .array-module::before { content: ''; width: 7px; height: 7px; background: #475569; border-radius: 50%; }
 
-    .diagram-wrapper .node-icon svg { width: 24px; height: 24px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    .diagram-wrapper .node-icon svg { width: 22px; height: 22px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
 
     .diagram-wrapper .mobile-hint { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--text-dark, #0f172a); color: var(--bg-color, #ffffff); padding: 10px 20px; border-radius: 20px; font-size: 12px; font-weight: bold; z-index: 9999; pointer-events: none; opacity: 0; }
     
-    /* Optimasi Mobile Khusus */
     @media (max-width: 768px) { 
-        .diagram-wrapper .diagram-grid { gap: 30px 80px; padding: 40px; }
+        .diagram-wrapper .diagram-grid { gap: 20px 80px; padding: 40px; }
         .diagram-wrapper .mobile-hint { opacity: 1; animation: fadeOut 5s forwards 2s; } 
     }
     @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
@@ -185,7 +180,7 @@ location: "JA-01"
                 <div class="node-info"><h4>Mic 4 - Peserta 2</h4><p>Shure SM58 • CH 04</p></div><div class="port port-out"></div>
             </div>
 
-            <div class="node style-media" id="in-med1" style="margin-top: 30px;">
+            <div class="node style-media" id="in-med1" style="margin-top: 20px;">
                 <div class="node-icon"><svg><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="2" y1="20" x2="22" y2="20"/></svg></div>
                 <div class="node-info"><h4>Media Utama</h4><p>Laptop • CH 09-10</p></div><div class="port port-out"></div>
             </div>
@@ -203,7 +198,7 @@ location: "JA-01"
             </div>
         </div>
 
-        <div class="node style-rack" id="mix-main" style="grid-area: 4 / 2; transform: translateY(40px);">
+        <div class="node style-rack" id="mix-main" style="grid-area: 4 / 2; transform: translateY(30px);">
             <div class="node-icon" style="color:#d946ef;"><svg><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></div>
             <div class="node-info"><h4>Yamaha MG16XU</h4><p>Audio Console Utama</p></div>
             <div class="port port-in"></div><div class="port port-out"></div>
@@ -214,13 +209,13 @@ location: "JA-01"
             <div class="node-info"><h4>FM Transmitter</h4><p>Broadcast Area Radio</p></div>
             <div class="port port-in"></div>
         </div>
-        <div class="node style-rack" id="proc-geq" style="grid-area: 4 / 3; transform: translateY(40px);">
+        <div class="node style-rack" id="proc-geq" style="grid-area: 4 / 3; transform: translateY(30px);">
             <div class="node-icon" style="color:#10b981;"><svg><rect x="2" y="4" width="20" height="16" rx="2" ry="2"/><line x1="6" y1="8" x2="6" y2="8"/><line x1="10" y1="8" x2="18" y2="8"/><line x1="6" y1="12" x2="6" y2="12"/><line x1="10" y1="12" x2="18" y2="12"/><line x1="6" y1="16" x2="6" y2="16"/><line x1="10" y1="16" x2="18" y2="16"/></svg></div>
             <div class="node-info"><h4>GEQ DBX 231</h4><p>Tonal Master / RTA</p></div>
             <div class="port port-in"></div><div class="port port-out"></div>
         </div>
 
-        <div class="node style-rack" id="proc-split" style="grid-area: 4 / 4; transform: translateY(40px);">
+        <div class="node style-rack" id="proc-split" style="grid-area: 4 / 4; transform: translateY(30px);">
             <div class="node-icon" style="color:#ef4444;"><svg><rect x="2" y="4" width="20" height="16" rx="2" ry="2"/><circle cx="8" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="16" cy="12" r="1"/></svg></div>
             <div class="node-info"><h4>MX882 Splitter</h4><p>Distribusi Utama</p></div>
             <div class="port port-in"></div><div class="port port-out"></div>
@@ -245,14 +240,14 @@ location: "JA-01"
 
         <div class="zone-group" style="grid-area: 1 / 7; border-color: #be123c;">
             <div class="zone-title" style="border-color: #be123c;">FOH Kiri (TOA HX-5 x 2 Set)</div>
-            <div class="speaker-row" style="gap: 60px;">
+            <div class="speaker-row" style="gap: 50px;">
                 <div class="foh-array-stack" id="foh-L1"><div class="port port-in"></div><div class="array-module"></div><div class="array-module"></div><div class="array-module"></div><div class="array-module"></div></div>
                 <div class="foh-array-stack" id="foh-L2"><div class="port port-in"></div><div class="array-module"></div><div class="array-module"></div><div class="array-module"></div><div class="array-module"></div></div>
             </div>
         </div>
         <div class="zone-group" style="grid-area: 2 / 7; border-color: #be123c;">
             <div class="zone-title" style="border-color: #be123c;">FOH Kanan (TOA HX-5 x 2 Set)</div>
-            <div class="speaker-row" style="gap: 60px;">
+            <div class="speaker-row" style="gap: 50px;">
                 <div class="foh-array-stack" id="foh-R1"><div class="port port-in"></div><div class="array-module"></div><div class="array-module"></div><div class="array-module"></div><div class="array-module"></div></div>
                 <div class="foh-array-stack" id="foh-R2"><div class="port port-in"></div><div class="array-module"></div><div class="array-module"></div><div class="array-module"></div><div class="array-module"></div></div>
             </div>
@@ -330,12 +325,12 @@ location: "JA-01"
         { from: 'mix-main', to: 'proc-geq', label: 'Stereo L/R', color: 'var(--c-mix)' },
         { from: 'proc-geq', to: 'proc-split', label: 'XLR L/R', color: 'var(--c-mix)' },
         
-        /* Offset Elbow Disesuaikan agar presisi dengan gap baru */
+        /* Offset Siku dinaikkan agar garis makin merenggang & tak tumpang tindih */
         { from: 'proc-split', to: 'amp-protea1', label: 'Out 1-2', color: 'var(--c-split)', route: 'elbow', xOffset: 30 },
-        { from: 'proc-split', to: 'amp-protea2', label: 'Out 3-4', color: 'var(--c-split)', route: 'elbow', xOffset: 50 },
-        { from: 'proc-split', to: 'proc-dlms', label: 'Main L/R', color: '#eab308', route: 'elbow', xOffset: 70 },
-        { from: 'proc-split', to: 'amp-za6', label: 'TRS Out 5', color: '#eab308', route: 'elbow', xOffset: 90 },
-        { from: 'proc-split', to: 'amp-za7', label: 'TRS Out 6', color: '#eab308', route: 'elbow', xOffset: 110 },
+        { from: 'proc-split', to: 'amp-protea2', label: 'Out 3-4', color: 'var(--c-split)', route: 'elbow', xOffset: 60 },
+        { from: 'proc-split', to: 'proc-dlms', label: 'Main L/R', color: '#eab308', route: 'elbow', xOffset: 90 },
+        { from: 'proc-split', to: 'amp-za6', label: 'TRS Out 5', color: '#eab308', route: 'elbow', xOffset: 120 },
+        { from: 'proc-split', to: 'amp-za7', label: 'TRS Out 6', color: '#eab308', route: 'elbow', xOffset: 150 },
         
         { from: 'proc-dlms', to: 'amp-za1', label: 'Zone 1', color: 'var(--c-dlms)' },
         { from: 'proc-dlms', to: 'amp-za2', label: 'Zone 2', color: 'var(--c-dlms)' },
@@ -343,10 +338,11 @@ location: "JA-01"
         { from: 'proc-dlms', to: 'amp-za4', label: 'Zone 4', color: 'var(--c-dlms)' },
         { from: 'proc-dlms', to: 'amp-za5', label: 'Zone 5', color: 'var(--c-dlms)' },
 
-        { from: 'amp-protea1', to: 'foh-L1', label: 'SpeakON (Ch A)', color: '#be123c', lblOffsetY: -22, lblOffsetX: -30 },
-        { from: 'amp-protea1', to: 'foh-L2', label: 'SpeakON (Ch B)', color: '#be123c', lblOffsetY: 22, lblOffsetX: 30 },
-        { from: 'amp-protea2', to: 'foh-R1', label: 'SpeakON (Ch A)', color: '#be123c', lblOffsetY: -22, lblOffsetX: -30 },
-        { from: 'amp-protea2', to: 'foh-R2', label: 'SpeakON (Ch B)', color: '#be123c', lblOffsetY: 22, lblOffsetX: 30 },
+        /* Label FOH digeser menjauh dari kotak speaker */
+        { from: 'amp-protea1', to: 'foh-L1', label: 'SpeakON (Ch A)', color: '#be123c', lblOffsetY: -22, lblOffsetX: -45 },
+        { from: 'amp-protea1', to: 'foh-L2', label: 'SpeakON (Ch B)', color: '#be123c', lblOffsetY: 22, lblOffsetX: 45 },
+        { from: 'amp-protea2', to: 'foh-R1', label: 'SpeakON (Ch A)', color: '#be123c', lblOffsetY: -22, lblOffsetX: -45 },
+        { from: 'amp-protea2', to: 'foh-R2', label: 'SpeakON (Ch B)', color: '#be123c', lblOffsetY: 22, lblOffsetX: 45 },
 
         { from: 'amp-za1', to: 'z1-1', label: '100V Hot/Com', color: 'var(--c-spk)' },
         { from: 'amp-za2', to: 'z2-1', label: '100V Hot/Com', color: 'var(--c-spk)' },
@@ -370,7 +366,7 @@ location: "JA-01"
         const container = document.getElementById('diagram-container');
         const grid = document.querySelector('.diagram-grid');
         
-        // Membatasi tinggi SVG hanya sebesar konten grid, bukan berlebih
+        /* Tinggi SVG dibatasi seukuran konten aktual */
         svg.style.width = Math.max(container.scrollWidth, grid.scrollWidth) + 'px';
         svg.style.height = Math.max(container.scrollHeight, grid.scrollHeight) + 'px';
         
@@ -402,11 +398,13 @@ location: "JA-01"
                 if (Math.abs(y2 - y1) < 10) {
                     pathD = `M ${x1} ${y1} L ${x2} ${y2}`;
                     labelX = (x1 + x2) / 2;
+                    labelY = y2;
                 } else {
                     pathD = `M ${x1} ${y1} L ${dropX - r} ${y1} Q ${dropX} ${y1} ${dropX} ${y1 + (r * dirY)} L ${dropX} ${y2 - (r * dirY)} Q ${dropX} ${y2} ${dropX + r} ${y2} L ${x2} ${y2}`;
-                    labelX = dropX; 
+                    /* LOGIKA BARU: Label ditaruh di GARIS HORIZONTAL SEBELUM MASUK KE ALAT. Bebas tumpukan! */
+                    labelX = (dropX + r + x2) / 2;
+                    labelY = y2;
                 }
-                labelY = (y1 + y2) / 2;
             } else {
                 const curveFactor = Math.max(Math.abs(x2 - x1) * 0.45, 40); 
                 pathD = `M ${x1} ${y1} C ${x1 + curveFactor} ${y1}, ${x2 - curveFactor} ${y2}, ${x2} ${y2}`;

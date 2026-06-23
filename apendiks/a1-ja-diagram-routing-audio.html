@@ -1,178 +1,163 @@
 ---
+layout: default
 location: "JA-01"
 ---
 
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    {% include head.html %}
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Audio Routing Diagram Matrix - Isolated Version</title>
-    
-    <style>
-        /* ====================================================
-           SISTEM WARNA (LIGHT & DARK MODE SUPPORT)
-           Variabel hanya disimpan di :root agar tidak bocor
-           ==================================================== */
+<style>
+    /* ====================================================
+       SISTEM WARNA (LIGHT & DARK MODE SUPPORT)
+       ==================================================== */
+    :root {
+        --dia-bg-canvas: #f8fafc;
+        --dia-grid-dot: #cbd5e1;
+        --dia-text-main: #0f172a;
+        --dia-text-muted: #475569;
+        --dia-card-bg: #ffffff;
+        --dia-card-border: #94a3b8; 
+        
+        --dia-lbl-bg: #ffffff;
+        --dia-lbl-text: #0f172a;
+        
+        --c-mic: #10b981;
+        --c-media: #0ea5e9;
+        --c-mix: #d946ef;
+        --c-tx: #f59e0b;
+        --c-split: #ef4444;
+        --c-dlms: #3b82f6;
+        --c-spk: #64748b;
+    }
+
+    @media (prefers-color-scheme: dark) {
         :root {
-            --dia-bg-canvas: #f8fafc;
-            --dia-grid-dot: #cbd5e1;
-            --dia-text-main: #0f172a;
-            --dia-text-muted: #475569;
-            --dia-card-bg: #ffffff;
-            --dia-card-border: #94a3b8; 
+            --dia-bg-canvas: #0b1120;
+            --dia-grid-dot: #334155;
+            --dia-text-main: #f8fafc;
+            --dia-text-muted: #94a3b8;
+            --dia-card-bg: #1e293b;
+            --dia-card-border: #475569; 
             
-            --dia-lbl-bg: #ffffff;
-            --dia-lbl-text: #0f172a;
-            
-            --c-mic: #10b981;
-            --c-media: #0ea5e9;
-            --c-mix: #d946ef;
-            --c-tx: #f59e0b;
-            --c-split: #ef4444;
-            --c-dlms: #3b82f6;
-            --c-spk: #64748b;
+            --dia-lbl-bg: #1e293b;
+            --dia-lbl-text: #f8fafc;
         }
+    }
 
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --dia-bg-canvas: #0b1120;
-                --dia-grid-dot: #334155;
-                --dia-text-main: #f8fafc;
-                --dia-text-muted: #94a3b8;
-                --dia-card-bg: #1e293b;
-                --dia-card-border: #475569; 
-                
-                --dia-lbl-bg: #1e293b;
-                --dia-lbl-text: #f8fafc;
-            }
-        }
+    /* KANVAS EMBEDDED - Terisolasi penuh agar tidak merusak tema web */
+    .diagram-wrapper {
+        position: relative; 
+        width: 100%; 
+        /* Menggunakan 80vh agar muat di layar tapi menyisakan ruang untuk scroll header */
+        height: 80vh; 
+        min-height: 600px;
+        background-color: var(--dia-bg-canvas);
+        background-image: radial-gradient(var(--dia-grid-dot) 1.5px, transparent 1.5px);
+        background-size: 30px 30px; 
+        overflow: auto; 
+        cursor: grab;
+        transition: background-color 0.3s ease, background-image 0.3s ease;
+        border-radius: 12px; 
+        border: 1px solid var(--dia-card-border);
+        margin: 20px 0; 
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        color: var(--dia-text-main);
+        box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
+    }
+    .diagram-wrapper:active { cursor: grabbing; }
 
-        /* 100% ISOLASI CSS:
-          Semua style HANYA diawali dengan .diagram-wrapper 
-          (Tidak ada lagi pemanggilan tag 'body' atau 'html' yang merusak website Anda!) 
-        */
+    .diagram-wrapper #svg-canvas { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 10; }
+    
+    .diagram-wrapper .cable-flow { stroke-dasharray: 10, 10; animation: flowAnim 1s linear infinite; }
+    @keyframes flowAnim { from { stroke-dashoffset: 20; } to { stroke-dashoffset: 0; } }
+    
+    .diagram-wrapper .cable-label-bg { 
+        fill: var(--dia-lbl-bg); 
+        stroke-width: 2; 
+        transition: fill 0.3s; 
+    }
+    .diagram-wrapper .cable-label-text { 
+        fill: var(--dia-lbl-text); 
+        stroke: none !important; 
+        font-size: 13px; 
+        font-weight: 800; 
+        text-anchor: middle; 
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        transition: fill 0.3s; 
+    }
 
-        .diagram-wrapper {
-            position: relative; 
-            width: 100%; 
-            height: 75vh; /* Menyisakan 25% layar untuk Header/Footer Website Anda */
-            min-height: 550px;
-            max-height: 800px;
-            background-color: var(--dia-bg-canvas);
-            background-image: radial-gradient(var(--dia-grid-dot) 1.5px, transparent 1.5px);
-            background-size: 30px 30px; 
-            overflow: auto; 
-            cursor: grab;
-            transition: background-color 0.3s ease, background-image 0.3s ease;
-            border-radius: 12px; 
-            border: 1px solid var(--dia-card-border);
-            margin: 20px 0; 
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            color: var(--dia-text-main);
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
-        }
-        .diagram-wrapper:active { cursor: grabbing; }
+    .diagram-wrapper .diagram-grid {
+        display: grid;
+        grid-template-columns: 240px 240px 240px 260px 240px 320px minmax(500px, max-content);
+        grid-auto-rows: minmax(80px, auto);
+        gap: 40px 180px; 
+        padding: 80px 120px;
+        position: relative;
+        z-index: 20;
+        width: max-content;
+        align-items: center; 
+    }
 
-        .diagram-wrapper #svg-canvas { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 10; }
-        
-        .diagram-wrapper .cable-flow { stroke-dasharray: 10, 10; animation: flowAnim 1s linear infinite; }
-        @keyframes flowAnim { from { stroke-dashoffset: 20; } to { stroke-dashoffset: 0; } }
-        
-        /* Teks Label Super Tajam & Proporsional */
-        .diagram-wrapper .cable-label-bg { 
-            fill: var(--dia-lbl-bg); 
-            stroke-width: 2; 
-            transition: fill 0.3s; 
-        }
-        .diagram-wrapper .cable-label-text { 
-            fill: var(--dia-lbl-text); 
-            stroke: none !important; 
-            font-size: 13px; /* Diperbesar agar mudah dibaca */
-            font-weight: 800; 
-            text-anchor: middle; 
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            transition: fill 0.3s; 
-        }
+    .diagram-wrapper .input-group { display: flex; flex-direction: column; gap: 20px; justify-content: center; }
 
-        .diagram-wrapper .diagram-grid {
-            display: grid;
-            grid-template-columns: 240px 240px 240px 260px 240px 320px minmax(500px, max-content);
-            grid-auto-rows: minmax(80px, auto);
-            gap: 40px 180px; 
-            padding: 80px 120px;
-            position: relative;
-            z-index: 20;
-            width: max-content;
-            align-items: center; 
-        }
+    .diagram-wrapper .node {
+        position: relative; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        display: flex; align-items: center; padding: 12px 16px; gap: 15px;
+        transition: transform 0.2s, box-shadow 0.2s, background 0.3s, border-color 0.3s;
+        background: var(--dia-card-bg); border: 2px solid var(--dia-card-border);
+    }
+    .diagram-wrapper .node:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.3); z-index: 30; }
 
-        .diagram-wrapper .input-group { display: flex; flex-direction: column; gap: 20px; justify-content: center; }
+    .diagram-wrapper .style-input { border-left: 6px solid var(--c-mic); }
+    .diagram-wrapper .style-media { border-left: 6px solid var(--c-media); }
+    
+    .diagram-wrapper .style-rack {
+        background: #1e293b !important; color: #f8fafc !important; border: 2px solid #0f172a !important;
+        border-left: 14px solid #334155 !important; border-right: 14px solid #334155 !important;
+    }
+    .diagram-wrapper .style-rack::before, .diagram-wrapper .style-rack::after { content: ''; position: absolute; left: -9px; width: 4px; height: 4px; background: #0f172a; border-radius: 50%; }
+    .diagram-wrapper .style-rack::before { top: 12px; } .diagram-wrapper .style-rack::after { bottom: 12px; }
 
-        .diagram-wrapper .node {
-            position: relative; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-            display: flex; align-items: center; padding: 12px 16px; gap: 15px;
-            transition: transform 0.2s, box-shadow 0.2s, background 0.3s, border-color 0.3s;
-            background: var(--dia-card-bg); border: 2px solid var(--dia-card-border);
-        }
-        .diagram-wrapper .node:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.3); z-index: 30; }
+    .diagram-wrapper .node-icon { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 8px; flex-shrink: 0; }
+    .diagram-wrapper .node-info { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+    .diagram-wrapper .node-info h4 { margin: 0; font-size: 13.5px; font-weight: 700; letter-spacing: 0.5px; }
+    .diagram-wrapper .node-info p { margin: 0; font-size: 11px; opacity: 0.8; font-family: monospace; }
+    
+    .diagram-wrapper .style-input .node-info p, .diagram-wrapper .style-media .node-info p { color: var(--dia-text-muted); }
 
-        .diagram-wrapper .style-input { border-left: 6px solid var(--c-mic); }
-        .diagram-wrapper .style-media { border-left: 6px solid var(--c-media); }
-        
-        .diagram-wrapper .style-rack {
-            background: #1e293b !important; color: #f8fafc !important; border: 2px solid #0f172a !important;
-            border-left: 14px solid #334155 !important; border-right: 14px solid #334155 !important;
-        }
-        .diagram-wrapper .style-rack::before, .diagram-wrapper .style-rack::after { content: ''; position: absolute; left: -9px; width: 4px; height: 4px; background: #0f172a; border-radius: 50%; }
-        .diagram-wrapper .style-rack::before { top: 12px; } .diagram-wrapper .style-rack::after { bottom: 12px; }
+    .diagram-wrapper .port {
+        width: 12px; height: 12px; background: var(--dia-bg-canvas); border: 3px solid #0f172a;
+        border-radius: 50%; position: absolute; top: 50%; transform: translateY(-50%); z-index: 5;
+        transition: background-color 0.3s;
+    }
+    .diagram-wrapper .port-in { left: -22px; } .diagram-wrapper .port-out { right: -22px; }
+    .diagram-wrapper .style-input .port-out, .diagram-wrapper .style-media .port-out { right: -8px; } 
 
-        .diagram-wrapper .node-icon { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 8px; flex-shrink: 0; }
-        .diagram-wrapper .node-info { display: flex; flex-direction: column; gap: 4px; flex: 1; }
-        .diagram-wrapper .node-info h4 { margin: 0; font-size: 13.5px; font-weight: 700; letter-spacing: 0.5px; }
-        .diagram-wrapper .node-info p { margin: 0; font-size: 11px; opacity: 0.8; font-family: monospace; }
-        
-        .diagram-wrapper .style-input .node-info p, .diagram-wrapper .style-media .node-info p { color: var(--dia-text-muted); }
+    .diagram-wrapper .zone-group {
+        display: flex; flex-direction: column; gap: 15px; background: rgba(100,116,139,0.05);
+        padding: 20px 25px; border-radius: 12px; border: 1px dashed var(--dia-text-muted); position: relative;
+    }
+    .diagram-wrapper .zone-title { font-size: 13px; font-weight: 800; color: var(--dia-text-main); text-transform: uppercase; border-bottom: 2px solid var(--c-spk); padding-bottom: 5px; display: inline-block; }
+    .diagram-wrapper .speaker-row { display: flex; flex-direction: row; gap: 45px; align-items: center; position: relative; }
 
-        .diagram-wrapper .port {
-            width: 12px; height: 12px; background: var(--dia-bg-canvas); border: 3px solid #0f172a;
-            border-radius: 50%; position: absolute; top: 50%; transform: translateY(-50%); z-index: 5;
-            transition: background-color 0.3s;
-        }
-        .diagram-wrapper .port-in { left: -22px; } .diagram-wrapper .port-out { right: -22px; }
-        .diagram-wrapper .style-input .port-out, .diagram-wrapper .style-media .port-out { right: -8px; } 
+    .diagram-wrapper .spk-unit {
+        width: 48px; height: 70px; background: #1e293b; border-radius: 6px; position: relative;
+        box-shadow: 3px 4px 10px rgba(0,0,0,0.2); border: 2px solid #475569;
+        display: flex; flex-direction: column; align-items: center; justify-content: space-evenly; z-index: 20;
+    }
+    .diagram-wrapper .spk-unit::before { content: ''; width: 14px; height: 14px; background: #0f172a; border-radius: 50%; } 
+    .diagram-wrapper .spk-unit::after { content: ''; width: 28px; height: 28px; background: #0f172a; border-radius: 50%; border: 1px solid #334155; } 
 
-        .diagram-wrapper .zone-group {
-            display: flex; flex-direction: column; gap: 15px; background: rgba(100,116,139,0.05);
-            padding: 20px 25px; border-radius: 12px; border: 1px dashed var(--dia-text-muted); position: relative;
-        }
-        .diagram-wrapper .zone-title { font-size: 13px; font-weight: 800; color: var(--dia-text-main); text-transform: uppercase; border-bottom: 2px solid var(--c-spk); padding-bottom: 5px; display: inline-block; }
-        .diagram-wrapper .speaker-row { display: flex; flex-direction: row; gap: 45px; align-items: center; position: relative; }
+    .diagram-wrapper .foh-array-stack {
+        display: flex; flex-direction: column; gap: 2px; align-items: center; background: #1e293b; padding: 6px;
+        border-radius: 8px; border: 2px solid #be123c; box-shadow: 0 5px 15px rgba(226, 29, 72, 0.2); position: relative; z-index: 20;
+    }
+    .diagram-wrapper .array-module { width: 65px; height: 22px; background: #0f172a; border-radius: 3px; border-bottom: 2px solid #334155; display: flex; justify-content: center; align-items: center; }
+    .diagram-wrapper .array-module::before { content: ''; width: 9px; height: 9px; background: #475569; border-radius: 50%; }
 
-        .diagram-wrapper .spk-unit {
-            width: 48px; height: 70px; background: #1e293b; border-radius: 6px; position: relative;
-            box-shadow: 3px 4px 10px rgba(0,0,0,0.2); border: 2px solid #475569;
-            display: flex; flex-direction: column; align-items: center; justify-content: space-evenly; z-index: 20;
-        }
-        .diagram-wrapper .spk-unit::before { content: ''; width: 14px; height: 14px; background: #0f172a; border-radius: 50%; } 
-        .diagram-wrapper .spk-unit::after { content: ''; width: 28px; height: 28px; background: #0f172a; border-radius: 50%; border: 1px solid #334155; } 
+    .diagram-wrapper .node-icon svg { width: 24px; height: 24px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
 
-        .diagram-wrapper .foh-array-stack {
-            display: flex; flex-direction: column; gap: 2px; align-items: center; background: #1e293b; padding: 6px;
-            border-radius: 8px; border: 2px solid #be123c; box-shadow: 0 5px 15px rgba(226, 29, 72, 0.2); position: relative; z-index: 20;
-        }
-        .diagram-wrapper .array-module { width: 65px; height: 22px; background: #0f172a; border-radius: 3px; border-bottom: 2px solid #334155; display: flex; justify-content: center; align-items: center; }
-        .diagram-wrapper .array-module::before { content: ''; width: 9px; height: 9px; background: #475569; border-radius: 50%; }
-
-        .diagram-wrapper .node-icon svg { width: 24px; height: 24px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
-
-        .diagram-wrapper .mobile-hint { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #0f172a; color: #fff; padding: 10px 20px; border-radius: 20px; font-size: 12px; font-weight: bold; z-index: 9999; pointer-events: none; display: none; }
-        @media (max-width: 768px) { .diagram-wrapper .mobile-hint { display: block; animation: fadeOut 4s forwards 2s; } }
-        @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
-    </style>
-</head>
-<body>
+    .diagram-wrapper .mobile-hint { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #0f172a; color: #fff; padding: 10px 20px; border-radius: 20px; font-size: 12px; font-weight: bold; z-index: 9999; pointer-events: none; display: none; }
+    @media (max-width: 768px) { .diagram-wrapper .mobile-hint { display: block; animation: fadeOut 4s forwards 2s; } }
+    @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
+</style>
 
 <div class="diagram-wrapper" id="diagram-container">
     <div class="mobile-hint">👆 Geser area diagram untuk menjelajah</div>
@@ -458,5 +443,3 @@ location: "JA-01"
     window.onload = () => { setTimeout(drawConnections, 100); };
     window.onresize = drawConnections;
 </script>
-</body>
-</html>

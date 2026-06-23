@@ -206,9 +206,9 @@ location: "JA-01"
             <div class="port port-in"></div><div class="port port-out"></div>
         </div>
 
-        <!-- KOLOM 7: AMPLIFIERS & STREAM OUT -->
-        <div class="node style-rack" id="amp-protea1" style="grid-area: 1 / 7;"><div class="node-info"><h4>Ampli PROTEA 1</h4><p>FOH L (Main L)</p></div><div class="port port-in"></div><div class="port port-out"></div></div>
-        <div class="node style-rack" id="amp-protea2" style="grid-area: 2 / 7;"><div class="node-info"><h4>Ampli PROTEA 2</h4><p>FOH R (Main R)</p></div><div class="port port-in"></div><div class="port port-out"></div></div>
+        <!-- KOLOM 7: AMPLIFIERS & STREAM OUT & VIDEO SWITCHER -->
+        <div class="node style-rack" id="amp-protea1" style="grid-area: 1 / 7;"><div class="node-info"><h4>Ampli PROTEA 1</h4><p>FOH L (IN 1 &rarr; Link 1-2)</p></div><div class="port port-in"></div><div class="port port-out"></div></div>
+        <div class="node style-rack" id="amp-protea2" style="grid-area: 2 / 7;"><div class="node-info"><h4>Ampli PROTEA 2</h4><p>FOH R (IN 1 &rarr; Link 1-2)</p></div><div class="port port-in"></div><div class="port port-out"></div></div>
         <div class="node style-rack" id="amp-za1" style="grid-area: 3 / 7;"><div class="node-info"><h4>TOA ZA 2240</h4><p>Belakang Panggung</p></div><div class="port port-in"></div><div class="port port-out"></div></div>
         <div class="node style-rack" id="amp-za2" style="grid-area: 4 / 7;"><div class="node-info"><h4>TOA ZA 2240</h4><p>Samping Panggung</p></div><div class="port port-in"></div><div class="port port-out"></div></div>
         
@@ -220,6 +220,9 @@ location: "JA-01"
         <div class="node style-rack" id="amp-za7" style="grid-area: 9 / 7;"><div class="node-info"><h4>TOA ZA 2240</h4><p>Ruang Media</p></div><div class="port port-in"></div><div class="port port-out"></div></div>
         
         <div class="node style-media" id="out-stream" style="grid-area: 10 / 7;"><div class="node-icon" style="color:var(--c-media)"><svg><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="2" y1="20" x2="22" y2="20"/></svg></div><div class="node-info"><h4>Stream Out</h4><p>OBS / PC Broadcast</p></div><div class="port port-in"></div></div>
+
+        <!-- VIDEO SWITCHER -->
+        <div class="node style-media" id="out-video" style="grid-area: 11 / 7;"><div class="node-icon" style="color:var(--c-media)"><svg><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg></div><div class="node-info"><h4>Video Switcher</h4><p>Input Audio</p></div><div class="port port-in"></div></div>
 
         <!-- KOLOM 8: SPEAKERS -->
         <div class="zone-group" style="grid-area: 1 / 8; border-color: #be123c;">
@@ -298,64 +301,93 @@ location: "JA-01"
 <script>
     const cables = [
         // Mic -> Snake Cable
-        { from: 'in-mic1', to: 'snake-box', label: 'XLR', color: 'var(--c-mic)' },
-        { from: 'in-mic2', to: 'snake-box', label: 'XLR', color: 'var(--c-mic)' },
-        { from: 'in-mic3', to: 'snake-box', label: 'XLR', color: 'var(--c-mic)' },
-        { from: 'in-mic4', to: 'snake-box', label: 'XLR', color: 'var(--c-mic)' },
+        { from: 'in-mic1', to: 'snake-box', label: 'XLR to XLR', color: 'var(--c-mic)' },
+        { from: 'in-mic2', to: 'snake-box', label: 'XLR to XLR', color: 'var(--c-mic)' },
+        { from: 'in-mic3', to: 'snake-box', label: 'XLR to XLR', color: 'var(--c-mic)' },
+        { from: 'in-mic4', to: 'snake-box', label: 'XLR to XLR', color: 'var(--c-mic)' },
         
-        // Snake -> Mixer (Offset jauh)
-        { from: 'snake-box', to: 'mix-main', label: 'Multicore PROEL', color: 'var(--c-mic)', route: 'elbow', xOffset: 160 },
+        // Snake -> Mixer 
+        { from: 'snake-box', to: 'mix-main', label: 'XLR to XLR', color: 'var(--c-mic)' },
         
-        // PERBAIKAN MEDIA: Kembali pakai mode bezier lengkung agar mekar kipas rapi, teks diubah sesuai spesifikasi
+        // Kipas Media
         { from: 'in-med1', to: 'mix-main', label: '3.5mm to TRS', color: 'var(--c-media)' },
         { from: 'in-med2', to: 'mix-main', label: '3.5mm to TRS', color: 'var(--c-media)' },
         { from: 'in-med3', to: 'mix-main', label: '3.5mm to RCA', color: 'var(--c-media)' },
         { from: 'in-med4', to: 'mix-main', label: '3.5mm to RCA', color: 'var(--c-media)' },
         
-        // Mixer -> Prosesor
-        { from: 'mix-main', to: 'tx-fm', label: 'Group 1-2', color: 'var(--c-tx)', route: 'elbow', xOffset: 60 },
-        { from: 'mix-main', to: 'proc-geq', label: 'Stereo L/R', color: 'var(--c-mix)' },
-        { from: 'proc-geq', to: 'proc-dlms', label: 'XLR L/R', color: 'var(--c-mix)' },
+        // Mixer -> Prosesor & TX 
+        { from: 'mix-main', to: 'tx-fm', label: 'TRS to 3.5mm', color: 'var(--c-tx)', route: 'elbow', xOffset: 60 },
+        { from: 'mix-main', to: 'proc-geq', label: 'Main L/R: XLR to XLR', color: 'var(--c-mix)', dual: true },
+        { from: 'proc-geq', to: 'proc-dlms', label: 'L/R: XLR to XLR', color: 'var(--c-mix)', dual: true },
         
-        // DLMS -> Zone Amps & Splitter
-        { from: 'proc-dlms', to: 'amp-za3', label: 'Out 1 (Panggung)', color: 'var(--c-dlms)', route: 'elbow', xOffset: 25 },
-        { from: 'proc-dlms', to: 'amp-za4', label: 'Out 2 (Tower 1)', color: 'var(--c-dlms)', route: 'elbow', xOffset: 45 },
-        { from: 'proc-dlms', to: 'amp-za5', label: 'Out 3 (Tower 2)', color: 'var(--c-dlms)', route: 'elbow', xOffset: 65 },
-        { from: 'proc-dlms', to: 'proc-split', label: 'Out 5/6 (MX882)', color: 'var(--c-dlms)', route: 'elbow', xOffset: 85 },
+        // DLMS -> Zone Amps, Video Switcher & Splitter
+        { from: 'proc-dlms', to: 'amp-za3', label: 'Out 1: XLR to RCA', color: 'var(--c-dlms)', route: 'elbow', xOffset: 25 },
+        { from: 'proc-dlms', to: 'amp-za4', label: 'Out 2: XLR to RCA', color: 'var(--c-dlms)', route: 'elbow', xOffset: 40 },
+        { from: 'proc-dlms', to: 'amp-za5', label: 'Out 3: XLR to RCA', color: 'var(--c-dlms)', route: 'elbow', xOffset: 55 },
+        { from: 'proc-dlms', to: 'out-video', label: 'Out 4: XLR to XLR', color: 'var(--c-dlms)', route: 'elbow', xOffset: 70 }, // Out 4 kembali 1 garis tunggal
+        { from: 'proc-dlms', to: 'proc-split', label: 'Out 5/6: XLR to XLR', color: 'var(--c-dlms)', route: 'elbow', xOffset: 85, dual: true },
 
-        // PERBAIKAN SPLITTER: Mengunci xOffset rapat (20-110px). 
-        // Titik potong tengah ada di ~150px, jadi garis merah vertikal TIDAK AKAN menyentuh label "Out 1" lagi
-        { from: 'proc-split', to: 'amp-protea1', label: 'Main L (FOH)', color: 'var(--c-split)', route: 'elbow', xOffset: 20 },
-        { from: 'proc-split', to: 'amp-protea2', label: 'Main R (FOH)', color: 'var(--c-split)', route: 'elbow', xOffset: 35 },
-        { from: 'proc-split', to: 'amp-za1', label: 'Out 1 (Blkng)', color: 'var(--c-split)', route: 'elbow', xOffset: 50 },
-        { from: 'proc-split', to: 'amp-za2', label: 'Out 2 (Samping)', color: 'var(--c-split)', route: 'elbow', xOffset: 65 },
-        { from: 'proc-split', to: 'amp-za6', label: 'Out 3 (P3K)', color: 'var(--c-split)', route: 'elbow', xOffset: 80 },
-        { from: 'proc-split', to: 'amp-za7', label: 'Out 4 (Media)', color: 'var(--c-split)', route: 'elbow', xOffset: 95 },
-        { from: 'proc-split', to: 'out-stream', label: 'Out 5 (Stream)', color: 'var(--c-split)', route: 'elbow', xOffset: 110 },
+        // SPLITTER -> Amps & Stream
+        { from: 'proc-split', to: 'amp-protea1', label: 'Main L to IN 1', color: 'var(--c-split)', route: 'elbow', xOffset: 20 },
+        { from: 'proc-split', to: 'amp-protea2', label: 'Main R to IN 1', color: 'var(--c-split)', route: 'elbow', xOffset: 35 },
+        { from: 'proc-split', to: 'amp-za1', label: 'Out 1: XLR to RCA', color: 'var(--c-split)', route: 'elbow', xOffset: 50 },
+        { from: 'proc-split', to: 'amp-za2', label: 'Out 2: XLR to RCA', color: 'var(--c-split)', route: 'elbow', xOffset: 65 },
+        { from: 'proc-split', to: 'amp-za6', label: 'Out 3: XLR to RCA', color: 'var(--c-split)', route: 'elbow', xOffset: 80 },
+        { from: 'proc-split', to: 'amp-za7', label: 'Out 4: XLR to RCA', color: 'var(--c-split)', route: 'elbow', xOffset: 95 },
+        { from: 'proc-split', to: 'out-stream', label: 'Out 5: XLR to TRS', color: 'var(--c-split)', route: 'elbow', xOffset: 110 },
 
-        // Amps -> Speakers
-        { from: 'amp-protea1', to: 'foh-L1', label: 'SpeakON (Ch A)', color: 'var(--c-spk)', route: 'elbow', xOffset: 40 },
-        { from: 'amp-protea1', to: 'foh-L2', label: 'SpeakON (Ch B)', color: 'var(--c-spk)', route: 'elbow', xOffset: 75 },
-        { from: 'amp-protea2', to: 'foh-R1', label: 'SpeakON (Ch A)', color: 'var(--c-spk)', route: 'elbow', xOffset: 40 },
-        { from: 'amp-protea2', to: 'foh-R2', label: 'SpeakON (Ch B)', color: 'var(--c-spk)', route: 'elbow', xOffset: 75 },
+        // Amps -> Speakers (Ditambah Flag Dual untuk membentuk kabel + dan -)
+        { from: 'amp-protea1', to: 'foh-L1', label: 'Ch 1: SpeakON', color: 'var(--c-spk)', route: 'elbow', xOffset: 40, dual: true },
+        { from: 'amp-protea1', to: 'foh-L2', label: 'Ch 2: SpeakON', color: 'var(--c-spk)', route: 'elbow', xOffset: 75, dual: true },
+        { from: 'amp-protea2', to: 'foh-R1', label: 'Ch 1: SpeakON', color: 'var(--c-spk)', route: 'elbow', xOffset: 40, dual: true },
+        { from: 'amp-protea2', to: 'foh-R2', label: 'Ch 2: SpeakON', color: 'var(--c-spk)', route: 'elbow', xOffset: 75, dual: true },
 
-        { from: 'amp-za1', to: 'z1-1', label: '100V Com/Hot', color: 'var(--c-spk)' },
-        { from: 'amp-za2', to: 'z2-1', label: '100V Com/Hot', color: 'var(--c-spk)' },
-        { from: 'amp-za3', to: 'z3-1', label: '100V Com/Hot', color: 'var(--c-spk)' },
-        { from: 'amp-za4', to: 'z4-1', label: '100V Com/Hot', color: 'var(--c-spk)' },
-        { from: 'amp-za5', to: 'z5-1', label: '100V Com/Hot', color: 'var(--c-spk)' },
-        { from: 'amp-za6', to: 'z6-1', label: '100V Com/Hot', color: 'var(--c-spk)' },
-        { from: 'amp-za7', to: 'z7-1', label: '100V Com/Hot', color: 'var(--c-spk)' },
+        { from: 'amp-za1', to: 'z1-1', label: '100V (+) & COM (-)', color: 'var(--c-spk)', dual: true },
+        { from: 'amp-za2', to: 'z2-1', label: '100V (+) & COM (-)', color: 'var(--c-spk)', dual: true },
+        { from: 'amp-za3', to: 'z3-1', label: '100V (+) & COM (-)', color: 'var(--c-spk)', dual: true },
+        { from: 'amp-za4', to: 'z4-1', label: '100V (+) & COM (-)', color: 'var(--c-spk)', dual: true },
+        { from: 'amp-za5', to: 'z5-1', label: '100V (+) & COM (-)', color: 'var(--c-spk)', dual: true },
+        { from: 'amp-za6', to: 'z6-1', label: '100V (+) & COM (-)', color: 'var(--c-spk)', dual: true },
+        { from: 'amp-za7', to: 'z7-1', label: '100V (+) & COM (-)', color: 'var(--c-spk)', dual: true },
 
-        // Jumper Paralel antar Speaker
-        { from: 'z1-1', to: 'z1-2', color: '#94a3b8' }, { from: 'z1-2', to: 'z1-3', color: '#94a3b8' },
-        { from: 'z2-1', to: 'z2-2', color: '#94a3b8' },
-        { from: 'z3-1', to: 'z3-2', color: '#94a3b8' }, { from: 'z3-2', to: 'z3-3', color: '#94a3b8' },
-        { from: 'z4-1', to: 'z4-2', color: '#94a3b8' }, { from: 'z4-2', to: 'z4-3', color: '#94a3b8' }, { from: 'z4-3', to: 'z4-4', color: '#94a3b8' }, { from: 'z4-4', to: 'z4-5', color: '#94a3b8' },
-        { from: 'z5-1', to: 'z5-2', color: '#94a3b8' },
-        { from: 'z6-1', to: 'z6-2', color: '#94a3b8' },
-        { from: 'z7-1', to: 'z7-2', color: '#94a3b8' }
+        // Jumper Paralel antar Speaker (Semua memakai sistem 2 kabel + / - )
+        { from: 'z1-1', to: 'z1-2', color: '#94a3b8', dual: true }, { from: 'z1-2', to: 'z1-3', color: '#94a3b8', dual: true },
+        { from: 'z2-1', to: 'z2-2', color: '#94a3b8', dual: true },
+        { from: 'z3-1', to: 'z3-2', color: '#94a3b8', dual: true }, { from: 'z3-2', to: 'z3-3', color: '#94a3b8', dual: true },
+        { from: 'z4-1', to: 'z4-2', color: '#94a3b8', dual: true }, { from: 'z4-2', to: 'z4-3', color: '#94a3b8', dual: true }, { from: 'z4-3', to: 'z4-4', color: '#94a3b8', dual: true }, { from: 'z4-4', to: 'z4-5', color: '#94a3b8', dual: true },
+        { from: 'z5-1', to: 'z5-2', color: '#94a3b8', dual: true },
+        { from: 'z6-1', to: 'z6-2', color: '#94a3b8', dual: true },
+        { from: 'z7-1', to: 'z7-2', color: '#94a3b8', dual: true }
     ];
+
+    // FUNGSI PEMBANTU UNTUK MEMBUAT PATH SVGS
+    function createPathD(x1, y1, x2, y2, link) {
+        let pathD = "";
+        let labelX, labelY;
+
+        if (link.route === 'elbow') {
+            const dropX = x1 + link.xOffset;
+            let r = 15; 
+            const dirY = y2 > y1 ? 1 : -1; 
+
+            if (Math.abs(y2 - y1) < 10) {
+                pathD = `M ${x1} ${y1} L ${x2} ${y2}`;
+                labelX = (x1 + x2) / 2;
+                labelY = y2;
+            } else {
+                if (Math.abs(y2 - y1) < r * 2) r = Math.abs(y2 - y1) / 2;
+                pathD = `M ${x1} ${y1} L ${dropX - r} ${y1} Q ${dropX} ${y1} ${dropX} ${y1 + (r * dirY)} L ${dropX} ${y2 - (r * dirY)} Q ${dropX} ${y2} ${dropX + r} ${y2} L ${x2} ${y2}`;
+                labelX = dropX + ((x2 - dropX) / 2);
+                labelY = y2;
+            }
+        } else {
+            const curveFactor = Math.max(Math.abs(x2 - x1) * 0.45, 40); 
+            pathD = `M ${x1} ${y1} C ${x1 + curveFactor} ${y1}, ${x2 - curveFactor} ${y2}, ${x2} ${y2}`;
+            labelX = (x1 + x2) / 2;
+            labelY = (y1 + y2) / 2;
+        }
+        return { pathD, labelX, labelY };
+    }
 
     function drawConnections() {
         const svg = document.getElementById('svg-canvas');
@@ -382,43 +414,45 @@ location: "JA-01"
             const x2 = rectTo.left + rectTo.width/2 - cRect.left + container.scrollLeft;
             const y2 = rectTo.top + rectTo.height/2 - cRect.top + container.scrollTop;
             
-            let pathD = "";
-            let labelX, labelY;
+            let paths = [];
+            let finalLabelX, finalLabelY;
 
-            if (link.route === 'elbow') {
-                const dropX = x1 + link.xOffset;
-                let r = 15; 
-                const dirY = y2 > y1 ? 1 : -1; 
-
-                if (Math.abs(y2 - y1) < 10) {
-                    pathD = `M ${x1} ${y1} L ${x2} ${y2}`;
-                    labelX = (x1 + x2) / 2;
-                    labelY = y2;
-                } else {
-                    if (Math.abs(y2 - y1) < r * 2) r = Math.abs(y2 - y1) / 2;
-                    pathD = `M ${x1} ${y1} L ${dropX - r} ${y1} Q ${dropX} ${y1} ${dropX} ${y1 + (r * dirY)} L ${dropX} ${y2 - (r * dirY)} Q ${dropX} ${y2} ${dropX + r} ${y2} L ${x2} ${y2}`;
-                    
-                    labelX = dropX + ((x2 - dropX) / 2);
-                    labelY = y2;
-                }
+            // Logika khusus 2 garis (+ dan - atau L dan R)
+            if (link.dual) {
+                const gap = 8; // Jarak pemisah antar garis
+                // Geser xOffset juga agar saat turun berbelok vertikal garis tidak bertumpuk
+                const l1 = { ...link, xOffset: link.xOffset ? link.xOffset - gap/2 : undefined };
+                const l2 = { ...link, xOffset: link.xOffset ? link.xOffset + gap/2 : undefined };
+                
+                const p1 = createPathD(x1, y1 - gap/2, x2, y2 - gap/2, l1);
+                const p2 = createPathD(x1, y1 + gap/2, x2, y2 + gap/2, l2);
+                
+                paths.push(p1.pathD, p2.pathD);
+                
+                // Posisikan label tepat di tengah-tengah kedua garis
+                finalLabelX = (p1.labelX + p2.labelX) / 2;
+                finalLabelY = (p1.labelY + p2.labelY) / 2;
             } else {
-                const curveFactor = Math.max(Math.abs(x2 - x1) * 0.45, 40); 
-                pathD = `M ${x1} ${y1} C ${x1 + curveFactor} ${y1}, ${x2 - curveFactor} ${y2}, ${x2} ${y2}`;
-                labelX = (x1 + x2) / 2;
-                labelY = (y1 + y2) / 2;
+                const p = createPathD(x1, y1, x2, y2, link);
+                paths.push(p.pathD);
+                finalLabelX = p.labelX;
+                finalLabelY = p.labelY;
             }
             
-            svgContent += `<path d="${pathD}" fill="none" stroke="${link.color}" stroke-width="5" stroke-linecap="round" opacity="0.5" />`;
-            svgContent += `<path d="${pathD}" fill="none" stroke="${link.color}" stroke-width="4" stroke-linecap="round" class="cable-flow" />`;
+            // Render setiap path (garis) ke SVG
+            paths.forEach(d => {
+                svgContent += `<path d="${d}" fill="none" stroke="${link.color}" stroke-width="5" stroke-linecap="round" opacity="0.5" />`;
+                svgContent += `<path d="${d}" fill="none" stroke="${link.color}" stroke-width="4" stroke-linecap="round" class="cable-flow" />`;
+            });
                         
             if (link.label) {
-                labelX += link.lblOffsetX || 0;
-                labelY += link.lblOffsetY || 0;
+                finalLabelX += link.lblOffsetX || 0;
+                finalLabelY += link.lblOffsetY || 0;
                 
                 const labelWidth = link.label.length * 7.5 + 16; 
                 svgContent += `
-                    <rect class="cable-label-bg" x="${labelX - labelWidth/2}" y="${labelY - 12}" width="${labelWidth}" height="24" rx="12" stroke="${link.color}" />
-                    <text class="cable-label-text" x="${labelX}" y="${labelY}" dominant-baseline="central" alignment-baseline="central">${link.label}</text>
+                    <rect class="cable-label-bg" x="${finalLabelX - labelWidth/2}" y="${finalLabelY - 12}" width="${labelWidth}" height="24" rx="12" stroke="${link.color}" />
+                    <text class="cable-label-text" x="${finalLabelX}" y="${finalLabelY}" dominant-baseline="central" alignment-baseline="central">${link.label}</text>
                 `;
             }
         });

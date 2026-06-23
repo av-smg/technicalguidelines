@@ -61,7 +61,7 @@ location: "JA-01"
         transition: fill 0.3s; 
     }
 
-    /* MATRIX GRID - Gap Horizontal Diperlebar menjadi 250px untuk ruang label siku */
+    /* MATRIX GRID */
     .diagram-wrapper .diagram-grid {
         display: grid;
         grid-template-columns: 240px 240px 240px 240px 240px 280px max-content;
@@ -244,15 +244,16 @@ location: "JA-01"
         <div class="zone-group" style="grid-area: 1 / 7; border-color: #be123c;">
             <div class="zone-title" style="border-color: #be123c;">FOH Kiri (TOA HX-5 x 2 Set)</div>
             <div class="speaker-row" style="gap: 50px;">
-                <div class="foh-array-stack" id="foh-L1"><div class="port port-in"></div><div class="array-module"></div><div class="array-module"></div><div class="array-module"></div><div class="array-module"></div></div>
-                <div class="foh-array-stack" id="foh-L2"><div class="port port-in"></div><div class="array-module"></div><div class="array-module"></div><div class="array-module"></div><div class="array-module"></div></div>
+                <!-- PEMBARUAN: Port in untuk FOH digeser persentase Top-nya agar kabel tidak numpuk -->
+                <div class="foh-array-stack" id="foh-L1"><div class="port port-in" style="top: 20%;"></div><div class="array-module"></div><div class="array-module"></div><div class="array-module"></div><div class="array-module"></div></div>
+                <div class="foh-array-stack" id="foh-L2"><div class="port port-in" style="top: 80%;"></div><div class="array-module"></div><div class="array-module"></div><div class="array-module"></div><div class="array-module"></div></div>
             </div>
         </div>
         <div class="zone-group" style="grid-area: 2 / 7; border-color: #be123c;">
             <div class="zone-title" style="border-color: #be123c;">FOH Kanan (TOA HX-5 x 2 Set)</div>
             <div class="speaker-row" style="gap: 50px;">
-                <div class="foh-array-stack" id="foh-R1"><div class="port port-in"></div><div class="array-module"></div><div class="array-module"></div><div class="array-module"></div><div class="array-module"></div></div>
-                <div class="foh-array-stack" id="foh-R2"><div class="port port-in"></div><div class="array-module"></div><div class="array-module"></div><div class="array-module"></div><div class="array-module"></div></div>
+                <div class="foh-array-stack" id="foh-R1"><div class="port port-in" style="top: 20%;"></div><div class="array-module"></div><div class="array-module"></div><div class="array-module"></div><div class="array-module"></div></div>
+                <div class="foh-array-stack" id="foh-R2"><div class="port port-in" style="top: 80%;"></div><div class="array-module"></div><div class="array-module"></div><div class="array-module"></div><div class="array-module"></div></div>
             </div>
         </div>
         
@@ -272,10 +273,11 @@ location: "JA-01"
             </div>
         </div>
         <div class="zone-group" style="grid-area: 5 / 7;">
-            <div class="zone-title">Zone 3: Panggung Monitor (2 Unit)</div>
+            <div class="zone-title">Zone 3: Panggung Monitor (3 Unit)</div>
             <div class="speaker-row">
                 <div class="spk-unit" id="z3-1"><div class="port port-in"></div><div class="port port-out"></div></div>
-                <div class="spk-unit" id="z3-2"><div class="port port-in"></div></div>
+                <div class="spk-unit" id="z3-2"><div class="port port-in"></div><div class="port port-out"></div></div>
+                 <div class="spk-unit" id="z3-3"><div class="port port-in"></div></div>
             </div>
         </div>
         <div class="zone-group" style="grid-area: 6 / 7;">
@@ -328,10 +330,9 @@ location: "JA-01"
         { from: 'mix-main', to: 'proc-geq', label: 'Stereo L/R', color: 'var(--c-mix)' },
         { from: 'proc-geq', to: 'proc-split', label: 'XLR L/R', color: 'var(--c-mix)' },
         
-        /* Jarak sela Offset dipertahankan, karena gap horizontal kini sangat lega (250px) */
         { from: 'proc-split', to: 'amp-protea1', label: 'Out 1-2', color: 'var(--c-split)', route: 'elbow', xOffset: 40 },
         { from: 'proc-split', to: 'amp-protea2', label: 'Out 3-4', color: 'var(--c-split)', route: 'elbow', xOffset: 65 },
-        { from: 'proc-split', to: 'proc-dlms', label: 'Main L/R', color: '#eab308', route: 'elbow', xOffset: 90 },
+        { from: 'proc-split', to: 'proc-dlms', label: 'Main L/R', color: '#eab308', route: 'elbow', xOffset: 95 },
         { from: 'proc-split', to: 'amp-za6', label: 'TRS Out 5', color: '#eab308', route: 'elbow', xOffset: 115 },
         { from: 'proc-split', to: 'amp-za7', label: 'TRS Out 6', color: '#eab308', route: 'elbow', xOffset: 140 },
         
@@ -341,10 +342,11 @@ location: "JA-01"
         { from: 'proc-dlms', to: 'amp-za4', label: 'Zone 4', color: 'var(--c-dlms)' },
         { from: 'proc-dlms', to: 'amp-za5', label: 'Zone 5', color: 'var(--c-dlms)' },
 
-        { from: 'amp-protea1', to: 'foh-L1', label: 'SpeakON (Ch A)', color: 'var(--c-spk)', lblOffsetY: -20, lblOffsetX: -30 },
-        { from: 'amp-protea1', to: 'foh-L2', label: 'SpeakON (Ch B)', color: 'var(--c-spk)', lblOffsetY: 20, lblOffsetX: -30 },
-        { from: 'amp-protea2', to: 'foh-R1', label: 'SpeakON (Ch A)', color: 'var(--c-spk)', lblOffsetY: -20, lblOffsetX: -30 },
-        { from: 'amp-protea2', to: 'foh-R2', label: 'SpeakON (Ch B)', color: 'var(--c-spk)', lblOffsetY: 20, lblOffsetX: -30 },
+        /* PEMBARUAN: FOH Menggunakan mode 'elbow' dengan xOffset berbeda agar jalurnya benar-benar terpisah */
+        { from: 'amp-protea1', to: 'foh-L1', label: 'SpeakON (Ch A)', color: 'var(--c-spk)', route: 'elbow', xOffset: 40 },
+        { from: 'amp-protea1', to: 'foh-L2', label: 'SpeakON (Ch B)', color: 'var(--c-spk)', route: 'elbow', xOffset: 70 },
+        { from: 'amp-protea2', to: 'foh-R1', label: 'SpeakON (Ch A)', color: 'var(--c-spk)', route: 'elbow', xOffset: 40 },
+        { from: 'amp-protea2', to: 'foh-R2', label: 'SpeakON (Ch B)', color: 'var(--c-spk)', route: 'elbow', xOffset: 70 },
 
         { from: 'amp-za1', to: 'z1-1', label: '100V Hot/Com', color: 'var(--c-spk)' },
         { from: 'amp-za2', to: 'z2-1', label: '100V Hot/Com', color: 'var(--c-spk)' },
@@ -356,7 +358,7 @@ location: "JA-01"
 
         { from: 'z1-1', to: 'z1-2', color: '#94a3b8' }, { from: 'z1-2', to: 'z1-3', color: '#94a3b8' },
         { from: 'z2-1', to: 'z2-2', color: '#94a3b8' },
-        { from: 'z3-1', to: 'z3-2', color: '#94a3b8' },
+        { from: 'z3-1', to: 'z3-2', color: '#94a3b8' }, { from: 'z3-2', to: 'z3-3', color: '#94a3b8' },
         { from: 'z4-1', to: 'z4-2', color: '#94a3b8' }, { from: 'z4-2', to: 'z4-3', color: '#94a3b8' }, { from: 'z4-3', to: 'z4-4', color: '#94a3b8' }, { from: 'z4-4', to: 'z4-5', color: '#94a3b8' },
         { from: 'z5-1', to: 'z5-2', color: '#94a3b8' },
         { from: 'z6-1', to: 'z6-2', color: '#94a3b8' },
@@ -393,7 +395,7 @@ location: "JA-01"
 
             if (link.route === 'elbow') {
                 const dropX = x1 + link.xOffset;
-                const r = 15; 
+                let r = 15; 
                 const dirY = y2 > y1 ? 1 : -1; 
 
                 if (Math.abs(y2 - y1) < 10) {
@@ -401,12 +403,16 @@ location: "JA-01"
                     labelX = (x1 + x2) / 2;
                     labelY = y2;
                 } else {
+                    /* MATEMATIKA RADIUS DINAMIS:
+                       Jika jarak vertikal lebih pendek dari 2x Radius (30px), 
+                       radius dikurangi agar lengkungan SVG tidak menggulung (looping).
+                    */
+                    if (Math.abs(y2 - y1) < r * 2) {
+                        r = Math.abs(y2 - y1) / 2;
+                    }
+
                     pathD = `M ${x1} ${y1} L ${dropX - r} ${y1} Q ${dropX} ${y1} ${dropX} ${y1 + (r * dirY)} L ${dropX} ${y2 - (r * dirY)} Q ${dropX} ${y2} ${dropX + r} ${y2} L ${x2} ${y2}`;
                     
-                    /* PERBAIKAN FINAL (100% BEBAS TABRAKAN): 
-                       - Mengunci label murni 50% di sisa garis horizontal terakhir (antara lekukan vertikal sampai titik colokan alat).
-                       - Label ditaruh kembali menempel sejajar di sumbu Y (tidak melayang) agar konsisten menimpa rapi garisnya.
-                    */
                     labelX = dropX + ((x2 - dropX) / 2);
                     labelY = y2;
                 }

@@ -14,7 +14,7 @@ location: "JA-01"
         --c-tx: #f59e0b;
         --c-split: #ef4444;
         --c-dlms: #3b82f6;
-        --c-spk: #64748b; /* Abu-abu Kabel Speaker */
+        --c-spk: #64748b;
     }
 
     /* KANVAS EMBEDDED */
@@ -64,9 +64,9 @@ location: "JA-01"
     /* MATRIX GRID */
     .diagram-wrapper .diagram-grid {
         display: grid;
-        grid-template-columns: 240px 240px 240px 240px 240px 280px max-content;
+        grid-template-columns: 240px 200px 240px 240px 240px 240px 280px max-content;
         grid-auto-rows: minmax(60px, auto);
-        gap: 20px 250px; 
+        gap: 20px 300px; 
         padding: 60px 100px;
         position: relative;
         z-index: 20;
@@ -75,14 +75,11 @@ location: "JA-01"
         margin: auto; 
     }
 
-    .diagram-wrapper .input-group { display: flex; flex-direction: column; gap: 15px; justify-content: center; }
-
     /* NODE KARTU */
     .diagram-wrapper .node {
         position: relative; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         display: flex; align-items: center; padding: 12px 16px; gap: 15px;
         transition: transform 0.2s, box-shadow 0.2s, background 0.3s, border-color 0.3s;
-        
         background: var(--card-bg, #ffffff); 
         border: 2px solid var(--border-color, #cbd5e1);
         color: var(--text-dark, #0f172a);
@@ -146,7 +143,7 @@ location: "JA-01"
     .diagram-wrapper .mobile-hint { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--text-dark, #0f172a); color: var(--bg-color, #ffffff); padding: 10px 20px; border-radius: 20px; font-size: 12px; font-weight: bold; z-index: 9999; pointer-events: none; opacity: 0; }
     
     @media (max-width: 768px) { 
-        .diagram-wrapper .diagram-grid { gap: 20px 140px; padding: 40px; }
+        .diagram-wrapper .diagram-grid { gap: 20px 160px; padding: 40px; }
         .diagram-wrapper .mobile-hint { opacity: 1; animation: fadeOut 5s forwards 2s; } 
     }
     @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
@@ -159,97 +156,80 @@ location: "JA-01"
     <div class="diagram-grid">
         
         <!-- KOLOM 1: INPUTS -->
-        <div class="input-group" style="grid-area: 1 / 1 / 10 / 2;">
-            <div class="node style-input" id="in-mic1">
-                <div class="node-icon"><svg><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg></div>
-                <div class="node-info"><h4>Mic 1 - Ketua</h4><p>Shure SM58 • CH 01</p></div><div class="port port-out"></div>
-            </div>
-            <div class="node style-input" id="in-mic2">
-                <div class="node-icon"><svg><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg></div>
-                <div class="node-info"><h4>Mic 2 - Mimbar</h4><p>Sennheiser • CH 02</p></div><div class="port port-out"></div>
-            </div>
-            <div class="node style-input" id="in-mic3">
-                <div class="node-icon"><svg><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg></div>
-                <div class="node-info"><h4>Mic 3 - Peserta 1</h4><p>Shure SM58 • CH 03</p></div><div class="port port-out"></div>
-            </div>
-            <div class="node style-input" id="in-mic4">
-                <div class="node-icon"><svg><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg></div>
-                <div class="node-info"><h4>Mic 4 - Peserta 2</h4><p>Shure SM58 • CH 04</p></div><div class="port port-out"></div>
-            </div>
+        <div class="node style-input" id="in-mic1" style="grid-area: 1 / 1;"><div class="node-icon"><svg><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg></div><div class="node-info"><h4>Mic 1 - Ketua</h4><p>Shure SM58 • CH 01</p></div><div class="port port-out"></div></div>
+        <div class="node style-input" id="in-mic2" style="grid-area: 2 / 1;"><div class="node-icon"><svg><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg></div><div class="node-info"><h4>Mic 2 - Mimbar</h4><p>Sennheiser • CH 02</p></div><div class="port port-out"></div></div>
+        <div class="node style-input" id="in-mic3" style="grid-area: 3 / 1;"><div class="node-icon"><svg><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg></div><div class="node-info"><h4>Mic 3 - Peserta 1</h4><p>Shure SM58 • CH 03</p></div><div class="port port-out"></div></div>
+        <div class="node style-input" id="in-mic4" style="grid-area: 4 / 1;"><div class="node-icon"><svg><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg></div><div class="node-info"><h4>Mic 4 - Peserta 2</h4><p>Shure SM58 • CH 04</p></div><div class="port port-out"></div></div>
 
-            <div class="node style-media" id="in-med1" style="margin-top: 20px;">
-                <div class="node-icon"><svg><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="2" y1="20" x2="22" y2="20"/></svg></div>
-                <div class="node-info"><h4>Media Utama</h4><p>Laptop • CH 09-10</p></div><div class="port port-out"></div>
-            </div>
-            <div class="node style-media" id="in-med2">
-                <div class="node-icon"><svg><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="2" y1="20" x2="22" y2="20"/></svg></div>
-                <div class="node-info"><h4>Media AD Utama</h4><p>Laptop • CH 11-12</p></div><div class="port port-out"></div>
-            </div>
-            <div class="node style-media" id="in-med3">
-                <div class="node-icon"><svg><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="2" y1="20" x2="22" y2="20"/></svg></div>
-                <div class="node-info"><h4>Media Backup</h4><p>Laptop • CH 13-14</p></div><div class="port port-out"></div>
-            </div>
-            <div class="node style-media" id="in-med4">
-                <div class="node-icon"><svg><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="2" y1="20" x2="22" y2="20"/></svg></div>
-                <div class="node-info"><h4>Media AD Backup</h4><p>Laptop • CH 15-16</p></div><div class="port port-out"></div>
-            </div>
-        </div>
-
-        <!-- KOLOM 2: MIXER -->
-        <div class="node style-rack" id="mix-main" style="grid-area: 4 / 2; transform: translateY(30px);">
-            <div class="node-icon" style="color:#d946ef;"><svg><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></div>
-            <div class="node-info"><h4>Yamaha MG16XU</h4><p>Audio Console Utama</p></div>
+        <!-- KOLOM 2: SNAKE CABLE PROEL -->
+        <div class="node style-rack" id="snake-box" style="grid-area: 2 / 2 / span 2 / 3; align-self: center;">
+            <div class="node-icon" style="color:#10b981;"><svg><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><circle cx="9" cy="9" r="1"/><circle cx="15" cy="9" r="1"/><circle cx="9" cy="15" r="1"/><circle cx="15" cy="15" r="1"/></svg></div>
+            <div class="node-info"><h4>PROEL Stagebox</h4><p>Snake Cable 8/4</p></div>
             <div class="port port-in"></div><div class="port port-out"></div>
         </div>
 
-        <!-- KOLOM 3: EQ & FM TX -->
-        <div class="node style-rack" id="tx-fm" style="grid-area: 2 / 3;">
+        <div class="node style-media" id="in-med1" style="grid-area: 6 / 1;"><div class="node-icon"><svg><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="2" y1="20" x2="22" y2="20"/></svg></div><div class="node-info"><h4>Media Utama</h4><p>Laptop • CH 09-10</p></div><div class="port port-out"></div></div>
+        <div class="node style-media" id="in-med2" style="grid-area: 7 / 1;"><div class="node-icon"><svg><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="2" y1="20" x2="22" y2="20"/></svg></div><div class="node-info"><h4>Media AD Utama</h4><p>Laptop • CH 11-12</p></div><div class="port port-out"></div></div>
+        <div class="node style-media" id="in-med3" style="grid-area: 8 / 1;"><div class="node-icon"><svg><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="2" y1="20" x2="22" y2="20"/></svg></div><div class="node-info"><h4>Media Backup</h4><p>Laptop • CH 13-14</p></div><div class="port port-out"></div></div>
+        <div class="node style-media" id="in-med4" style="grid-area: 9 / 1;"><div class="node-icon"><svg><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="2" y1="20" x2="22" y2="20"/></svg></div><div class="node-info"><h4>Media AD Backup</h4><p>Laptop • CH 15-16</p></div><div class="port port-out"></div></div>
+
+        <!-- KOLOM 3: MIXER -->
+        <div class="node style-rack" id="mix-main" style="grid-area: 5 / 3;">
+            <div class="node-icon" style="color:#d946ef;"><svg><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></div>
+            <div class="node-info"><h4>Yamaha MG16XU</h4><p>Audio Console</p></div>
+            <div class="port port-in"></div><div class="port port-out"></div>
+        </div>
+
+        <!-- KOLOM 4: EQ & TX -->
+        <div class="node style-rack" id="tx-fm" style="grid-area: 4 / 4;">
             <div class="node-icon" style="color:#f59e0b;"><svg><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48 0a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/></svg></div>
-            <div class="node-info"><h4>FM Transmitter</h4><p>Broadcast Area Radio</p></div>
+            <div class="node-info"><h4>FM Transmitter</h4><p>Broadcast Radio</p></div>
             <div class="port port-in"></div>
         </div>
-        <div class="node style-rack" id="proc-geq" style="grid-area: 4 / 3; transform: translateY(30px);">
+        <div class="node style-rack" id="proc-geq" style="grid-area: 5 / 4;">
             <div class="node-icon" style="color:#10b981;"><svg><rect x="2" y="4" width="20" height="16" rx="2" ry="2"/><line x1="6" y1="8" x2="6" y2="8"/><line x1="10" y1="8" x2="18" y2="8"/><line x1="6" y1="12" x2="6" y2="12"/><line x1="10" y1="12" x2="18" y2="12"/><line x1="6" y1="16" x2="6" y2="16"/><line x1="10" y1="16" x2="18" y2="16"/></svg></div>
-            <div class="node-info"><h4>GEQ DBX 231</h4><p>Tonal Master / RTA</p></div>
-            <div class="port port-in"></div><div class="port port-out"></div>
-        </div>
-
-        <!-- KOLOM 4: SPLITTER -->
-        <div class="node style-rack" id="proc-split" style="grid-area: 4 / 4; transform: translateY(30px);">
-            <div class="node-icon" style="color:#ef4444;"><svg><rect x="2" y="4" width="20" height="16" rx="2" ry="2"/><circle cx="8" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="16" cy="12" r="1"/></svg></div>
-            <div class="node-info"><h4>MX882 Splitter</h4><p>Distribusi Utama</p></div>
+            <div class="node-info"><h4>GEQ DBX 231</h4><p>Tonal Master</p></div>
             <div class="port port-in"></div><div class="port port-out"></div>
         </div>
 
         <!-- KOLOM 5: DLMS -->
         <div class="node style-rack" id="proc-dlms" style="grid-area: 5 / 5;">
             <div class="node-icon" style="color:#3b82f6;"><svg><rect x="2" y="4" width="20" height="16" rx="2" ry="2"/><path d="M6 12h4m4 0h4m-8-4v8"/></svg></div>
-            <div class="node-info"><h4>DLMS DSP</h4><p>Manajemen Delay Zona</p></div>
+            <div class="node-info"><h4>DLMS DSP</h4><p>Manajemen Delay</p></div>
             <div class="port port-in"></div><div class="port port-out"></div>
         </div>
 
-        <!-- KOLOM 6: AMPLIFIERS -->
-        <div class="node style-rack" id="amp-protea1" style="grid-area: 1 / 6;"><div class="node-info"><h4>Ampli PROTEA 1</h4><p>FOH Kiri (Ch A & B)</p></div><div class="port port-in"></div><div class="port port-out"></div></div>
-        <div class="node style-rack" id="amp-protea2" style="grid-area: 2 / 6;"><div class="node-info"><h4>Ampli PROTEA 2</h4><p>FOH Kanan (Ch A & B)</p></div><div class="port port-in"></div><div class="port port-out"></div></div>
-        
-        <div class="node style-rack" id="amp-za1" style="grid-area: 3 / 6;"><div class="node-info"><h4>TOA ZA 2240 (1)</h4><p>Belakang Panggung</p></div><div class="port port-in"></div><div class="port port-out"></div></div>
-        <div class="node style-rack" id="amp-za2" style="grid-area: 4 / 6;"><div class="node-info"><h4>TOA ZA 2240 (2)</h4><p>Samping Panggung</p></div><div class="port port-in"></div><div class="port port-out"></div></div>
-        <div class="node style-rack" id="amp-za3" style="grid-area: 5 / 6;"><div class="node-info"><h4>TOA ZA 2240 (3)</h4><p>Panggung Monitor</p></div><div class="port port-in"></div><div class="port port-out"></div></div>
-        <div class="node style-rack" id="amp-za4" style="grid-area: 6 / 6;"><div class="node-info"><h4>TOA ZA 2240 (4)</h4><p>Tower Delay 1</p></div><div class="port port-in"></div><div class="port port-out"></div></div>
-        <div class="node style-rack" id="amp-za5" style="grid-area: 7 / 6;"><div class="node-info"><h4>TOA ZA 2240 (5)</h4><p>Tower Delay 2</p></div><div class="port port-in"></div><div class="port port-out"></div></div>
-        <div class="node style-rack" id="amp-za6" style="grid-area: 8 / 6;"><div class="node-info"><h4>TOA ZA 2240 (6)</h4><p>Ruang Media</p></div><div class="port port-in"></div><div class="port port-out"></div></div>
-        <div class="node style-rack" id="amp-za7" style="grid-area: 9 / 6;"><div class="node-info"><h4>TOA ZA 2240 (7)</h4><p>Ruang P3K</p></div><div class="port port-in"></div><div class="port port-out"></div></div>
+        <!-- KOLOM 6: SPLITTER MX882 -->
+        <div class="node style-rack" id="proc-split" style="grid-area: 3 / 6;">
+            <div class="node-icon" style="color:#ef4444;"><svg><rect x="2" y="4" width="20" height="16" rx="2" ry="2"/><circle cx="8" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="16" cy="12" r="1"/></svg></div>
+            <div class="node-info"><h4>MX882 Splitter</h4><p>Distribusi Zona</p></div>
+            <div class="port port-in"></div><div class="port port-out"></div>
+        </div>
 
-        <!-- KOLOM 7: SPEAKERS -->
-        <div class="zone-group" style="grid-area: 1 / 7; border-color: #be123c;">
+        <!-- KOLOM 7: AMPLIFIERS & STREAM OUT -->
+        <div class="node style-rack" id="amp-protea1" style="grid-area: 1 / 7;"><div class="node-info"><h4>Ampli PROTEA 1</h4><p>FOH L (Main L)</p></div><div class="port port-in"></div><div class="port port-out"></div></div>
+        <div class="node style-rack" id="amp-protea2" style="grid-area: 2 / 7;"><div class="node-info"><h4>Ampli PROTEA 2</h4><p>FOH R (Main R)</p></div><div class="port port-in"></div><div class="port port-out"></div></div>
+        <div class="node style-rack" id="amp-za1" style="grid-area: 3 / 7;"><div class="node-info"><h4>TOA ZA 2240</h4><p>Belakang Panggung</p></div><div class="port port-in"></div><div class="port port-out"></div></div>
+        <div class="node style-rack" id="amp-za2" style="grid-area: 4 / 7;"><div class="node-info"><h4>TOA ZA 2240</h4><p>Samping Panggung</p></div><div class="port port-in"></div><div class="port port-out"></div></div>
+        
+        <div class="node style-rack" id="amp-za3" style="grid-area: 5 / 7;"><div class="node-info"><h4>TOA ZA 2240</h4><p>Panggung Monitor</p></div><div class="port port-in"></div><div class="port port-out"></div></div>
+        <div class="node style-rack" id="amp-za4" style="grid-area: 6 / 7;"><div class="node-info"><h4>TOA ZA 2240</h4><p>Tower Delay 1</p></div><div class="port port-in"></div><div class="port port-out"></div></div>
+        <div class="node style-rack" id="amp-za5" style="grid-area: 7 / 7;"><div class="node-info"><h4>TOA ZA 2240</h4><p>Tower Delay 2</p></div><div class="port port-in"></div><div class="port port-out"></div></div>
+        
+        <div class="node style-rack" id="amp-za6" style="grid-area: 8 / 7;"><div class="node-info"><h4>TOA ZA 2240</h4><p>Ruang P3K</p></div><div class="port port-in"></div><div class="port port-out"></div></div>
+        <div class="node style-rack" id="amp-za7" style="grid-area: 9 / 7;"><div class="node-info"><h4>TOA ZA 2240</h4><p>Ruang Media</p></div><div class="port port-in"></div><div class="port port-out"></div></div>
+        
+        <div class="node style-media" id="out-stream" style="grid-area: 10 / 7;"><div class="node-icon" style="color:var(--c-media)"><svg><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="2" y1="20" x2="22" y2="20"/></svg></div><div class="node-info"><h4>Stream Out</h4><p>OBS / PC Broadcast</p></div><div class="port port-in"></div></div>
+
+        <!-- KOLOM 8: SPEAKERS -->
+        <div class="zone-group" style="grid-area: 1 / 8; border-color: #be123c;">
             <div class="zone-title" style="border-color: #be123c;">FOH Kiri (TOA HX-5 x 2 Set)</div>
             <div class="speaker-row" style="gap: 50px;">
-                <!-- PEMBARUAN: Port in untuk FOH digeser persentase Top-nya agar kabel tidak numpuk -->
                 <div class="foh-array-stack" id="foh-L1"><div class="port port-in" style="top: 20%;"></div><div class="array-module"></div><div class="array-module"></div><div class="array-module"></div><div class="array-module"></div></div>
                 <div class="foh-array-stack" id="foh-L2"><div class="port port-in" style="top: 80%;"></div><div class="array-module"></div><div class="array-module"></div><div class="array-module"></div><div class="array-module"></div></div>
             </div>
         </div>
-        <div class="zone-group" style="grid-area: 2 / 7; border-color: #be123c;">
+        <div class="zone-group" style="grid-area: 2 / 8; border-color: #be123c;">
             <div class="zone-title" style="border-color: #be123c;">FOH Kanan (TOA HX-5 x 2 Set)</div>
             <div class="speaker-row" style="gap: 50px;">
                 <div class="foh-array-stack" id="foh-R1"><div class="port port-in" style="top: 20%;"></div><div class="array-module"></div><div class="array-module"></div><div class="array-module"></div><div class="array-module"></div></div>
@@ -257,31 +237,31 @@ location: "JA-01"
             </div>
         </div>
         
-        <div class="zone-group" style="grid-area: 3 / 7;">
-            <div class="zone-title">Zone 1: Blkng Panggung (3 Unit)</div>
+        <div class="zone-group" style="grid-area: 3 / 8;">
+            <div class="zone-title">Belakang Panggung (3 Unit)</div>
             <div class="speaker-row">
                 <div class="spk-unit" id="z1-1"><div class="port port-in"></div><div class="port port-out"></div></div>
                 <div class="spk-unit" id="z1-2"><div class="port port-in"></div><div class="port port-out"></div></div>
                 <div class="spk-unit" id="z1-3"><div class="port port-in"></div></div>
             </div>
         </div>
-        <div class="zone-group" style="grid-area: 4 / 7;">
-            <div class="zone-title">Zone 2: Samping Panggung (2 Unit)</div>
+        <div class="zone-group" style="grid-area: 4 / 8;">
+            <div class="zone-title">Samping Panggung (2 Unit)</div>
             <div class="speaker-row">
                 <div class="spk-unit" id="z2-1"><div class="port port-in"></div><div class="port port-out"></div></div>
                 <div class="spk-unit" id="z2-2"><div class="port port-in"></div></div>
             </div>
         </div>
-        <div class="zone-group" style="grid-area: 5 / 7;">
-            <div class="zone-title">Zone 3: Panggung Monitor (3 Unit)</div>
+        <div class="zone-group" style="grid-area: 5 / 8;">
+            <div class="zone-title">Panggung Monitor (3 Unit)</div>
             <div class="speaker-row">
                 <div class="spk-unit" id="z3-1"><div class="port port-in"></div><div class="port port-out"></div></div>
                 <div class="spk-unit" id="z3-2"><div class="port port-in"></div><div class="port port-out"></div></div>
                  <div class="spk-unit" id="z3-3"><div class="port port-in"></div></div>
             </div>
         </div>
-        <div class="zone-group" style="grid-area: 6 / 7;">
-            <div class="zone-title">Zone 4: Tower Delay 1 (5 Unit)</div>
+        <div class="zone-group" style="grid-area: 6 / 8;">
+            <div class="zone-title">Tower Delay 1 (5 Unit)</div>
             <div class="speaker-row">
                 <div class="spk-unit" id="z4-1"><div class="port port-in"></div><div class="port port-out"></div></div>
                 <div class="spk-unit" id="z4-2"><div class="port port-in"></div><div class="port port-out"></div></div>
@@ -290,22 +270,22 @@ location: "JA-01"
                 <div class="spk-unit" id="z4-5"><div class="port port-in"></div></div>
             </div>
         </div>
-        <div class="zone-group" style="grid-area: 7 / 7;">
-            <div class="zone-title">Zone 5: Tower Delay 2 (2 Unit)</div>
+        <div class="zone-group" style="grid-area: 7 / 8;">
+            <div class="zone-title">Tower Delay 2 (2 Unit)</div>
             <div class="speaker-row">
                 <div class="spk-unit" id="z5-1"><div class="port port-in"></div><div class="port port-out"></div></div>
                 <div class="spk-unit" id="z5-2"><div class="port port-in"></div></div>
             </div>
         </div>
-        <div class="zone-group" style="grid-area: 8 / 7;">
-            <div class="zone-title">Zone 6: Ruang Media (2 Unit)</div>
+        <div class="zone-group" style="grid-area: 8 / 8;">
+            <div class="zone-title">Ruang P3K (2 Unit)</div>
             <div class="speaker-row">
                 <div class="spk-unit" id="z6-1"><div class="port port-in"></div><div class="port port-out"></div></div>
                 <div class="spk-unit" id="z6-2"><div class="port port-in"></div></div>
             </div>
         </div>
-        <div class="zone-group" style="grid-area: 9 / 7;">
-            <div class="zone-title">Zone 7: Ruang P3K (2 Unit)</div>
+        <div class="zone-group" style="grid-area: 9 / 8;">
+            <div class="zone-title">Ruang Media (2 Unit)</div>
             <div class="speaker-row">
                 <div class="spk-unit" id="z7-1"><div class="port port-in"></div><div class="port port-out"></div></div>
                 <div class="spk-unit" id="z7-2"><div class="port port-in"></div></div>
@@ -317,45 +297,57 @@ location: "JA-01"
 
 <script>
     const cables = [
-        { from: 'in-mic1', to: 'mix-main', label: 'XLR', color: 'var(--c-mic)' },
-        { from: 'in-mic2', to: 'mix-main', label: 'XLR', color: 'var(--c-mic)' },
-        { from: 'in-mic3', to: 'mix-main', label: 'XLR', color: 'var(--c-mic)' },
-        { from: 'in-mic4', to: 'mix-main', label: 'XLR', color: 'var(--c-mic)' },
-        { from: 'in-med1', to: 'mix-main', label: 'TRS', color: 'var(--c-media)' },
-        { from: 'in-med2', to: 'mix-main', label: 'TRS', color: 'var(--c-media)' },
-        { from: 'in-med3', to: 'mix-main', label: 'TRS', color: 'var(--c-media)' },
-        { from: 'in-med4', to: 'mix-main', label: 'TRS', color: 'var(--c-media)' },
+        // Mic -> Snake Cable
+        { from: 'in-mic1', to: 'snake-box', label: 'XLR', color: 'var(--c-mic)' },
+        { from: 'in-mic2', to: 'snake-box', label: 'XLR', color: 'var(--c-mic)' },
+        { from: 'in-mic3', to: 'snake-box', label: 'XLR', color: 'var(--c-mic)' },
+        { from: 'in-mic4', to: 'snake-box', label: 'XLR', color: 'var(--c-mic)' },
         
-        { from: 'mix-main', to: 'tx-fm', label: 'Group 1-2', color: 'var(--c-tx)' },
+        // Snake -> Mixer (Offset jauh)
+        { from: 'snake-box', to: 'mix-main', label: 'Multicore PROEL', color: 'var(--c-mic)', route: 'elbow', xOffset: 160 },
+        
+        // PERBAIKAN MEDIA: Kembali pakai mode bezier lengkung agar mekar kipas rapi, teks diubah sesuai spesifikasi
+        { from: 'in-med1', to: 'mix-main', label: '3.5mm to TRS', color: 'var(--c-media)' },
+        { from: 'in-med2', to: 'mix-main', label: '3.5mm to TRS', color: 'var(--c-media)' },
+        { from: 'in-med3', to: 'mix-main', label: '3.5mm to RCA', color: 'var(--c-media)' },
+        { from: 'in-med4', to: 'mix-main', label: '3.5mm to RCA', color: 'var(--c-media)' },
+        
+        // Mixer -> Prosesor
+        { from: 'mix-main', to: 'tx-fm', label: 'Group 1-2', color: 'var(--c-tx)', route: 'elbow', xOffset: 60 },
         { from: 'mix-main', to: 'proc-geq', label: 'Stereo L/R', color: 'var(--c-mix)' },
-        { from: 'proc-geq', to: 'proc-split', label: 'XLR L/R', color: 'var(--c-mix)' },
+        { from: 'proc-geq', to: 'proc-dlms', label: 'XLR L/R', color: 'var(--c-mix)' },
         
-        { from: 'proc-split', to: 'amp-protea1', label: 'Out 1-2', color: 'var(--c-split)', route: 'elbow', xOffset: 40 },
-        { from: 'proc-split', to: 'amp-protea2', label: 'Out 3-4', color: 'var(--c-split)', route: 'elbow', xOffset: 65 },
-        { from: 'proc-split', to: 'proc-dlms', label: 'Main L/R', color: '#eab308', route: 'elbow', xOffset: 95 },
-        { from: 'proc-split', to: 'amp-za6', label: 'TRS Out 5', color: '#eab308', route: 'elbow', xOffset: 115 },
-        { from: 'proc-split', to: 'amp-za7', label: 'TRS Out 6', color: '#eab308', route: 'elbow', xOffset: 140 },
-        
-        { from: 'proc-dlms', to: 'amp-za1', label: 'Zone 1', color: 'var(--c-dlms)' },
-        { from: 'proc-dlms', to: 'amp-za2', label: 'Zone 2', color: 'var(--c-dlms)' },
-        { from: 'proc-dlms', to: 'amp-za3', label: 'Zone 3', color: 'var(--c-dlms)' },
-        { from: 'proc-dlms', to: 'amp-za4', label: 'Zone 4', color: 'var(--c-dlms)' },
-        { from: 'proc-dlms', to: 'amp-za5', label: 'Zone 5', color: 'var(--c-dlms)' },
+        // DLMS -> Zone Amps & Splitter
+        { from: 'proc-dlms', to: 'amp-za3', label: 'Out 1 (Panggung)', color: 'var(--c-dlms)', route: 'elbow', xOffset: 25 },
+        { from: 'proc-dlms', to: 'amp-za4', label: 'Out 2 (Tower 1)', color: 'var(--c-dlms)', route: 'elbow', xOffset: 45 },
+        { from: 'proc-dlms', to: 'amp-za5', label: 'Out 3 (Tower 2)', color: 'var(--c-dlms)', route: 'elbow', xOffset: 65 },
+        { from: 'proc-dlms', to: 'proc-split', label: 'Out 5/6 (MX882)', color: 'var(--c-dlms)', route: 'elbow', xOffset: 85 },
 
-        /* PEMBARUAN: FOH Menggunakan mode 'elbow' dengan xOffset berbeda agar jalurnya benar-benar terpisah */
+        // PERBAIKAN SPLITTER: Mengunci xOffset rapat (20-110px). 
+        // Titik potong tengah ada di ~150px, jadi garis merah vertikal TIDAK AKAN menyentuh label "Out 1" lagi
+        { from: 'proc-split', to: 'amp-protea1', label: 'Main L (FOH)', color: 'var(--c-split)', route: 'elbow', xOffset: 20 },
+        { from: 'proc-split', to: 'amp-protea2', label: 'Main R (FOH)', color: 'var(--c-split)', route: 'elbow', xOffset: 35 },
+        { from: 'proc-split', to: 'amp-za1', label: 'Out 1 (Blkng)', color: 'var(--c-split)', route: 'elbow', xOffset: 50 },
+        { from: 'proc-split', to: 'amp-za2', label: 'Out 2 (Samping)', color: 'var(--c-split)', route: 'elbow', xOffset: 65 },
+        { from: 'proc-split', to: 'amp-za6', label: 'Out 3 (P3K)', color: 'var(--c-split)', route: 'elbow', xOffset: 80 },
+        { from: 'proc-split', to: 'amp-za7', label: 'Out 4 (Media)', color: 'var(--c-split)', route: 'elbow', xOffset: 95 },
+        { from: 'proc-split', to: 'out-stream', label: 'Out 5 (Stream)', color: 'var(--c-split)', route: 'elbow', xOffset: 110 },
+
+        // Amps -> Speakers
         { from: 'amp-protea1', to: 'foh-L1', label: 'SpeakON (Ch A)', color: 'var(--c-spk)', route: 'elbow', xOffset: 40 },
-        { from: 'amp-protea1', to: 'foh-L2', label: 'SpeakON (Ch B)', color: 'var(--c-spk)', route: 'elbow', xOffset: 70 },
+        { from: 'amp-protea1', to: 'foh-L2', label: 'SpeakON (Ch B)', color: 'var(--c-spk)', route: 'elbow', xOffset: 75 },
         { from: 'amp-protea2', to: 'foh-R1', label: 'SpeakON (Ch A)', color: 'var(--c-spk)', route: 'elbow', xOffset: 40 },
-        { from: 'amp-protea2', to: 'foh-R2', label: 'SpeakON (Ch B)', color: 'var(--c-spk)', route: 'elbow', xOffset: 70 },
+        { from: 'amp-protea2', to: 'foh-R2', label: 'SpeakON (Ch B)', color: 'var(--c-spk)', route: 'elbow', xOffset: 75 },
 
-        { from: 'amp-za1', to: 'z1-1', label: '100V Hot/Com', color: 'var(--c-spk)' },
-        { from: 'amp-za2', to: 'z2-1', label: '100V Hot/Com', color: 'var(--c-spk)' },
-        { from: 'amp-za3', to: 'z3-1', label: '100V Hot/Com', color: 'var(--c-spk)' },
-        { from: 'amp-za4', to: 'z4-1', label: '100V Hot/Com', color: 'var(--c-spk)' },
-        { from: 'amp-za5', to: 'z5-1', label: '100V Hot/Com', color: 'var(--c-spk)' },
-        { from: 'amp-za6', to: 'z6-1', label: '100V Hot/Com', color: 'var(--c-spk)' },
-        { from: 'amp-za7', to: 'z7-1', label: '100V Hot/Com', color: 'var(--c-spk)' },
+        { from: 'amp-za1', to: 'z1-1', label: '100V Com/Hot', color: 'var(--c-spk)' },
+        { from: 'amp-za2', to: 'z2-1', label: '100V Com/Hot', color: 'var(--c-spk)' },
+        { from: 'amp-za3', to: 'z3-1', label: '100V Com/Hot', color: 'var(--c-spk)' },
+        { from: 'amp-za4', to: 'z4-1', label: '100V Com/Hot', color: 'var(--c-spk)' },
+        { from: 'amp-za5', to: 'z5-1', label: '100V Com/Hot', color: 'var(--c-spk)' },
+        { from: 'amp-za6', to: 'z6-1', label: '100V Com/Hot', color: 'var(--c-spk)' },
+        { from: 'amp-za7', to: 'z7-1', label: '100V Com/Hot', color: 'var(--c-spk)' },
 
+        // Jumper Paralel antar Speaker
         { from: 'z1-1', to: 'z1-2', color: '#94a3b8' }, { from: 'z1-2', to: 'z1-3', color: '#94a3b8' },
         { from: 'z2-1', to: 'z2-2', color: '#94a3b8' },
         { from: 'z3-1', to: 'z3-2', color: '#94a3b8' }, { from: 'z3-2', to: 'z3-3', color: '#94a3b8' },
@@ -403,14 +395,7 @@ location: "JA-01"
                     labelX = (x1 + x2) / 2;
                     labelY = y2;
                 } else {
-                    /* MATEMATIKA RADIUS DINAMIS:
-                       Jika jarak vertikal lebih pendek dari 2x Radius (30px), 
-                       radius dikurangi agar lengkungan SVG tidak menggulung (looping).
-                    */
-                    if (Math.abs(y2 - y1) < r * 2) {
-                        r = Math.abs(y2 - y1) / 2;
-                    }
-
+                    if (Math.abs(y2 - y1) < r * 2) r = Math.abs(y2 - y1) / 2;
                     pathD = `M ${x1} ${y1} L ${dropX - r} ${y1} Q ${dropX} ${y1} ${dropX} ${y1 + (r * dirY)} L ${dropX} ${y2 - (r * dirY)} Q ${dropX} ${y2} ${dropX + r} ${y2} L ${x2} ${y2}`;
                     
                     labelX = dropX + ((x2 - dropX) / 2);
@@ -429,10 +414,10 @@ location: "JA-01"
             if (link.label) {
                 labelX += link.lblOffsetX || 0;
                 labelY += link.lblOffsetY || 0;
-                const labelWidth = link.label.length * 8 + 24; 
                 
+                const labelWidth = link.label.length * 7.5 + 16; 
                 svgContent += `
-                    <rect class="cable-label-bg" x="${labelX - labelWidth/2}" y="${labelY - 14}" width="${labelWidth}" height="28" rx="14" stroke="${link.color}" />
+                    <rect class="cable-label-bg" x="${labelX - labelWidth/2}" y="${labelY - 12}" width="${labelWidth}" height="24" rx="12" stroke="${link.color}" />
                     <text class="cable-label-text" x="${labelX}" y="${labelY}" dominant-baseline="central" alignment-baseline="central">${link.label}</text>
                 `;
             }

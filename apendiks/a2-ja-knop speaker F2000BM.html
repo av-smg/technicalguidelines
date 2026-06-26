@@ -1,0 +1,153 @@
+---
+layout: default
+location: "JA-01"
+---
+
+<style>
+    /* ====================================================
+       SISTEM WARNA (SINKRONISASI TEMA WEBSITE JEKYLL)
+       ==================================================== */
+    :root {
+        --c-mic: #10b981;
+        --c-media: #0ea5e9;
+        --c-mix: #d946ef;
+        --c-tx: #f59e0b;
+        --c-split: #ef4444;
+        --c-dlms: #3b82f6;
+        --c-spk: #64748b;
+    }
+
+    /* KANVAS EMBEDDED */
+    .diagram-wrapper {
+        position: relative; 
+        background: #ffffff;
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+        border: 1px solid rgba(125,125,125,0.1);
+        margin-top: 20px;
+    }
+
+    /* HEADER HALAMAN */
+    .page-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .page-header h1 {
+        font-size: 2rem;
+        color: #0f172a;
+        font-weight: 800;
+        margin-bottom: 10px;
+    }
+    .page-header p {
+        color: var(--c-spk);
+        font-size: 1.1rem;
+        font-weight: 500;
+    }
+
+    /* KOTAK PERINGATAN / INSTRUKSI TIM */
+    .alert-box {
+        background-color: #fffbeb; /* Kuning pucat */
+        border-left: 5px solid var(--c-tx); /* Garis tepi oranye */
+        padding: 18px 24px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+        box-shadow: 0 4px 6px rgba(245, 158, 11, 0.05);
+    }
+    .alert-icon {
+        font-size: 1.8rem;
+    }
+    .alert-content h4 {
+        margin: 0 0 5px 0;
+        color: #b45309;
+        font-size: 1.1rem;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+    .alert-content p {
+        margin: 0;
+        color: #78350f;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        font-weight: 500;
+    }
+
+    /* GRID GAMBAR */
+    .image-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 25px;
+    }
+
+    .image-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 15px;
+        text-align: center;
+        transition: transform 0.3s ease;
+    }
+    .image-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+    }
+    .image-card img {
+        width: 100%;
+        height: auto;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        object-fit: cover;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .image-card h3 {
+        font-size: 1.2rem;
+        color: #1e293b;
+        font-weight: 700;
+        margin: 0 0 5px 0;
+    }
+    .image-card p {
+        font-size: 0.85rem;
+        color: #64748b;
+        margin: 0;
+    }
+
+    .back-btn { display: inline-block; margin-bottom: 20px; font-weight: bold; color: #e67e22; text-decoration: none; }
+</style>
+
+<div class="content-container">
+    <a href="javascript:history.back()" class="back-btn">&larr; Kembali</a>
+
+    <div class="diagram-wrapper">
+        <div class="page-header">
+            <h1>Konfigurasi Speaker F2000BM</h1>
+            <p>Panduan Pengaturan Tegangan Daya (Wattase)</p>
+        </div>
+
+        <div class="alert-box">
+            <div class="alert-icon">⚠️</div>
+            <div class="alert-content">
+                <h4>Instruksi Penting: Tim Speaker</h4>
+                <p>Saat melakukan instalasi speaker di zona masing-masing, <strong>pastikan untuk memutar knop selektor daya di bagian belakang speaker</strong> agar sesuai dengan kapasitas yang dibutuhkan (120W atau 240W). Kesalahan pengaturan knop dapat mengakibatkan distribusi suara tidak merata atau <em>overload</em> pada power amplifier.</p>
+            </div>
+        </div>
+
+        <div class="image-grid">
+            
+            <div class="image-card">
+                <img src="{{ '/assets/images/F2000BM%20-%20120W.jpeg' | relative_url }}" alt="Knop Speaker 120W">
+                <h3>Setelan Knop 120W</h3>
+                <p>Gunakan setelan ini untuk zona standar dengan kebutuhan daya menengah.</p>
+            </div>
+
+            <div class="image-card">
+                <img src="{{ '/assets/images/F2000BM%20-%20240W.jpeg' | relative_url }}" alt="Knop Speaker 240W">
+                <h3>Setelan Knop 240W</h3>
+                <p>Gunakan setelan ini khusus untuk area utama / FOH yang membutuhkan daya lontar maksimal.</p>
+            </div>
+
+        </div>
+    </div>
+</div>

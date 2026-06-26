@@ -37,21 +37,23 @@ location: "JA-01"
       display: flex; align-items: center; gap: 5px; border: 1px solid #fecaca;
     }
 
-    /* BANNER PERSONIL TIM (BARU) */
-    .personnel-banner {
-      background: #f0fdf4;
-      border-left: 5px solid #22c55e;
-      padding: 12px 18px;
-      border-radius: 12px;
-      margin-bottom: 20px;
+    /* KARTU INFORMASI PERSONIL (DESAIN PROFESIONAL) */
+    .info-card {
+      background: #ffffff;
+      border-left: 4px solid #3b82f6;
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 25px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
       display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      box-shadow: 0 4px 10px rgba(34, 197, 94, 0.1);
+      flex-direction: column;
+      gap: 12px;
     }
-    .personnel-label { font-weight: 900; color: #166534; font-size: 0.95rem; }
-    .personnel-list { color: #15803d; font-weight: 600; font-size: 0.9rem; line-height: 1.4; }
+    .info-header { font-weight: 800; color: #1e293b; font-size: 1.05rem; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #f1f5f9; padding-bottom: 8px; }
+    .info-row { display: flex; flex-wrap: wrap; gap: 10px; font-size: 0.9rem; color: #475569; }
+    .info-item { background: #f8fafc; padding: 8px 14px; border-radius: 6px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 8px; flex: 1; min-width: 200px; }
+    .info-label { font-weight: 700; color: #64748b; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
+    .info-value { font-weight: 600; color: #0f172a; }
 
     /* KARTU TUGAS & PERALATAN */
     .task-item { display: flex; align-items: flex-start; gap: 15px; text-align: left; cursor: default; transition: 0.3s; }
@@ -89,10 +91,7 @@ location: "JA-01"
           <h2 id="team-title">Memuat data...</h2>
         </div>
         
-        <div id="personnel-banner" class="personnel-banner" style="display: none;">
-          <div class="personnel-label">👥 Personil:</div>
-          <div id="personnel-list" class="personnel-list"></div>
-        </div>
+        <div id="personnel-container" style="display: none;"></div>
 
         <div id="safety-banner" class="safety-banner">
           <div class="safety-label">⚠️ WAJIB APD:</div>
@@ -122,22 +121,56 @@ location: "JA-01"
       const teamNameStr = currentTeamId.replace(/-/g, ' ').toUpperCase();
       document.getElementById('team-title').innerText = "Tugas: " + teamNameStr;
 
-      // --- LOGIKA PENENTUAN PERSONIL BERDASARKAN NAMA TIM ---
-      let personnelText = "";
-      let checkName = teamNameStr.toLowerCase();
+      // Hapus semua spasi dan tanda strip untuk pencarian yang lebih akurat
+      const normalizedCheck = currentTeamId.toLowerCase().replace(/[-\s]/g, '');
       
-      if (checkName.includes("kabel") || checkName.includes("ja 01")) {
-        personnelText = "Anggid (Kapten tim), Naela, Sarah, Yonna";
-      } else if (checkName.includes("speaker") || checkName.includes("ja 02")) {
-        personnelText = "Malkhiel (Kapten tim), Surya, Edo, Sachi, Rian";
-      } else if (checkName.includes("booth") || checkName.includes("jw 08")) {
-        personnelText = "Truna (Kapten tim), Evan";
+      let teamRoleName = "";
+      let kapten = "";
+      let inventaris = "";
+      let anggota = "";
+      
+      // LOGIKA PERSONIL YANG SUDAH DIPERBAIKI
+      if (normalizedCheck.includes("kabel") || normalizedCheck.includes("ja01")) {
+        teamRoleName = "Tim Audio Kabel";
+        kapten = "Anggid";
+        inventaris = "Peni";
+        anggota = "Naela, Sarah, Yonna";
+      } else if (normalizedCheck.includes("speaker") || normalizedCheck.includes("ja02")) {
+        teamRoleName = "Tim Audio Speaker";
+        kapten = "Malkhiel";
+        inventaris = "Vina";
+        anggota = "Surya, Edo, Sachi, Rian";
+      } else if (normalizedCheck.includes("booth") || normalizedCheck.includes("jw08")) {
+        teamRoleName = "Tim Audio Booth";
+        kapten = "Truna";
+        inventaris = "Emma";
+        anggota = "Evan";
       }
 
-      // Tampilkan banner jika personil terdeteksi
-      if (personnelText !== "") {
-        document.getElementById('personnel-banner').style.display = 'flex';
-        document.getElementById('personnel-list').innerText = personnelText;
+      // TAMPILKAN KARTU PERSONIL PROFESIONAL
+      if (kapten !== "") {
+        document.getElementById('personnel-container').style.display = 'block';
+        document.getElementById('personnel-container').innerHTML = `
+          <div class="info-card">
+            <div class="info-header">👥 Struktur ${teamRoleName}</div>
+            <div class="info-row">
+              <div class="info-item">
+                <span class="info-label">👑 Kapten</span>
+                <span class="info-value">${kapten}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">📦 Inventaris</span>
+                <span class="info-value">${inventaris}</span>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="info-item" style="flex: 100%;">
+                <span class="info-label">🤝 Anggota</span>
+                <span class="info-value">${anggota}</span>
+              </div>
+            </div>
+          </div>
+        `;
       }
       
     } else {
@@ -150,7 +183,14 @@ location: "JA-01"
       try {
         const response = await fetch(APPS_SCRIPT_URL, { method: "GET", redirect: "follow" });
         const allTasks = await response.json();
-        const teamTasks = allTasks.filter(task => task.kode === currentTeamId);
+        
+        // Pencarian case-insensitive untuk URL vs Database
+        const teamTasks = allTasks.filter(task => {
+            const taskKodeNormalized = (task.kode || "").toLowerCase().replace(/[-\s]/g, '');
+            const currentKodeNormalized = currentTeamId.toLowerCase().replace(/[-\s]/g, '');
+            return taskKodeNormalized === currentKodeNormalized;
+        });
+        
         renderTasks(teamTasks);
       } catch (error) {
         console.error("Fetch Error:", error);
@@ -167,14 +207,14 @@ location: "JA-01"
       container.innerHTML = '';
 
       if (tasks.length === 0) {
-        container.innerHTML = '<div class="mission-card"><p style="text-align:center; margin:0;">Tidak ada tugas untuk tim ini.</p></div>';
+        container.innerHTML = '<div class="mission-card" style="background:#fff; padding:20px; border-radius:12px; border:1px solid #e2e8f0;"><p style="text-align:center; margin:0; color:#64748b; font-weight:bold;">Tidak ada tugas untuk tim ini.</p></div>';
         return;
       }
 
       tasks.sort((a, b) => parseInt(a.urutan) - parseInt(b.urutan));
       
       let apdSet = new Set(); 
-      // --- APD WAJIB SEKARANG DIMASUKKAN SEBAGAI DEFAULT ---
+      // APD WAJIB DEFAULT
       apdSet.add('🥾 Sepatu Safety'); 
       apdSet.add('🧤 Sarung Tangan');
       apdSet.add('👷 Helm');
@@ -201,7 +241,6 @@ location: "JA-01"
           
           if (alatRaw.endsWith('.')) alatRaw = alatRaw.slice(0, -1);
           
-          // Filter badge abu-abu agar tidak menampilkan ulang sepatu, helm, sarung tangan
           const alatArray = alatRaw.split(',')
             .map(item => item.trim())
             .filter(item => {

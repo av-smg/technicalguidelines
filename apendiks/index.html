@@ -10,12 +10,33 @@ title: Daftar Apendiks
        MODERN UI STYLING UNTUK APENDIKS
        ========================================== */
     
-    /* Grid System */
+    /* Grid System - Dibagi 2 Rata & Full Width */
     .grid-cards {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        grid-template-columns: 1fr 1fr; /* Membagi tepat 2 kolom */
         gap: 25px;
         margin-top: 20px;
+        width: 100%;
+    }
+
+    /* Agar responsif di layar HP menjadi 1 kolom */
+    @media (max-width: 768px) {
+        .grid-cards {
+            grid-template-columns: 1fr;
+        }
+        
+        .mission-card.struktur-card {
+            flex-direction: column !important;
+            text-align: center;
+            gap: 15px;
+        }
+        .mission-card.struktur-card .struktur-title-wrapper {
+            flex-direction: column !important;
+        }
+        .mission-card.struktur-card .icon-box {
+            margin-right: 0 !important;
+            margin-bottom: 10px !important;
+        }
     }
 
     /* Styling Kartu (Modern, Not Flat) */
@@ -38,6 +59,20 @@ title: Daftar Apendiks
         border-color: #60a5fa; /* Highlight biru saat di-hover */
     }
 
+    /* Kartu Khusus Struktur Departemen (Tipis & Memanjang) */
+    .mission-card.struktur-card {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px 30px;
+    }
+
+    .struktur-title-wrapper {
+        display: flex;
+        align-items: center;
+        flex-grow: 1;
+    }
+
     /* Icon / Emoji Box */
     .icon-box {
         display: inline-flex;
@@ -51,6 +86,14 @@ title: Daftar Apendiks
         margin-bottom: 15px;
         border: 1px solid rgba(96, 165, 250, 0.2);
     }
+    
+    .mission-card.struktur-card .icon-box {
+        margin-bottom: 0;
+        margin-right: 20px;
+        width: 45px;
+        height: 45px;
+        font-size: 1.5rem;
+    }
 
     /* Typography dalam Kartu */
     .mission-card h3 {
@@ -59,6 +102,10 @@ title: Daftar Apendiks
         margin: 0 0 10px 0;
         letter-spacing: -0.5px;
         color: var(--text-dark, inherit);
+    }
+    
+    .mission-card.struktur-card h3 {
+        margin: 0; /* Menghilangkan margin bawah karena posisinya sejajar */
     }
 
     .mission-card p {
@@ -86,7 +133,13 @@ title: Daftar Apendiks
         transition: all 0.3s ease;
         box-shadow: 0 4px 15px rgba(234, 88, 12, 0.25);
         user-select: none;
-        text-decoration: none; /* Tambahan untuk link a */
+        text-decoration: none;
+    }
+
+    .mission-card.struktur-card .btn-go {
+        width: auto;
+        padding: 12px 30px;
+        white-space: nowrap;
     }
 
     .btn-go:hover {
@@ -208,15 +261,16 @@ title: Daftar Apendiks
         <div class="team-header" style="margin-bottom: 15px;">
             <span class="team-badge badge-audio" style="background-color: #059669 !important; border-radius: 8px; font-weight: 800; font-size: 0.85rem;">B. DOKUMEN TEKNIS - JW-08 (JAWA)</span>
         </div>
+        
         <div class="grid-cards">
             
-            <div class="card-link struktur-link" style="grid-column: 1 / -1; justify-self: center; width: 100%; max-width: 500px;">
-                <div class="mission-card" style="text-align: center; align-items: center; padding: 25px;">
-                    <div class="icon-box" style="margin: 0 auto 15px auto;">🏢</div>
-                    <h3>Struktur Departemen</h3>
-                    <p style="margin-bottom: 20px;">Informasi struktur organisasi, hierarki, dan distribusi personil departemen Audio Video.</p>
-                    
-                    <a href="technicalguidelines" class="btn-go" style="max-width: 250px;">
+            <div class="card-link struktur-link" style="grid-column: 1 / -1; width: 100%;">
+                <div class="mission-card struktur-card">
+                    <div class="struktur-title-wrapper">
+                        <div class="icon-box">🏢</div>
+                        <h3>Struktur Departemen</h3>
+                    </div>
+                    <a href="technicalguidelines" class="btn-go">
                         <span>Lihat Struktur &rarr;</span>
                     </a>
                 </div>
@@ -235,7 +289,7 @@ title: Daftar Apendiks
                     <div id="toaDropdownJawa" class="dropdown-menu">
                         <ul class="dropdown-list">
                             <li><a href="a1-ja-diagram-routing-audio.html">📄 A1 - Diagram Routing Audio System</a></li>
-                            <li><a href="a2-ja-knop speaker F2000BM.html">📄 A2 - Petunjuk Knop Speaker F2000BM (berdasarkan jumlah speaker)/<a></li>
+                            <li><a href="a2-ja-knop speaker F2000BM.html">📄 A2 - Petunjuk Knop Speaker F2000BM (berdasarkan jumlah speaker)</a></li>
                             <li><a href="folder_apendiks/jawa_semarang/audio/a4.html">📄 A3 - Layout Booth Audio Video IT</a></li>
                             <li><a href="folder_apendiks/jawa_semarang/audio/a6.html">📄 A4 - Layout Junction</a></li>
                         </ul>

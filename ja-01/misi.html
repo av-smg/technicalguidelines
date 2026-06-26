@@ -12,10 +12,10 @@ location: "JA-01"
   <style>
     .back-btn { display: inline-block; margin-bottom: 20px; font-weight: bold; color: #e67e22; text-decoration: none; }
     
-    /* BANNER APD STICKY (DI-FREEZE) */
+    /* BANNER APD STICKY */
     .safety-banner {
       position: sticky;
-      top: 80px; /* Jarak freeze dari atas (disesuaikan dengan tinggi navbar kamu) */
+      top: 80px; 
       z-index: 50;
       background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(10px);
@@ -24,7 +24,7 @@ location: "JA-01"
       border-radius: 12px;
       box-shadow: 0 6px 20px rgba(239, 68, 68, 0.15);
       margin-bottom: 25px;
-      display: none; /* Disembunyikan secara default, JS yang akan memunculkan */
+      display: none; 
       align-items: center;
       gap: 15px;
       flex-wrap: wrap;
@@ -37,16 +37,30 @@ location: "JA-01"
       display: flex; align-items: center; gap: 5px; border: 1px solid #fecaca;
     }
 
+    /* BANNER PERSONIL TIM (BARU) */
+    .personnel-banner {
+      background: #f0fdf4;
+      border-left: 5px solid #22c55e;
+      padding: 12px 18px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      box-shadow: 0 4px 10px rgba(34, 197, 94, 0.1);
+    }
+    .personnel-label { font-weight: 900; color: #166534; font-size: 0.95rem; }
+    .personnel-list { color: #15803d; font-weight: 600; font-size: 0.9rem; line-height: 1.4; }
+
     /* KARTU TUGAS & PERALATAN */
     .task-item { display: flex; align-items: flex-start; gap: 15px; text-align: left; cursor: default; transition: 0.3s; }
     .task-item input[type="checkbox"] { width: 22px; height: 22px; margin-top: 4px; accent-color: #059669; cursor: pointer; flex-shrink: 0; }
     .task-content { flex: 1; min-width: 0; }
     .task-content h3 { margin: 0 0 12px 0; font-size: 1.15rem; color: #1e293b; }
     
-    /* Styling saat checklist dicentang (Opsional agar terlihat modern) */
     .task-completed h3 { text-decoration: line-through; color: #94a3b8; }
     
-    /* Tampilan Badge Alat Modern */
     .tools-container { margin-bottom: 15px; padding-bottom: 12px; border-bottom: 1px dashed #cbd5e1; display: flex; flex-wrap: wrap; gap: 8px;}
     .tool-badge { 
       display: inline-flex; align-items: center; background: #f1f5f9; color: #334155; 
@@ -59,7 +73,6 @@ location: "JA-01"
     .task-meta { display: inline-block; padding: 5px 12px; background: #f8fafc; color: #475569; border-radius: 8px; font-size: 0.8rem; font-weight: bold; border: 1px solid #cbd5e1;}
     .loading-text { text-align: center; padding: 40px; color: #64748b; font-weight: bold; }
     
-    /* Gambar di dalam task */
     .task-img { width: 100%; max-width: 350px; border-radius: 12px; margin: 12px 0; display: block; border: 1px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
   </style>
 </head>
@@ -76,6 +89,11 @@ location: "JA-01"
           <h2 id="team-title">Memuat data...</h2>
         </div>
         
+        <div id="personnel-banner" class="personnel-banner" style="display: none;">
+          <div class="personnel-label">👥 Personil:</div>
+          <div id="personnel-list" class="personnel-list"></div>
+        </div>
+
         <div id="safety-banner" class="safety-banner">
           <div class="safety-label">⚠️ WAJIB APD:</div>
           <div id="apd-items" class="safety-items">
@@ -95,14 +113,33 @@ location: "JA-01"
   </footer>
 
   <script>
-    // --- MASUKKAN URL APPS SCRIPT KAMU DI SINI ---
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx48weXwYDomgoRo02hh-yXXHd-EdiexmYY3Rxg6SUC_ptGJKHYIPSv6kD96NFvLt7oOg/exec"; 
 
     const urlParams = new URLSearchParams(window.location.search);
     const currentTeamId = urlParams.get('id');
 
     if(currentTeamId) {
-      document.getElementById('team-title').innerText = "Tugas: " + currentTeamId.replace(/-/g, ' ').toUpperCase();
+      const teamNameStr = currentTeamId.replace(/-/g, ' ').toUpperCase();
+      document.getElementById('team-title').innerText = "Tugas: " + teamNameStr;
+
+      // --- LOGIKA PENENTUAN PERSONIL BERDASARKAN NAMA TIM ---
+      let personnelText = "";
+      let checkName = teamNameStr.toLowerCase();
+      
+      if (checkName.includes("kabel") || checkName.includes("ja 01")) {
+        personnelText = "Anggid (Kapten tim), Naela, Sarah, Yonna";
+      } else if (checkName.includes("speaker") || checkName.includes("ja 02")) {
+        personnelText = "Malkhiel (Kapten tim), Surya, Edo, Sachi, Rian";
+      } else if (checkName.includes("booth") || checkName.includes("jw 08")) {
+        personnelText = "Truna (Kapten tim), Evan";
+      }
+
+      // Tampilkan banner jika personil terdeteksi
+      if (personnelText !== "") {
+        document.getElementById('personnel-banner').style.display = 'flex';
+        document.getElementById('personnel-list').innerText = personnelText;
+      }
+      
     } else {
       document.getElementById('team-title').innerText = "Kode Tim Tidak Valid";
       document.getElementById('loading').style.display = 'none';
@@ -137,8 +174,10 @@ location: "JA-01"
       tasks.sort((a, b) => parseInt(a.urutan) - parseInt(b.urutan));
       
       let apdSet = new Set(); 
-      // SEPATU SAFETY SELALU WAJIB UNTUK SEMUA TIM
+      // --- APD WAJIB SEKARANG DIMASUKKAN SEBAGAI DEFAULT ---
       apdSet.add('🥾 Sepatu Safety'); 
+      apdSet.add('🧤 Sarung Tangan');
+      apdSet.add('👷 Helm');
 
       tasks.forEach(task => {
         const isChecked = task.selesai ? 'checked' : '';
@@ -148,11 +187,8 @@ location: "JA-01"
         card.id = `card-${task.row}`;
         
         let desc = task.deskripsi;
-        
-        // --- 1. RENDER GAMBAR ---
         desc = desc.replace(/\[img:\s*(.+?)\]/gi, '<img src="$1" class="task-img">');
 
-        // --- 2. PEMISAHAN PERALATAN & LANGKAH PINTAR ---
         let toolsHtml = '';
         let stepsHtml = desc.replace(/\n/g, '<br>'); 
         
@@ -165,16 +201,11 @@ location: "JA-01"
           
           if (alatRaw.endsWith('.')) alatRaw = alatRaw.slice(0, -1);
           
-          let alatLower = alatRaw.toLowerCase();
-          if (alatLower.includes('helm')) apdSet.add('👷 Helm');
-          if (alatLower.includes('sarung tangan')) apdSet.add('🧤 Sarung Tangan');
-
-          // MEMBUAT BADGE ALAT SEKALIGUS MENGHAPUS APD DARI DAFTAR
+          // Filter badge abu-abu agar tidak menampilkan ulang sepatu, helm, sarung tangan
           const alatArray = alatRaw.split(',')
             .map(item => item.trim())
             .filter(item => {
               let itemLower = item.toLowerCase();
-              // Jangan masukkan ke badge abu-abu jika mengandung kata helm, sarung tangan, atau sepatu
               return item !== "" && !itemLower.includes('helm') && !itemLower.includes('sarung tangan') && !itemLower.includes('sepatu');
             });
 
@@ -213,7 +244,6 @@ location: "JA-01"
         container.appendChild(card);
       });
 
-      // --- 3. TAMPILKAN BANNER APD ---
       if (apdSet.size > 0) {
         safetyBanner.style.display = 'flex';
         apdItemsContainer.innerHTML = Array.from(apdSet).map(item => `<span class="apd-badge">${item}</span>`).join('');

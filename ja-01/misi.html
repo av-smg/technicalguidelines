@@ -121,7 +121,7 @@ location: "JA-01"
       const teamNameStr = currentTeamId.replace(/-/g, ' ').toUpperCase();
       document.getElementById('team-title').innerText = "Tugas: " + teamNameStr;
 
-      // Hapus semua spasi dan tanda strip untuk pencarian yang lebih akurat
+      // Hapus semua spasi dan tanda strip
       const normalizedCheck = currentTeamId.toLowerCase().replace(/[-\s]/g, '');
       
       let teamRoleName = "";
@@ -129,25 +129,38 @@ location: "JA-01"
       let inventaris = "";
       let anggota = "";
       
-      // LOGIKA PERSONIL YANG SUDAH DIPERBAIKI
-      if (normalizedCheck.includes("kabel") || normalizedCheck.includes("ja01")) {
+      // LOGIKA PERSONIL YANG SUDAH DIPERBAIKI BEBAS BUG
+      // Sistem akan mengecek KATA UTAMA "kabel", "speaker", "booth" lebih dulu
+      if (normalizedCheck.includes("kabel")) {
         teamRoleName = "Tim Audio Kabel";
         kapten = "Anggid";
         inventaris = "Peni";
         anggota = "Naela, Sarah, Yonna";
-      } else if (normalizedCheck.includes("speaker") || normalizedCheck.includes("ja02")) {
+      } else if (normalizedCheck.includes("speaker")) {
         teamRoleName = "Tim Audio Speaker";
         kapten = "Malkhiel";
         inventaris = "Vina";
         anggota = "Surya, Edo, Sachi, Rian";
-      } else if (normalizedCheck.includes("booth") || normalizedCheck.includes("jw08")) {
+      } else if (normalizedCheck.includes("booth")) {
         teamRoleName = "Tim Audio Booth";
         kapten = "Truna";
         inventaris = "Emma";
         anggota = "Evan";
+      } else {
+        // Fallback JIKA di URL HANYA ada kode tanpa nama tim (Misal cuma ja-01)
+        if (normalizedCheck === "ja01") {
+          teamRoleName = "Tim Audio Kabel";
+          kapten = "Anggid"; inventaris = "Peni"; anggota = "Naela, Sarah, Yonna";
+        } else if (normalizedCheck === "ja02") {
+          teamRoleName = "Tim Audio Speaker";
+          kapten = "Malkhiel"; inventaris = "Vina"; anggota = "Surya, Edo, Sachi, Rian";
+        } else if (normalizedCheck === "jw08") {
+          teamRoleName = "Tim Audio Booth";
+          kapten = "Truna"; inventaris = "Emma"; anggota = "Evan";
+        }
       }
 
-      // TAMPILKAN KARTU PERSONIL PROFESIONAL
+      // TAMPILKAN KARTU PERSONIL
       if (kapten !== "") {
         document.getElementById('personnel-container').style.display = 'block';
         document.getElementById('personnel-container').innerHTML = `
@@ -184,7 +197,7 @@ location: "JA-01"
         const response = await fetch(APPS_SCRIPT_URL, { method: "GET", redirect: "follow" });
         const allTasks = await response.json();
         
-        // Pencarian case-insensitive untuk URL vs Database
+        // Pencarian URL vs Database
         const teamTasks = allTasks.filter(task => {
             const taskKodeNormalized = (task.kode || "").toLowerCase().replace(/[-\s]/g, '');
             const currentKodeNormalized = currentTeamId.toLowerCase().replace(/[-\s]/g, '');

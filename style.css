@@ -68,7 +68,7 @@ header {
   padding: 15px;
   position: sticky;
   top: 0;
-  z-index: 1000;
+  z-index: 9999;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
@@ -257,7 +257,7 @@ header {
     justify-content: space-between;
     padding: 80px 25px 30px 25px;
     transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 2000;
+    z-index: 9999;
     box-shadow: 10px 0 30px rgba(0, 0, 0, 0.1);
   }
   .nav-menu.active {

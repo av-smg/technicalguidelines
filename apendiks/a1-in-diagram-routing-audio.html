@@ -187,19 +187,23 @@ location: "JW-08"
 
         <div class="node style-media" id="in-med1" style="grid-area: 6 / 1;">
             <div class="node-icon"><svg><rect x="2" y="3" width="20" height="14" rx="2"/></svg></div><div class="node-info"><h4>Media Utama</h4><p>Laptop • CH 09-10</p></div>
-            <div class="tp tp-out" id="t-md1-out" style="top:50%;" data-label="OUT"></div>
+            <div class="tp tp-out" id="t-md1-L" style="top:35%;" data-label="OUT L"></div>
+            <div class="tp tp-out" id="t-md1-R" style="top:65%;" data-label="OUT R"></div>
         </div>
         <div class="node style-media" id="in-med2" style="grid-area: 7 / 1;">
             <div class="node-icon"><svg><rect x="2" y="3" width="20" height="14" rx="2"/></svg></div><div class="node-info"><h4>Media AD Utama</h4><p>Laptop • CH 11-12</p></div>
-            <div class="tp tp-out" id="t-md2-out" style="top:50%;" data-label="OUT"></div>
+            <div class="tp tp-out" id="t-md2-L" style="top:35%;" data-label="OUT L"></div>
+            <div class="tp tp-out" id="t-md2-R" style="top:65%;" data-label="OUT R"></div>
         </div>
         <div class="node style-media" id="in-med3" style="grid-area: 8 / 1;">
             <div class="node-icon"><svg><rect x="2" y="3" width="20" height="14" rx="2"/></svg></div><div class="node-info"><h4>Media Backup</h4><p>Laptop • CH 13-14</p></div>
-            <div class="tp tp-out" id="t-md3-out" style="top:50%;" data-label="OUT"></div>
+            <div class="tp tp-out" id="t-md3-L" style="top:35%;" data-label="OUT L"></div>
+            <div class="tp tp-out" id="t-md3-R" style="top:65%;" data-label="OUT R"></div>
         </div>
         <div class="node style-media" id="in-med4" style="grid-area: 9 / 1;">
             <div class="node-icon"><svg><rect x="2" y="3" width="20" height="14" rx="2"/></svg></div><div class="node-info"><h4>Media AD Backup</h4><p>Laptop • CH 15-16</p></div>
-            <div class="tp tp-out" id="t-md4-out" style="top:50%;" data-label="OUT"></div>
+            <div class="tp tp-out" id="t-md4-L" style="top:35%;" data-label="OUT L"></div>
+            <div class="tp tp-out" id="t-md4-R" style="top:65%;" data-label="OUT R"></div>
         </div>
 
         <div class="node style-rack" id="snake-box" style="grid-area: 1 / 2 / span 5 / 3; align-self: center; height: 350px; width: 300px;">
@@ -226,14 +230,19 @@ location: "JW-08"
             <div class="node-icon" style="color:#d946ef; align-self:flex-start; margin-top:5px;"><svg><line x1="4" y1="21" x2="4" y2="14"/><line x1="12" y1="21" x2="12" y2="3"/></svg></div>
             <div class="node-info" style="align-self:flex-start; margin-top:5px;"><h4>Yamaha MG24/14FX</h4><p>Audio Console</p></div>
             
-            <div class="tp tp-in" id="t-mix-i1" style="top:12%;" data-label="CH 1 IN"></div>
-            <div class="tp tp-in" id="t-mix-i2" style="top:22%;" data-label="CH 2 IN"></div>
-            <div class="tp tp-in" id="t-mix-i3" style="top:32%;" data-label="CH 3 IN"></div>
-            <div class="tp tp-in" id="t-mix-i4" style="top:42%;" data-label="CH 4 IN"></div>
-            <div class="tp tp-in" id="t-mix-pc1" style="top:57%; border-color:var(--c-media);" data-label="CH 9/10 IN"></div>
-            <div class="tp tp-in" id="t-mix-pc2" style="top:67%; border-color:var(--c-media);" data-label="CH 11/12 IN"></div>
-            <div class="tp tp-in" id="t-mix-pc3" style="top:77%; border-color:var(--c-media);" data-label="CH 13/14 IN"></div>
-            <div class="tp tp-in" id="t-mix-pc4" style="top:87%; border-color:var(--c-media);" data-label="CH 15/16 IN"></div>
+            <div class="tp tp-in" id="t-mix-i1" style="top:6%;" data-label="CH 1 IN"></div>
+            <div class="tp tp-in" id="t-mix-i2" style="top:14%;" data-label="CH 2 IN"></div>
+            <div class="tp tp-in" id="t-mix-i3" style="top:22%;" data-label="CH 3 IN"></div>
+            <div class="tp tp-in" id="t-mix-i4" style="top:30%;" data-label="CH 4 IN"></div>
+            
+            <div class="tp tp-in" id="t-mix-9L" style="top:42%; border-color:var(--c-media);" data-label="CH 9 IN (L)"></div>
+            <div class="tp tp-in" id="t-mix-9R" style="top:48%; border-color:var(--c-media);" data-label="CH 10 IN (R)"></div>
+            <div class="tp tp-in" id="t-mix-11L" style="top:56%; border-color:var(--c-media);" data-label="CH 11 IN (L)"></div>
+            <div class="tp tp-in" id="t-mix-11R" style="top:62%; border-color:var(--c-media);" data-label="CH 12 IN (R)"></div>
+            <div class="tp tp-in" id="t-mix-13L" style="top:70%; border-color:var(--c-media);" data-label="CH 13 IN (L)"></div>
+            <div class="tp tp-in" id="t-mix-13R" style="top:76%; border-color:var(--c-media);" data-label="CH 14 IN (R)"></div>
+            <div class="tp tp-in" id="t-mix-15L" style="top:84%; border-color:var(--c-media);" data-label="CH 15 IN (L)"></div>
+            <div class="tp tp-in" id="t-mix-15R" style="top:90%; border-color:var(--c-media);" data-label="CH 16 IN (R)"></div>
             
             <div class="tp tp-out" id="t-mix-mainL" style="top:25%;" data-label="MAIN L"></div>
             <div class="tp tp-out" id="t-mix-mainR" style="top:35%;" data-label="MAIN R"></div>
@@ -438,11 +447,18 @@ location: "JW-08"
         { from: 't-sb-o3', to: 't-mix-i3', label: 'CH 3', color: 'var(--c-mic)' },
         { from: 't-sb-o4', to: 't-mix-i4', label: 'CH 4', color: 'var(--c-mic)' },
         
-        // Media -> Mixer (4 Kabel Stereo)
-        { from: 't-md1-out', to: 't-mix-pc1', label: 'CH 9/10', color: 'var(--c-media)' },
-        { from: 't-md2-out', to: 't-mix-pc2', label: 'CH 11/12', color: 'var(--c-media)' },
-        { from: 't-md3-out', to: 't-mix-pc3', label: 'CH 13/14', color: 'var(--c-media)' },
-        { from: 't-md4-out', to: 't-mix-pc4', label: 'CH 15/16', color: 'var(--c-media)' },
+        // Media -> Mixer (Pemisahan L/R Diskret ke Mono TRS)
+        { from: 't-md1-L', to: 't-mix-9L', label: 'CH 9 (TRS)', color: 'var(--c-media)' },
+        { from: 't-md1-R', to: 't-mix-9R', label: 'CH 10 (TRS)', color: 'var(--c-media)' },
+        
+        { from: 't-md2-L', to: 't-mix-11L', label: 'CH 11 (TRS)', color: 'var(--c-media)' },
+        { from: 't-md2-R', to: 't-mix-11R', label: 'CH 12 (TRS)', color: 'var(--c-media)' },
+        
+        { from: 't-md3-L', to: 't-mix-13L', label: 'CH 13 (TRS)', color: 'var(--c-media)' },
+        { from: 't-md3-R', to: 't-mix-13R', label: 'CH 14 (TRS)', color: 'var(--c-media)' },
+        
+        { from: 't-md4-L', to: 't-mix-15L', label: 'CH 15 (TRS)', color: 'var(--c-media)' },
+        { from: 't-md4-R', to: 't-mix-15R', label: 'CH 16 (TRS)', color: 'var(--c-media)' },
         
         // Mixer -> Prosesor & TX
         { from: 't-mix-grp1', to: 't-tx-in', label: 'Dual TRS to 3.5mm (Group 1-2)', color: 'var(--c-tx)', route: 'elbow', xOffset: 70, labelOffsetY: -22 },

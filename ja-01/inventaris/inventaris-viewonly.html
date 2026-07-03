@@ -497,10 +497,13 @@ location: "JA-01"
         document.getElementById("m-max-text").innerText = `Total persediaan: ${total} Pcs`;
         document.getElementById("m-sisa-text").innerText = `Sisa: ${sisa}`;
         
-        document.getElementById("m-desc-text").innerText = item.keterangan_edit || "Belum ada catatan update.";
+       // Memanggil Cell O untuk Catatan Update
+document.getElementById("m-desc-text").innerText = item.keterangan || "Belum ada catatan update.";
 
-        let historiValid = (item.log_history && item.log_history !== "undefined") ? item.log_history : "Belum ada histori update.";
-        document.getElementById("m-system-log").innerText = historiValid;
+// Memanggil Cell P untuk Histori Log (Bisa membaca dari log_history atau keterangan_edit)
+let logData = item.log_history || item.keterangan_edit;
+let historiValid = (logData && logData !== "undefined") ? logData : "Belum ada histori update.";
+document.getElementById("m-system-log").innerText = historiValid;
         
         document.getElementById("modal").classList.add("active");
     }

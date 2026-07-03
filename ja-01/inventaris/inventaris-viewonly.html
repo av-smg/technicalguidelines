@@ -497,9 +497,9 @@ location: "JA-01"
         document.getElementById("m-max-text").innerText = `Total persediaan: ${total} Pcs`;
         document.getElementById("m-sisa-text").innerText = `Sisa: ${sisa}`;
         
-       // Memanggil Cell O untuk Catatan Update
-document.getElementById("m-desc-text").innerText = item.keterangan || "Belum ada catatan update.";
-
+       // Memanggil key JSON berdasarkan header "Catatan Update"
+document.getElementById("m-desc-text").innerText = item.catatan_update || item.keterangan || "Belum ada catatan update.";
+        
 // Memanggil Cell P untuk Histori Log (Bisa membaca dari log_history atau keterangan_edit)
 let logData = item.log_history || item.keterangan_edit;
 let historiValid = (logData && logData !== "undefined") ? logData : "Belum ada histori update.";

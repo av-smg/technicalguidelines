@@ -1,0 +1,134 @@
+---
+layout: default
+location: "JA-01"
+---
+
+<style>
+    /* ====================================================
+       SISTEM WARNA (SINKRONISASI TEMA WEBSITE JEKYLL)
+       ==================================================== */
+    :root {
+        --c-mic: #10b981;
+        --c-media: #0ea5e9;
+        --c-mix: #d946ef;
+        --c-tx: #f59e0b;
+        --c-split: #ef4444;
+        --c-dlms: #3b82f6;
+        --c-spk: #64748b;
+    }
+
+    /* KANVAS EMBEDDED */
+    .diagram-wrapper {
+        position: relative; 
+        background: #ffffff;
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+        border: 1px solid rgba(125,125,125,0.1);
+        margin-top: 20px;
+    }
+
+    /* HEADER HALAMAN */
+    .page-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .page-header h1 {
+        font-size: 2rem;
+        color: #0f172a;
+        font-weight: 800;
+        margin-bottom: 10px;
+    }
+    .page-header p {
+        color: var(--c-spk);
+        font-size: 1.1rem;
+        font-weight: 500;
+    }
+
+    /* KOTAK PERINGATAN / INSTRUKSI TIM */
+    .alert-box {
+        background-color: #f0fdf4; /* Hijau pucat */
+        border-left: 5px solid var(--c-mic); /* Garis tepi hijau */
+        padding: 18px 24px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+        box-shadow: 0 4px 6px rgba(16, 185, 129, 0.05);
+    }
+    .alert-icon {
+        font-size: 1.8rem;
+    }
+    .alert-content h4 {
+        margin: 0 0 5px 0;
+        color: #065f46;
+        font-size: 1.1rem;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+    .alert-content p {
+        margin: 0;
+        color: #064e3b;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        font-weight: 500;
+    }
+
+    /* KARTU LAYOUT BESAR */
+    .layout-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    }
+    .layout-card img {
+        width: 100%;
+        max-width: 1000px; /* Agar tidak terlalu melar di layar sangat besar */
+        height: auto;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    .layout-card h3 {
+        font-size: 1.4rem;
+        color: #1e293b;
+        font-weight: 700;
+        margin: 0 0 8px 0;
+    }
+    .layout-card p {
+        font-size: 1rem;
+        color: #64748b;
+        margin: 0;
+    }
+
+    .back-btn { display: inline-block; margin-bottom: 20px; font-weight: bold; color: #e67e22; text-decoration: none; }
+</style>
+
+<div class="content-container">
+    <a href="javascript:history.back()" class="back-btn">&larr; Kembali</a>
+
+    <div class="diagram-wrapper">
+        <div class="page-header">
+            <h1>Apendiks: Layout AV & Tata Kursi</h1>
+            <p>Pertemuan Regional 2026 JA</p>
+        </div>
+
+        <div class="alert-box">
+            <div class="alert-icon">📌</div>
+            <div class="alert-content">
+                <h4>Instruksi Penting: Tim Instalasi & Tata Letak</h4>
+                <p>Pastikan penempatan perangkat Audio Video dan deretan kursi penonton mengikuti secara presisi panduan layout di bawah ini. Hal ini penting untuk memastikan alur lalu lintas hadirin tetap lancar, jarak pandang ke panggung optimal, dan jangkauan suara merata ke seluruh ruangan.</p>
+            </div>
+        </div>
+
+        <div class="layout-card">
+            <!-- Nama file di-encode %20 untuk menggantikan spasi agar path aman -->
+            <img src="{{ '/assets/images/Layout%20Final%20AV%20JA%202026.png' | relative_url }}" alt="Layout Final AV dan Tata Kursi JA 2026">
+            <h3>Denah Layout Final</h3>
+            <p>Referensi resmi tata letak ruangan, panggung, posisi alat AV, dan zona kursi audiens.</p>
+        </div>
+    </div>
+</div>

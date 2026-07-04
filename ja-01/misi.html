@@ -37,6 +37,26 @@ location: "JA-01"
       display: flex; align-items: center; gap: 5px; border: 1px solid #fecaca;
     }
 
+    /* TAMBAHAN: CSS UNTUK TOMBOL LAYOUT ZONA */
+    .btn-layout {
+      background: #3b82f6;
+      color: #ffffff;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: auto; /* Mendorong tombol ke kanan */
+      box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2);
+      transition: background 0.3s;
+    }
+    .btn-layout:hover {
+      background: #2563eb;
+    }
+
     /* KARTU INFORMASI PERSONIL (DESAIN PROFESIONAL) */
     .info-card {
       background: #ffffff;
@@ -97,6 +117,9 @@ location: "JA-01"
           <div class="safety-label">⚠️ WAJIB APD:</div>
           <div id="apd-items" class="safety-items">
             </div>
+          <a href="https://av-smg.my.id/apendiks/a3-ja-layout%20av.html" target="_blank" class="btn-layout">
+            🗺️ Cek Layout Zona
+          </a>
         </div>
 
         <div id="loading" class="loading-text">Sedang menyinkronkan data dengan server... ⏳</div>
@@ -129,8 +152,7 @@ location: "JA-01"
       let inventaris = "";
       let anggota = "";
       
-      // LOGIKA PERSONIL YANG SUDAH DIPERBAIKI BEBAS BUG
-      // Sistem akan mengecek KATA UTAMA "kabel", "speaker", "booth" lebih dulu
+      // LOGIKA PERSONIL
       if (normalizedCheck.includes("kabel")) {
         teamRoleName = "Tim Audio Kabel";
         kapten = "Anggid";
@@ -147,7 +169,7 @@ location: "JA-01"
         inventaris = "Emma";
         anggota = "Evan";
       } else {
-        // Fallback JIKA di URL HANYA ada kode tanpa nama tim (Misal cuma ja-01)
+        // Fallback
         if (normalizedCheck === "ja01") {
           teamRoleName = "Tim Audio Kabel";
           kapten = "Anggid"; inventaris = "Peni"; anggota = "Naela, Sarah, Yonna";

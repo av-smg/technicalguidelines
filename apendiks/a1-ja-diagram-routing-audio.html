@@ -187,14 +187,14 @@ location: "JA-01"
 
         <div class="node style-media" id="in-med-utama" style="grid-area: 6 / 1;">
             <div class="node-icon"><svg><rect x="2" y="3" width="20" height="14" rx="2"/></svg></div>
-            <div class="node-info"><h4>Media Utama</h4><p>Laptop • CH 5-6</p></div>
+            <div class="node-info"><h4>Media Utama</h4><p>CH 5 (Main) • CH 6 (Audio Desc)</p></div>
             <div class="tp tp-out" id="t-mu-L" style="top:35%;" data-label="OUT L"></div>
             <div class="tp tp-out" id="t-mu-R" style="top:65%;" data-label="OUT R"></div>
         </div>
         
         <div class="node style-media" id="in-med-backup" style="grid-area: 7 / 1;">
             <div class="node-icon"><svg><rect x="2" y="3" width="20" height="14" rx="2"/></svg></div>
-            <div class="node-info"><h4>Media Backup</h4><p>Laptop • CH 7-8</p></div>
+            <div class="node-info"><h4>Media Backup</h4><p>CH 7 (Main) • CH 8 (Audio Desc)</p></div>
             <div class="tp tp-out" id="t-mb-L" style="top:35%;" data-label="OUT L"></div>
             <div class="tp tp-out" id="t-mb-R" style="top:65%;" data-label="OUT R"></div>
         </div>
@@ -219,9 +219,14 @@ location: "JA-01"
             <div class="tp tp-out" id="t-sb-protR" style="top:95%; border-color:#ef4444;" data-label="TO PROTEA R"></div>
         </div>
 
-        <div class="node style-rack" id="mix-main" style="grid-area: 3 / 3 / span 4 / 4; align-self: end; height: 340px; width: 300px;">
+        <div class="node style-rack" id="mix-main" style="grid-area: 3 / 3 / span 4 / 4; align-self: end; height: 350px; width: 300px;">
             <div class="node-icon" style="color:#d946ef; align-self:flex-start; margin-top:5px;"><svg><line x1="4" y1="21" x2="4" y2="14"/><line x1="12" y1="21" x2="12" y2="3"/></svg></div>
-            <div class="node-info" style="align-self:flex-start; margin-top:5px;"><h4>Yamaha MG16XU</h4><p>Audio Console</p></div>
+            <div class="node-info" style="align-self:flex-start; margin-top:5px;">
+                <h4>Yamaha MG16XU</h4>
+                <p>Audio Console</p>
+                <p style="font-size: 10px; color: #d946ef; font-weight: bold;">» CH 1-5, 7 ➔ Stereo Out</p>
+                <p style="font-size: 10px; color: #f59e0b; margin-top: 6px; font-weight: bold;">» CH 6, 8 ➔ Group 1-2</p>
+            </div>
             
             <div class="tp tp-in" id="t-mix-i1" style="top:12%;" data-label="CH 1 IN"></div>
             <div class="tp tp-in" id="t-mix-i2" style="top:22%;" data-label="CH 2 IN"></div>
@@ -233,8 +238,8 @@ location: "JA-01"
             <div class="tp tp-in" id="t-mix-i7" style="top:77%; border-color:var(--c-media);" data-label="CH 7 IN"></div>
             <div class="tp tp-in" id="t-mix-i8" style="top:87%; border-color:var(--c-media);" data-label="CH 8 IN"></div>
             
-            <div class="tp tp-out" id="t-mix-mainL" style="top:25%;" data-label="MAIN L"></div>
-            <div class="tp tp-out" id="t-mix-mainR" style="top:35%;" data-label="MAIN R"></div>
+            <div class="tp tp-out" id="t-mix-mainL" style="top:25%;" data-label="STEREO L"></div>
+            <div class="tp tp-out" id="t-mix-mainR" style="top:35%;" data-label="STEREO R"></div>
             <div class="tp tp-out" id="t-mix-grp1" style="top:75%; border-color:var(--c-tx);" data-label="GRP 1"></div>
             <div class="tp tp-out" id="t-mix-grp2" style="top:85%; border-color:var(--c-tx);" data-label="GRP 2"></div>
         </div>
@@ -417,16 +422,16 @@ location: "JA-01"
         { from: 't-sb-o4', to: 't-mix-i4', label: 'CH 4', color: 'var(--c-mic)' },
         
         // Media -> Mixer (Pemisahan L/R Diskret ke Mono TRS)
-        { from: 't-mu-L', to: 't-mix-i5', label: 'CH 5 (TRS)', color: 'var(--c-media)' },
-        { from: 't-mu-R', to: 't-mix-i6', label: 'CH 6 (TRS)', color: 'var(--c-media)' },
-        { from: 't-mb-L', to: 't-mix-i7', label: 'CH 7 (TRS)', color: 'var(--c-media)' },
-        { from: 't-mb-R', to: 't-mix-i8', label: 'CH 8 (TRS)', color: 'var(--c-media)' },
+        { from: 't-mu-L', to: 't-mix-i5', label: 'CH 5 (Main)', color: 'var(--c-media)' },
+        { from: 't-mu-R', to: 't-mix-i6', label: 'CH 6 (Audio Desc)', color: 'var(--c-media)' },
+        { from: 't-mb-L', to: 't-mix-i7', label: 'CH 7 (Main)', color: 'var(--c-media)' },
+        { from: 't-mb-R', to: 't-mix-i8', label: 'CH 8 (Audio Desc)', color: 'var(--c-media)' },
         
         // Mixer -> Prosesor & TX
-        { from: 't-mix-grp1', to: 't-tx-in', label: 'Dual TRS to 3.5mm (Group 1-2)', color: 'var(--c-tx)', route: 'elbow', xOffset: 70, labelOffsetY: -22 },
+        { from: 't-mix-grp1', to: 't-tx-in', label: 'Group 1-2 to FM Transmitter', color: 'var(--c-tx)', route: 'elbow', xOffset: 70, labelOffsetY: -22 },
         { from: 't-mix-grp2', to: 't-tx-in', color: 'var(--c-tx)', route: 'elbow', xOffset: 70 },
         
-        { from: 't-mix-mainL', to: 't-geq-inL', label: 'Main L/R', color: 'var(--c-mix)' },
+        { from: 't-mix-mainL', to: 't-geq-inL', label: 'Stereo Out L/R', color: 'var(--c-mix)' },
         { from: 't-mix-mainR', to: 't-geq-inR', color: 'var(--c-mix)' },
         
         { from: 't-geq-outL', to: 't-dlms-inL', label: 'XLR L/R', color: 'var(--c-mix)' },

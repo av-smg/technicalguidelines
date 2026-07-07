@@ -244,12 +244,20 @@ location: "JA-01"
             <div class="tp tp-out" id="t-mix-grp2" style="top:85%; border-color:var(--c-tx);" data-label="GRP 2"></div>
         </div>
 
-        <div class="node style-rack" id="tx-fm" style="grid-area: 4 / 4; height: 100px;">
+        <div class="node style-rack" id="proc-iso" style="grid-area: 3 / 4; height: 100px;">
+            <div class="node-icon" style="color:#8b5cf6;"><svg><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 12h16"/></svg></div>
+            <div class="node-info"><h4>Audio Isolator</h4><p>Ground Loop Isolator</p></div>
+            <div class="tp tp-in" id="t-iso-inL" style="top:35%;" data-label="IN L"></div>
+            <div class="tp tp-in" id="t-iso-inR" style="top:65%;" data-label="IN R"></div>
+            <div class="tp tp-out" id="t-iso-outL" style="top:35%;" data-label="OUT L"></div>
+            <div class="tp tp-out" id="t-iso-outR" style="top:65%;" data-label="OUT R"></div>
+        </div>
+
+        <div class="node style-rack" id="tx-fm" style="grid-area: 3 / 5; height: 100px;">
             <div class="node-icon" style="color:#f59e0b;"><svg><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49"/></svg></div>
             <div class="node-info"><h4>FM Transmitter</h4><p>Broadcast Radio</p></div>
             <div class="tp tp-in" id="t-tx-in" style="top:50%;" data-label="IN"></div>
         </div>
-        
         <div class="node style-rack" id="proc-geq" style="grid-area: 5 / 4; height: 100px; width: 230px;">
             <div class="node-icon" style="color:#10b981; align-self:flex-start; margin-top:5px;"><svg><rect x="2" y="4" width="20" height="16" rx="2"/></svg></div>
             <div class="node-info" style="align-self:flex-start; margin-top:5px;"><h4>GEQ DBX 231</h4><p>Graphic EQ 2 Channel</p></div>
@@ -427,10 +435,18 @@ location: "JA-01"
         { from: 't-mb-L', to: 't-mix-i7', label: 'CH 7 (Main)', color: 'var(--c-media)' },
         { from: 't-mb-R', to: 't-mix-i8', label: 'CH 8 (Audio Desc)', color: 'var(--c-media)' },
         
-        // Mixer -> Prosesor & TX
-        { from: 't-mix-grp1', to: 't-tx-in', label: 'Group 1-2 to FM Transmitter', color: 'var(--c-tx)', route: 'elbow', xOffset: 70, labelOffsetY: -22 },
-        { from: 't-mix-grp2', to: 't-tx-in', color: 'var(--c-tx)', route: 'elbow', xOffset: 70 },
-        
+        // ==============================================
+        // UPDATE: Mixer -> Audio Isolator (Kolom 4) -> FM Tx (Kolom 5)
+        // Kabel ditarik lurus dengan sedikit offset siku.
+        // ==============================================
+        { from: 't-mix-grp1', to: 't-iso-inL', label: 'Dual TRS to TRS', color: 'var(--c-tx)', route: 'elbow', xOffset: 50, labelOffsetY: -15 },
+        { from: 't-mix-grp2', to: 't-iso-inR', color: 'var(--c-tx)', route: 'elbow', xOffset: 65 },
+
+        // Menggabungkan 2 kabel dari Isolator menjadi 1 titik masuk di FM Transmitter (yang kini ada di kanannya)
+        { from: 't-iso-outL', to: 't-tx-in', label: 'TRS L/R to 3,5mm', color: 'var(--c-tx)', route: 'elbow', xOffset: 80, labelOffsetY: -15 },
+        { from: 't-iso-outR', to: 't-tx-in', color: 'var(--c-tx)', route: 'elbow', xOffset: 100 },
+        // ==============================================
+
         { from: 't-mix-mainL', to: 't-geq-inL', label: 'Stereo Out L/R', color: 'var(--c-mix)' },
         { from: 't-mix-mainR', to: 't-geq-inR', color: 'var(--c-mix)' },
         
@@ -445,15 +461,11 @@ location: "JA-01"
         { from: 't-dlms-o2', to: 't-az4-in', label: 'Out 2: XLR to RCA', color: 'var(--c-dlms)', route: 'elbow', xOffset: 65 },
         { from: 't-dlms-o3', to: 't-az5-in', label: 'Out 3: XLR to RCA', color: 'var(--c-dlms)', route: 'elbow', xOffset: 95 },
 
-        // =================================================================
         // JALUR TOL ATAS: Splitter Return L/R kembali ke Snake Box 
-        // =================================================================
         { from: 't-split-retL', to: 't-sb-retL', label: 'Main Out L (Snake)', color: 'var(--c-split)', route: 'return-top', yOffset: 45 },
         { from: 't-split-retR', to: 't-sb-retR', label: 'Main Out R (Snake)', color: 'var(--c-split)', route: 'return-top', yOffset: 25 },
         
-        // =================================================================
         // JALUR TOL BAWAH: Dari Snake Box bypass langsung ke Ampli PROTEA 
-        // =================================================================
         { from: 't-sb-protL', to: 't-ap1-in', label: 'XLR L', color: 'var(--c-split)', route: 'under', underOffset: 120 },
         { from: 't-sb-protR', to: 't-ap2-in', label: 'XLR R', color: 'var(--c-split)', route: 'under', underOffset: 95 },
 
@@ -461,8 +473,6 @@ location: "JA-01"
         { from: 't-split-o1', to: 't-az1-in', label: 'Out 1: XLR to RCA', color: 'var(--c-split)', route: 'elbow', xOffset: 50 },
         { from: 't-split-o2', to: 't-az2-in', label: 'Out 2: XLR to RCA', color: 'var(--c-split)' }, 
         { from: 't-split-o3', to: 't-az6-in', label: 'Out 3: XLR to RCA', color: 'var(--c-split)', route: 'elbow', xOffset: 80 },
-        
-        // Perbaikan Visual: xOffset diubah ke 30 agar siku belokan lebih awal dan teks tidak menabrak node Video Switcher
         { from: 't-split-o4', to: 't-vd-in', label: 'Out 4: XLR to Video Switcher', color: 'var(--c-media)', route: 'elbow', xOffset: 30 },
         
         // Amps -> Speakers Pertama (Jalur Input Speaker)
@@ -478,19 +488,14 @@ location: "JA-01"
         // Jumper Paralel Antar Speaker (Disusun Menyambung Lurus)
         { from: 'z1-1', to: 'z1-2', color: '#94a3b8', dual: true, route: 'jumper' },
         { from: 'z1-2', to: 'z1-3', color: '#94a3b8', dual: true, route: 'jumper' },
-        
         { from: 'z2-1', to: 'z2-2', color: '#94a3b8', dual: true, route: 'jumper' },
-        
         { from: 'z3-1', to: 'z3-2', color: '#94a3b8', dual: true, route: 'jumper' },
         { from: 'z3-2', to: 'z3-3', color: '#94a3b8', dual: true, route: 'jumper' },
-        
         { from: 'z4-1', to: 'z4-2', color: '#94a3b8', dual: true, route: 'jumper' },
         { from: 'z4-2', to: 'z4-3', color: '#94a3b8', dual: true, route: 'jumper' },
         { from: 'z4-3', to: 'z4-4', color: '#94a3b8', dual: true, route: 'jumper' },
         { from: 'z4-4', to: 'z4-5', color: '#94a3b8', dual: true, route: 'jumper' },
-        
         { from: 'z5-1', to: 'z5-2', color: '#94a3b8', dual: true, route: 'jumper' },
-        
         { from: 'z6-1', to: 'z6-2', color: '#94a3b8', dual: true, route: 'jumper' }
     ];
 
@@ -504,13 +509,23 @@ location: "JA-01"
             const dropX = x1 + (link.xOffset || 40);
             let r = 15; 
             const dirY = y2 > y1 ? 1 : -1; 
+            
+            const dirX1 = dropX > x1 ? 1 : -1;
+            const dirX2 = x2 > dropX ? 1 : -1;
 
             if (Math.abs(y2 - y1) < 10) {
                 pathD = `M ${x1} ${y1} L ${x2} ${y2}`;
                 labelX = (x1 + x2) / 2; labelY = y2;
             } else {
                 if (Math.abs(y2 - y1) < r * 2) r = Math.abs(y2 - y1) / 2;
-                pathD = `M ${x1} ${y1} L ${dropX - r} ${y1} Q ${dropX} ${y1} ${dropX} ${y1 + (r * dirY)} L ${dropX} ${y2 - (r * dirY)} Q ${dropX} ${y2} ${dropX + r} ${y2} L ${x2} ${y2}`;
+                
+                pathD = `M ${x1} ${y1} 
+                         L ${dropX - (r * dirX1)} ${y1} 
+                         Q ${dropX} ${y1} ${dropX} ${y1 + (r * dirY)} 
+                         L ${dropX} ${y2 - (r * dirY)} 
+                         Q ${dropX} ${y2} ${dropX + (r * dirX2)} ${y2} 
+                         L ${x2} ${y2}`;
+                         
                 labelX = dropX + ((x2 - dropX) / 2); labelY = y2;
             }
         } else if (link.route === 'return-top') {
@@ -581,7 +596,6 @@ location: "JA-01"
                         
             if (link.label) {
                 const labelWidth = link.label.length * 7.5 + 20; 
-                // Ambil nilai geser Y dari kabel, jika tidak ada default ke 0
                 const offsetY = link.labelOffsetY || 0; 
 
                 svgContent += `

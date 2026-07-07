@@ -244,7 +244,16 @@ location: "JW-08"
             <div class="tp tp-out" id="t-mix-grp2" style="top:85%; border-color:var(--c-tx);" data-label="GRP 2"></div>
         </div>
 
-        <div class="node style-rack" id="tx-fm" style="grid-area: 4 / 4; height: 100px;">
+        <div class="node style-rack" id="proc-iso" style="grid-area: 3 / 4; height: 100px;">
+            <div class="node-icon" style="color:#8b5cf6;"><svg><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 12h16"/></svg></div>
+            <div class="node-info"><h4>Audio Isolator</h4><p>Noise Isolator</p></div>
+            <div class="tp tp-in" id="t-iso-inL" style="top:35%;" data-label="IN L"></div>
+            <div class="tp tp-in" id="t-iso-inR" style="top:65%;" data-label="IN R"></div>
+            <div class="tp tp-out" id="t-iso-outL" style="top:35%;" data-label="OUT L"></div>
+            <div class="tp tp-out" id="t-iso-outR" style="top:65%;" data-label="OUT R"></div>
+        </div>
+
+        <div class="node style-rack" id="tx-fm" style="grid-area: 3 / 5; height: 100px;">
             <div class="node-icon" style="color:#f59e0b;"><svg><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49"/></svg></div>
             <div class="node-info"><h4>FM Transmitter</h4><p>Broadcast Radio</p></div>
             <div class="tp tp-in" id="t-tx-in" style="top:50%;" data-label="IN"></div>
@@ -438,9 +447,15 @@ location: "JW-08"
         { from: 't-mb-L', to: 't-mix-i7', label: 'CH 7 (Main)', color: 'var(--c-media)' },
         { from: 't-mb-R', to: 't-mix-i8', label: 'CH 8 (Audio Desc)', color: 'var(--c-media)' },
         
-        // Mixer -> TX
-        { from: 't-mix-grp1', to: 't-tx-in', label: 'Group 1-2 (Audio Desc) to FM Transmitter', color: 'var(--c-tx)', route: 'elbow', xOffset: 70, labelOffsetY: -22 },
-        { from: 't-mix-grp2', to: 't-tx-in', color: 'var(--c-tx)', route: 'elbow', xOffset: 70 },
+        // =======================================================
+        // Mixer -> Audio Isolator -> FM Transmitter
+        // =======================================================
+        { from: 't-mix-grp1', to: 't-iso-inL', label: 'Dual TRS to TRS', color: 'var(--c-tx)', route: 'elbow', xOffset: 50, labelOffsetY: -15 },
+        { from: 't-mix-grp2', to: 't-iso-inR', color: 'var(--c-tx)', route: 'elbow', xOffset: 65 },
+        
+        { from: 't-iso-outL', to: 't-tx-in', label: 'Sum L/R to Mono', color: 'var(--c-tx)', route: 'elbow', xOffset: 80, labelOffsetY: -15 },
+        { from: 't-iso-outR', to: 't-tx-in', color: 'var(--c-tx)', route: 'elbow', xOffset: 100 },
+        // =======================================================
         
         // BYPASS GEQ -> Mixer langsung ke DLMS
         { from: 't-mix-mainL', to: 't-dlms-inL', label: 'Stereo Out L/R to DLMS', color: 'var(--c-mix)' },

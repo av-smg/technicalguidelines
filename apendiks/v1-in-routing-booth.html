@@ -5,148 +5,144 @@ location: "JW-08"
 
 <style>
     /* ====================================================
-       SISTEM WARNA SCHEMATIC - TIM BOOTH (PRO-BROADCAST)
+       SISTEM WARNA SCHEMATIC - TIM BOOTH (AUTO DARK MODE)
        ==================================================== */
-    :root {
-        --c-hdmi: #10b981; /* Hijau */
-        --c-sdi: #0f172a;  /* Hitam / Slate */
-        --c-usb: #eab308;  /* Kuning */
-        --c-lan: #0ea5e9;  /* Biru */
-    }
-
-    * { box-sizing: border-box; }
-
     .diagram-wrapper {
+        /* LIGHT MODE VARIABLES (Default) */
+        --c-hdmi: #10b981; 
+        --c-sdi: #0f172a;  
+        --c-usb: #eab308;  
+        --c-lan: #0ea5e9;  
+
+        --bg-canvas: #f8fafc;
+        --bg-dot: #cbd5e1;
+        --bg-node: #ffffff;
+        --border-node: #cbd5e1;
+        --text-main: #0f172a;
+        --text-port: #334155;
+        --bg-label: rgba(255, 255, 255, 0.95);
+        --dot-bg: #ffffff;
+        --dot-border: #0f172a;
+        --shadow-node: rgba(0,0,0,0.06);
+
         position: relative; 
         width: 100%; 
         height: 90vh; 
         min-height: 850px;
-        background-color: #f8fafc;
-        background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
+        background-color: var(--bg-canvas);
+        background-image: radial-gradient(var(--bg-dot) 1.5px, transparent 1.5px);
         background-size: 30px 30px; 
         overflow: auto; 
         cursor: grab;
         border-radius: 12px; 
-        border: 2px solid #cbd5e1;
+        border: 2px solid var(--border-node);
         margin: 20px auto; 
         font-family: 'Segoe UI', system-ui, sans-serif;
+        transition: background-color 0.3s, border-color 0.3s;
     }
+
+    /* DARK MODE VARIABLES (Tereksekusi otomatis jika OS / Web Wrapper Mode Gelap) */
+    @media (prefers-color-scheme: dark) {
+        .diagram-wrapper {
+            --bg-canvas: #020617; /* Biru sangat gelap */
+            --bg-dot: #1e293b;
+            --bg-node: #0f172a;
+            --border-node: #334155;
+            --text-main: #f8fafc;
+            --text-port: #cbd5e1;
+            --bg-label: rgba(15, 23, 42, 0.95);
+            --dot-bg: #0f172a;
+            --dot-border: #94a3b8;
+            --shadow-node: rgba(0,0,0,0.4);
+            --c-sdi: #94a3b8; /* Kabel SDI jadi Abu terang di Dark Mode */
+        }
+    }
+
+    /* Fallback jika Web Wrapper Anda menggunakan class .dark atau data-theme */
+    :global(.dark) .diagram-wrapper, 
+    html.dark .diagram-wrapper, 
+    body.dark .diagram-wrapper, 
+    [data-theme="dark"] .diagram-wrapper {
+            --bg-canvas: #020617;
+            --bg-dot: #1e293b;
+            --bg-node: #0f172a;
+            --border-node: #334155;
+            --text-main: #f8fafc;
+            --text-port: #cbd5e1;
+            --bg-label: rgba(15, 23, 42, 0.95);
+            --dot-bg: #0f172a;
+            --dot-border: #94a3b8;
+            --shadow-node: rgba(0,0,0,0.4);
+            --c-sdi: #94a3b8;
+    }
+
+    * { box-sizing: border-box; }
     .diagram-wrapper:active { cursor: grabbing; }
-    
     .diagram-wrapper #svg-canvas { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 0; }
     
     .cable-flow { stroke-dasharray: 12, 12; animation: flowAnim 1.2s linear infinite; }
     @keyframes flowAnim { from { stroke-dashoffset: 24; } to { stroke-dashoffset: 0; } }
     
-    .cable-label-bg { fill: rgba(255, 255, 255, 0.95); stroke-width: 1.5; rx: 6; }
-    .cable-label-text { fill: #0f172a; font-size: 11px; font-weight: 800; text-anchor: middle; letter-spacing: 0.5px;}
+    .cable-label-bg { fill: var(--bg-label); stroke-width: 1.5; rx: 6; transition: fill 0.3s; }
+    .cable-label-text { fill: var(--text-main); font-size: 11.5px; font-weight: 800; text-anchor: middle; letter-spacing: 0.3px; transition: fill 0.3s; }
 
     .cable-legend {
-        position: sticky; top: 20px; left: 20px; z-index: 50; background: rgba(255, 255, 255, 0.95);
-        padding: 12px 20px; border-radius: 8px; border: 2px solid #cbd5e1; display: inline-flex; gap: 20px;
-        font-size: 13px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        position: sticky; top: 20px; left: 20px; z-index: 50; background: var(--bg-label);
+        padding: 12px 20px; border-radius: 8px; border: 2px solid var(--border-node); display: inline-flex; gap: 20px;
+        font-size: 13px; font-weight: bold; color: var(--text-main); box-shadow: 0 4px 15px var(--shadow-node);
+        transition: all 0.3s;
     }
     .legend-item { display: flex; align-items: center; gap: 8px; }
     .legend-color { width: 24px; height: 6px; border-radius: 3px; }
 
-    /* ====================================================
-       LAYOUT KOLOM (WATERFALL SEJAJAR - 100% ZERO CROSSING)
-       ==================================================== */
+    /* LAYOUT KOLOM */
     .diagram-board {
-        display: flex;
-        gap: 260px; 
-        padding: 120px 150px 300px 80px;
-        position: relative;
-        z-index: 10;
-        width: max-content;
+        display: flex; gap: 260px; padding: 120px 150px 300px 80px; position: relative; z-index: 10; width: max-content;
     }
-
-    .column { 
-        display: flex; 
-        flex-direction: column; 
-        gap: 35px;
-        justify-content: flex-start; 
-    }
+    .column { display: flex; flex-direction: column; gap: 35px; justify-content: flex-start; }
 
     /* KOTAK ALAT DASAR */
     .node {
-        background: #ffffff; 
-        border: 2px solid #cbd5e1;
+        background: var(--bg-node); 
+        border: 2px solid var(--border-node);
         border-radius: 10px;
-        width: 275px;
-        box-shadow: 0 6px 15px rgba(0,0,0,0.05);
-        display: flex;
-        flex-direction: column;
-        transition: transform 0.2s;
-        z-index: 10;
+        width: 285px; /* Sedikit diperlebar untuk teks baru */
+        box-shadow: 0 6px 15px var(--shadow-node);
+        display: flex; flex-direction: column; transition: transform 0.2s, background 0.3s, border-color 0.3s; z-index: 10;
     }
-    .node:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 20; }
+    .node:hover { transform: translateY(-4px); box-shadow: 0 10px 30px var(--shadow-node); z-index: 20; }
 
-    .node-header {
-        padding: 12px 15px;
-        border-radius: 8px 8px 0 0;
-        text-align: center;
-    }
-    .node-header h4 { margin: 0; font-size: 14.5px; font-weight: 800; color: #ffffff; letter-spacing: 0.3px; display: flex; align-items: center; justify-content: center; }
+    .node-header { padding: 12px 15px; border-radius: 8px 8px 0 0; text-align: center; }
+    /* Ikon dirapikan sejajar dengan teks menggunakan flexbox */
+    .node-header h4 { margin: 0; font-size: 14.5px; font-weight: 800; color: #ffffff; letter-spacing: 0.3px; display: flex; align-items: center; justify-content: center; gap: 6px; }
     .node-header p { margin: 4px 0 0 0; font-size: 11.5px; font-weight: 600; color: #e2e8f0; }
 
-    /* ====================================================
-       COLOR CODING MASKULIN / PRO-TECH
-       ==================================================== */
-    
-    /* Laptops & Control (Bronze / Dark Gold) */
-    .type-lpt { border-color: #b45309; }
-    .type-lpt .node-header { background: #d97706; border-bottom: 2px solid #b45309; }
-    
-    /* Kamera PTZ (Crimson Red) */
-    .type-cam { border-color: #9f1239; }
-    .type-cam .node-header { background: #be123c; border-bottom: 2px solid #9f1239; }
-    
-    /* ATEM Switcher (Midnight Slate) */
-    .node.rack-core { border: 2px solid #020617; width: 330px; }
-    .node.rack-core .node-header { background: #0f172a; border-bottom: 2px solid #020617; }
-    .node.rack-core .node-header p { color: #94a3b8; }
-    
-    /* Processors / Converters (Deep Indigo) */
-    .type-proc { border-color: #3730a3; }
-    .type-proc .node-header { background: #4338ca; border-bottom: 2px solid #3730a3; }
-    
-    /* SDI Distributors (Rust Orange) */
-    .type-dist { border-color: #9a3412; }
-    .type-dist .node-header { background: #c2410c; border-bottom: 2px solid #9a3412; }
-    
-    /* TV / Final Output (Ocean Blue) */
-    .type-tv { border-color: #0284c7; }
-    .type-tv .node-header { background: #0369a1; border-bottom: 2px solid #0284c7; }
-    
-    /* Monitors & LED (Slate Gray) */
-    .type-mon { border-color: #334155; }
-    .type-mon .node-header { background: #475569; border-bottom: 2px solid #334155; }
-
-    /* BORDER KIRI INDIKATOR PORT MASUK/KELUAR */
-    .border-hdmi { border-left: 8px solid var(--c-hdmi); }
-    .border-sdi { border-left: 8px solid var(--c-sdi); }
-    .border-usb { border-left: 8px solid var(--c-usb); }
-    .border-lan { border-left: 8px solid var(--c-lan); }
-    .rack-core { border-left: 8px solid #334155; border-right: 8px solid #334155; }
+    /* COLOR CODING */
+    .type-lpt { border-color: #b45309; } .type-lpt .node-header { background: #d97706; border-bottom: 2px solid #b45309; }
+    .type-cam { border-color: #9f1239; } .type-cam .node-header { background: #be123c; border-bottom: 2px solid #9f1239; }
+    .node.rack-core { border: 2px solid #020617; width: 330px; } .node.rack-core .node-header { background: #0f172a; border-bottom: 2px solid #020617; } .node.rack-core .node-header p { color: #94a3b8; }
+    .type-proc { border-color: #3730a3; } .type-proc .node-header { background: #4338ca; border-bottom: 2px solid #3730a3; }
+    .type-dist { border-color: #9a3412; } .type-dist .node-header { background: #c2410c; border-bottom: 2px solid #9a3412; }
+    .type-tv { border-color: #0284c7; } .type-tv .node-header { background: #0369a1; border-bottom: 2px solid #0284c7; }
+    .type-mon { border-color: #334155; } .type-mon .node-header { background: #475569; border-bottom: 2px solid #334155; }
 
     /* SISTEM PORT */
     .node-ports { display: flex; justify-content: space-between; padding: 15px 0; }
     .ports-left { display: flex; flex-direction: column; gap: 20px; transform: translateX(-7px); }
     .ports-right { display: flex; flex-direction: column; gap: 20px; transform: translateX(7px); align-items: flex-end; }
     .port-row { display: flex; flex-direction: row; align-items: center; gap: 10px; }
-    .port-label { font-size: 11.5px; font-weight: 800; color: #334155; font-family: monospace; white-space: nowrap; }
+    .port-label { font-size: 11.5px; font-weight: 800; color: var(--text-port); font-family: monospace; white-space: nowrap; transition: color 0.3s; }
     
-    .dot { width: 14px; height: 14px; background: #ffffff; border: 3.5px solid #0f172a; border-radius: 50%; position: relative; z-index: 30; transition: 0.3s; }
+    .dot { width: 14px; height: 14px; background: var(--dot-bg); border: 3.5px solid var(--dot-border); border-radius: 50%; position: relative; z-index: 30; transition: 0.3s; }
     .dot:hover { background: #ef4444; transform: scale(1.4); }
 
     /* Visual LED */
     .led-container { display: flex; justify-content: center; padding-bottom: 15px; }
     .led-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; background: #1e293b; padding: 4px; border: 2px solid #3b82f6; border-radius: 4px; width: 180px; height: 90px; }
-    .led-panel { background: #0f172a; border-radius: 2px; width: 100%; height: 100%; }
+    .led-panel { background: #020617; border-radius: 2px; width: 100%; height: 100%; }
 
-    /* ICONS */
-    .ico { width: 18px; height: 18px; margin-right: 8px; vertical-align: text-bottom; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    /* ICONS - Lebih presisi */
+    .ico { width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 </style>
 
 <svg style="display:none;">
@@ -217,8 +213,8 @@ location: "JW-08"
                 <div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-mix"></use></svg>ATEM Television Studio HD</h4><p>Pusat Video Switcher</p></div>
                 <div class="node-ports">
                     <div class="ports-left">
-                        <div class="port-row"><div class="dot" id="atem-i1"></div><span class="port-label">IN 1 (Lpt 1)</span></div>
-                        <div class="port-row"><div class="dot" id="atem-i2"></div><span class="port-label">IN 2 (Lpt 2)</span></div>
+                        <div class="port-row"><div class="dot" id="atem-i1"></div><span class="port-label">IN 1 (Laptop 1)</span></div>
+                        <div class="port-row"><div class="dot" id="atem-i2"></div><span class="port-label">IN 2 (Laptop 2)</span></div>
                         <div style="height: 15px;"></div> 
                         <div class="port-row"><div class="dot" id="atem-i5"></div><span class="port-label">IN 5 (PTZ 1)</span></div>
                         <div class="port-row"><div class="dot" id="atem-i6"></div><span class="port-label">IN 6 (PTZ 2)</span></div>
@@ -253,7 +249,7 @@ location: "JW-08"
 
             <div style="height: 10px;"></div>
 
-            <div class="node type-dist" style="border-left-width: 14px;"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-dist"></use></svg>SDI Distributor Utama</h4></div>
+            <div class="node type-dist" style="border-left-width: 14px;"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-dist"></use></svg>SDI Distributor Utama</h4><p>Pusat Routing PGM</p></div>
                 <div class="node-ports">
                     <div class="ports-left"><div class="port-row"><div class="dot" id="d1-in"></div><span class="port-label">SDI IN</span></div></div>
                     <div class="ports-right">
@@ -332,7 +328,7 @@ location: "JW-08"
         </div>
 
         <div class="column">
-            <div style="height: 360px;"></div> 
+            <div style="height: 350px;"></div> 
             
             <div class="node type-lpt"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-lpt"></use></svg>Laptop Streaming 1</h4></div><div class="node-ports"><div class="ports-left"><div class="port-row"><div class="dot" id="ls1-in"></div><span class="port-label">USB IN</span></div></div><div class="ports-right"></div></div></div>
             
@@ -379,7 +375,7 @@ location: "JW-08"
         </div>
 
         <div class="column">
-            <div style="height: 860px;"></div> 
+            <div style="height: 840px;"></div> 
             
             <div class="node type-tv"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-tv"></use></svg>TV A1</h4></div><div class="node-ports"><div class="ports-left"><div class="port-row"><div class="dot" id="tva1-in"></div><span class="port-label">SDI IN</span></div></div><div class="ports-right"></div></div></div>
             <div class="node type-tv"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-tv"></use></svg>TV A2</h4></div><div class="node-ports"><div class="ports-left"><div class="port-row"><div class="dot" id="tva2-in"></div><span class="port-label">SDI IN</span></div></div><div class="ports-right"></div></div></div>

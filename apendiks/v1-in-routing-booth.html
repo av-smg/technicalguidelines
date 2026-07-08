@@ -1,20 +1,21 @@
 ---
 layout: default
-location: "JW-08"
+location: "JW-08 & JW-01"
 ---
 
 <style>
     /* ====================================================
-       SISTEM WARNA SCHEMATIC - TIM BOOTH (AUTO DARK MODE)
+       SISTEM WARNA SCHEMATIC - VIDEO (AUTO DARK MODE)
        ==================================================== */
     
     /* 1. CSS VARIABLES: Pijakan utama untuk warna dinamis */
     .diagram-wrapper {
-        /* Warna Label Garis Kabel */
+        /* Warna Kabel Dasar */
         --c-hdmi: #10b981; 
         --c-sdi: #0f172a;  
         --c-usb: #eab308;  
         --c-lan: #0ea5e9;  
+        --c-aud: #d946ef; /* Magenta untuk kabel XLR Audio */
 
         /* Warna Dasar Mode Terang (Light Mode) */
         --dw-bg: #f8fafc;
@@ -22,6 +23,7 @@ location: "JW-08"
         --dw-node-bg: #ffffff;
         --dw-border: #cbd5e1;
         --dw-text: #0f172a;
+        --dw-text-muted: #475569;
         --dw-label-bg: rgba(255, 255, 255, 0.95);
         --dw-shadow: rgba(0,0,0,0.06);
 
@@ -50,12 +52,13 @@ location: "JW-08"
     body.dark-mode .diagram-wrapper,
     .dark-mode .diagram-wrapper,
     .dark-theme .diagram-wrapper {
-        --c-sdi: #94a3b8; /* Kabel SDI berubah jadi abu terang agar kelihatan di layar gelap */
+        --c-sdi: #94a3b8; /* Kabel SDI berubah jadi abu terang di layar gelap */
         --dw-bg: #0f172a; /* Canvas berubah jadi Slate 900 */
         --dw-dot: #334155; 
         --dw-node-bg: #1e293b; /* Kotak alat jadi lebih gelap */
         --dw-border: #475569;
         --dw-text: #f8fafc; /* Teks berubah jadi putih */
+        --dw-text-muted: #cbd5e1;
         --dw-label-bg: rgba(30, 41, 59, 0.95);
         --dw-shadow: rgba(0,0,0,0.4);
     }
@@ -67,7 +70,7 @@ location: "JW-08"
     .cable-flow { stroke-dasharray: 12, 12; animation: flowAnim 1.2s linear infinite; }
     @keyframes flowAnim { from { stroke-dashoffset: 24; } to { stroke-dashoffset: 0; } }
     
-    .cable-label-bg { fill: var(--dw-label-bg); stroke-width: 1.5; rx: 6; transition: fill 0.4s ease; }
+    .cable-label-bg { fill: var(--dw-label-bg); stroke-width: 1.5; rx: 6; transition: fill 0.4s ease, stroke 0.4s ease; }
     .cable-label-text { fill: var(--dw-text); font-size: 11px; font-weight: 800; text-anchor: middle; letter-spacing: 0.5px; transition: fill 0.4s ease; }
 
     .cable-legend {
@@ -83,7 +86,7 @@ location: "JW-08"
     .legend-color { width: 24px; height: 6px; border-radius: 3px; }
 
     /* ====================================================
-       LAYOUT KOLOM (WATERFALL SEJAJAR - 100% ZERO CROSSING)
+       LAYOUT KOLOM (WATERFALL SEJAJAR - ZERO CROSSING)
        ==================================================== */
     .diagram-board {
         display: flex;
@@ -101,7 +104,7 @@ location: "JW-08"
         justify-content: flex-start; 
     }
 
-    /* KOTAK ALAT (Sekarang 100% Variabel Responsif) */
+    /* KOTAK ALAT */
     .node {
         background: var(--dw-node-bg); 
         border: 2px solid var(--dw-border);
@@ -130,8 +133,9 @@ location: "JW-08"
     .type-dist { border-color: #9a3412; } .type-dist .node-header { background: #c2410c; border-bottom: 2px solid #9a3412; }
     .type-tv { border-color: #0284c7; } .type-tv .node-header { background: #0369a1; border-bottom: 2px solid #0284c7; }
     .type-mon { border-color: #334155; } .type-mon .node-header { background: #475569; border-bottom: 2px solid #334155; }
+    .type-aud { border-color: #a21caf; } .type-aud .node-header { background: #d946ef; border-bottom: 2px solid #a21caf; }
 
-    /* CORE SWITCHER (Beradaptasi dengan warna teks di pinggirannya) */
+    /* CORE SWITCHER */
     .node.rack-core { border: 2px solid var(--dw-text); width: 330px; }
     .node.rack-core .node-header { background: #020617; border-bottom: 2px solid var(--dw-text); }
     .node.rack-core .node-header p { color: #94a3b8; }
@@ -141,6 +145,7 @@ location: "JW-08"
     .border-sdi { border-left: 8px solid var(--c-sdi); transition: border-color 0.4s ease; }
     .border-usb { border-left: 8px solid var(--c-usb); }
     .border-lan { border-left: 8px solid var(--c-lan); }
+    .border-aud { border-left: 8px solid var(--c-aud); }
     .rack-core { border-left: 8px solid #475569; border-right: 8px solid #475569; }
 
     /* SISTEM PORT */
@@ -162,6 +167,7 @@ location: "JW-08"
     .ico { width: 18px; height: 18px; margin-right: 8px; flex-shrink: 0; vertical-align: text-bottom; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 </style>
 
+<!-- SVGs Kumpulan Ikon -->
 <svg style="display:none;">
     <defs>
         <g id="i-tv"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect><polyline points="17 2 12 7 7 2"></polyline></g>
@@ -171,6 +177,7 @@ location: "JW-08"
         <g id="i-dist"><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="18" x2="6.01" y2="18"></line><line x1="10" y1="18" x2="10.01" y2="18"></line><polyline points="12 14 12 8 16 8 16 2"></polyline><polyline points="12 14 12 8 8 8 8 4"></polyline></g>
         <g id="i-mix"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></g>
         <g id="i-cpu"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></g>
+        <g id="i-mic"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></g>
     </defs>
 </svg>
 
@@ -180,13 +187,16 @@ location: "JW-08"
         <div class="legend-item"><div class="legend-color" style="background: var(--c-hdmi);"></div> HDMI</div>
         <div class="legend-item"><div class="legend-color" style="background: var(--c-sdi); transition: background 0.4s ease;"></div> SDI</div>
         <div class="legend-item"><div class="legend-color" style="background: var(--c-lan);"></div> LAN</div>
+        <div class="legend-item"><div class="legend-color" style="background: var(--c-aud);"></div> XLR Audio</div>
     </div>
     
     <svg id="svg-canvas"></svg>
 
     <div class="diagram-board">
         
+        <!-- KOLOM 1: PTZ CONTROLLER -->
         <div class="column">
+            <!-- Jarak margin diperkecil sedikit karena ada Audio Dist. di bawahnya -->
             <div class="node type-lpt border-lan" style="margin-top: 310px;"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-mix"></use></svg>PTZ Controller</h4><p>Joystick Control</p></div>
                 <div class="node-ports"><div class="ports-left"></div>
                     <div class="ports-right">
@@ -197,6 +207,7 @@ location: "JW-08"
             </div>
         </div>
 
+        <!-- KOLOM 2: INPUT DEVICES & AUDIO DISTRIBUTOR -->
         <div class="column">
             <div class="node type-lpt border-hdmi"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-lpt"></use></svg>Laptop Utama</h4></div>
                 <div class="node-ports"><div class="ports-left"></div>
@@ -223,8 +234,17 @@ location: "JW-08"
                     <div class="ports-right"><div class="port-row"><span class="port-label">SDI OUT</span><div class="dot" id="ptz2-sdi"></div></div></div>
                 </div>
             </div>
+
+            <!-- NODE BARU: AUDIO DISTRIBUTOR -->
+            <div class="node type-aud border-aud"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-mic"></use></svg>Audio Distributor</h4><p>Behringer Splitter MX882</p></div>
+                <div class="node-ports">
+                    <div class="ports-left"></div>
+                    <div class="ports-right"><div class="port-row"><span class="port-label">XLR OUT</span><div class="dot" id="ad-out"></div></div></div>
+                </div>
+            </div>
         </div>
 
+        <!-- KOLOM 3: SWITCHER INDUK -->
         <div class="column" style="justify-content: flex-start;">
             <div class="node rack-core">
                 <div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-mix"></use></svg>ATEM Television Studio HD</h4><p>Pusat Video Switcher</p></div>
@@ -235,13 +255,16 @@ location: "JW-08"
                         <div style="height: 15px;"></div> 
                         <div class="port-row"><div class="dot" id="atem-i5"></div><span class="port-label">IN 5 (PTZ 1)</span></div>
                         <div class="port-row"><div class="dot" id="atem-i6"></div><span class="port-label">IN 6 (PTZ 2)</span></div>
+                        <div style="height: 15px;"></div> 
+                        <!-- PORT BARU UNTUK INPUT AUDIO XLR -->
+                        <div class="port-row"><div class="dot" id="atem-xlr1"></div><span class="port-label">IN XLR 1 (Audio)</span></div>
                     </div>
                     <div class="ports-right">
                         <div class="port-row"><span class="port-label">OUT 5 (Ke VP 1)</span><div class="dot" id="atem-o5"></div></div>
                         <div class="port-row"><span class="port-label">OUT 6 (Ke VP 2)</span><div class="dot" id="atem-o6"></div></div>
                         <div style="height: 15px;"></div>
                         <div class="port-row"><span class="port-label">OUT 7 (PGM Utama)</span><div class="dot" id="atem-o7"></div></div>
-                        <div style="height: 35px;"></div>
+                        <div style="height: 60px;"></div> <!-- Spacer ekstra agar selaras dengan input audio di seberangnya -->
                         <div class="port-row"><span class="port-label">SDI Multiview</span><div class="dot" id="atem-smv"></div></div>
                         <div class="port-row"><span class="port-label">HDMI Multiview</span><div class="dot" id="atem-hmv"></div></div>
                     </div>
@@ -249,6 +272,7 @@ location: "JW-08"
             </div>
         </div>
 
+        <!-- KOLOM 4: PROCESSORS & MAIN DIST (100% SEJAJAR) -->
         <div class="column">
             <div class="node type-proc border-lan"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-cpu"></use></svg>Video Processor 1</h4></div>
                 <div class="node-ports">
@@ -278,7 +302,7 @@ location: "JW-08"
                 </div>
             </div>
             
-            <div style="height: 25px;"></div>
+            <div style="height: 50px;"></div>
 
             <div class="node type-proc border-hdmi"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-cpu"></use></svg>Converter SDI to HDMI</h4></div>
                 <div class="node-ports">
@@ -292,6 +316,7 @@ location: "JW-08"
             </div>
         </div>
 
+        <!-- KOLOM 5: OUTPUT TAHAP 1 -->
         <div class="column">
             <div class="node type-mon border-lan" style="padding-bottom:0;"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-mon"></use></svg>LED Wall Kiri (1)</h4></div>
                 <div class="node-ports"><div class="ports-left"><div class="port-row"><div class="dot" id="led1-lan"></div><span class="port-label">LAN IN</span></div></div><div class="ports-right"></div></div>
@@ -344,6 +369,7 @@ location: "JW-08"
             </div>
         </div>
 
+        <!-- KOLOM 6: LAPTOP STREAM & TV TAHAP 1 -->
         <div class="column">
             <div style="height: 350px;"></div> 
             
@@ -371,6 +397,7 @@ location: "JW-08"
             <div class="node type-tv border-sdi"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-tv"></use></svg>TV Ruang Ibu & Anak (B5)</h4></div><div class="node-ports"><div class="ports-left"><div class="port-row"><div class="dot" id="tvi-in"></div><span class="port-label">SDI IN</span></div></div><div class="ports-right"></div></div></div>
         </div>
 
+        <!-- KOLOM 7: TV B DAN DISTRIBUSI LORONG A -->
         <div class="column">
             <div style="height: 605px;"></div> 
             
@@ -391,6 +418,7 @@ location: "JW-08"
             </div>
         </div>
 
+        <!-- KOLOM 8: FINAL TV LORONG A -->
         <div class="column">
             <div style="height: 840px;"></div> 
             
@@ -406,6 +434,10 @@ location: "JW-08"
 
 <script>
     const cables = [
+        // KABEL AUDIO DISTRIBUTOR KE ATEM SWITCHER
+        { from: 'ad-out', to: 'atem-xlr1', label: 'XLR', color: 'var(--c-aud)' },
+
+        // KABEL LAINNYA
         { from: 'lu-out', to: 'atem-i1', label: 'HDMI', color: 'var(--c-hdmi)' },
         { from: 'lb-out', to: 'atem-i2', label: 'HDMI', color: 'var(--c-hdmi)' },
         { from: 'ctrl-o1', to: 'ptz1-lan', label: 'LAN', color: 'var(--c-lan)' },
@@ -488,8 +520,8 @@ location: "JW-08"
             svgContent += `<path d="${pathD}" fill="none" stroke="${link.color}" stroke-width="2.5" stroke-linecap="round" class="cable-flow" style="transition: stroke 0.4s ease" />`;
             
             const labelWidth = link.label.length * 8 + 20; 
-            svgContent += `<rect class="cable-label-bg" x="${labelX - labelWidth/2}" y="${labelY - 12}" width="${labelWidth}" height="24" stroke="${link.color}" style="transition: stroke 0.4s ease" />`;
-            svgContent += `<text class="cable-label-text" x="${labelX}" y="${labelY + 1.5}" dominant-baseline="central" alignment-baseline="central">${link.label}</text>`;
+            svgContent += `<rect class="cable-label-bg" x="${labelX - labelWidth/2}" y="${labelY - 12}" width="${labelWidth}" height="24" stroke="${link.color}" style="transition: fill 0.4s ease, stroke 0.4s ease" />`;
+            svgContent += `<text class="cable-label-text" x="${labelX}" y="${labelY + 1.5}" dominant-baseline="central" alignment-baseline="central" style="transition: fill 0.4s ease">${link.label}</text>`;
         });
         
         svg.innerHTML = svgContent;

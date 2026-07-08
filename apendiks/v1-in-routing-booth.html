@@ -1,0 +1,433 @@
+---
+layout: default
+location: "Booth AV"
+---
+
+<style>
+    /* ====================================================
+       SISTEM WARNA SCHEMATIC - TIM BOOTH
+       ==================================================== */
+    :root {
+        --c-hdmi: #10b981; /* Hijau */
+        --c-sdi: #0f172a;  /* Hitam / Dark Slate */
+        --c-usb: #eab308;  /* Kuning */
+        --c-lan: #0ea5e9;  /* Biru */
+    }
+
+    .diagram-wrapper {
+        position: relative; 
+        width: 100%; 
+        height: calc(100vh - 100px); 
+        min-height: 800px;
+        max-height: 95vh;
+        background-color: #f8fafc;
+        background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
+        background-size: 30px 30px; 
+        overflow: auto; 
+        cursor: grab;
+        border-radius: 12px; 
+        border: 1px solid #cbd5e1;
+        margin: 20px auto; 
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        box-shadow: inset 0 0 20px rgba(0,0,0,0.03);
+    }
+    .diagram-wrapper:active { cursor: grabbing; }
+    .diagram-wrapper #svg-canvas { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 10; }
+    
+    .diagram-wrapper .cable-flow { stroke-dasharray: 10, 10; animation: flowAnim 1s linear infinite; }
+    @keyframes flowAnim { from { stroke-dashoffset: 20; } to { stroke-dashoffset: 0; } }
+    
+    .diagram-wrapper .cable-label-bg { fill: #ffffff; stroke-width: 2.5; }
+    .diagram-wrapper .cable-label-text { 
+        fill: #0f172a; stroke: none !important; 
+        font-size: 11.5px; font-weight: 800; text-anchor: middle; 
+    }
+
+    /* LEGENDA KABEL */
+    .cable-legend {
+        position: sticky; top: 20px; left: 20px; z-index: 50;
+        background: rgba(255, 255, 255, 0.95); padding: 12px 18px; border-radius: 8px;
+        border: 2px solid #cbd5e1; display: inline-flex; gap: 18px; font-size: 13px; font-weight: bold;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+    .legend-item { display: flex; align-items: center; gap: 8px; }
+    .legend-color { width: 26px; height: 5px; border-radius: 2px; }
+
+    /* MATRIX GRID - EKSTRA LONGGAR */
+    .diagram-wrapper .diagram-grid {
+        display: grid;
+        grid-template-columns: 280px 360px 280px 280px 360px; /* Lebar node diperbesar */
+        grid-auto-rows: minmax(110px, auto);
+        gap: 80px 280px; /* JARAK ANTAR KOLOM DILEBARKAN EKSTRIM KE 280px */
+        padding: 120px 200px 250px 200px;
+        position: relative; z-index: 20; width: max-content; align-items: center; margin: auto; 
+    }
+
+    /* NODE KARTU */
+    .diagram-wrapper .node {
+        position: relative; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        display: flex; align-items: center; padding: 18px 20px; gap: 15px;
+        background: #ffffff; border: 2px solid #cbd5e1; color: #0f172a;
+    }
+    .diagram-wrapper .node:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 30; }
+
+    .diagram-wrapper .style-hdmi { border-left: 6px solid var(--c-hdmi); }
+    .diagram-wrapper .style-sdi { border-left: 6px solid var(--c-sdi); }
+    .diagram-wrapper .style-usb { border-left: 6px solid var(--c-usb); }
+    .diagram-wrapper .style-lan { border-left: 6px solid var(--c-lan); }
+    
+    .diagram-wrapper .style-rack {
+        background: #1e293b !important; color: #f8fafc !important; border: 2px solid #0f172a !important;
+        border-left: 14px solid #334155 !important; border-right: 14px solid #334155 !important;
+    }
+
+    .diagram-wrapper .node-icon { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; background: rgba(100,116,139,0.1); border-radius: 8px; flex-shrink: 0; }
+    .diagram-wrapper .node-info { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+    .diagram-wrapper .node-info h4 { margin: 0; font-size: 14.5px; font-weight: 700; }
+    .diagram-wrapper .node-info p { margin: 0; font-size: 12.5px; opacity: 0.85; font-family: monospace; }
+    .style-rack .node-info p { color: #cbd5e1; }
+
+    /* SISTEM TERMINAL PORT (Di-offset menjauh dari body) */
+    .diagram-wrapper .tp {
+        width: 14px; height: 14px; background: #ffffff; border: 3px solid #0f172a;
+        border-radius: 50%; position: absolute; z-index: 15; transition: 0.3s;
+    }
+    .diagram-wrapper .tp:hover { background: #ef4444; transform: scale(1.3); }
+    
+    .diagram-wrapper .tp::after {
+        content: attr(data-label); position: absolute; font-size: 11px; font-weight: 800;
+        font-family: monospace; color: #475569; white-space: nowrap; pointer-events: none;
+    }
+    .style-rack .tp::after { color: #94a3b8; }
+
+    .diagram-wrapper .tp-in { left: -26px; }
+    .diagram-wrapper .tp-in::after { left: 22px; top: -1px; }
+    .diagram-wrapper .tp-out { right: -26px; }
+    .diagram-wrapper .tp-out::after { right: 22px; top: -1px; text-align: right; }
+    
+    /* ZONA ENDPOINT */
+    .diagram-wrapper .zone-group {
+        display: flex; flex-direction: column; gap: 15px; background: rgba(100,116,139,0.03);
+        padding: 20px 30px 30px 30px; border-radius: 12px; border: 1px dashed #94a3b8; position: relative;
+    }
+    .diagram-wrapper .zone-title { font-size: 13.5px; font-weight: 800; border-bottom: 2px solid #cbd5e1; padding-bottom: 5px; display: inline-block; }
+    .diagram-wrapper .endpoint-row { display: flex; flex-direction: row; gap: 25px; align-items: center; }
+    
+    .diagram-wrapper .tv-unit {
+        width: 50px; height: 30px; background: #0f172a; border-radius: 4px; position: relative; border: 2px solid #475569; z-index: 20;
+    }
+    .diagram-wrapper .led-unit {
+        width: 120px; height: 70px; background: #1e293b; border: 1px solid #3b82f6; border-radius: 4px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; padding: 3px; z-index: 20; position: relative;
+    }
+    .diagram-wrapper .led-panel { background: #0f172a; width: 100%; height: 100%; border-radius: 1px; }
+
+    .diagram-wrapper .mobile-hint { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: #0f172a; color: #ffffff; padding: 10px 20px; border-radius: 20px; font-size: 13px; font-weight: bold; z-index: 9999; pointer-events: none; opacity: 0; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+    @media (max-width: 768px) { 
+        .diagram-wrapper .mobile-hint { opacity: 1; animation: fadeOut 6s forwards 1s; } 
+    }
+    @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
+</style>
+
+<div class="diagram-wrapper" id="diagram-container">
+    <div class="cable-legend">
+        <div class="legend-item"><div class="legend-color" style="background: var(--c-usb);"></div> USB</div>
+        <div class="legend-item"><div class="legend-color" style="background: var(--c-hdmi);"></div> HDMI</div>
+        <div class="legend-item"><div class="legend-color" style="background: var(--c-sdi);"></div> SDI</div>
+        <div class="legend-item"><div class="legend-color" style="background: var(--c-lan);"></div> LAN</div>
+    </div>
+    
+    <div class="mobile-hint">👆 Geser area diagram untuk menelusuri jalur kabel</div>
+    <svg id="svg-canvas"></svg>
+
+    <div class="diagram-grid">
+        
+        <!-- KOLOM 1: INPUT SOURCE -->
+        <div class="node style-hdmi" id="in-lap-utama" style="grid-area: 1 / 1;">
+            <div class="node-info"><h4>Laptop Media Utama</h4><p>Source HDMI</p></div>
+            <div class="tp tp-out" id="t-lu-out" style="top:50%; border-color:var(--c-hdmi);" data-label="HDMI OUT"></div>
+        </div>
+        <div class="node style-hdmi" id="in-lap-backup" style="grid-area: 2 / 1;">
+            <div class="node-info"><h4>Laptop Media Backup</h4><p>Source HDMI</p></div>
+            <div class="tp tp-out" id="t-lb-out" style="top:50%; border-color:var(--c-hdmi);" data-label="HDMI OUT"></div>
+        </div>
+        
+        <div class="node style-sdi" id="in-ptz-1" style="grid-area: 3 / 1;">
+            <div class="node-info"><h4>Kamera PTZ (Backup)</h4><p>SDI Output</p></div>
+            <div class="tp tp-in" id="t-ptz1-lan" style="top:25%; border-color:var(--c-lan);" data-label="LAN IN"></div>
+            <div class="tp tp-out" id="t-ptz1-sdi" style="top:75%; border-color:var(--c-sdi);" data-label="SDI OUT"></div>
+        </div>
+        <div class="node style-sdi" id="in-ptz-2" style="grid-area: 4 / 1;">
+            <div class="node-info"><h4>Kamera PTZ (Utama)</h4><p>SDI Output</p></div>
+            <div class="tp tp-in" id="t-ptz2-lan" style="top:25%; border-color:var(--c-lan);" data-label="LAN IN"></div>
+            <div class="tp tp-out" id="t-ptz2-sdi" style="top:75%; border-color:var(--c-sdi);" data-label="SDI OUT"></div>
+        </div>
+        <div class="node style-sdi" id="in-ptz-3" style="grid-area: 5 / 1;">
+            <div class="node-info"><h4>Kamera PTZ (Baptisan)</h4><p>SDI Output</p></div>
+            <div class="tp tp-in" id="t-ptz3-lan" style="top:25%; border-color:var(--c-lan);" data-label="LAN IN"></div>
+            <div class="tp tp-out" id="t-ptz3-sdi" style="top:75%; border-color:var(--c-sdi);" data-label="SDI OUT"></div>
+        </div>
+        
+        <div class="node style-lan" id="lan-dist" style="grid-area: 7 / 1;">
+            <div class="node-info"><h4>LAN Distributor</h4><p>PTZ Controller (x2)</p></div>
+            <div class="tp tp-in" id="t-lan-1" style="top:25%; border-color:var(--c-lan);" data-label="CTRL 1"></div>
+            <div class="tp tp-in" id="t-lan-2" style="top:50%; border-color:var(--c-lan);" data-label="CTRL 2"></div>
+            <div class="tp tp-in" id="t-lan-3" style="top:75%; border-color:var(--c-lan);" data-label="CTRL 3"></div>
+        </div>
+
+        <!-- KOLOM 2: VIDEO SWITCHER ATEM (Lebih tinggi) -->
+        <div class="node style-rack" id="atem" style="grid-area: 1 / 2 / span 7 / 3; align-self: stretch; min-height: 900px; width: 360px;">
+            <div class="node-info" style="align-self:flex-start; margin-top:10px;">
+                <h4 style="color:var(--c-hdmi);">ATEM Television Studio HD</h4>
+                <p>Video Switcher Induk</p>
+            </div>
+            
+            <!-- ATEM INPUTS -->
+            <div class="tp tp-in" id="t-atem-h1" style="top:15%; border-color:var(--c-hdmi);" data-label="HDMI IN 1"></div>
+            <div class="tp tp-in" id="t-atem-h2" style="top:25%; border-color:var(--c-hdmi);" data-label="HDMI IN 2"></div>
+            
+            <div class="tp tp-in" id="t-atem-s5" style="top:45%; border-color:var(--c-sdi);" data-label="SDI IN 5"></div>
+            <div class="tp tp-in" id="t-atem-s6" style="top:55%; border-color:var(--c-sdi);" data-label="SDI IN 6"></div>
+            <div class="tp tp-in" id="t-atem-s7" style="top:65%; border-color:var(--c-sdi);" data-label="SDI IN 7"></div>
+            
+            <!-- ATEM OUTPUTS -->
+            <div class="tp tp-out" id="t-atem-o5" style="top:15%; border-color:var(--c-sdi);" data-label="SDI OUT 5"></div>
+            <div class="tp tp-out" id="t-atem-o6" style="top:25%; border-color:var(--c-sdi);" data-label="SDI OUT 6"></div>
+            
+            <div class="tp tp-out" id="t-atem-smv" style="top:40%; border-color:var(--c-sdi);" data-label="SDI MULTIVIEW"></div>
+            <div class="tp tp-out" id="t-atem-hmv" style="top:50%; border-color:var(--c-hdmi);" data-label="HDMI MULTIVIEW"></div>
+            
+            <div class="tp tp-out" id="t-atem-o7" style="top:65%; border-color:var(--c-sdi);" data-label="SDI OUT 7"></div>
+            <div class="tp tp-out" id="t-atem-o8" style="top:75%; border-color:var(--c-sdi);" data-label="SDI OUT 8"></div>
+            
+            <div class="tp tp-out" id="t-atem-pgm" style="top:90%; border-color:var(--c-sdi);" data-label="PGM OUT (TV)"></div>
+        </div>
+
+        <!-- KOLOM 3: CONVERTERS & CAPTURES -->
+        <div class="node style-usb" id="ezcap-1" style="grid-area: 1 / 3;">
+            <div class="node-info"><h4>ezcap #1</h4><p>USB3.0 SDI Capture</p></div>
+            <div class="tp tp-in" id="t-ez1-in" style="top:50%; border-color:var(--c-sdi);" data-label="SDI IN 1"></div>
+            <div class="tp tp-out" id="t-ez1-out" style="top:50%; border-color:var(--c-usb);" data-label="USB OUT"></div>
+        </div>
+        <div class="node style-usb" id="ezcap-2" style="grid-area: 2 / 3;">
+            <div class="node-info"><h4>ezcap #2</h4><p>USB3.0 SDI Capture</p></div>
+            <div class="tp tp-in" id="t-ez2-in" style="top:50%; border-color:var(--c-sdi);" data-label="SDI IN 1"></div>
+            <div class="tp tp-out" id="t-ez2-out" style="top:50%; border-color:var(--c-usb);" data-label="USB OUT"></div>
+        </div>
+
+        <div class="node style-sdi" id="mc-1" style="grid-area: 3 / 3;">
+            <div class="node-info"><h4>Micro Converter #1</h4><p>SDI to HDMI</p></div>
+            <div class="tp tp-in" id="t-mc1-in" style="top:50%; border-color:var(--c-sdi);" data-label="SDI IN"></div>
+            <div class="tp tp-out" id="t-mc1-out" style="top:50%; border-color:var(--c-hdmi);" data-label="HDMI OUT"></div>
+        </div>
+        <div class="node style-sdi" id="mc-2" style="grid-area: 4 / 3;">
+            <div class="node-info"><h4>Micro Converter #2</h4><p>SDI to HDMI</p></div>
+            <div class="tp tp-in" id="t-mc2-in" style="top:50%; border-color:var(--c-sdi);" data-label="SDI IN"></div>
+            <div class="tp tp-out" id="t-mc2-out" style="top:50%; border-color:var(--c-hdmi);" data-label="HDMI OUT"></div>
+        </div>
+        <div class="node style-sdi" id="mc-3" style="grid-area: 5 / 3;">
+            <div class="node-info"><h4>Micro Converter #3</h4><p>SDI to HDMI</p></div>
+            <div class="tp tp-in" id="t-mc3-in" style="top:50%; border-color:var(--c-sdi);" data-label="SDI IN"></div>
+            <div class="tp tp-out" id="t-mc3-out" style="top:50%; border-color:var(--c-hdmi);" data-label="HDMI OUT"></div>
+        </div>
+
+        <div class="node style-sdi" id="sdi-dist" style="grid-area: 7 / 3;">
+            <div class="node-info"><h4>Mini Converter</h4><p>SDI Distribution</p></div>
+            <div class="tp tp-in" id="t-sdist-in" style="top:50%; border-color:var(--c-sdi);" data-label="SDI IN 1"></div>
+            
+            <div class="tp tp-out" id="t-sdist-o1" style="top:20%; border-color:var(--c-sdi);" data-label="OUT"></div>
+            <div class="tp tp-out" id="t-sdist-o2" style="top:40%; border-color:var(--c-sdi);" data-label="OUT"></div>
+            <div class="tp tp-out" id="t-sdist-o3" style="top:60%; border-color:var(--c-sdi);" data-label="OUT"></div>
+            <div class="tp tp-out" id="t-sdist-o4" style="top:80%; border-color:var(--c-sdi);" data-label="OUT"></div>
+        </div>
+
+        <!-- KOLOM 4: ENDPOINTS & PROCESSORS -->
+        <div class="node style-usb" id="out-stream-1" style="grid-area: 1 / 4;">
+            <div class="node-info"><h4>Laptop Stream Utama</h4><p>Broadcasting</p></div>
+            <div class="tp tp-in" id="t-su-in" style="top:50%; border-color:var(--c-usb);" data-label="USB IN"></div>
+        </div>
+        <div class="node style-usb" id="out-stream-2" style="grid-area: 2 / 4;">
+            <div class="node-info"><h4>Laptop Stream Backup</h4><p>Broadcasting</p></div>
+            <div class="tp tp-in" id="t-sb-in" style="top:50%; border-color:var(--c-usb);" data-label="USB IN"></div>
+        </div>
+        
+        <div class="node style-hdmi" id="out-mon-audio" style="grid-area: 3 / 4;">
+            <div class="node-info"><h4>Monitor Tim Audio</h4><p>ASUS 24"</p></div>
+            <div class="tp tp-in" id="t-mona-in" style="top:50%; border-color:var(--c-hdmi);" data-label="HDMI IN"></div>
+        </div>
+        
+        <div class="node style-hdmi" id="out-mon-kam" style="grid-area: 4 / 4;">
+            <div class="node-info"><h4>Monitor Tim Kamera</h4><p>Display Multiview</p></div>
+            <div class="tp tp-in" id="t-monk-in" style="top:50%; border-color:var(--c-hdmi);" data-label="HDMI IN"></div>
+        </div>
+
+        <div class="node style-lan" id="proc-led-1" style="grid-area: 5 / 4;">
+            <div class="node-info"><h4>Video Processor #1</h4><p>LED Controller</p></div>
+            <div class="tp tp-in" id="t-vp1-in" style="top:50%; border-color:var(--c-hdmi);" data-label="HDMI IN"></div>
+            <div class="tp tp-out" id="t-vp1-out" style="top:50%; border-color:var(--c-lan);" data-label="LAN OUT 1"></div>
+        </div>
+        <div class="node style-lan" id="proc-led-2" style="grid-area: 6 / 4;">
+            <div class="node-info"><h4>Video Processor #2</h4><p>LED Controller</p></div>
+            <div class="tp tp-in" id="t-vp2-in" style="top:50%; border-color:var(--c-hdmi);" data-label="HDMI IN"></div>
+            <div class="tp tp-out" id="t-vp2-out" style="top:50%; border-color:var(--c-lan);" data-label="LAN OUT 2"></div>
+        </div>
+
+        <div class="zone-group" style="grid-area: 7 / 4 / span 1 / 6;">
+            <div class="zone-title" style="border-color: var(--c-sdi);">Semua TV (Distribusi SDI)</div>
+            <div class="endpoint-row">
+                <div class="tv-unit"><div class="tp tp-in" id="t-tv1-in" style="top:50%; border-color:var(--c-sdi);"></div></div>
+                <div class="tv-unit"><div class="tp tp-in" id="t-tv2-in" style="top:50%; border-color:var(--c-sdi);"></div></div>
+                <div class="tv-unit"><div class="tp tp-in" id="t-tv3-in" style="top:50%; border-color:var(--c-sdi);"></div></div>
+                <div class="tv-unit"><div class="tp tp-in" id="t-tv4-in" style="top:50%; border-color:var(--c-sdi);"></div></div>
+            </div>
+        </div>
+
+        <!-- KOLOM 5: FINAL LED ENDPOINTS -->
+        <div class="zone-group" style="grid-area: 5 / 5; border-color: var(--c-lan);">
+            <div class="zone-title" style="border-color: var(--c-lan);">LED Wall 1</div>
+            <div class="led-unit"><div class="tp tp-in" id="t-led1-in" style="top:50%; border-color:var(--c-lan);"></div>
+                <div class="led-panel"></div><div class="led-panel"></div><div class="led-panel"></div><div class="led-panel"></div>
+                <div class="led-panel"></div><div class="led-panel"></div><div class="led-panel"></div><div class="led-panel"></div>
+            </div>
+        </div>
+        <div class="zone-group" style="grid-area: 6 / 5; border-color: var(--c-lan);">
+            <div class="zone-title" style="border-color: var(--c-lan);">LED Wall 2</div>
+            <div class="led-unit"><div class="tp tp-in" id="t-led2-in" style="top:50%; border-color:var(--c-lan);"></div>
+                <div class="led-panel"></div><div class="led-panel"></div><div class="led-panel"></div><div class="led-panel"></div>
+                <div class="led-panel"></div><div class="led-panel"></div><div class="led-panel"></div><div class="led-panel"></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const cables = [
+        // Source -> ATEM
+        { from: 't-lu-out', to: 't-atem-h1', label: 'HDMI (3m)', color: 'var(--c-hdmi)' },
+        { from: 't-lb-out', to: 't-atem-h2', label: 'HDMI (3m)', color: 'var(--c-hdmi)' },
+        { from: 't-ptz1-sdi', to: 't-atem-s5', label: 'SDI', color: 'var(--c-sdi)' },
+        { from: 't-ptz2-sdi', to: 't-atem-s6', label: 'SDI', color: 'var(--c-sdi)' },
+        { from: 't-ptz3-sdi', to: 't-atem-s7', label: 'SDI', color: 'var(--c-sdi)' },
+
+        // ATEM -> Captures & Converters
+        { from: 't-atem-o5', to: 't-ez1-in', label: 'SDI Out 5 (5m)', color: 'var(--c-sdi)' },
+        { from: 't-atem-o6', to: 't-ez2-in', label: 'SDI Out 6 (5m)', color: 'var(--c-sdi)' },
+        { from: 't-atem-smv', to: 't-mc1-in', label: 'SDI Multiview (5m)', color: 'var(--c-sdi)' },
+        
+        // Offset JAUH LEBIH BESAR agar melompati kolom tengah (Gap 280px + Lebar Node 280px)
+        { from: 't-atem-hmv', to: 't-monk-in', label: 'HDMI Multiview (3m)', color: 'var(--c-hdmi)', route: 'elbow', xOffset: 650, labelOffsetY: -20 },
+        
+        { from: 't-atem-o7', to: 't-mc2-in', label: 'SDI Out 7 (3m)', color: 'var(--c-sdi)' },
+        { from: 't-atem-o8', to: 't-mc3-in', label: 'SDI Out 8 (3m)', color: 'var(--c-sdi)' },
+        { from: 't-atem-pgm', to: 't-sdist-in', label: 'PGM to Dist', color: 'var(--c-sdi)' },
+
+        // Converters -> Endpoints
+        { from: 't-ez1-out', to: 't-su-in', label: 'USB (Capture)', color: 'var(--c-usb)' },
+        { from: 't-ez2-out', to: 't-sb-in', label: 'USB (Capture)', color: 'var(--c-usb)' },
+        { from: 't-mc1-out', to: 't-mona-in', label: 'HDMI (3m)', color: 'var(--c-hdmi)' },
+        { from: 't-mc2-out', to: 't-vp1-in', label: 'HDMI (3m)', color: 'var(--c-hdmi)' },
+        { from: 't-mc3-out', to: 't-vp2-in', label: 'HDMI (3m)', color: 'var(--c-hdmi)' },
+
+        // Processors -> LEDs
+        { from: 't-vp1-out', to: 't-led1-in', label: 'LAN (LED Out)', color: 'var(--c-lan)' },
+        { from: 't-vp2-out', to: 't-led2-in', label: 'LAN (LED Out)', color: 'var(--c-lan)' },
+
+        // SDI Distribution -> TVs (Lebar sikunya ditingkatkan bertahap agar muat lapang)
+        { from: 't-sdist-o1', to: 't-tv1-in', label: 'SDI (3m)', color: 'var(--c-sdi)', route: 'elbow', xOffset: 60 },
+        { from: 't-sdist-o2', to: 't-tv2-in', color: 'var(--c-sdi)', route: 'elbow', xOffset: 85 },
+        { from: 't-sdist-o3', to: 't-tv3-in', color: 'var(--c-sdi)', route: 'elbow', xOffset: 110 },
+        { from: 't-sdist-o4', to: 't-tv4-in', color: 'var(--c-sdi)', route: 'elbow', xOffset: 135 },
+
+        // LAN Distributor Controller (Loopback/Margin Kiri - Ditarik sangat jauh)
+        { from: 't-lan-1', to: 't-ptz1-lan', label: 'LAN Ctrl', color: 'var(--c-lan)', route: 'left-margin', xOffset: 80 },
+        { from: 't-lan-2', to: 't-ptz2-lan', color: 'var(--c-lan)', route: 'left-margin', xOffset: 115 },
+        { from: 't-lan-3', to: 't-ptz3-lan', color: 'var(--c-lan)', route: 'left-margin', xOffset: 150 }
+    ];
+
+    function createPathD(x1, y1, x2, y2, link) {
+        let pathD = ""; let labelX, labelY;
+
+        if (link.route === 'elbow') {
+            const dropX = x1 + (link.xOffset || 40);
+            let r = 20; const dirY = y2 > y1 ? 1 : -1; 
+            if (Math.abs(y2 - y1) < 10) {
+                pathD = `M ${x1} ${y1} L ${x2} ${y2}`;
+                labelX = (x1 + x2) / 2; labelY = y2;
+            } else {
+                if (Math.abs(y2 - y1) < r * 2) r = Math.abs(y2 - y1) / 2;
+                pathD = `M ${x1} ${y1} L ${dropX - r} ${y1} Q ${dropX} ${y1} ${dropX} ${y1 + (r * dirY)} L ${dropX} ${y2 - (r * dirY)} Q ${dropX} ${y2} ${dropX + r} ${y2} L ${x2} ${y2}`;
+                labelX = dropX + ((x2 - dropX) / 2); labelY = y2;
+            }
+        } else if (link.route === 'left-margin') {
+            const dropX = x1 - (link.xOffset || 40);
+            const r = 20;
+            pathD = `M ${x1} ${y1} L ${dropX + r} ${y1} Q ${dropX} ${y1} ${dropX} ${y1 - r} L ${dropX} ${y2 + r} Q ${dropX} ${y2} ${dropX + r} ${y2} L ${x2} ${y2}`;
+            labelX = dropX; labelY = (y1 + y2) / 2;
+        } else {
+            // Lengkungan (Curve Factor) kabel diperbesar agar selaras dengan grid raksasa
+            const curveFactor = Math.max(Math.abs(x2 - x1) * 0.45, 100); 
+            const cp1x = x1 < x2 ? x1 + curveFactor : x1 - curveFactor;
+            const cp2x = x1 < x2 ? x2 - curveFactor : x2 + curveFactor;
+            pathD = `M ${x1} ${y1} C ${cp1x} ${y1}, ${cp2x} ${y2}, ${x2} ${y2}`;
+            labelX = (x1 + x2) / 2; labelY = (y1 + y2) / 2;
+        }
+        return { pathD, labelX, labelY };
+    }
+
+    function drawConnections() {
+        const svg = document.getElementById('svg-canvas');
+        const container = document.getElementById('diagram-container');
+        const grid = document.querySelector('.diagram-grid');
+        
+        svg.style.width = Math.max(container.scrollWidth, grid.scrollWidth) + 'px';
+        svg.style.height = Math.max(container.scrollHeight, grid.scrollHeight) + 'px';
+        
+        const cRect = container.getBoundingClientRect();
+        let svgContent = '';
+
+        cables.forEach(link => {
+            const elFrom = document.getElementById(link.from);
+            const elTo = document.getElementById(link.to);
+            if(!elFrom || !elTo) return;
+
+            const rectFrom = elFrom.getBoundingClientRect();
+            const rectTo = elTo.getBoundingClientRect();
+            
+            const x1 = rectFrom.left + rectFrom.width/2 - cRect.left + container.scrollLeft;
+            const y1 = rectFrom.top + rectFrom.height/2 - cRect.top + container.scrollTop;
+            const x2 = rectTo.left + rectTo.width/2 - cRect.left + container.scrollLeft;
+            const y2 = rectTo.top + rectTo.height/2 - cRect.top + container.scrollTop;
+            
+            const p = createPathD(x1, y1, x2, y2, link);
+            
+            svgContent += `<path d="${p.pathD}" fill="none" stroke="${link.color}" stroke-width="6" stroke-linecap="round" opacity="0.4" />`;
+            svgContent += `<path d="${p.pathD}" fill="none" stroke="${link.color}" stroke-width="3" stroke-linecap="round" class="cable-flow" />`;
+            
+            if (link.label) {
+                // RUMUSAN BARU: Lebar kotak otomatis mengikuti jumlah karakter + ekstra margin yang sangat lega
+                const labelWidth = link.label.length * 8 + 20; 
+                const offsetY = link.labelOffsetY || 0; 
+                svgContent += `
+                    <rect class="cable-label-bg" x="${p.labelX - labelWidth/2}" y="${p.labelY - 14 + offsetY}" width="${labelWidth}" height="28" rx="14" stroke="${link.color}" />
+                    <text class="cable-label-text" x="${p.labelX}" y="${p.labelY + offsetY}" dominant-baseline="central" alignment-baseline="central">${link.label}</text>
+                `;
+            }
+        });
+        svg.innerHTML = svgContent;
+    }
+
+    const slider = document.getElementById('diagram-container');
+    let isDown = false, startX, startY, scrollLeft, scrollTop;
+
+    slider.addEventListener('mousedown', (e) => {
+        isDown = true; startX = e.pageX - slider.offsetLeft; startY = e.pageY - slider.offsetTop; scrollLeft = slider.scrollLeft; scrollTop = slider.scrollTop;
+    });
+    slider.addEventListener('mouseleave', () => { isDown = false; });
+    slider.addEventListener('mouseup', () => { isDown = false; });
+    slider.addEventListener('mousemove', (e) => {
+        if (!isDown) return; e.preventDefault(); slider.scrollLeft = scrollLeft - (e.pageX - slider.offsetLeft - startX) * 1.5; slider.scrollTop = scrollTop - (e.pageY - slider.offsetTop - startY) * 1.5;
+    });
+
+    window.onload = () => { setTimeout(drawConnections, 100); };
+    window.onresize = drawConnections;
+</script>

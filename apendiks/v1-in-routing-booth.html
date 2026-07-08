@@ -167,7 +167,6 @@ location: "JW-08 & JW-01"
     .ico { width: 18px; height: 18px; margin-right: 8px; flex-shrink: 0; vertical-align: text-bottom; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 </style>
 
-<!-- SVGs Kumpulan Ikon -->
 <svg style="display:none;">
     <defs>
         <g id="i-tv"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect><polyline points="17 2 12 7 7 2"></polyline></g>
@@ -194,20 +193,25 @@ location: "JW-08 & JW-01"
 
     <div class="diagram-board">
         
-        <!-- KOLOM 1: PTZ CONTROLLER -->
         <div class="column">
-            <!-- Jarak margin diperkecil sedikit karena ada Audio Dist. di bawahnya -->
-            <div class="node type-lpt border-lan" style="margin-top: 310px;"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-mix"></use></svg>PTZ Controller</h4><p>Joystick Control</p></div>
+            <div class="node type-lpt border-lan" style="margin-top: 225px;"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-mix"></use></svg>PTZ Controller 1</h4><p>Joystick Control</p></div>
                 <div class="node-ports"><div class="ports-left"></div>
                     <div class="ports-right">
-                        <div class="port-row"><span class="port-label">LAN 1 OUT</span><div class="dot" id="ctrl-o1"></div></div>
-                        <div class="port-row"><span class="port-label">LAN 2 OUT</span><div class="dot" id="ctrl-o2"></div></div>
+                        <div class="port-row"><span class="port-label">LAN OUT</span><div class="dot" id="ctrl1-o1"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="node type-lpt border-lan" style="margin-top: 5px;"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-mix"></use></svg>PTZ Controller 2</h4><p>Joystick Control</p></div>
+                <div class="node-ports"><div class="ports-left"></div>
+                    <div class="ports-right">
+                        <div class="port-row"><span class="port-label">LAN 1 OUT</span><div class="dot" id="ctrl2-o1"></div></div>
+                        <div class="port-row"><span class="port-label">LAN 2 OUT</span><div class="dot" id="ctrl2-o2"></div></div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- KOLOM 2: INPUT DEVICES & AUDIO DISTRIBUTOR -->
         <div class="column">
             <div class="node type-lpt border-hdmi"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-lpt"></use></svg>Laptop Utama</h4></div>
                 <div class="node-ports"><div class="ports-left"></div>
@@ -235,8 +239,14 @@ location: "JW-08 & JW-01"
                 </div>
             </div>
 
-            <!-- NODE BARU: AUDIO DISTRIBUTOR -->
-            <div class="node type-aud border-aud"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-mic"></use></svg>Audio Distributor</h4><p>Behringer Splitter MX882</p></div>
+            <div class="node type-cam border-sdi"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-cam"></use></svg>Kamera PTZ 3</h4><p>Hanya untuk Baptisan</p></div>
+                <div class="node-ports">
+                    <div class="ports-left"><div class="port-row"><div class="dot" id="ptz3-lan"></div><span class="port-label">LAN IN</span></div></div>
+                    <div class="ports-right"><div class="port-row"><span class="port-label">SDI OUT</span><div class="dot" id="ptz3-sdi"></div></div></div>
+                </div>
+            </div>
+
+            <div class="node type-aud border-aud"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-mic"></use></svg>Audio Distributor</h4><p>Press Box / External Feed</p></div>
                 <div class="node-ports">
                     <div class="ports-left"></div>
                     <div class="ports-right"><div class="port-row"><span class="port-label">XLR OUT</span><div class="dot" id="ad-out"></div></div></div>
@@ -244,7 +254,6 @@ location: "JW-08 & JW-01"
             </div>
         </div>
 
-        <!-- KOLOM 3: SWITCHER INDUK -->
         <div class="column" style="justify-content: flex-start;">
             <div class="node rack-core">
                 <div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-mix"></use></svg>ATEM Television Studio HD</h4><p>Pusat Video Switcher</p></div>
@@ -255,8 +264,8 @@ location: "JW-08 & JW-01"
                         <div style="height: 15px;"></div> 
                         <div class="port-row"><div class="dot" id="atem-i5"></div><span class="port-label">IN 5 (PTZ 1)</span></div>
                         <div class="port-row"><div class="dot" id="atem-i6"></div><span class="port-label">IN 6 (PTZ 2)</span></div>
+                        <div class="port-row"><div class="dot" id="atem-i7"></div><span class="port-label">IN 7 (PTZ 3)</span></div>
                         <div style="height: 15px;"></div> 
-                        <!-- PORT BARU UNTUK INPUT AUDIO XLR -->
                         <div class="port-row"><div class="dot" id="atem-xlr1"></div><span class="port-label">IN XLR 1 (Audio)</span></div>
                     </div>
                     <div class="ports-right">
@@ -264,15 +273,13 @@ location: "JW-08 & JW-01"
                         <div class="port-row"><span class="port-label">OUT 6 (Ke VP 2)</span><div class="dot" id="atem-o6"></div></div>
                         <div style="height: 15px;"></div>
                         <div class="port-row"><span class="port-label">OUT 7 (PGM Utama)</span><div class="dot" id="atem-o7"></div></div>
-                        <div style="height: 60px;"></div> <!-- Spacer ekstra agar selaras dengan input audio di seberangnya -->
-                        <div class="port-row"><span class="port-label">SDI Multiview</span><div class="dot" id="atem-smv"></div></div>
+                        <div style="height: 100px;"></div> <div class="port-row"><span class="port-label">SDI Multiview</span><div class="dot" id="atem-smv"></div></div>
                         <div class="port-row"><span class="port-label">HDMI Multiview</span><div class="dot" id="atem-hmv"></div></div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- KOLOM 4: PROCESSORS & MAIN DIST (100% SEJAJAR) -->
         <div class="column">
             <div class="node type-proc border-lan"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-cpu"></use></svg>Video Processor 1</h4></div>
                 <div class="node-ports">
@@ -302,9 +309,7 @@ location: "JW-08 & JW-01"
                 </div>
             </div>
             
-            <div style="height: 50px;"></div>
-
-            <div class="node type-proc border-hdmi"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-cpu"></use></svg>Converter SDI to HDMI</h4></div>
+            <div style="height: 60px;"></div> <div class="node type-proc border-hdmi"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-cpu"></use></svg>Converter SDI to HDMI</h4></div>
                 <div class="node-ports">
                     <div class="ports-left"><div class="port-row"><div class="dot" id="mcmv-in"></div><span class="port-label">SDI IN</span></div></div>
                     <div class="ports-right"><div class="port-row"><span class="port-label">HDMI OUT</span><div class="dot" id="mcmv-hdmi"></div></div></div>
@@ -316,7 +321,6 @@ location: "JW-08 & JW-01"
             </div>
         </div>
 
-        <!-- KOLOM 5: OUTPUT TAHAP 1 -->
         <div class="column">
             <div class="node type-mon border-lan" style="padding-bottom:0;"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-mon"></use></svg>LED Wall Kiri (1)</h4></div>
                 <div class="node-ports"><div class="ports-left"><div class="port-row"><div class="dot" id="led1-lan"></div><span class="port-label">LAN IN</span></div></div><div class="ports-right"></div></div>
@@ -362,14 +366,11 @@ location: "JW-08 & JW-01"
                 </div>
             </div>
             
-            <div style="height: 10px;"></div>
-
-            <div class="node type-mon border-hdmi"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-mon"></use></svg>Monitor Kamera PTZ</h4><p>Multiview</p></div>
+            <div style="height: 45px;"></div> <div class="node type-mon border-hdmi"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-mon"></use></svg>Monitor Kamera PTZ</h4><p>Multiview</p></div>
                 <div class="node-ports"><div class="ports-left"><div class="port-row"><div class="dot" id="mcam-in"></div><span class="port-label">HDMI IN</span></div></div><div class="ports-right"></div></div>
             </div>
         </div>
 
-        <!-- KOLOM 6: LAPTOP STREAM & TV TAHAP 1 -->
         <div class="column">
             <div style="height: 350px;"></div> 
             
@@ -392,12 +393,11 @@ location: "JW-08 & JW-01"
                 </div>
             </div>
 
-            <div class="node type-tv border-sdi"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-tv"></use></svg>TV Area P3K</h4></div><div class="node-ports"><div class="ports-left"><div class="port-row"><div class="dot" id="tvp-in"></div><span class="port-label">SDI IN</span></div></div><div class="ports-right"></div></div></div>
+            <div class="node type-tv border-sdi"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-tv"></use></svg>TV Ruang P3K (B6)</h4></div><div class="node-ports"><div class="ports-left"><div class="port-row"><div class="dot" id="tvp-in"></div><span class="port-label">SDI IN</span></div></div><div class="ports-right"></div></div></div>
             
-            <div class="node type-tv border-sdi"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-tv"></use></svg>TV Ruang Ibu & Anak (B5)</h4></div><div class="node-ports"><div class="ports-left"><div class="port-row"><div class="dot" id="tvi-in"></div><span class="port-label">SDI IN</span></div></div><div class="ports-right"></div></div></div>
+            <div class="node type-tv border-sdi"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-tv"></use></svg>TV Ruang Ibu & Anak</h4></div><div class="node-ports"><div class="ports-left"><div class="port-row"><div class="dot" id="tvi-in"></div><span class="port-label">SDI IN</span></div></div><div class="ports-right"></div></div></div>
         </div>
 
-        <!-- KOLOM 7: TV B DAN DISTRIBUSI LORONG A -->
         <div class="column">
             <div style="height: 605px;"></div> 
             
@@ -418,7 +418,6 @@ location: "JW-08 & JW-01"
             </div>
         </div>
 
-        <!-- KOLOM 8: FINAL TV LORONG A -->
         <div class="column">
             <div style="height: 840px;"></div> 
             
@@ -434,48 +433,57 @@ location: "JW-08 & JW-01"
 
 <script>
     const cables = [
-        // KABEL AUDIO DISTRIBUTOR KE ATEM SWITCHER
-        { from: 'ad-out', to: 'atem-xlr1', label: 'XLR', color: 'var(--c-aud)' },
+        // AUDIO DISTRIBUTOR
+        { from: 'ad-out', to: 'atem-xlr1', label: 'XLR Audio', color: 'var(--c-aud)' },
 
-        // KABEL LAINNYA
+        // CONTROLLERS
+        { from: 'ctrl1-o1', to: 'ptz1-lan', label: 'LAN', color: 'var(--c-lan)' },
+        { from: 'ctrl2-o1', to: 'ptz2-lan', label: 'LAN', color: 'var(--c-lan)' },
+        { from: 'ctrl2-o2', to: 'ptz3-lan', label: 'LAN', color: 'var(--c-lan)' },
+
+        // INPUTS
         { from: 'lu-out', to: 'atem-i1', label: 'HDMI', color: 'var(--c-hdmi)' },
         { from: 'lb-out', to: 'atem-i2', label: 'HDMI', color: 'var(--c-hdmi)' },
-        { from: 'ctrl-o1', to: 'ptz1-lan', label: 'LAN', color: 'var(--c-lan)' },
-        { from: 'ctrl-o2', to: 'ptz2-lan', label: 'LAN', color: 'var(--c-lan)' },
-
         { from: 'ptz1-sdi', to: 'atem-i5', label: 'SDI', color: 'var(--c-sdi)' },
         { from: 'ptz2-sdi', to: 'atem-i6', label: 'SDI', color: 'var(--c-sdi)' },
+        { from: 'ptz3-sdi', to: 'atem-i7', label: 'SDI', color: 'var(--c-sdi)' },
 
+        // SWITCHER OUT
         { from: 'atem-o5', to: 'vp1-in', label: 'SDI', color: 'var(--c-sdi)' },  
         { from: 'atem-o6', to: 'vp2-in', label: 'SDI', color: 'var(--c-sdi)' },  
         { from: 'atem-o7', to: 'd1-in', label: 'SDI', color: 'var(--c-sdi)' },
-        
         { from: 'atem-smv', to: 'mcmv-in', label: 'SDI', color: 'var(--c-sdi)' },
         { from: 'atem-hmv', to: 'msw-in', label: 'HDMI', color: 'var(--c-hdmi)' },
 
+        // PROCESSORS
         { from: 'vp1-out', to: 'led1-lan', label: 'LAN', color: 'var(--c-lan)' },
         { from: 'vp2-out', to: 'led2-lan', label: 'LAN', color: 'var(--c-lan)' },
-        
         { from: 'mcmv-hdmi', to: 'mcam-in', label: 'HDMI', color: 'var(--c-hdmi)' }, 
 
+        // DISTRIBUTOR 1
         { from: 'd1-o1', to: 'ez1-in', label: 'SDI', color: 'var(--c-sdi)' },
         { from: 'd1-o2', to: 'ez2-in', label: 'SDI', color: 'var(--c-sdi)' },
         { from: 'd1-o3', to: 'd2-in', label: 'SDI', color: 'var(--c-sdi)' },
         { from: 'd1-o4', to: 'd5-in', label: 'SDI', color: 'var(--c-sdi)' },
 
+        // CAPTURE
         { from: 'ez1-out', to: 'ls1-in', label: 'USB', color: 'var(--c-usb)' },
         { from: 'ez2-out', to: 'ls2-in', label: 'USB', color: 'var(--c-usb)' },
 
+        // DIST 2
         { from: 'd2-o1', to: 'tvt-in', label: 'SDI', color: 'var(--c-sdi)' },
         { from: 'd2-o2', to: 'd3-in', label: 'SDI', color: 'var(--c-sdi)' },
 
+        // DIST 5
         { from: 'd5-o1', to: 'tvp-in', label: 'SDI', color: 'var(--c-sdi)' },
         { from: 'd5-o2', to: 'tvi-in', label: 'SDI', color: 'var(--c-sdi)' },
 
+        // DIST 3
         { from: 'd3-o1', to: 'tvb1-in', label: 'SDI', color: 'var(--c-sdi)' },
         { from: 'd3-o2', to: 'tvb2-in', label: 'SDI', color: 'var(--c-sdi)' },
         { from: 'd3-o3', to: 'd4-in', label: 'SDI', color: 'var(--c-sdi)' },
 
+        // DIST 4
         { from: 'd4-o1', to: 'tva1-in', label: 'SDI', color: 'var(--c-sdi)' },
         { from: 'd4-o2', to: 'tva2-in', label: 'SDI', color: 'var(--c-sdi)' },
         { from: 'd4-o3', to: 'tva3-in', label: 'SDI', color: 'var(--c-sdi)' },

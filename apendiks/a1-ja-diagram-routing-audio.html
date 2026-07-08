@@ -5,7 +5,7 @@ location: "JA-01"
 
 <style>
     /* ====================================================
-       SISTEM WARNA SCHEMATIC
+       SISTEM WARNA SCHEMATIC - AUDIO (AUTO DARK MODE)
        ==================================================== */
     :root {
         --c-mic: #10b981;
@@ -14,48 +14,98 @@ location: "JA-01"
         --c-tx: #f59e0b;
         --c-split: #ef4444;
         --c-dlms: #3b82f6;
-        --c-spk: #64748b;
     }
 
-    /* KANVAS EMBEDDED */
+    /* 1. CSS VARIABLES (Mode Terang - Default) */
     .diagram-wrapper {
+        --c-spk: #64748b; /* Warna kabel speaker */
+        
+        --dw-bg: #f8fafc;
+        --dw-dot: #cbd5e1;
+        --dw-node-bg: #ffffff;
+        --dw-border: #cbd5e1;
+        --dw-text: #0f172a;
+        --dw-text-muted: #475569;
+        --dw-label-bg: rgba(255, 255, 255, 0.95);
+        --dw-rack-bg: #1e293b;
+        --dw-rack-border: #0f172a;
+        --dw-rack-text: #f8fafc;
+        --dw-zone-bg: rgba(100,116,139,0.03);
+        --dw-zone-border: #94a3b8;
+        --dw-spk-bg: #1e293b;
+        --dw-spk-border: #475569;
+        --dw-watt-bg: #f1f5f9;
+        --dw-shadow: rgba(0,0,0,0.05);
+
         position: relative; 
         width: 100%; 
         height: calc(100vh - 100px); 
         min-height: 600px;
         max-height: 900px;
-        background-color: #f8fafc;
-        background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
+        background-color: var(--dw-bg);
+        background-image: radial-gradient(var(--dw-dot) 1.5px, transparent 1.5px);
         background-size: 30px 30px; 
         overflow: auto; 
         cursor: grab;
         border-radius: 12px; 
-        border: 1px solid #cbd5e1;
+        border: 1px solid var(--dw-border);
         margin: 20px auto; 
         font-family: 'Segoe UI', system-ui, sans-serif;
         box-shadow: inset 0 0 20px rgba(0,0,0,0.03);
+        transition: background-color 0.4s ease, border-color 0.4s ease;
     }
+
+    /* 2. TRIGGER DARK MODE (Terdeteksi Otomatis) */
+    html.dark .diagram-wrapper,
+    html.dark-mode .diagram-wrapper,
+    html[data-theme="dark"] .diagram-wrapper,
+    html[data-bs-theme="dark"] .diagram-wrapper,
+    body.dark .diagram-wrapper,
+    body.dark-mode .diagram-wrapper,
+    .dark-mode .diagram-wrapper,
+    .dark-theme .diagram-wrapper {
+        --c-spk: #cbd5e1; /* Kabel speaker dibuat lebih terang */
+        
+        --dw-bg: #020617;
+        --dw-dot: #1e293b;
+        --dw-node-bg: #0f172a;
+        --dw-border: #334155;
+        --dw-text: #f8fafc;
+        --dw-text-muted: #94a3b8;
+        --dw-label-bg: rgba(15, 23, 42, 0.95);
+        --dw-rack-bg: #000000;
+        --dw-rack-border: #1e293b;
+        --dw-rack-text: #f8fafc;
+        --dw-zone-bg: rgba(15, 23, 42, 0.4);
+        --dw-zone-border: #475569;
+        --dw-spk-bg: #000000;
+        --dw-spk-border: #334155;
+        --dw-watt-bg: #1e293b;
+        --dw-shadow: rgba(0,0,0,0.4);
+    }
+
     .diagram-wrapper:active { cursor: grabbing; }
     .diagram-wrapper #svg-canvas { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 10; }
     
     .diagram-wrapper .cable-flow { stroke-dasharray: 10, 10; animation: flowAnim 1s linear infinite; }
     @keyframes flowAnim { from { stroke-dashoffset: 20; } to { stroke-dashoffset: 0; } }
     
-    .diagram-wrapper .cable-label-bg { fill: #ffffff; stroke-width: 2.5; }
+    .diagram-wrapper .cable-label-bg { fill: var(--dw-label-bg); stroke-width: 2.5; transition: fill 0.4s ease, stroke 0.4s ease; }
     .diagram-wrapper .cable-label-text { 
-        fill: #0f172a; stroke: none !important; 
+        fill: var(--dw-text); stroke: none !important; 
         font-size: 12px; font-weight: 800; text-anchor: middle; 
+        transition: fill 0.4s ease;
     }
 
-    /* ANIMASI KOTAK DELAY */
+    /* ANIMASI KOTAK DELAY (Diperbaiki agar ramah Dark Mode) */
     @keyframes flashDelayBorder {
-        0%, 100% { border-color: #ef4444; background: #fff5f5; box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); }
-        50% { border-color: #fca5a5; background: #ffffff; box-shadow: 0 0 2px rgba(239, 68, 68, 0.1); }
+        0%, 100% { border-color: #ef4444; box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); }
+        50% { border-color: rgba(239, 68, 68, 0.2); box-shadow: 0 0 2px rgba(239, 68, 68, 0.1); }
     }
     .diagram-wrapper .node.is-delayed { animation: flashDelayBorder 1.2s infinite ease-in-out; }
     @keyframes flashDelayTag {
         0%, 100% { background-color: #ef4444; color: #ffffff; }
-        50% { background-color: #fee2e2; color: #991b1b; }
+        50% { background-color: #7f1d1d; color: #fca5a5; }
     }
     .diagram-wrapper .tag-delay {
         position: absolute; top: -12px; right: 15px;
@@ -77,35 +127,41 @@ location: "JA-01"
 
     /* NODE KARTU */
     .diagram-wrapper .node {
-        position: relative; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        position: relative; border-radius: 8px; box-shadow: 0 4px 15px var(--dw-shadow);
         display: flex; align-items: center; padding: 12px 16px; gap: 15px;
-        background: #ffffff; border: 2px solid #cbd5e1; color: #0f172a;
+        background: var(--dw-node-bg); border: 2px solid var(--dw-border); color: var(--dw-text);
+        transition: transform 0.2s, background 0.4s ease, border-color 0.4s ease, color 0.4s ease;
     }
-    .diagram-wrapper .node:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); z-index: 30; }
+    .diagram-wrapper .node:hover { transform: translateY(-3px); box-shadow: 0 8px 25px var(--dw-shadow); z-index: 30; }
 
     .diagram-wrapper .style-input { border-left: 6px solid var(--c-mic); }
     .diagram-wrapper .style-media { border-left: 6px solid var(--c-media); }
     .diagram-wrapper .style-rack {
-        background: #1e293b !important; color: #f8fafc !important; border: 2px solid #0f172a !important;
-        border-left: 14px solid #334155 !important; border-right: 14px solid #334155 !important;
+        background: var(--dw-rack-bg) !important; 
+        color: var(--dw-rack-text) !important; 
+        border: 2px solid var(--dw-rack-border) !important;
+        border-left: 14px solid #334155 !important; 
+        border-right: 14px solid #334155 !important;
+        transition: background 0.4s ease, border-color 0.4s ease, color 0.4s ease !important;
     }
 
     .diagram-wrapper .node-icon { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; background: rgba(100,116,139,0.1); border-radius: 8px; flex-shrink: 0; }
     .diagram-wrapper .node-info { display: flex; flex-direction: column; gap: 4px; flex: 1; }
     .diagram-wrapper .node-info h4 { margin: 0; font-size: 13px; font-weight: 700; }
     .diagram-wrapper .node-info p { margin: 0; font-size: 11px; opacity: 0.85; font-family: monospace; }
-    .style-rack .node-info p { color: #cbd5e1; }
+    .style-rack .node-info p { color: #94a3b8; }
 
-    /* SISTEM TERMINAL PORT (PIN COLOKAN) */
+    /* SISTEM TERMINAL PORT */
     .diagram-wrapper .tp {
-        width: 12px; height: 12px; background: #ffffff; border: 3px solid #0f172a;
-        border-radius: 50%; position: absolute; z-index: 15; transition: 0.3s;
+        width: 12px; height: 12px; background: var(--dw-node-bg); border: 3px solid var(--dw-text);
+        border-radius: 50%; position: absolute; z-index: 15; transition: all 0.3s ease;
     }
     .diagram-wrapper .tp:hover { background: #ef4444; transform: scale(1.3); }
     
     .diagram-wrapper .tp::after {
         content: attr(data-label); position: absolute; font-size: 10px; font-weight: 800;
-        font-family: monospace; color: #475569; white-space: nowrap; pointer-events: none;
+        font-family: monospace; color: var(--dw-text-muted); white-space: nowrap; pointer-events: none;
+        transition: color 0.4s ease;
     }
     .style-rack .tp::after { color: #94a3b8; }
 
@@ -117,36 +173,33 @@ location: "JA-01"
 
     /* ZONA SPEAKER LAPANGAN */
     .diagram-wrapper .zone-group {
-        display: flex; flex-direction: column; gap: 15px; background: rgba(100,116,139,0.03);
-        padding: 15px 25px 25px 25px; border-radius: 12px; border: 1px dashed #94a3b8; position: relative;
+        display: flex; flex-direction: column; gap: 15px; 
+        background: var(--dw-zone-bg);
+        padding: 15px 25px 25px 25px; border-radius: 12px; 
+        border: 1px dashed var(--dw-zone-border); position: relative;
+        transition: background 0.4s ease, border-color 0.4s ease;
     }
-    .diagram-wrapper .zone-title { font-size: 12px; font-weight: 800; border-bottom: 2px solid var(--c-spk); padding-bottom: 5px; display: inline-block; }
+    .diagram-wrapper .zone-title { font-size: 12px; font-weight: 800; border-bottom: 2px solid var(--c-spk); padding-bottom: 5px; display: inline-block; color: var(--dw-text); transition: color 0.4s ease;}
     .diagram-wrapper .speaker-row { display: flex; flex-direction: row; gap: 40px; align-items: center; }
 
     .diagram-wrapper .spk-unit {
-        width: 36px; height: 54px; background: #1e293b; border-radius: 5px; position: relative; border: 2px solid #475569; z-index: 20;
+        width: 36px; height: 54px; background: var(--dw-spk-bg); border-radius: 5px; position: relative; border: 2px solid var(--dw-spk-border); z-index: 20;
+        transition: background 0.4s ease, border-color 0.4s ease;
     }
     
-    /* LABEL WATT PADA SPEAKER */
     .diagram-wrapper .watt-label {
-        position: absolute;
-        bottom: -22px;
-        left: 50%;
-        transform: translateX(-50%);
-        font-size: 10px;
-        font-weight: 800;
-        color: #0f172a;
-        background: #f1f5f9;
-        padding: 2px 6px;
-        border-radius: 4px;
-        border: 1px solid #cbd5e1;
-        white-space: nowrap;
+        position: absolute; bottom: -22px; left: 50%; transform: translateX(-50%);
+        font-size: 10px; font-weight: 800; color: var(--dw-text);
+        background: var(--dw-watt-bg); padding: 2px 6px; border-radius: 4px;
+        border: 1px solid var(--dw-border); white-space: nowrap;
+        transition: background 0.4s ease, color 0.4s ease, border-color 0.4s ease;
     }
 
     .diagram-wrapper .foh-array-stack {
-        display: flex; flex-direction: column; gap: 2px; align-items: center; background: #1e293b; padding: 5px; border-radius: 6px; border: 2px solid #be123c; z-index: 20;
+        display: flex; flex-direction: column; gap: 2px; align-items: center; background: var(--dw-spk-bg); padding: 5px; border-radius: 6px; border: 2px solid #be123c; z-index: 20;
+        transition: background 0.4s ease;
     }
-    .diagram-wrapper .array-module { width: 50px; height: 16px; background: #0f172a; border-radius: 3px; }
+    .diagram-wrapper .array-module { width: 50px; height: 16px; background: #000000; border-radius: 3px; }
 
     .diagram-wrapper .node-icon svg { width: 24px; height: 24px; stroke: currentColor; stroke-width: 2; fill: none; }
     
@@ -417,35 +470,26 @@ location: "JA-01"
 
 <script>
     const cables = [
-        // Mic -> Snake Box Pins
         { from: 't-m1-out', to: 't-sb-m1', label: 'XLR', color: 'var(--c-mic)' },
         { from: 't-m2-out', to: 't-sb-m2', label: 'XLR', color: 'var(--c-mic)' },
         { from: 't-m3-out', to: 't-sb-m3', label: 'XLR', color: 'var(--c-mic)' },
         { from: 't-m4-out', to: 't-sb-m4', label: 'XLR', color: 'var(--c-mic)' },
         
-        // Snake Box -> Mixer (4 Kabel Individual)
         { from: 't-sb-o1', to: 't-mix-i1', label: 'CH 1', color: 'var(--c-mic)' },
         { from: 't-sb-o2', to: 't-mix-i2', label: 'CH 2', color: 'var(--c-mic)' },
         { from: 't-sb-o3', to: 't-mix-i3', label: 'CH 3', color: 'var(--c-mic)' },
         { from: 't-sb-o4', to: 't-mix-i4', label: 'CH 4', color: 'var(--c-mic)' },
         
-        // Media -> Mixer (Pemisahan L/R Diskret ke Mono TRS)
         { from: 't-mu-L', to: 't-mix-i5', label: 'CH 5 (Main)', color: 'var(--c-media)' },
         { from: 't-mu-R', to: 't-mix-i6', label: 'CH 6 (Audio Desc)', color: 'var(--c-media)' },
         { from: 't-mb-L', to: 't-mix-i7', label: 'CH 7 (Main)', color: 'var(--c-media)' },
         { from: 't-mb-R', to: 't-mix-i8', label: 'CH 8 (Audio Desc)', color: 'var(--c-media)' },
         
-        // ==============================================
-        // UPDATE: Mixer -> Audio Isolator (Kolom 4) -> FM Tx (Kolom 5)
-        // Kabel ditarik lurus dengan sedikit offset siku.
-        // ==============================================
         { from: 't-mix-grp1', to: 't-iso-inL', label: 'Dual TRS to TRS', color: 'var(--c-tx)', route: 'elbow', xOffset: 50, labelOffsetY: -15 },
         { from: 't-mix-grp2', to: 't-iso-inR', color: 'var(--c-tx)', route: 'elbow', xOffset: 65 },
 
-        // Menggabungkan 2 kabel dari Isolator menjadi 1 titik masuk di FM Transmitter (yang kini ada di kanannya)
         { from: 't-iso-outL', to: 't-tx-in', label: 'TRS L/R to 3,5mm', color: 'var(--c-tx)', route: 'elbow', xOffset: 80, labelOffsetY: -15 },
         { from: 't-iso-outR', to: 't-tx-in', color: 'var(--c-tx)', route: 'elbow', xOffset: 100 },
-        // ==============================================
 
         { from: 't-mix-mainL', to: 't-geq-inL', label: 'Stereo Out L/R', color: 'var(--c-mix)' },
         { from: 't-mix-mainR', to: 't-geq-inR', color: 'var(--c-mix)' },
@@ -453,7 +497,6 @@ location: "JA-01"
         { from: 't-geq-outL', to: 't-dlms-inL', label: 'XLR L/R', color: 'var(--c-mix)' },
         { from: 't-geq-outR', to: 't-dlms-inR', color: 'var(--c-mix)' },
         
-        // DLMS -> Amps (Bawah), Splitter (Samping)
         { from: 't-dlms-o5', to: 't-split-inL', label: 'Out 5/6: XLR', color: 'var(--c-dlms)', route: 'elbow', xOffset: 35 },
         { from: 't-dlms-o6', to: 't-split-inR', color: 'var(--c-dlms)', route: 'elbow', xOffset: 45 },
         
@@ -461,21 +504,17 @@ location: "JA-01"
         { from: 't-dlms-o2', to: 't-az4-in', label: 'Out 2: XLR to RCA', color: 'var(--c-dlms)', route: 'elbow', xOffset: 65 },
         { from: 't-dlms-o3', to: 't-az5-in', label: 'Out 3: XLR to RCA', color: 'var(--c-dlms)', route: 'elbow', xOffset: 95 },
 
-        // JALUR TOL ATAS: Splitter Return L/R kembali ke Snake Box 
         { from: 't-split-retL', to: 't-sb-retL', label: 'Main Out L (Snake)', color: 'var(--c-split)', route: 'return-top', yOffset: 45 },
         { from: 't-split-retR', to: 't-sb-retR', label: 'Main Out R (Snake)', color: 'var(--c-split)', route: 'return-top', yOffset: 25 },
         
-        // JALUR TOL BAWAH: Dari Snake Box bypass langsung ke Ampli PROTEA 
         { from: 't-sb-protL', to: 't-ap1-in', label: 'XLR L', color: 'var(--c-split)', route: 'under', underOffset: 120 },
         { from: 't-sb-protR', to: 't-ap2-in', label: 'XLR R', color: 'var(--c-split)', route: 'under', underOffset: 95 },
 
-        // Splitter -> Amps & Video Switcher
         { from: 't-split-o1', to: 't-az1-in', label: 'Out 1: XLR to RCA', color: 'var(--c-split)', route: 'elbow', xOffset: 50 },
         { from: 't-split-o2', to: 't-az2-in', label: 'Out 2: XLR to RCA', color: 'var(--c-split)' }, 
         { from: 't-split-o3', to: 't-az6-in', label: 'Out 3: XLR to RCA', color: 'var(--c-split)', route: 'elbow', xOffset: 80 },
         { from: 't-split-o4', to: 't-vd-in', label: 'Out 4: XLR to Video Switcher', color: 'var(--c-media)', route: 'elbow', xOffset: 30 },
         
-        // Amps -> Speakers Pertama (Jalur Input Speaker)
         { from: 't-ap1-out', to: 't-spk-fl', label: 'SpeakON', color: 'var(--c-spk)', route: 'elbow', xOffset: 40, dual: true },
         { from: 't-ap2-out', to: 't-spk-fr', label: 'SpeakON', color: 'var(--c-spk)', route: 'elbow', xOffset: 80, dual: true },
         { from: 't-az1-out', to: 't-spk-1', label: '100V Line', color: 'var(--c-spk)', dual: true },
@@ -485,18 +524,17 @@ location: "JA-01"
         { from: 't-az5-out', to: 't-spk-5', label: '100V Line', color: 'var(--c-spk)', dual: true },
         { from: 't-az6-out', to: 't-spk-6', label: '100V Line', color: 'var(--c-spk)', dual: true },
 
-        // Jumper Paralel Antar Speaker (Disusun Menyambung Lurus)
-        { from: 'z1-1', to: 'z1-2', color: '#94a3b8', dual: true, route: 'jumper' },
-        { from: 'z1-2', to: 'z1-3', color: '#94a3b8', dual: true, route: 'jumper' },
-        { from: 'z2-1', to: 'z2-2', color: '#94a3b8', dual: true, route: 'jumper' },
-        { from: 'z3-1', to: 'z3-2', color: '#94a3b8', dual: true, route: 'jumper' },
-        { from: 'z3-2', to: 'z3-3', color: '#94a3b8', dual: true, route: 'jumper' },
-        { from: 'z4-1', to: 'z4-2', color: '#94a3b8', dual: true, route: 'jumper' },
-        { from: 'z4-2', to: 'z4-3', color: '#94a3b8', dual: true, route: 'jumper' },
-        { from: 'z4-3', to: 'z4-4', color: '#94a3b8', dual: true, route: 'jumper' },
-        { from: 'z4-4', to: 'z4-5', color: '#94a3b8', dual: true, route: 'jumper' },
-        { from: 'z5-1', to: 'z5-2', color: '#94a3b8', dual: true, route: 'jumper' },
-        { from: 'z6-1', to: 'z6-2', color: '#94a3b8', dual: true, route: 'jumper' }
+        { from: 'z1-1', to: 'z1-2', color: 'var(--c-spk)', dual: true, route: 'jumper' },
+        { from: 'z1-2', to: 'z1-3', color: 'var(--c-spk)', dual: true, route: 'jumper' },
+        { from: 'z2-1', to: 'z2-2', color: 'var(--c-spk)', dual: true, route: 'jumper' },
+        { from: 'z3-1', to: 'z3-2', color: 'var(--c-spk)', dual: true, route: 'jumper' },
+        { from: 'z3-2', to: 'z3-3', color: 'var(--c-spk)', dual: true, route: 'jumper' },
+        { from: 'z4-1', to: 'z4-2', color: 'var(--c-spk)', dual: true, route: 'jumper' },
+        { from: 'z4-2', to: 'z4-3', color: 'var(--c-spk)', dual: true, route: 'jumper' },
+        { from: 'z4-3', to: 'z4-4', color: 'var(--c-spk)', dual: true, route: 'jumper' },
+        { from: 'z4-4', to: 'z4-5', color: 'var(--c-spk)', dual: true, route: 'jumper' },
+        { from: 'z5-1', to: 'z5-2', color: 'var(--c-spk)', dual: true, route: 'jumper' },
+        { from: 'z6-1', to: 'z6-2', color: 'var(--c-spk)', dual: true, route: 'jumper' }
     ];
 
     function createPathD(x1, y1, x2, y2, link, gridH) {
@@ -590,8 +628,8 @@ location: "JA-01"
             
             paths.forEach(d => {
                 const zClass = link.route === 'jumper' ? 'z-index: 1;' : '';
-                svgContent += `<path d="${d}" fill="none" stroke="${link.color}" stroke-width="6" stroke-linecap="round" opacity="0.4" style="${zClass}" />`;
-                svgContent += `<path d="${d}" fill="none" stroke="${link.color}" stroke-width="3" stroke-linecap="round" class="cable-flow" style="${zClass}" />`;
+                svgContent += `<path d="${d}" fill="none" stroke="${link.color}" stroke-width="6" stroke-linecap="round" opacity="0.4" style="transition: stroke 0.4s ease; ${zClass}" />`;
+                svgContent += `<path d="${d}" fill="none" stroke="${link.color}" stroke-width="3" stroke-linecap="round" class="cable-flow" style="transition: stroke 0.4s ease; ${zClass}" />`;
             });
                         
             if (link.label) {
@@ -599,8 +637,8 @@ location: "JA-01"
                 const offsetY = link.labelOffsetY || 0; 
 
                 svgContent += `
-                    <rect class="cable-label-bg" x="${finalLabelX - labelWidth/2}" y="${finalLabelY - 14 + offsetY}" width="${labelWidth}" height="28" rx="14" stroke="${link.color}" />
-                    <text class="cable-label-text" x="${finalLabelX}" y="${finalLabelY + offsetY}" dominant-baseline="central" alignment-baseline="central">${link.label}</text>
+                    <rect class="cable-label-bg" x="${finalLabelX - labelWidth/2}" y="${finalLabelY - 14 + offsetY}" width="${labelWidth}" height="28" rx="14" stroke="${link.color}" style="transition: fill 0.4s ease, stroke 0.4s ease;" />
+                    <text class="cable-label-text" x="${finalLabelX}" y="${finalLabelY + offsetY}" dominant-baseline="central" alignment-baseline="central" style="transition: fill 0.4s ease;">${link.label}</text>
                 `;
             }
         });
@@ -619,6 +657,11 @@ location: "JA-01"
         if (!isDown) return; e.preventDefault(); slider.scrollLeft = scrollLeft - (e.pageX - slider.offsetLeft - startX) * 1.5; slider.scrollTop = scrollTop - (e.pageY - slider.offsetTop - startY) * 1.5;
     });
 
-    window.onload = () => { setTimeout(drawConnections, 100); };
+    // Observer untuk memastikan kabel digambar ulang dan merespons ganti tema
+    const observer = new MutationObserver(() => drawConnections());
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class', 'data-theme', 'data-bs-theme'] });
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+
+    window.onload = () => { setTimeout(drawConnections, 300); };
     window.onresize = drawConnections;
 </script>

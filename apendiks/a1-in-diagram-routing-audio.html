@@ -328,21 +328,14 @@ location: "JW-08"
             <div class="tp tp-in" id="t-az5-in" style="top:50%; border-color:#ef4444;" data-label="IN"></div>
             <div class="tp tp-out" id="t-az5-out" style="top:50%;" data-label="OUT"></div>
         </div>
-        
-        <div class="node style-rack is-delayed" id="amp-za7" style="grid-area: 8 / 7;">
-            <div class="tag-delay">DELAY</div>
-            <div class="node-info"><h4>TOA ZA 2240</h4><p>Tower Delay 3</p></div>
-            <div class="tp tp-in" id="t-az7-in" style="top:50%; border-color:#ef4444;" data-label="IN"></div>
-            <div class="tp tp-out" id="t-az7-out" style="top:50%;" data-label="OUT"></div>
-        </div>
 
-        <div class="node style-rack" id="amp-za6" style="grid-area: 9 / 7;">
+        <div class="node style-rack" id="amp-za6" style="grid-area: 8 / 7;">
             <div class="node-info"><h4>TOA ZA 2240</h4><p>Ruang P3K</p></div>
             <div class="tp tp-in" id="t-az6-in" style="top:50%;" data-label="IN"></div>
             <div class="tp tp-out" id="t-az6-out" style="top:50%;" data-label="OUT"></div>
         </div>
         
-        <div class="node style-media" id="out-video" style="grid-area: 10 / 7;">
+        <div class="node style-media" id="out-video" style="grid-area: 9 / 7;">
             <div class="node-icon" style="color:var(--c-media);"><svg><rect x="1" y="5" width="15" height="14" rx="2"/></svg></div>
             <div class="node-info"><h4>Video Switcher</h4><p>ATEM Television Studio HD</p></div>
             <div class="tp tp-in" id="t-vd-in" style="top:50%; border-color:var(--c-media);" data-label="IN"></div>
@@ -405,19 +398,9 @@ location: "JW-08"
                 <div class="spk-unit" id="z5-4"><span class="watt-label">30W</span></div>
             </div>
         </div>
-        
-        <div class="zone-group" style="grid-area: 8 / 8;">
-            <div class="zone-title">Tower Delay 3 (TOA F-2000BM) - ZONA G</div>
-            <div class="speaker-row">
-                <div class="spk-unit" id="z7-1"><div class="tp tp-in" id="t-spk-7" style="top:50%;"></div><span class="watt-label">30W</span></div>
-                <div class="spk-unit" id="z7-2"><span class="watt-label">30W</span></div>
-                <div class="spk-unit" id="z7-3"><span class="watt-label">30W</span></div>
-                <div class="spk-unit" id="z7-4"><span class="watt-label">30W</span></div>
-            </div>
-        </div>
 
-        <div class="zone-group" style="grid-area: 9 / 8;">
-            <div class="zone-title">Ruang P3K (TOA F-2000BM) - ZONA H</div>
+        <div class="zone-group" style="grid-area: 8 / 8;">
+            <div class="zone-title">Ruang P3K (TOA F-2000BM) - ZONA G</div>
             <div class="speaker-row">
                 <div class="spk-unit" id="z6-1"><div class="tp tp-in" id="t-spk-6" style="top:50%;"></div><span class="watt-label">60W</span></div>
                 <div class="spk-unit" id="z6-2"><span class="watt-label">60W</span></div>
@@ -468,7 +451,6 @@ location: "JW-08"
         { from: 't-dlms-o1', to: 't-az3-in', label: 'Out 1: XLR to RCA', color: 'var(--c-dlms)' },
         { from: 't-dlms-o2', to: 't-az4-in', label: 'Out 2: XLR to RCA', color: 'var(--c-dlms)', route: 'elbow', xOffset: 65 },
         { from: 't-dlms-o3', to: 't-az5-in', label: 'Out 3: XLR to RCA', color: 'var(--c-dlms)', route: 'elbow', xOffset: 95 },
-        { from: 't-dlms-o4', to: 't-az7-in', label: 'Out 4: XLR to RCA', color: 'var(--c-dlms)', route: 'elbow', xOffset: 125 },
 
         // =================================================================
         // JALUR TOL ATAS: Splitter Return L/R kembali ke Snake Box 
@@ -497,7 +479,6 @@ location: "JW-08"
         { from: 't-az3-out', to: 't-spk-3', label: '100V Line', color: 'var(--c-spk)', dual: true },
         { from: 't-az4-out', to: 't-spk-4', label: '100V Line', color: 'var(--c-spk)', dual: true },
         { from: 't-az5-out', to: 't-spk-5', label: '100V Line', color: 'var(--c-spk)', dual: true },
-        { from: 't-az7-out', to: 't-spk-7', label: '100V Line', color: 'var(--c-spk)', dual: true },
         { from: 't-az6-out', to: 't-spk-6', label: '100V Line', color: 'var(--c-spk)', dual: true },
 
         // Jumper Paralel Antar Speaker (Disusun Menyambung Lurus)
@@ -518,11 +499,6 @@ location: "JW-08"
         { from: 'z5-1', to: 'z5-2', color: '#94a3b8', dual: true, route: 'jumper' },
         { from: 'z5-2', to: 'z5-3', color: '#94a3b8', dual: true, route: 'jumper' },
         { from: 'z5-3', to: 'z5-4', color: '#94a3b8', dual: true, route: 'jumper' },
-        
-        // Jumper Paralel Tower Delay 3
-        { from: 'z7-1', to: 'z7-2', color: '#94a3b8', dual: true, route: 'jumper' },
-        { from: 'z7-2', to: 'z7-3', color: '#94a3b8', dual: true, route: 'jumper' },
-        { from: 'z7-3', to: 'z7-4', color: '#94a3b8', dual: true, route: 'jumper' },
 
         { from: 'z6-1', to: 'z6-2', color: '#94a3b8', dual: true, route: 'jumper' }
     ];

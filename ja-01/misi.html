@@ -37,7 +37,7 @@ location: "JA-01"
       display: flex; align-items: center; gap: 5px; border: 1px solid #fecaca;
     }
 
-    /* TAMBAHAN: CSS UNTUK TOMBOL LAYOUT ZONA */
+    /* CSS UNTUK TOMBOL LAYOUT ZONA */
     .btn-layout {
       background: #3b82f6;
       color: #ffffff;
@@ -49,7 +49,7 @@ location: "JA-01"
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      margin-left: auto; /* Mendorong tombol ke kanan */
+      margin-left: auto;
       box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2);
       transition: background 0.3s;
     }
@@ -57,7 +57,7 @@ location: "JA-01"
       background: #2563eb;
     }
 
-    /* KARTU INFORMASI PERSONIL (DESAIN PROFESIONAL) */
+    /* KARTU INFORMASI PERSONIL */
     .info-card {
       background: #ffffff;
       border-left: 4px solid #3b82f6;
@@ -75,26 +75,161 @@ location: "JA-01"
     .info-label { font-weight: 700; color: #64748b; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
     .info-value { font-weight: 600; color: #0f172a; }
 
-    /* KARTU TUGAS & PERALATAN */
-    .task-item { display: flex; align-items: flex-start; gap: 15px; text-align: left; cursor: default; transition: 0.3s; }
-    .task-item input[type="checkbox"] { width: 22px; height: 22px; margin-top: 4px; accent-color: #059669; cursor: pointer; flex-shrink: 0; }
-    .task-content { flex: 1; min-width: 0; }
-    .task-content h3 { margin: 0 0 12px 0; font-size: 1.15rem; color: #1e293b; }
-    
-    .task-completed h3 { text-decoration: line-through; color: #94a3b8; }
-    
-    .tools-container { margin-bottom: 15px; padding-bottom: 12px; border-bottom: 1px dashed #cbd5e1; display: flex; flex-wrap: wrap; gap: 8px;}
-    .tool-badge { 
-      display: inline-flex; align-items: center; background: #f1f5f9; color: #334155; 
-      padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; 
-      font-weight: 700; border: 1px solid #e2e8f0; letter-spacing: 0.2px;
+    /* KARTU TUGAS TERSTRUKTUR (DESAIN BARU) */
+    .task-item { 
+      background: #ffffff;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      padding: 16px;
+      display: flex; 
+      flex-direction: column; 
+      gap: 12px; 
+      transition: all 0.3s ease; 
     }
-    
-    .steps-container { font-size: 0.95rem; line-height: 1.6; color: #444; margin-bottom: 15px; }
-    .steps-label { font-weight: 800; color: #0f172a; margin-bottom: 6px; display: block; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.5px;}
-    .task-meta { display: inline-block; padding: 5px 12px; background: #f8fafc; color: #475569; border-radius: 8px; font-size: 0.8rem; font-weight: bold; border: 1px solid #cbd5e1;}
+    .task-item:hover {
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      border-color: #cbd5e1;
+    }
+    .task-completed {
+      opacity: 0.65;
+      background: #f8fafc;
+    }
+    .task-completed h3 { text-decoration: line-through; color: #94a3b8; }
+
+    /* HEADER KARTU (JUDUL & ZONA) */
+    .task-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 15px;
+      border-bottom: 1px solid #f1f5f9;
+      padding-bottom: 12px;
+    }
+    .task-title-group {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      flex: 1;
+    }
+    .task-title-group input[type="checkbox"] { 
+      width: 24px; 
+      height: 24px; 
+      margin-top: 1px; 
+      accent-color: #059669; 
+      cursor: pointer; 
+      flex-shrink: 0; 
+    }
+    .task-title-group h3 { 
+      margin: 0; 
+      font-size: 1.15rem; 
+      color: #0f172a; 
+      line-height: 1.4;
+    }
+
+    /* BADGE ZONA SUPER JELAS */
+    .zone-badge {
+      background: #e0e7ff;
+      color: #3730a3;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      border: 1px solid #c7d2fe;
+      box-shadow: 0 2px 4px rgba(55, 48, 163, 0.1);
+      flex-shrink: 0;
+    }
+
+    /* KONTENER ALAT & KHUSUS KABEL */
+    .tools-container { 
+      display: flex; 
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 15px; 
+      padding-bottom: 12px; 
+      border-bottom: 1px dashed #cbd5e1; 
+    }
+    .tool-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .tool-group-label {
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .tool-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .tool-badge { 
+      display: inline-flex; 
+      align-items: center; 
+      background: #f1f5f9; 
+      color: #334155; 
+      padding: 6px 12px; 
+      border-radius: 8px; 
+      font-size: 0.85rem; 
+      font-weight: 600; 
+      border: 1px solid #e2e8f0; 
+    }
+    /* HIGHLIGHT KHUSUS KABEL */
+    .cable-badge {
+      background: #ecfdf5;
+      color: #065f46;
+      border-color: #a7f3d0;
+      font-weight: 700;
+      box-shadow: 0 2px 4px rgba(6, 95, 70, 0.05);
+    }
+
+    /* LANGKAH / INSTRUKSI KERJA */
+    .steps-container { 
+      font-size: 0.95rem; 
+      line-height: 1.6; 
+      color: #334155; 
+      background: #f8fafc;
+      padding: 12px 16px;
+      border-radius: 8px;
+      border-left: 4px solid #94a3b8;
+    }
+    .steps-label { 
+      font-weight: 800; 
+      color: #1e293b; 
+      margin-bottom: 8px; 
+      display: block; 
+      font-size: 0.9rem; 
+      text-transform: uppercase; 
+      letter-spacing: 0.5px;
+    }
+
+    /* FOOTER TUGAS (TARGET WAKTU) */
+    .task-footer {
+      display: flex;
+      justify-content: flex-start;
+      margin-top: 4px;
+    }
+    .task-meta { 
+      display: inline-flex; 
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px; 
+      background: #fff7ed; 
+      color: #c2410c; 
+      border-radius: 8px; 
+      font-size: 0.85rem; 
+      font-weight: 700; 
+      border: 1px solid #ffedd5;
+    }
+
     .loading-text { text-align: center; padding: 40px; color: #64748b; font-weight: bold; }
-    
     .task-img { width: 100%; max-width: 350px; border-radius: 12px; margin: 12px 0; display: block; border: 1px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
   </style>
 </head>
@@ -144,7 +279,6 @@ location: "JA-01"
       const teamNameStr = currentTeamId.replace(/-/g, ' ').toUpperCase();
       document.getElementById('team-title').innerText = "Tugas: " + teamNameStr;
 
-      // Hapus semua spasi dan tanda strip
       const normalizedCheck = currentTeamId.toLowerCase().replace(/[-\s]/g, '');
       
       let teamRoleName = "";
@@ -169,7 +303,6 @@ location: "JA-01"
         inventaris = "Emma";
         anggota = "Evan";
       } else {
-        // Fallback
         if (normalizedCheck === "ja01") {
           teamRoleName = "Tim Audio Kabel";
           kapten = "Anggid"; inventaris = "Peni"; anggota = "Naela, Sarah, Yonna";
@@ -182,7 +315,6 @@ location: "JA-01"
         }
       }
 
-      // TAMPILKAN KARTU PERSONIL
       if (kapten !== "") {
         document.getElementById('personnel-container').style.display = 'block';
         document.getElementById('personnel-container').innerHTML = `
@@ -219,7 +351,6 @@ location: "JA-01"
         const response = await fetch(APPS_SCRIPT_URL, { method: "GET", redirect: "follow" });
         const allTasks = await response.json();
         
-        // Pencarian URL vs Database
         const teamTasks = allTasks.filter(task => {
             const taskKodeNormalized = (task.kode || "").toLowerCase().replace(/[-\s]/g, '');
             const currentKodeNormalized = currentTeamId.toLowerCase().replace(/[-\s]/g, '');
@@ -249,7 +380,6 @@ location: "JA-01"
       tasks.sort((a, b) => parseInt(a.urutan) - parseInt(b.urutan));
       
       let apdSet = new Set(); 
-      // APD WAJIB DEFAULT
       apdSet.add('🥾 Sepatu Safety'); 
       apdSet.add('🧤 Sarung Tangan');
       apdSet.add('👷 Helm');
@@ -258,7 +388,7 @@ location: "JA-01"
         const isChecked = task.selesai ? 'checked' : '';
         const completedClass = task.selesai ? 'task-completed' : '';
         const card = document.createElement('div');
-        card.className = `mission-card task-item ${completedClass}`; 
+        card.className = `task-item ${completedClass}`; 
         card.id = `card-${task.row}`;
         
         let desc = task.deskripsi;
@@ -283,18 +413,37 @@ location: "JA-01"
               return item !== "" && !itemLower.includes('helm') && !itemLower.includes('sarung tangan') && !itemLower.includes('sepatu');
             });
 
-          const badgesHtml = alatArray.map(item => {
-            let icon = '🛠️';
-            let lowerItem = item.toLowerCase();
-            if(lowerItem.includes('kabel')) icon = '🔌';
-            else if(lowerItem.includes('speaker') || lowerItem.includes('array') || lowerItem.includes('toa')) icon = '🔊';
-            else if(lowerItem.includes('mic')) icon = '🎤';
-            else if(lowerItem.includes('baut') || lowerItem.includes('kunci')) icon = '🔧';
-            return `<span class="tool-badge">${icon} ${item}</span>`;
-          }).join('');
+          // PISAHKAN KABEL DAN PERALATAN LAINNYA
+          let cables = [];
+          let otherTools = [];
           
-          if (badgesHtml) {
-            toolsHtml = `<div class="tools-container">${badgesHtml}</div>`;
+          alatArray.forEach(item => {
+            if (item.toLowerCase().includes('kabel')) {
+              cables.push(item);
+            } else {
+              otherTools.push(item);
+            }
+          });
+
+          if (cables.length > 0 || otherTools.length > 0) {
+            let cablesHtml = cables.map(item => `<span class="tool-badge cable-badge">🔌 ${item}</span>`).join('');
+            let othersHtml = otherTools.map(item => {
+              let icon = '🛠️';
+              let lowerItem = item.toLowerCase();
+              if(lowerItem.includes('speaker') || lowerItem.includes('array') || lowerItem.includes('toa')) icon = '🔊';
+              else if(lowerItem.includes('mic')) icon = '🎤';
+              else if(lowerItem.includes('baut') || lowerItem.includes('kunci')) icon = '🔧';
+              return `<span class="tool-badge">${icon} ${item}</span>`;
+            }).join('');
+            
+            toolsHtml = `<div class="tools-container">`;
+            if (cables.length > 0) {
+               toolsHtml += `<div class="tool-group"><span class="tool-group-label">Kebutuhan Kabel:</span><div class="tool-items">${cablesHtml}</div></div>`;
+            }
+            if (otherTools.length > 0) {
+               toolsHtml += `<div class="tool-group"><span class="tool-group-label">Peralatan Lainnya:</span><div class="tool-items">${othersHtml}</div></div>`;
+            }
+            toolsHtml += `</div>`;
           }
           
           if (keywordSelanjutnya) {
@@ -306,13 +455,23 @@ location: "JA-01"
           }
         }
         
+        // STRUKTUR KARTU BARU (HEADER, BODY, FOOTER)
         card.innerHTML = `
-          <input type="checkbox" id="task-${task.row}" ${isChecked} onchange="updateTaskStatus(${task.row}, this.checked)">
-          <div class="task-content">
-            <h3>${task.urutan}. ${task.judul}</h3>
+          <div class="task-header">
+            <div class="task-title-group">
+              <input type="checkbox" id="task-${task.row}" ${isChecked} onchange="updateTaskStatus(${task.row}, this.checked)">
+              <h3>${task.urutan}. ${task.judul}</h3>
+            </div>
+            <span class="zone-badge">📍 ${task.zona}</span>
+          </div>
+          
+          <div class="task-body">
             ${toolsHtml}
             ${stepsHtml}
-            <span class="task-meta">⏱️ Target: ${task.target_menit} Menit | Zona: ${task.zona}</span>
+          </div>
+          
+          <div class="task-footer">
+            <span class="task-meta">⏱️ Target: ${task.target_menit} Menit</span>
           </div>
         `;
         container.appendChild(card);

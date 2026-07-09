@@ -8,16 +8,13 @@ location: "JW-08 & JW-01"
        SISTEM WARNA SCHEMATIC - VIDEO (AUTO DARK MODE)
        ==================================================== */
     
-    /* 1. CSS VARIABLES: Pijakan utama untuk warna dinamis */
     .diagram-wrapper {
-        /* Warna Kabel Dasar */
         --c-hdmi: #10b981; 
         --c-sdi: #0f172a;  
         --c-usb: #eab308;  
         --c-lan: #0ea5e9;  
-        --c-aud: #d946ef; /* Magenta untuk kabel XLR Audio */
+        --c-aud: #d946ef; 
 
-        /* Warna Dasar Mode Terang (Light Mode) */
         --dw-bg: #f8fafc;
         --dw-dot: #cbd5e1;
         --dw-node-bg: #ffffff;
@@ -43,7 +40,6 @@ location: "JW-08 & JW-01"
         transition: background-color 0.4s ease, border-color 0.4s ease;
     }
 
-    /* 2. TRIGGER DARK MODE: Menangkap instruksi dari luar (Website Utama) */
     html.dark .diagram-wrapper,
     html.dark-mode .diagram-wrapper,
     html[data-theme="dark"] .diagram-wrapper,
@@ -52,12 +48,12 @@ location: "JW-08 & JW-01"
     body.dark-mode .diagram-wrapper,
     .dark-mode .diagram-wrapper,
     .dark-theme .diagram-wrapper {
-        --c-sdi: #94a3b8; /* Kabel SDI berubah jadi abu terang di layar gelap */
-        --dw-bg: #0f172a; /* Canvas berubah jadi Slate 900 */
+        --c-sdi: #94a3b8; 
+        --dw-bg: #0f172a; 
         --dw-dot: #334155; 
-        --dw-node-bg: #1e293b; /* Kotak alat jadi lebih gelap */
+        --dw-node-bg: #1e293b; 
         --dw-border: #475569;
-        --dw-text: #f8fafc; /* Teks berubah jadi putih */
+        --dw-text: #f8fafc; 
         --dw-text-muted: #cbd5e1;
         --dw-label-bg: rgba(30, 41, 59, 0.95);
         --dw-shadow: rgba(0,0,0,0.4);
@@ -85,12 +81,9 @@ location: "JW-08 & JW-01"
     .legend-item { display: flex; align-items: center; gap: 8px; }
     .legend-color { width: 24px; height: 6px; border-radius: 3px; }
 
-    /* ====================================================
-       LAYOUT KOLOM (WATERFALL SEJAJAR - ZERO CROSSING)
-       ==================================================== */
     .diagram-board {
         display: flex;
-        gap: 260px; 
+        gap: 160px; 
         padding: 120px 150px 300px 80px;
         position: relative;
         z-index: 10;
@@ -104,7 +97,6 @@ location: "JW-08 & JW-01"
         justify-content: flex-start; 
     }
 
-    /* KOTAK ALAT */
     .node {
         background: var(--dw-node-bg); 
         border: 2px solid var(--dw-border);
@@ -126,7 +118,6 @@ location: "JW-08 & JW-01"
     .node-header h4 { margin: 0; font-size: 14.5px; font-weight: 800; color: #ffffff; letter-spacing: 0.3px; display: flex; align-items: center; justify-content: center; }
     .node-header p { margin: 4px 0 0 0; font-size: 11.5px; font-weight: 600; color: #e2e8f0; }
 
-    /* COLOR CODING MASKULIN / PRO-TECH */
     .type-lpt { border-color: #b45309; } .type-lpt .node-header { background: #d97706; border-bottom: 2px solid #b45309; }
     .type-cam { border-color: #9f1239; } .type-cam .node-header { background: #be123c; border-bottom: 2px solid #9f1239; }
     .type-proc { border-color: #3730a3; } .type-proc .node-header { background: #4338ca; border-bottom: 2px solid #3730a3; }
@@ -135,12 +126,10 @@ location: "JW-08 & JW-01"
     .type-mon { border-color: #334155; } .type-mon .node-header { background: #475569; border-bottom: 2px solid #334155; }
     .type-aud { border-color: #a21caf; } .type-aud .node-header { background: #d946ef; border-bottom: 2px solid #a21caf; }
 
-    /* CORE SWITCHER */
     .node.rack-core { border: 2px solid var(--dw-text); width: 330px; }
     .node.rack-core .node-header { background: #020617; border-bottom: 2px solid var(--dw-text); }
     .node.rack-core .node-header p { color: #94a3b8; }
 
-    /* BORDER KIRI INDIKATOR PORT MASUK/KELUAR */
     .border-hdmi { border-left: 8px solid var(--c-hdmi); }
     .border-sdi { border-left: 8px solid var(--c-sdi); transition: border-color 0.4s ease; }
     .border-usb { border-left: 8px solid var(--c-usb); }
@@ -148,7 +137,6 @@ location: "JW-08 & JW-01"
     .border-aud { border-left: 8px solid var(--c-aud); }
     .rack-core { border-left: 8px solid #475569; border-right: 8px solid #475569; }
 
-    /* SISTEM PORT */
     .node-ports { display: flex; justify-content: space-between; padding: 15px 0; }
     .ports-left { display: flex; flex-direction: column; gap: 20px; transform: translateX(-7px); }
     .ports-right { display: flex; flex-direction: column; gap: 20px; transform: translateX(7px); align-items: flex-end; }
@@ -158,12 +146,10 @@ location: "JW-08 & JW-01"
     .dot { width: 14px; height: 14px; background: var(--dw-node-bg); border: 3.5px solid var(--dw-text); border-radius: 50%; position: relative; z-index: 30; transition: all 0.3s ease; }
     .dot:hover { background: #ef4444; transform: scale(1.4); }
 
-    /* Visual LED */
     .led-container { display: flex; justify-content: center; padding-bottom: 15px; }
     .led-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; background: #1e293b; padding: 4px; border: 2px solid #3b82f6; border-radius: 4px; width: 180px; height: 90px; }
     .led-panel { background: #0f172a; border-radius: 2px; width: 100%; height: 100%; }
 
-    /* ICONS */
     .ico { width: 18px; height: 18px; margin-right: 8px; flex-shrink: 0; vertical-align: text-bottom; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 </style>
 
@@ -246,7 +232,7 @@ location: "JW-08 & JW-01"
                 </div>
             </div>
 
-            <div class="node type-aud border-aud"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-mic"></use></svg>Audio Distributor</h4><p>Press Box / External Feed</p></div>
+            <div class="node type-aud border-aud"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-mic"></use></svg>Audio Distributor</h4><p>Behringer MX882</p></div>
                 <div class="node-ports">
                     <div class="ports-left"></div>
                     <div class="ports-right"><div class="port-row"><span class="port-label">XLR OUT</span><div class="dot" id="ad-out"></div></div></div>
@@ -271,9 +257,12 @@ location: "JW-08 & JW-01"
                     <div class="ports-right">
                         <div class="port-row"><span class="port-label">OUT 5 (Ke VP 1)</span><div class="dot" id="atem-o5"></div></div>
                         <div class="port-row"><span class="port-label">OUT 6 (Ke VP 2)</span><div class="dot" id="atem-o6"></div></div>
-                        <div style="height: 15px;"></div>
-                        <div class="port-row"><span class="port-label">OUT 7 (PGM Utama)</span><div class="dot" id="atem-o7"></div></div>
-                        <div style="height: 100px;"></div> <div class="port-row"><span class="port-label">SDI Multiview</span><div class="dot" id="atem-smv"></div></div>
+                        <div style="height: 90px;"></div>
+                        <div class="port-row"><span class="port-label">OUT 7 (Jalur 1)</span><div class="dot" id="atem-o7"></div></div>
+                        <div style="height: 110px;"></div>
+                        <div class="port-row"><span class="port-label">OUT 8 (Jalur 2)</span><div class="dot" id="atem-o8"></div></div>
+                        <div style="height: 110px;"></div> 
+                        <div class="port-row"><span class="port-label">SDI Multiview</span><div class="dot" id="atem-smv"></div></div>
                         <div class="port-row"><span class="port-label">HDMI Multiview</span><div class="dot" id="atem-hmv"></div></div>
                     </div>
                 </div>
@@ -288,6 +277,7 @@ location: "JW-08 & JW-01"
                 </div>
             </div>
             
+            <div style="height: 80px;"></div>
             <div class="node type-proc border-lan"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-cpu"></use></svg>Video Processor 2</h4></div>
                 <div class="node-ports">
                     <div class="ports-left"><div class="port-row"><div class="dot" id="vp2-in"></div><span class="port-label">SDI IN</span></div></div>
@@ -295,21 +285,30 @@ location: "JW-08 & JW-01"
                 </div>
             </div>
 
-            <div style="height: 10px;"></div>
-
-            <div class="node type-dist border-sdi" style="border-left-width: 14px;"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-dist"></use></svg>SDI Distributor Utama</h4></div>
+            <div style="height: 80px;"></div> 
+            <div class="node type-dist border-sdi" style="border-left-width: 14px;"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-dist"></use></svg>SDI Distributor 1</h4><p>Jalur Distribusi 1</p></div>
                 <div class="node-ports">
-                    <div class="ports-left"><div class="port-row"><div class="dot" id="d1-in"></div><span class="port-label">SDI IN</span></div></div>
+                    <div class="ports-left"><div class="port-row"><div class="dot" id="dist1-in"></div><span class="port-label">SDI IN</span></div></div>
                     <div class="ports-right">
-                        <div class="port-row"><span class="port-label">Out 1 (Stream 1)</span><div class="dot" id="d1-o1"></div></div>
-                        <div class="port-row"><span class="port-label">Out 2 (Stream 2)</span><div class="dot" id="d1-o2"></div></div>
-                        <div class="port-row"><span class="port-label">Out 3 (Ke Dist 2)</span><div class="dot" id="d1-o3"></div></div>
-                        <div class="port-row"><span class="port-label">Out 4 (Ke Dist 5)</span><div class="dot" id="d1-o4"></div></div>
+                        <div class="port-row"><span class="port-label">Ke Capture 1</span><div class="dot" id="dist1-o1"></div></div>
+                        <div class="port-row"><span class="port-label">Ke TV Tengah</span><div class="dot" id="dist1-o2"></div></div>
                     </div>
                 </div>
             </div>
-            
-            <div style="height: 60px;"></div> <div class="node type-proc border-hdmi"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-cpu"></use></svg>Converter SDI to HDMI</h4></div>
+
+            <div style="height: 70px;"></div> 
+            <div class="node type-dist border-sdi" style="border-left-width: 14px;"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-dist"></use></svg>SDI Distributor 2</h4><p>Jalur Distribusi 2</p></div>
+                <div class="node-ports">
+                    <div class="ports-left"><div class="port-row"><div class="dot" id="dist2-in"></div><span class="port-label">SDI IN</span></div></div>
+                    <div class="ports-right">
+                        <div class="port-row"><span class="port-label">Ke Capture 2</span><div class="dot" id="dist2-o1"></div></div>
+                        <div class="port-row"><span class="port-label">Ke TV P3K</span><div class="dot" id="dist2-o2"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="height: 45px;"></div> 
+            <div class="node type-proc border-hdmi"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-cpu"></use></svg>Converter SDI to HDMI</h4></div>
                 <div class="node-ports">
                     <div class="ports-left"><div class="port-row"><div class="dot" id="mcmv-in"></div><span class="port-label">SDI IN</span></div></div>
                     <div class="ports-right"><div class="port-row"><span class="port-label">HDMI OUT</span><div class="dot" id="mcmv-hdmi"></div></div></div>
@@ -332,100 +331,135 @@ location: "JW-08 & JW-01"
                 <div class="led-container"><div class="led-grid"><div class="led-panel"></div><div class="led-panel"></div><div class="led-panel"></div><div class="led-panel"></div><div class="led-panel"></div><div class="led-panel"></div><div class="led-panel"></div><div class="led-panel"></div></div></div>
             </div>
 
-            <div class="node type-lpt border-usb"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-cpu"></use></svg>Video Capture 1 (ezcap)</h4></div>
+            <div style="height: 15px;"></div>
+            <div class="node type-lpt border-usb"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-cpu"></use></svg>Video Capture 1 (Jalur 1)</h4></div>
                 <div class="node-ports">
                     <div class="ports-left"><div class="port-row"><div class="dot" id="ez1-in"></div><span class="port-label">SDI IN</span></div></div>
                     <div class="ports-right"><div class="port-row"><span class="port-label">USB OUT</span><div class="dot" id="ez1-out"></div></div></div>
                 </div>
             </div>
             
-            <div class="node type-lpt border-usb"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-cpu"></use></svg>Video Capture 2 (ezcap)</h4></div>
+            <div style="height: 110px;"></div>
+
+            <div class="node type-lpt border-usb"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-cpu"></use></svg>Video Capture 2 (Jalur 2)</h4></div>
                 <div class="node-ports">
                     <div class="ports-left"><div class="port-row"><div class="dot" id="ez2-in"></div><span class="port-label">SDI IN</span></div></div>
                     <div class="ports-right"><div class="port-row"><span class="port-label">USB OUT</span><div class="dot" id="ez2-out"></div></div></div>
                 </div>
             </div>
+        </div>
 
-            <div class="node type-dist border-sdi"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-dist"></use></svg>SDI Distributor #2</h4></div>
-                <div class="node-ports">
-                    <div class="ports-left"><div class="port-row"><div class="dot" id="d2-in"></div><span class="port-label">SDI IN</span></div></div>
-                    <div class="ports-right">
-                        <div class="port-row"><span class="port-label">TV Tengah</span><div class="dot" id="d2-o1"></div></div>
-                        <div class="port-row"><span class="port-label">Ke Dist 3</span><div class="dot" id="d2-o2"></div></div>
-                    </div>
-                </div>
-            </div>
+        <div class="column">
+            <div style="height: 485px;"></div> 
+            <div class="node type-lpt border-usb"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-lpt"></use></svg>Laptop Streaming 1</h4></div><div class="node-ports"><div class="ports-left"><div class="port-row"><div class="dot" id="ls1-in"></div><span class="port-label">USB IN</span></div></div><div class="ports-right"></div></div></div>
             
-            <div class="node type-dist border-sdi"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-dist"></use></svg>SDI Distributor #5</h4></div>
-                <div class="node-ports">
-                    <div class="ports-left"><div class="port-row"><div class="dot" id="d5-in"></div><span class="port-label">SDI IN</span></div></div>
-                    <div class="ports-right">
-                        <div class="port-row"><span class="port-label">TV P3K</span><div class="dot" id="d5-o1"></div></div>
-                        <div class="port-row"><span class="port-label">TV Ibu Anak</span><div class="dot" id="d5-o2"></div></div>
-                    </div>
-                </div>
-            </div>
+            <div style="height: 110px;"></div>
+
+            <div class="node type-lpt border-usb"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-lpt"></use></svg>Laptop Streaming 2</h4></div><div class="node-ports"><div class="ports-left"><div class="port-row"><div class="dot" id="ls2-in"></div><span class="port-label">USB IN</span></div></div><div class="ports-right"></div></div></div>
+
+            <div style="height: 70px;"></div> 
             
-            <div style="height: 45px;"></div> <div class="node type-mon border-hdmi"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-mon"></use></svg>Monitor Kamera PTZ</h4><p>Multiview</p></div>
+            <div class="node type-mon border-hdmi"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-mon"></use></svg>Monitor Kamera PTZ</h4><p>Multiview</p></div>
                 <div class="node-ports"><div class="ports-left"><div class="port-row"><div class="dot" id="mcam-in"></div><span class="port-label">HDMI IN</span></div></div><div class="ports-right"></div></div>
             </div>
         </div>
 
         <div class="column">
-            <div style="height: 350px;"></div> 
-            
-            <div class="node type-lpt border-usb"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-lpt"></use></svg>Laptop Streaming 1</h4></div><div class="node-ports"><div class="ports-left"><div class="port-row"><div class="dot" id="ls1-in"></div><span class="port-label">USB IN</span></div></div><div class="ports-right"></div></div></div>
-            
-            <div class="node type-lpt border-usb"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-lpt"></use></svg>Laptop Streaming 2</h4></div><div class="node-ports"><div class="ports-left"><div class="port-row"><div class="dot" id="ls2-in"></div><span class="port-label">USB IN</span></div></div><div class="ports-right"></div></div></div>
-
-            <div style="height: 20px;"></div>
-            
-            <div class="node type-tv border-sdi"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-tv"></use></svg>TV Tengah Area Hadirin (B3)</h4></div><div class="node-ports"><div class="ports-left"><div class="port-row"><div class="dot" id="tvt-in"></div><span class="port-label">SDI IN</span></div></div><div class="ports-right"></div></div></div>
-            
-            <div class="node type-dist border-sdi"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-dist"></use></svg>SDI Distributor #3</h4></div>
+            <div style="height: 600px;"></div> 
+            <div class="node type-tv border-sdi"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-tv"></use></svg>TV Tengah Area Hadirin</h4><p>Awal Rantai TV (Jalur 1)</p></div>
                 <div class="node-ports">
-                    <div class="ports-left"><div class="port-row"><div class="dot" id="d3-in"></div><span class="port-label">SDI IN</span></div></div>
-                    <div class="ports-right">
-                        <div class="port-row"><span class="port-label">TV B1</span><div class="dot" id="d3-o1"></div></div>
-                        <div class="port-row"><span class="port-label">TV B2</span><div class="dot" id="d3-o2"></div></div>
-                        <div class="port-row"><span class="port-label">Ke Dist 4</span><div class="dot" id="d3-o3"></div></div>
-                    </div>
+                    <div class="ports-left"><div class="port-row"><div class="dot" id="tvt-in"></div><span class="port-label">SDI IN</span></div></div>
+                    <div class="ports-right"><div class="port-row"><span class="port-label">SDI OUT</span><div class="dot" id="tvt-out"></div></div></div>
                 </div>
             </div>
-
-            <div class="node type-tv border-sdi"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-tv"></use></svg>TV Ruang P3K (B6)</h4></div><div class="node-ports"><div class="ports-left"><div class="port-row"><div class="dot" id="tvp-in"></div><span class="port-label">SDI IN</span></div></div><div class="ports-right"></div></div></div>
             
-            <div class="node type-tv border-sdi"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-tv"></use></svg>TV Ruang Ibu & Anak</h4></div><div class="node-ports"><div class="ports-left"><div class="port-row"><div class="dot" id="tvi-in"></div><span class="port-label">SDI IN</span></div></div><div class="ports-right"></div></div></div>
-        </div>
-
-        <div class="column">
-            <div style="height: 605px;"></div> 
-            
-            <div class="node type-tv border-sdi"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-tv"></use></svg>TV B1</h4></div><div class="node-ports"><div class="ports-left"><div class="port-row"><div class="dot" id="tvb1-in"></div><span class="port-label">SDI IN</span></div></div><div class="ports-right"></div></div></div>
-            <div class="node type-tv border-sdi"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-tv"></use></svg>TV B2</h4></div><div class="node-ports"><div class="ports-left"><div class="port-row"><div class="dot" id="tvb2-in"></div><span class="port-label">SDI IN</span></div></div><div class="ports-right"></div></div></div>
-
-            <div class="node type-dist border-sdi"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-dist"></use></svg>SDI Distributor #4</h4></div>
+            <div style="height: 110px;"></div>
+            <div class="node type-tv border-sdi"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-tv"></use></svg>TV Ruang P3K</h4><p>Awal Rantai TV (Jalur 2)</p></div>
                 <div class="node-ports">
-                    <div class="ports-left"><div class="port-row"><div class="dot" id="d4-in"></div><span class="port-label">SDI IN</span></div></div>
-                    <div class="ports-right">
-                        <div class="port-row"><span class="port-label">TV A1</span><div class="dot" id="d4-o1"></div></div>
-                        <div class="port-row"><span class="port-label">TV A2</span><div class="dot" id="d4-o2"></div></div>
-                        <div class="port-row"><span class="port-label">TV A3</span><div class="dot" id="d4-o3"></div></div>
-                        <div class="port-row"><span class="port-label">TV A4</span><div class="dot" id="d4-o4"></div></div>
-                        <div class="port-row"><span class="port-label">TV A5</span><div class="dot" id="d4-o5"></div></div>
-                    </div>
+                    <div class="ports-left"><div class="port-row"><div class="dot" id="tvp-in"></div><span class="port-label">SDI IN</span></div></div>
+                    <div class="ports-right"><div class="port-row"><span class="port-label">SDI OUT</span><div class="dot" id="tvp-out"></div></div></div>
                 </div>
             </div>
         </div>
 
         <div class="column">
-            <div style="height: 840px;"></div> 
+            <div style="height: 600px;"></div> 
             
-            <div class="node type-tv border-sdi"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-tv"></use></svg>TV A1</h4></div><div class="node-ports"><div class="ports-left"><div class="port-row"><div class="dot" id="tva1-in"></div><span class="port-label">SDI IN</span></div></div><div class="ports-right"></div></div></div>
-            <div class="node type-tv border-sdi"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-tv"></use></svg>TV A2</h4></div><div class="node-ports"><div class="ports-left"><div class="port-row"><div class="dot" id="tva2-in"></div><span class="port-label">SDI IN</span></div></div><div class="ports-right"></div></div></div>
-            <div class="node type-tv border-sdi"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-tv"></use></svg>TV A3</h4></div><div class="node-ports"><div class="ports-left"><div class="port-row"><div class="dot" id="tva3-in"></div><span class="port-label">SDI IN</span></div></div><div class="ports-right"></div></div></div>
-            <div class="node type-tv border-sdi"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-tv"></use></svg>TV A4</h4></div><div class="node-ports"><div class="ports-left"><div class="port-row"><div class="dot" id="tva4-in"></div><span class="port-label">SDI IN</span></div></div><div class="ports-right"></div></div></div>
-            <div class="node type-tv border-sdi"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-tv"></use></svg>TV A5</h4></div><div class="node-ports"><div class="ports-left"><div class="port-row"><div class="dot" id="tva5-in"></div><span class="port-label">SDI IN</span></div></div><div class="ports-right"></div></div></div>
+            <div class="node type-tv border-sdi"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-tv"></use></svg>TV B2</h4></div>
+                <div class="node-ports">
+                    <div class="ports-left"><div class="port-row"><div class="dot" id="tvb2-in"></div><span class="port-label">SDI IN</span></div></div>
+                    <div class="ports-right"><div class="port-row"><span class="port-label">SDI OUT</span><div class="dot" id="tvb2-out"></div></div></div>
+                </div>
+            </div>
+
+            <div style="height: 110px;"></div> 
+            
+            <div class="node type-tv border-sdi"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-tv"></use></svg>TV Ruang Ibu & Anak</h4><p>Akhir Rantai TV (Jalur 2)</p></div>
+                <div class="node-ports">
+                    <div class="ports-left"><div class="port-row"><div class="dot" id="tvi-in"></div><span class="port-label">SDI IN</span></div></div>
+                    <div class="ports-right"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="column">
+            <div style="height: 600px;"></div> 
+            <div class="node type-tv border-sdi"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-tv"></use></svg>TV B1</h4></div>
+                <div class="node-ports">
+                    <div class="ports-left"><div class="port-row"><div class="dot" id="tvb1-in"></div><span class="port-label">SDI IN</span></div></div>
+                    <div class="ports-right"><div class="port-row"><span class="port-label">SDI OUT</span><div class="dot" id="tvb1-out"></div></div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="column">
+            <div style="height: 600px;"></div> 
+            <div class="node type-tv border-sdi"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-tv"></use></svg>TV A1</h4></div>
+                <div class="node-ports">
+                    <div class="ports-left"><div class="port-row"><div class="dot" id="tva1-in"></div><span class="port-label">SDI IN</span></div></div>
+                    <div class="ports-right"><div class="port-row"><span class="port-label">SDI OUT</span><div class="dot" id="tva1-out"></div></div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="column">
+            <div style="height: 600px;"></div> 
+            <div class="node type-tv border-sdi"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-tv"></use></svg>TV A2</h4></div>
+                <div class="node-ports">
+                    <div class="ports-left"><div class="port-row"><div class="dot" id="tva2-in"></div><span class="port-label">SDI IN</span></div></div>
+                    <div class="ports-right"><div class="port-row"><span class="port-label">SDI OUT</span><div class="dot" id="tva2-out"></div></div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="column">
+            <div style="height: 600px;"></div> 
+            <div class="node type-tv border-sdi"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-tv"></use></svg>TV A3</h4></div>
+                <div class="node-ports">
+                    <div class="ports-left"><div class="port-row"><div class="dot" id="tva3-in"></div><span class="port-label">SDI IN</span></div></div>
+                    <div class="ports-right"><div class="port-row"><span class="port-label">SDI OUT</span><div class="dot" id="tva3-out"></div></div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="column">
+            <div style="height: 600px;"></div> 
+            <div class="node type-tv border-sdi"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-tv"></use></svg>TV A4</h4></div>
+                <div class="node-ports">
+                    <div class="ports-left"><div class="port-row"><div class="dot" id="tva4-in"></div><span class="port-label">SDI IN</span></div></div>
+                    <div class="ports-right"><div class="port-row"><span class="port-label">SDI OUT</span><div class="dot" id="tva4-out"></div></div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="column">
+            <div style="height: 600px;"></div> 
+            <div class="node type-tv border-sdi"><div class="node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-tv"></use></svg>TV A5</h4><p>Akhir Rantai TV (Jalur 1)</p></div>
+                <div class="node-ports">
+                    <div class="ports-left"><div class="port-row"><div class="dot" id="tva5-in"></div><span class="port-label">SDI IN</span></div></div>
+                    <div class="ports-right"></div>
+                </div>
+            </div>
         </div>
 
     </div>
@@ -433,7 +467,7 @@ location: "JW-08 & JW-01"
 
 <script>
     const cables = [
-        // AUDIO DISTRIBUTOR
+        // AUDIO
         { from: 'ad-out', to: 'atem-xlr1', label: 'XLR Audio', color: 'var(--c-aud)' },
 
         // CONTROLLERS
@@ -441,54 +475,59 @@ location: "JW-08 & JW-01"
         { from: 'ctrl2-o1', to: 'ptz2-lan', label: 'LAN', color: 'var(--c-lan)' },
         { from: 'ctrl2-o2', to: 'ptz3-lan', label: 'LAN', color: 'var(--c-lan)' },
 
-        // INPUTS
+        // INPUTS TO SWITCHER
         { from: 'lu-out', to: 'atem-i1', label: 'HDMI', color: 'var(--c-hdmi)' },
         { from: 'lb-out', to: 'atem-i2', label: 'HDMI', color: 'var(--c-hdmi)' },
         { from: 'ptz1-sdi', to: 'atem-i5', label: 'SDI', color: 'var(--c-sdi)' },
         { from: 'ptz2-sdi', to: 'atem-i6', label: 'SDI', color: 'var(--c-sdi)' },
         { from: 'ptz3-sdi', to: 'atem-i7', label: 'SDI', color: 'var(--c-sdi)' },
 
-        // SWITCHER OUT
+        // SWITCHER OUT -> PROCESSORS
         { from: 'atem-o5', to: 'vp1-in', label: 'SDI', color: 'var(--c-sdi)' },  
         { from: 'atem-o6', to: 'vp2-in', label: 'SDI', color: 'var(--c-sdi)' },  
-        { from: 'atem-o7', to: 'd1-in', label: 'SDI', color: 'var(--c-sdi)' },
+        
+        // SWITCHER OUT -> SDI DISTRIBUTORS
+        { from: 'atem-o7', to: 'dist1-in', label: 'SDI (Jalur 1)', color: 'var(--c-sdi)' },
+        { from: 'atem-o8', to: 'dist2-in', label: 'SDI (Jalur 2)', color: 'var(--c-sdi)' },
+
+        // DISTRIBUTOR 1 OUT -> CAPTURE & TV AWAL 
+        { from: 'dist1-o1', to: 'ez1-in', label: 'SDI', color: 'var(--c-sdi)' },
+        { from: 'dist1-o2', to: 'tvt-in', label: 'SDI', color: 'var(--c-sdi)' },
+
+        // DISTRIBUTOR 2 OUT -> CAPTURE & TV AWAL 
+        { from: 'dist2-o1', to: 'ez2-in', label: 'SDI', color: 'var(--c-sdi)' },
+        { from: 'dist2-o2', to: 'tvp-in', label: 'SDI', color: 'var(--c-sdi)' },
+
+        // MULTIVIEW
         { from: 'atem-smv', to: 'mcmv-in', label: 'SDI', color: 'var(--c-sdi)' },
         { from: 'atem-hmv', to: 'msw-in', label: 'HDMI', color: 'var(--c-hdmi)' },
 
-        // PROCESSORS
+        // PROCESSORS TO LED 
         { from: 'vp1-out', to: 'led1-lan', label: 'LAN', color: 'var(--c-lan)' },
         { from: 'vp2-out', to: 'led2-lan', label: 'LAN', color: 'var(--c-lan)' },
+        
+        // CONVERTER TO PTZ MONITOR
         { from: 'mcmv-hdmi', to: 'mcam-in', label: 'HDMI', color: 'var(--c-hdmi)' }, 
 
-        // DISTRIBUTOR 1
-        { from: 'd1-o1', to: 'ez1-in', label: 'SDI', color: 'var(--c-sdi)' },
-        { from: 'd1-o2', to: 'ez2-in', label: 'SDI', color: 'var(--c-sdi)' },
-        { from: 'd1-o3', to: 'd2-in', label: 'SDI', color: 'var(--c-sdi)' },
-        { from: 'd1-o4', to: 'd5-in', label: 'SDI', color: 'var(--c-sdi)' },
-
-        // CAPTURE
+        // CAPTURE CARDS TO LAPTOPS
         { from: 'ez1-out', to: 'ls1-in', label: 'USB', color: 'var(--c-usb)' },
         { from: 'ez2-out', to: 'ls2-in', label: 'USB', color: 'var(--c-usb)' },
 
-        // DIST 2
-        { from: 'd2-o1', to: 'tvt-in', label: 'SDI', color: 'var(--c-sdi)' },
-        { from: 'd2-o2', to: 'd3-in', label: 'SDI', color: 'var(--c-sdi)' },
+        // ============================================
+        // DAISY CHAIN - JALUR 1 
+        // ============================================
+        { from: 'tvt-out', to: 'tvb2-in', label: 'SDI', color: 'var(--c-sdi)' },
+        { from: 'tvb2-out', to: 'tvb1-in', label: 'SDI', color: 'var(--c-sdi)' },
+        { from: 'tvb1-out', to: 'tva1-in', label: 'SDI', color: 'var(--c-sdi)' },
+        { from: 'tva1-out', to: 'tva2-in', label: 'SDI', color: 'var(--c-sdi)' },
+        { from: 'tva2-out', to: 'tva3-in', label: 'SDI', color: 'var(--c-sdi)' },
+        { from: 'tva3-out', to: 'tva4-in', label: 'SDI', color: 'var(--c-sdi)' },
+        { from: 'tva4-out', to: 'tva5-in', label: 'SDI', color: 'var(--c-sdi)' },
 
-        // DIST 5
-        { from: 'd5-o1', to: 'tvp-in', label: 'SDI', color: 'var(--c-sdi)' },
-        { from: 'd5-o2', to: 'tvi-in', label: 'SDI', color: 'var(--c-sdi)' },
-
-        // DIST 3
-        { from: 'd3-o1', to: 'tvb1-in', label: 'SDI', color: 'var(--c-sdi)' },
-        { from: 'd3-o2', to: 'tvb2-in', label: 'SDI', color: 'var(--c-sdi)' },
-        { from: 'd3-o3', to: 'd4-in', label: 'SDI', color: 'var(--c-sdi)' },
-
-        // DIST 4
-        { from: 'd4-o1', to: 'tva1-in', label: 'SDI', color: 'var(--c-sdi)' },
-        { from: 'd4-o2', to: 'tva2-in', label: 'SDI', color: 'var(--c-sdi)' },
-        { from: 'd4-o3', to: 'tva3-in', label: 'SDI', color: 'var(--c-sdi)' },
-        { from: 'd4-o4', to: 'tva4-in', label: 'SDI', color: 'var(--c-sdi)' },
-        { from: 'd4-o5', to: 'tva5-in', label: 'SDI', color: 'var(--c-sdi)' }
+        // ============================================
+        // DAISY CHAIN - JALUR 2 
+        // ============================================
+        { from: 'tvp-out', to: 'tvi-in', label: 'SDI', color: 'var(--c-sdi)' }
     ];
 
     function drawConnections() {
@@ -516,7 +555,8 @@ location: "JW-08 & JW-01"
             const y2 = rectTo.top + rectTo.height/2 - cRect.top + container.scrollTop;
             
             const dist = Math.abs(x2 - x1);
-            const curveFactor = Math.max(dist * 0.45, 60); 
+            
+            const curveFactor = Math.max(dist * 0.35, 40); 
             const cp1x = x1 + curveFactor;
             const cp2x = x2 - curveFactor;
             
@@ -555,7 +595,6 @@ location: "JW-08 & JW-01"
         slider.scrollTop = scrollTop - (e.pageY - slider.offsetTop - startY) * 1.5;
     });
 
-    // Jalankan ulang fungsi garis ketika terjadi perubahan mode di HTML (Observer Mutation)
     const observer = new MutationObserver(() => drawConnections());
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class', 'data-theme', 'data-bs-theme'] });
     observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });

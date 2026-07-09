@@ -1,0 +1,777 @@
+---
+layout: default
+location: "JW-08, JW-01 & JA-01 (Unified)"
+title: "Unified AV Routing Diagram"
+---
+
+<style>
+    /* ====================================================
+       1. CSS VARIABLES & THEME (AUTO DARK MODE)
+       ==================================================== */
+    :root {
+        /* Warna Kabel Video */
+        --c-hdmi: #10b981; 
+        --c-sdi: #0f172a;  
+        --c-usb: #eab308;  
+        --c-lan: #0ea5e9;  
+        
+        /* Warna Kabel Audio */
+        --c-mic: #10b981;
+        --c-media: #0ea5e9;
+        --c-mix: #d946ef;
+        --c-tx: #f59e0b;
+        --c-split: #ef4444;
+        --c-dlms: #3b82f6;
+        --c-spk: #64748b; 
+        
+        /* Warna Bridge (Audio to Video) */
+        --c-aud: #d946ef; 
+    }
+
+    /* LIGHT MODE (Default) */
+    .unified-container {
+        --dw-bg: #f8fafc;
+        --dw-dot: #cbd5e1;
+        --dw-node-bg: #ffffff;
+        --dw-border: #cbd5e1;
+        --dw-text: #0f172a;
+        --dw-text-muted: #475569;
+        --dw-label-bg: rgba(255, 255, 255, 0.95);
+        --dw-rack-bg: #1e293b;
+        --dw-rack-border: #0f172a;
+        --dw-rack-text: #f8fafc;
+        --dw-zone-bg: rgba(100,116,139,0.03);
+        --dw-zone-border: #94a3b8;
+        --dw-spk-bg: #1e293b;
+        --dw-spk-border: #475569;
+        --dw-watt-bg: #f1f5f9;
+        --dw-shadow: rgba(0,0,0,0.06);
+
+        position: relative; 
+        width: 100%; 
+        height: 88vh; 
+        min-height: 800px;
+        background-color: var(--dw-bg);
+        background-image: radial-gradient(var(--dw-dot) 1.5px, transparent 1.5px);
+        background-size: 30px 30px; 
+        overflow: auto; 
+        cursor: grab;
+        border-radius: 12px; 
+        border: 2px solid var(--dw-border);
+        margin: 20px auto; 
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        transition: background-color 0.4s ease, border-color 0.4s ease;
+    }
+
+    /* DARK MODE */
+    html.dark .unified-container, html.dark-mode .unified-container,
+    [data-theme="dark"] .unified-container, [data-bs-theme="dark"] .unified-container,
+    body.dark .unified-container, body.dark-mode .unified-container {
+        --c-sdi: #94a3b8; 
+        --c-spk: #cbd5e1; 
+        --dw-bg: #020617; 
+        --dw-dot: #1e293b; 
+        --dw-node-bg: #0f172a;
+        --dw-border: #334155;
+        --dw-text: #f8fafc;
+        --dw-text-muted: #94a3b8;
+        --dw-label-bg: rgba(15, 23, 42, 0.95);
+        --dw-rack-bg: #000000;
+        --dw-rack-border: #1e293b;
+        --dw-rack-text: #f8fafc;
+        --dw-zone-bg: rgba(15, 23, 42, 0.4);
+        --dw-zone-border: #475569;
+        --dw-spk-bg: #000000;
+        --dw-spk-border: #334155;
+        --dw-watt-bg: #1e293b;
+        --dw-shadow: rgba(0,0,0,0.4);
+    }
+
+    * { box-sizing: border-box; }
+    .unified-container:active { cursor: grabbing; }
+    #unified-canvas { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 10; }
+    
+    /* ANIMASI KABEL */
+    .cable-flow { stroke-dasharray: 12, 12; animation: flowAnim 1.2s linear infinite; }
+    @keyframes flowAnim { from { stroke-dashoffset: 24; } to { stroke-dashoffset: 0; } }
+    
+    .cable-label-bg { fill: var(--dw-label-bg); stroke-width: 1.5; rx: 6; transition: fill 0.4s ease, stroke 0.4s ease; }
+    .cable-label-text { fill: var(--dw-text); stroke: none !important; font-size: 11px; font-weight: 800; text-anchor: middle; letter-spacing: 0.5px; transition: fill 0.4s ease; }
+
+    /* LEGEND (MENGAMBANG DI POJOK) */
+    .cable-legend {
+        position: sticky; top: 20px; left: 20px; z-index: 50; 
+        background: var(--dw-label-bg); color: var(--dw-text);
+        padding: 12px 20px; border-radius: 8px; border: 2px solid var(--dw-border); 
+        display: inline-flex; flex-wrap: wrap; gap: 15px 20px; max-width: 800px;
+        font-size: 12px; font-weight: bold; box-shadow: 0 4px 15px var(--dw-shadow);
+        transition: all 0.4s ease;
+    }
+    .legend-item { display: flex; align-items: center; gap: 6px; }
+    .legend-color { width: 20px; height: 6px; border-radius: 3px; }
+
+    /* ====================================================
+       2. MASTER LAYOUT: GABUNGAN KIRI (AUDIO) & KANAN (VIDEO)
+       ==================================================== */
+    .master-board {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 300px; /* Jarak penyeberangan kabel bridge */
+        padding: 100px 150px 300px 100px;
+        width: max-content;
+        position: relative;
+        z-index: 20;
+    }
+
+    /* ====================================================
+       A. SISTEM AUDIO (CSS GRID)
+       ==================================================== */
+    .audio-board {
+        display: grid;
+        grid-template-columns: 240px 200px 240px 240px 240px 260px 280px max-content;
+        grid-auto-rows: minmax(70px, auto);
+        gap: 40px 320px; /* Dipersempit sedikit agar total diagram tidak terlalu lebar */
+    }
+
+    .audio-board .node {
+        position: relative; border-radius: 8px; box-shadow: 0 4px 15px var(--dw-shadow);
+        display: flex; align-items: center; padding: 12px 16px; gap: 15px;
+        background: var(--dw-node-bg); border: 2px solid var(--dw-border); color: var(--dw-text);
+        transition: transform 0.2s, background 0.4s ease, border-color 0.4s ease, color 0.4s ease;
+    }
+    .audio-board .node:hover { transform: translateY(-3px); box-shadow: 0 8px 25px var(--dw-shadow); z-index: 30; }
+
+    .style-input { border-left: 6px solid var(--c-mic); }
+    .style-media { border-left: 6px solid var(--c-media); }
+    .style-rack { background: var(--dw-rack-bg) !important; color: var(--dw-rack-text) !important; border: 2px solid var(--dw-rack-border) !important; border-left: 14px solid #334155 !important; border-right: 14px solid #334155 !important; }
+    
+    .node-icon { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; background: rgba(100,116,139,0.1); border-radius: 8px; flex-shrink: 0; }
+    .node-icon svg { width: 24px; height: 24px; stroke: currentColor; stroke-width: 2; fill: none; }
+    .node-info { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+    .node-info h4 { margin: 0; font-size: 13px; font-weight: 700; }
+    .node-info p { margin: 0; font-size: 11px; opacity: 0.85; font-family: monospace; }
+    .style-rack .node-info p { color: #94a3b8; }
+
+    /* DOT PORT AUDIO */
+    .tp { width: 12px; height: 12px; background: var(--dw-node-bg); border: 3px solid var(--dw-text); border-radius: 50%; position: absolute; z-index: 15; transition: all 0.3s ease; }
+    .tp:hover { background: #ef4444; transform: scale(1.3); }
+    .tp::after { content: attr(data-label); position: absolute; font-size: 10px; font-weight: 800; font-family: monospace; color: var(--dw-text-muted); white-space: nowrap; pointer-events: none; }
+    .style-rack .tp::after { color: #94a3b8; }
+    .tp-in { left: -22px; } .tp-in::after { left: 16px; top: -2px; }
+    .tp-out { right: -22px; } .tp-out::after { right: 16px; top: -2px; text-align: right; }
+    .style-input .tp-out, .style-media .tp-out { right: -8px; }
+
+    /* DELAY ZONES AUDIO */
+    @keyframes flashDelayBorder { 0%, 100% { border-color: #ef4444; box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); } 50% { border-color: rgba(239, 68, 68, 0.2); box-shadow: 0 0 2px rgba(239, 68, 68, 0.1); } }
+    .is-delayed { animation: flashDelayBorder 1.2s infinite ease-in-out; }
+    @keyframes flashDelayTag { 0%, 100% { background-color: #ef4444; color: #ffffff; } 50% { background-color: #7f1d1d; color: #fca5a5; } }
+    .tag-delay { position: absolute; top: -12px; right: 15px; padding: 3px 10px; border-radius: 6px; font-size: 10px; font-weight: 900; letter-spacing: 1px; border: 1px solid #ef4444; animation: flashDelayTag 1.2s infinite ease-in-out; z-index: 40; }
+
+    /* SPEAKERS AUDIO */
+    .zone-group { display: flex; flex-direction: column; gap: 15px; background: var(--dw-zone-bg); padding: 15px 25px 25px 25px; border-radius: 12px; border: 1px dashed var(--dw-zone-border); position: relative; }
+    .zone-title { font-size: 12px; font-weight: 800; border-bottom: 2px solid var(--c-spk); padding-bottom: 5px; display: inline-block; color: var(--dw-text); }
+    .speaker-row { display: flex; flex-direction: row; gap: 40px; align-items: center; }
+    .spk-unit { width: 36px; height: 54px; background: var(--dw-spk-bg); border-radius: 5px; position: relative; border: 2px solid var(--dw-spk-border); z-index: 20; }
+    .watt-label { position: absolute; bottom: -22px; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: 800; color: var(--dw-text); background: var(--dw-watt-bg); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--dw-border); white-space: nowrap; }
+    .foh-array-stack { display: flex; flex-direction: column; gap: 2px; align-items: center; background: var(--dw-spk-bg); padding: 5px; border-radius: 6px; border: 2px solid #be123c; z-index: 20; }
+    .array-module { width: 50px; height: 16px; background: #000000; border-radius: 3px; }
+
+    /* ====================================================
+       B. SISTEM VIDEO (FLEX COLUMN WATERFALL)
+       ==================================================== */
+    .video-board {
+        display: flex; gap: 200px;
+    }
+    .v-column { display: flex; flex-direction: column; gap: 35px; justify-content: flex-start; }
+
+    .v-node {
+        background: var(--dw-node-bg); border: 2px solid var(--dw-border);
+        border-radius: 10px; width: 275px; box-shadow: 0 6px 15px var(--dw-shadow);
+        display: flex; flex-direction: column; position: relative;
+        transition: transform 0.2s, background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+        z-index: 10;
+    }
+    .v-node:hover { transform: translateY(-4px); box-shadow: 0 10px 30px var(--dw-shadow); z-index: 20; }
+    
+    .v-node-header { padding: 12px 15px; border-radius: 8px 8px 0 0; text-align: center; }
+    .v-node-header h4 { margin: 0; font-size: 14.5px; font-weight: 800; color: #ffffff; letter-spacing: 0.3px; display: flex; align-items: center; justify-content: center; }
+    .v-node-header p { margin: 4px 0 0 0; font-size: 11.5px; font-weight: 600; color: #e2e8f0; }
+
+    /* COLOR CODING VIDEO */
+    .type-lpt { border-color: #b45309; } .type-lpt .v-node-header { background: #d97706; border-bottom: 2px solid #b45309; }
+    .type-cam { border-color: #9f1239; } .type-cam .v-node-header { background: #be123c; border-bottom: 2px solid #9f1239; }
+    .type-proc { border-color: #3730a3; } .type-proc .v-node-header { background: #4338ca; border-bottom: 2px solid #3730a3; }
+    .type-dist { border-color: #9a3412; } .type-dist .v-node-header { background: #c2410c; border-bottom: 2px solid #9a3412; }
+    .type-tv { border-color: #0284c7; } .type-tv .v-node-header { background: #0369a1; border-bottom: 2px solid #0284c7; }
+    .type-mon { border-color: #334155; } .type-mon .v-node-header { background: #475569; border-bottom: 2px solid #334155; }
+
+    /* CORE SWITCHER VIDEO */
+    .rack-core { border: 2px solid var(--dw-text); width: 330px; border-left: 8px solid #475569; border-right: 8px solid #475569; }
+    .rack-core .v-node-header { background: #020617; border-bottom: 2px solid var(--dw-text); }
+    .rack-core .v-node-header p { color: #94a3b8; }
+
+    /* BORDER WARNA KABEL MASUK/KELUAR (VIDEO) */
+    .border-hdmi { border-left: 8px solid var(--c-hdmi); }
+    .border-sdi { border-left: 8px solid var(--c-sdi); transition: border-color 0.4s ease; }
+    .border-usb { border-left: 8px solid var(--c-usb); }
+    .border-lan { border-left: 8px solid var(--c-lan); }
+
+    /* DOT PORT VIDEO */
+    .v-ports { display: flex; justify-content: space-between; padding: 15px 0; }
+    .v-ports-left { display: flex; flex-direction: column; gap: 20px; transform: translateX(-7px); }
+    .v-ports-right { display: flex; flex-direction: column; gap: 20px; transform: translateX(7px); align-items: flex-end; }
+    .v-port-row { display: flex; flex-direction: row; align-items: center; gap: 10px; }
+    .v-port-label { font-size: 11.5px; font-weight: 800; color: var(--dw-text); font-family: monospace; white-space: nowrap; transition: color 0.4s ease; }
+    
+    .dot { width: 14px; height: 14px; background: var(--dw-node-bg); border: 3.5px solid var(--dw-text); border-radius: 50%; position: relative; z-index: 30; transition: all 0.3s ease; }
+    .dot:hover { background: #ef4444; transform: scale(1.4); }
+
+    /* ICONS VIDEO */
+    .ico { width: 18px; height: 18px; margin-right: 8px; flex-shrink: 0; vertical-align: text-bottom; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    
+    .mobile-hint { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: #0f172a; color: #ffffff; padding: 10px 20px; border-radius: 20px; font-size: 13px; font-weight: bold; z-index: 9999; pointer-events: none; opacity: 0; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+    @media (max-width: 768px) { .mobile-hint { opacity: 1; animation: fadeOut 6s forwards 1s; } }
+    @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
+</style>
+
+<svg style="display:none;">
+    <defs>
+        <g id="i-tv"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect><polyline points="17 2 12 7 7 2"></polyline></g>
+        <g id="i-mon"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></g>
+        <g id="i-cam"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></g>
+        <g id="i-lpt"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="2" y1="20" x2="22" y2="20"></line></g>
+        <g id="i-dist"><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="18" x2="6.01" y2="18"></line><line x1="10" y1="18" x2="10.01" y2="18"></line><polyline points="12 14 12 8 16 8 16 2"></polyline><polyline points="12 14 12 8 8 8 8 4"></polyline></g>
+        <g id="i-mix"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></g>
+        <g id="i-cpu"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></g>
+    </defs>
+</svg>
+
+<div class="unified-container" id="unified-container">
+    <div class="mobile-hint">👆 Geser area diagram untuk menelusuri jalur kabel</div>
+    
+    <div class="cable-legend">
+        <span style="border-right: 2px solid var(--dw-border); padding-right: 15px; margin-right: 5px;">Video</span>
+        <div class="legend-item"><div class="legend-color" style="background: var(--c-usb);"></div> USB</div>
+        <div class="legend-item"><div class="legend-color" style="background: var(--c-hdmi);"></div> HDMI</div>
+        <div class="legend-item"><div class="legend-color" style="background: var(--c-sdi); transition: background 0.4s ease;"></div> SDI</div>
+        <div class="legend-item"><div class="legend-color" style="background: var(--c-lan);"></div> LAN</div>
+        
+        <span style="border-right: 2px solid var(--dw-border); padding-right: 15px; margin-right: 5px; margin-left: 10px;">Audio</span>
+        <div class="legend-item"><div class="legend-color" style="background: var(--c-mic);"></div> Mic / In</div>
+        <div class="legend-item"><div class="legend-color" style="background: var(--c-media);"></div> Media</div>
+        <div class="legend-item"><div class="legend-color" style="background: var(--c-tx);"></div> Aux/Group</div>
+        <div class="legend-item"><div class="legend-color" style="background: var(--c-split);"></div> Main (Splitter)</div>
+        <div class="legend-item"><div class="legend-color" style="background: var(--c-spk);"></div> Speaker</div>
+        
+        <span style="border-right: 2px solid var(--dw-border); padding-right: 15px; margin-right: 5px; margin-left: 10px;">Bridge</span>
+        <div class="legend-item"><div class="legend-color" style="background: var(--c-aud);"></div> Audio ➔ Video</div>
+    </div>
+    
+    <svg id="unified-canvas"></svg>
+
+    <div class="master-board">
+        
+        <div class="audio-board">
+            <div class="node style-input" id="in-mic1" style="grid-area: 1 / 1;">
+                <div class="node-icon"><svg><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg></div>
+                <div class="node-info"><h4>Mic 1 - Ketua</h4><p>Shure SM58 • CH 01</p></div><div class="tp tp-out" id="t-m1-out" style="top:50%;" data-label="OUT"></div>
+            </div>
+            <div class="node style-input" id="in-mic2" style="grid-area: 2 / 1;">
+                <div class="node-icon"><svg><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg></div>
+                <div class="node-info"><h4>Mic 2 - Mimbar</h4><p>Sennheiser e835• CH 02</p></div><div class="tp tp-out" id="t-m2-out" style="top:50%;" data-label="OUT"></div>
+            </div>
+            <div class="node style-input" id="in-mic3" style="grid-area: 3 / 1;">
+                <div class="node-icon"><svg><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg></div>
+                <div class="node-info"><h4>Mic 3 - Peserta 1</h4><p>Shure SM58 • CH 03</p></div><div class="tp tp-out" id="t-m3-out" style="top:50%;" data-label="OUT"></div>
+            </div>
+            <div class="node style-input" id="in-mic4" style="grid-area: 4 / 1;">
+                <div class="node-icon"><svg><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg></div>
+                <div class="node-info"><h4>Mic 4 - Peserta 2</h4><p>Shure SM58 • CH 04</p></div><div class="tp tp-out" id="t-m4-out" style="top:50%;" data-label="OUT"></div>
+            </div>
+
+            <div class="node style-media" id="in-med-utama" style="grid-area: 6 / 1;">
+                <div class="node-icon"><svg><rect x="2" y="3" width="20" height="14" rx="2"/></svg></div>
+                <div class="node-info"><h4>Media Utama</h4><p>CH 5 (Main) • CH 6 (Audio Desc)</p></div>
+                <div class="tp tp-out" id="t-mu-L" style="top:35%;" data-label="OUT L"></div><div class="tp tp-out" id="t-mu-R" style="top:65%;" data-label="OUT R"></div>
+            </div>
+            <div class="node style-media" id="in-med-backup" style="grid-area: 7 / 1;">
+                <div class="node-icon"><svg><rect x="2" y="3" width="20" height="14" rx="2"/></svg></div>
+                <div class="node-info"><h4>Media Backup</h4><p>CH 7 (Main) • CH 8 (Audio Desc)</p></div>
+                <div class="tp tp-out" id="t-mb-L" style="top:35%;" data-label="OUT L"></div><div class="tp tp-out" id="t-mb-R" style="top:65%;" data-label="OUT R"></div>
+            </div>
+
+            <div class="node style-rack" id="snake-box" style="grid-area: 1 / 2 / span 5 / 3; align-self: center; height: 350px; width: 300px;">
+                <div class="node-icon" style="color:#10b981; align-self:flex-start; margin-top:5px;"><svg><rect x="4" y="4" width="16" height="16" rx="2"/></svg></div>
+                <div class="node-info" style="align-self:flex-start; margin-top:5px;"><h4>PROEL Stagebox</h4><p>Snake Cable 8/4</p></div>
+                <div class="tp tp-in" id="t-sb-m1" style="top:15%;" data-label="CH 1"></div><div class="tp tp-in" id="t-sb-m2" style="top:35%;" data-label="CH 2"></div><div class="tp tp-in" id="t-sb-m3" style="top:55%;" data-label="CH 3"></div><div class="tp tp-in" id="t-sb-m4" style="top:75%;" data-label="CH 4"></div>
+                <div class="tp tp-out" id="t-sb-o1" style="top:15%;" data-label="OUT CH 1"></div><div class="tp tp-out" id="t-sb-o2" style="top:25%;" data-label="OUT CH 2"></div><div class="tp tp-out" id="t-sb-o3" style="top:35%;" data-label="OUT CH 3"></div><div class="tp tp-out" id="t-sb-o4" style="top:45%;" data-label="OUT CH 4"></div>
+                <div class="tp tp-out" id="t-sb-retL" style="top:60%; border-color:#ef4444;" data-label="RET L IN"></div><div class="tp tp-out" id="t-sb-retR" style="top:70%; border-color:#ef4444;" data-label="RET R IN"></div><div class="tp tp-out" id="t-sb-protL" style="top:85%; border-color:#ef4444;" data-label="TO PROTEA L"></div><div class="tp tp-out" id="t-sb-protR" style="top:95%; border-color:#ef4444;" data-label="TO PROTEA R"></div>
+            </div>
+
+            <div class="node style-rack" id="mix-main" style="grid-area: 3 / 3 / span 4 / 4; align-self: end; height: 350px; width: 300px;">
+                <div class="node-icon" style="color:#d946ef; align-self:flex-start; margin-top:5px;"><svg><line x1="4" y1="21" x2="4" y2="14"/><line x1="12" y1="21" x2="12" y2="3"/></svg></div>
+                <div class="node-info" style="align-self:flex-start; margin-top:5px;">
+                    <h4>Yamaha MG16XU</h4><p>Audio Console</p>
+                    <p style="font-size: 10px; color: #d946ef; font-weight: bold;">» CH 1-5, 7 ➔ Stereo Out</p>
+                    <p style="font-size: 10px; color: #f59e0b; margin-top: 6px; font-weight: bold;">» CH 6, 8 ➔ Group 1-2</p>
+                </div>
+                <div class="tp tp-in" id="t-mix-i1" style="top:12%;" data-label="CH 1 IN"></div><div class="tp tp-in" id="t-mix-i2" style="top:22%;" data-label="CH 2 IN"></div><div class="tp tp-in" id="t-mix-i3" style="top:32%;" data-label="CH 3 IN"></div><div class="tp tp-in" id="t-mix-i4" style="top:42%;" data-label="CH 4 IN"></div>
+                <div class="tp tp-in" id="t-mix-i5" style="top:57%; border-color:var(--c-media);" data-label="CH 5 IN"></div><div class="tp tp-in" id="t-mix-i6" style="top:67%; border-color:var(--c-media);" data-label="CH 6 IN"></div><div class="tp tp-in" id="t-mix-i7" style="top:77%; border-color:var(--c-media);" data-label="CH 7 IN"></div><div class="tp tp-in" id="t-mix-i8" style="top:87%; border-color:var(--c-media);" data-label="CH 8 IN"></div>
+                <div class="tp tp-out" id="t-mix-mainL" style="top:25%;" data-label="STEREO L"></div><div class="tp tp-out" id="t-mix-mainR" style="top:35%;" data-label="STEREO R"></div><div class="tp tp-out" id="t-mix-grp1" style="top:75%; border-color:var(--c-tx);" data-label="GRP 1"></div><div class="tp tp-out" id="t-mix-grp2" style="top:85%; border-color:var(--c-tx);" data-label="GRP 2"></div>
+            </div>
+
+            <div class="node style-rack" id="proc-iso" style="grid-area: 3 / 4; height: 100px;">
+                <div class="node-icon" style="color:#8b5cf6;"><svg><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 12h16"/></svg></div>
+                <div class="node-info"><h4>Audio Isolator</h4><p>Noise Isolator</p></div>
+                <div class="tp tp-in" id="t-iso-inL" style="top:35%;" data-label="IN L"></div><div class="tp tp-in" id="t-iso-inR" style="top:65%;" data-label="IN R"></div>
+                <div class="tp tp-out" id="t-iso-outL" style="top:35%;" data-label="OUT L"></div><div class="tp tp-out" id="t-iso-outR" style="top:65%;" data-label="OUT R"></div>
+            </div>
+
+            <div class="node style-rack" id="tx-fm" style="grid-area: 3 / 5; height: 100px;">
+                <div class="node-icon" style="color:#f59e0b;"><svg><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49"/></svg></div>
+                <div class="node-info"><h4>FM Transmitter</h4><p>Broadcast Radio</p></div>
+                <div class="tp tp-in" id="t-tx-in" style="top:50%;" data-label="IN"></div>
+            </div>
+            
+            <div class="node style-rack" id="proc-geq" style="grid-area: 5 / 4; height: 100px; width: 230px;">
+                <div class="node-icon" style="color:#10b981; align-self:flex-start; margin-top:5px;"><svg><rect x="2" y="4" width="20" height="16" rx="2"/></svg></div>
+                <div class="node-info" style="align-self:flex-start; margin-top:5px;"><h4>GEQ DBX 231</h4><p>Graphic EQ 2 Channel</p></div>
+                <div class="tp tp-in" id="t-geq-inL" style="top:35%;" data-label="IN L"></div><div class="tp tp-in" id="t-geq-inR" style="top:65%;" data-label="IN R"></div>
+                <div class="tp tp-out" id="t-geq-outL" style="top:35%;" data-label="OUT L"></div><div class="tp tp-out" id="t-geq-outR" style="top:65%;" data-label="OUT R"></div>
+            </div>
+
+            <div class="node style-rack" id="proc-dlms" style="grid-area: 5 / 5; height: 160px; width: 300px;">
+                <div class="node-icon" style="color:#3b82f6; align-self:flex-start; margin-top:5px;"><svg><rect x="2" y="4" width="20" height="16" rx="2"/></svg></div>
+                <div class="node-info" style="align-self:flex-start; margin-top:5px;"><h4>DLMS Behringer DCX2496</h4><p>Manajemen Delay</p></div>
+                <div class="tp tp-in" id="t-dlms-inL" style="top:35%;" data-label="IN L"></div><div class="tp tp-in" id="t-dlms-inR" style="top:65%;" data-label="IN R"></div>
+                <div class="tp tp-out" id="t-dlms-o1" style="top:15%;" data-label="OUT 1"></div><div class="tp tp-out" id="t-dlms-o2" style="top:30%; border-color:#ef4444;" data-label="OUT 2 (DLY)"></div><div class="tp tp-out" id="t-dlms-o3" style="top:45%; border-color:#ef4444;" data-label="OUT 3 (DLY)"></div>
+                <div class="tp tp-out" id="t-dlms-o4" style="top:60%;" data-label="OUT 4 (Backup)"></div><div class="tp tp-out" id="t-dlms-o5" style="top:75%;" data-label="OUT 5"></div><div class="tp tp-out" id="t-dlms-o6" style="top:90%;" data-label="OUT 6"></div>
+            </div>
+
+            <div class="node style-rack" id="proc-split" style="grid-area: 4 / 6; height: 160px; width: 300px;">
+                <div class="node-icon" style="color:#ef4444; align-self:flex-start; margin-top:5px;"><svg><circle cx="8" cy="12" r="1"/><circle cx="12" cy="12" r="1"/></svg></div>
+                <div class="node-info" style="align-self:flex-start; margin-top:5px;"><h4>MX882 Splitter</h4><p>Distribusi Zona Utama</p></div>
+                <div class="tp tp-in" id="t-split-inL" style="top:35%;" data-label="IN L"></div><div class="tp tp-in" id="t-split-inR" style="top:65%;" data-label="IN R"></div>
+                <div class="tp tp-out" id="t-split-retL" style="top:12%; border-color:#ef4444;" data-label="MAIN OUT L"></div><div class="tp tp-out" id="t-split-retR" style="top:26%; border-color:#ef4444;" data-label="MAIN OUT R"></div>
+                <div class="tp tp-out" id="t-split-o1" style="top:41%;" data-label="OUT 1"></div><div class="tp tp-out" id="t-split-o2" style="top:56%;" data-label="OUT 2"></div><div class="tp tp-out" id="t-split-o3" style="top:71%;" data-label="OUT 3"></div>
+                <div class="tp tp-out" id="t-split-o4" style="top:86%; border-color:var(--c-aud);" data-label="OUT 4 (To Video)"></div>
+            </div>
+
+            <div class="node style-rack" id="amp-protea1" style="grid-area: 1 / 7;"><div class="node-info"><h4>Ampli PROTEA 1</h4><p>FOH L (Link 1-2)</p></div><div class="tp tp-in" id="t-ap1-in" style="top:50%;" data-label="IN"></div><div class="tp tp-out" id="t-ap1-out" style="top:50%;" data-label="OUT"></div></div>
+            <div class="node style-rack" id="amp-protea2" style="grid-area: 2 / 7;"><div class="node-info"><h4>Ampli PROTEA 2</h4><p>FOH R (Link 1-2)</p></div><div class="tp tp-in" id="t-ap2-in" style="top:50%;" data-label="IN"></div><div class="tp tp-out" id="t-ap2-out" style="top:50%;" data-label="OUT"></div></div>
+            <div class="node style-rack" id="amp-za1" style="grid-area: 3 / 7;"><div class="node-info"><h4>TOA ZA 2240</h4><p>Belakang Panggung</p></div><div class="tp tp-in" id="t-az1-in" style="top:50%;" data-label="IN"></div><div class="tp tp-out" id="t-az1-out" style="top:50%;" data-label="OUT"></div></div>
+            <div class="node style-rack" id="amp-za2" style="grid-area: 4 / 7;"><div class="node-info"><h4>TOA ZA 2240</h4><p>Samping Panggung</p></div><div class="tp tp-in" id="t-az2-in" style="top:50%;" data-label="IN"></div><div class="tp tp-out" id="t-az2-out" style="top:50%;" data-label="OUT"></div></div>
+            <div class="node style-rack" id="amp-za3" style="grid-area: 5 / 7;"><div class="node-info"><h4>TOA ZA 2120</h4><p>Panggung Monitor</p></div><div class="tp tp-in" id="t-az3-in" style="top:50%;" data-label="IN"></div><div class="tp tp-out" id="t-az3-out" style="top:50%;" data-label="OUT"></div></div>
+            <div class="node style-rack is-delayed" id="amp-za4" style="grid-area: 6 / 7;"><div class="tag-delay">DELAY</div><div class="node-info"><h4>TOA ZA 2240</h4><p>Tower Delay 1</p></div><div class="tp tp-in" id="t-az4-in" style="top:50%; border-color:#ef4444;" data-label="IN"></div><div class="tp tp-out" id="t-az4-out" style="top:50%;" data-label="OUT"></div></div>
+            <div class="node style-rack is-delayed" id="amp-za5" style="grid-area: 7 / 7;"><div class="tag-delay">DELAY</div><div class="node-info"><h4>TOA ZA 2240</h4><p>Tower Delay 2</p></div><div class="tp tp-in" id="t-az5-in" style="top:50%; border-color:#ef4444;" data-label="IN"></div><div class="tp tp-out" id="t-az5-out" style="top:50%;" data-label="OUT"></div></div>
+            <div class="node style-rack" id="amp-za6" style="grid-area: 8 / 7;"><div class="node-info"><h4>TOA ZA 2240</h4><p>Ruang P3K</p></div><div class="tp tp-in" id="t-az6-in" style="top:50%;" data-label="IN"></div><div class="tp tp-out" id="t-az6-out" style="top:50%;" data-label="OUT"></div></div>
+
+            <div class="zone-group" style="grid-area: 1 / 8; border-color: #be123c;"><div class="zone-title" style="border-color: #be123c;">FOH Kiri (TOA HX-5) - ZONA D1</div><div class="speaker-row"><div class="foh-array-stack" id="foh-L1"><div class="tp tp-in" id="t-spk-fl" style="top:50%;" data-label="IN"></div><div class="array-module"></div><div class="array-module"></div></div><div class="foh-array-stack"><div class="array-module"></div><div class="array-module"></div></div></div></div>
+            <div class="zone-group" style="grid-area: 2 / 8; border-color: #be123c;"><div class="zone-title" style="border-color: #be123c;">FOH Kanan (TOA HX-5) - ZONA D2</div><div class="speaker-row"><div class="foh-array-stack" id="foh-R1"><div class="tp tp-in" id="t-spk-fr" style="top:50%;" data-label="IN"></div><div class="array-module"></div><div class="array-module"></div></div><div class="foh-array-stack"><div class="array-module"></div><div class="array-module"></div></div></div></div>
+            <div class="zone-group" style="grid-area: 3 / 8;"><div class="zone-title">Belakang Panggung (TOA F-2000BM) - ZONA A</div><div class="speaker-row"><div class="spk-unit" id="z1-1"><div class="tp tp-in" id="t-spk-1" style="top:50%;"></div><span class="watt-label">60W</span></div><div class="spk-unit" id="z1-2"><span class="watt-label">60W</span></div><div class="spk-unit" id="z1-3"><span class="watt-label">60W</span></div></div></div>
+            <div class="zone-group" style="grid-area: 4 / 8;"><div class="zone-title">Samping Panggung (TOA F-2000B) - ZONA B</div><div class="speaker-row"><div class="spk-unit" id="z2-1"><div class="tp tp-in" id="t-spk-2" style="top:50%;"></div><span class="watt-label">60W</span></div><div class="spk-unit" id="z2-2"><span class="watt-label">60W</span></div></div></div>
+            <div class="zone-group" style="grid-area: 5 / 8;"><div class="zone-title">Panggung Monitor (TOA F-1000BM) - ZONA C</div><div class="speaker-row"><div class="spk-unit" id="z3-1"><div class="tp tp-in" id="t-spk-3" style="top:50%;"></div><span class="watt-label">15W</span></div><div class="spk-unit" id="z3-2"><span class="watt-label">15W</span></div><div class="spk-unit" id="z3-3"><span class="watt-label">15W</span></div></div></div>
+            <div class="zone-group" style="grid-area: 6 / 8;"><div class="zone-title">Tower Delay 1 (TOA F-2000BM) - ZONA E</div><div class="speaker-row"><div class="spk-unit" id="z4-1"><div class="tp tp-in" id="t-spk-4" style="top:50%;"></div><span class="watt-label">30W</span></div><div class="spk-unit" id="z4-2"><span class="watt-label">30W</span></div><div class="spk-unit" id="z4-3"><span class="watt-label">30W</span></div><div class="spk-unit" id="z4-4"><span class="watt-label">30W</span></div><div class="spk-unit" id="z4-5"><span class="watt-label">30W</span></div></div></div>
+            <div class="zone-group" style="grid-area: 7 / 8;"><div class="zone-title">Tower Delay 2 (TOA F-2000B) - ZONA F</div><div class="speaker-row"><div class="spk-unit" id="z5-1"><div class="tp tp-in" id="t-spk-5" style="top:50%;"></div><span class="watt-label">60W</span></div><div class="spk-unit" id="z5-2"><span class="watt-label">60W</span></div></div></div>
+            <div class="zone-group" style="grid-area: 8 / 8;"><div class="zone-title">Ruang P3K (TOA F-2000BM) - ZONA G</div><div class="speaker-row"><div class="spk-unit" id="z6-1"><div class="tp tp-in" id="t-spk-6" style="top:50%;"></div><span class="watt-label">60W</span></div><div class="spk-unit" id="z6-2"><span class="watt-label">60W</span></div></div></div>
+        </div>
+
+        <div class="video-board">
+            <div class="v-column">
+                <div class="v-node type-lpt border-lan" style="margin-top: 225px;"><div class="v-node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-mix"></use></svg>PTZ Controller 1</h4><p>Joystick Control</p></div>
+                    <div class="v-ports"><div class="v-ports-left"></div><div class="v-ports-right"><div class="v-port-row"><span class="v-port-label">LAN OUT</span><div class="dot" id="ctrl1-o1"></div></div></div></div>
+                </div>
+                <div class="v-node type-lpt border-lan" style="margin-top: 5px;"><div class="v-node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-mix"></use></svg>PTZ Controller 2</h4><p>Joystick Control</p></div>
+                    <div class="v-ports"><div class="v-ports-left"></div><div class="v-ports-right"><div class="v-port-row"><span class="v-port-label">LAN 1 OUT</span><div class="dot" id="ctrl2-o1"></div></div><div class="v-port-row"><span class="v-port-label">LAN 2 OUT</span><div class="dot" id="ctrl2-o2"></div></div></div></div>
+                </div>
+            </div>
+
+            <div class="v-column">
+                <div class="v-node type-lpt border-hdmi"><div class="v-node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-lpt"></use></svg>Laptop Utama</h4></div>
+                    <div class="v-ports"><div class="v-ports-left"></div><div class="v-ports-right"><div class="v-port-row"><span class="v-port-label">HDMI OUT</span><div class="dot" id="lu-out"></div></div></div></div>
+                </div>
+                <div class="v-node type-lpt border-hdmi"><div class="v-node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-lpt"></use></svg>Laptop Backup</h4></div>
+                    <div class="v-ports"><div class="v-ports-left"></div><div class="v-ports-right"><div class="v-port-row"><span class="v-port-label">HDMI OUT</span><div class="dot" id="lb-out"></div></div></div></div>
+                </div>
+                <div class="v-node type-cam border-sdi"><div class="v-node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-cam"></use></svg>Kamera PTZ 1</h4></div>
+                    <div class="v-ports"><div class="v-ports-left"><div class="v-port-row"><div class="dot" id="ptz1-lan"></div><span class="v-port-label">LAN IN</span></div></div><div class="v-ports-right"><div class="v-port-row"><span class="v-port-label">SDI OUT</span><div class="dot" id="ptz1-sdi"></div></div></div></div>
+                </div>
+                <div class="v-node type-cam border-sdi"><div class="v-node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-cam"></use></svg>Kamera PTZ 2</h4></div>
+                    <div class="v-ports"><div class="v-ports-left"><div class="v-port-row"><div class="dot" id="ptz2-lan"></div><span class="v-port-label">LAN IN</span></div></div><div class="v-ports-right"><div class="v-port-row"><span class="v-port-label">SDI OUT</span><div class="dot" id="ptz2-sdi"></div></div></div></div>
+                </div>
+                <div class="v-node type-cam border-sdi"><div class="v-node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-cam"></use></svg>Kamera PTZ 3</h4><p>Hanya untuk Baptisan</p></div>
+                    <div class="v-ports"><div class="v-ports-left"><div class="v-port-row"><div class="dot" id="ptz3-lan"></div><span class="v-port-label">LAN IN</span></div></div><div class="v-ports-right"><div class="v-port-row"><span class="v-port-label">SDI OUT</span><div class="dot" id="ptz3-sdi"></div></div></div></div>
+                </div>
+            </div>
+
+            <div class="v-column" style="justify-content: flex-start;">
+                <div class="v-node rack-core">
+                    <div class="v-node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-mix"></use></svg>ATEM Television Studio HD</h4><p>Pusat Video Switcher</p></div>
+                    <div class="v-ports">
+                        <div class="v-ports-left">
+                            <div class="v-port-row"><div class="dot" id="atem-i1"></div><span class="v-port-label">IN 1 (Laptop 1)</span></div>
+                            <div class="v-port-row"><div class="dot" id="atem-i2"></div><span class="v-port-label">IN 2 (Laptop 2)</span></div>
+                            <div style="height: 15px;"></div> 
+                            <div class="v-port-row"><div class="dot" id="atem-i5"></div><span class="v-port-label">IN 5 (PTZ 1)</span></div>
+                            <div class="v-port-row"><div class="dot" id="atem-i6"></div><span class="v-port-label">IN 6 (PTZ 2)</span></div>
+                            <div class="v-port-row"><div class="dot" id="atem-i7"></div><span class="v-port-label">IN 7 (PTZ 3)</span></div>
+                            <div style="height: 15px;"></div> 
+                            <div class="v-port-row"><div class="dot" id="atem-xlr1" style="border-color:var(--c-aud);"></div><span class="v-port-label">IN XLR 1 (Audio L)</span></div>
+                        </div>
+                        <div class="v-ports-right">
+                            <div class="v-port-row"><span class="v-port-label">OUT 5 (Ke VP 1)</span><div class="dot" id="atem-o5"></div></div>
+                            <div class="v-port-row"><span class="v-port-label">OUT 6 (Ke VP 2)</span><div class="dot" id="atem-o6"></div></div>
+                            <div style="height: 15px;"></div>
+                            <div class="v-port-row"><span class="v-port-label">OUT 7 (PGM Utama)</span><div class="dot" id="atem-o7"></div></div>
+                            <div style="height: 100px;"></div> <div class="v-port-row"><span class="v-port-label">SDI Multiview</span><div class="dot" id="atem-smv"></div></div>
+                            <div class="v-port-row"><span class="v-port-label">HDMI Multiview</span><div class="dot" id="atem-hmv"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="v-column">
+                <div class="v-node type-proc border-lan"><div class="v-node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-cpu"></use></svg>Video Processor 1</h4></div>
+                    <div class="v-ports"><div class="v-ports-left"><div class="v-port-row"><div class="dot" id="vp1-in"></div><span class="v-port-label">SDI IN</span></div></div><div class="v-ports-right"><div class="v-port-row"><span class="v-port-label">LAN OUT</span><div class="dot" id="vp1-out"></div></div></div></div>
+                </div>
+                <div class="v-node type-proc border-lan"><div class="v-node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-cpu"></use></svg>Video Processor 2</h4></div>
+                    <div class="v-ports"><div class="v-ports-left"><div class="v-port-row"><div class="dot" id="vp2-in"></div><span class="v-port-label">SDI IN</span></div></div><div class="v-ports-right"><div class="v-port-row"><span class="v-port-label">LAN OUT</span><div class="dot" id="vp2-out"></div></div></div></div>
+                </div>
+                <div style="height: 10px;"></div>
+                <div class="v-node type-dist border-sdi" style="border-left-width: 14px;"><div class="v-node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-dist"></use></svg>SDI Distributor Utama</h4></div>
+                    <div class="v-ports"><div class="v-ports-left"><div class="v-port-row"><div class="dot" id="d1-in"></div><span class="v-port-label">SDI IN</span></div></div>
+                        <div class="v-ports-right"><div class="v-port-row"><span class="v-port-label">Out 1 (Stream 1)</span><div class="dot" id="d1-o1"></div></div><div class="v-port-row"><span class="v-port-label">Out 2 (Stream 2)</span><div class="dot" id="d1-o2"></div></div><div class="v-port-row"><span class="v-port-label">Out 3 (Ke Dist 2)</span><div class="dot" id="d1-o3"></div></div><div class="v-port-row"><span class="v-port-label">Out 4 (Ke Dist 5)</span><div class="dot" id="d1-o4"></div></div></div>
+                    </div>
+                </div>
+                <div style="height: 60px;"></div> <div class="v-node type-proc border-hdmi"><div class="v-node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-cpu"></use></svg>Converter SDI to HDMI</h4></div>
+                    <div class="v-ports"><div class="v-ports-left"><div class="v-port-row"><div class="dot" id="mcmv-in"></div><span class="v-port-label">SDI IN</span></div></div><div class="v-ports-right"><div class="v-port-row"><span class="v-port-label">HDMI OUT</span><div class="dot" id="mcmv-hdmi"></div></div></div></div>
+                </div>
+                <div class="v-node type-mon border-hdmi"><div class="v-node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-mon"></use></svg>Monitor Video Switcher</h4><p>Audio & Program</p></div>
+                    <div class="v-ports"><div class="v-ports-left"><div class="v-port-row"><div class="dot" id="msw-in"></div><span class="v-port-label">HDMI IN</span></div></div><div class="v-ports-right"></div></div>
+                </div>
+            </div>
+
+            <div class="v-column">
+                <div class="v-node type-mon border-lan" style="padding-bottom:0;"><div class="v-node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-mon"></use></svg>LED Wall Kiri (1)</h4></div>
+                    <div class="v-ports"><div class="v-ports-left"><div class="v-port-row"><div class="dot" id="led1-lan"></div><span class="v-port-label">LAN IN</span></div></div><div class="v-ports-right"></div></div>
+                </div>
+                <div class="v-node type-mon border-lan" style="padding-bottom:0;"><div class="v-node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-mon"></use></svg>LED Wall Kanan (2)</h4></div>
+                    <div class="v-ports"><div class="v-ports-left"><div class="v-port-row"><div class="dot" id="led2-lan"></div><span class="v-port-label">LAN IN</span></div></div><div class="v-ports-right"></div></div>
+                </div>
+                <div class="v-node type-lpt border-usb"><div class="v-node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-cpu"></use></svg>Video Capture 1 (ezcap)</h4></div>
+                    <div class="v-ports"><div class="v-ports-left"><div class="v-port-row"><div class="dot" id="ez1-in"></div><span class="v-port-label">SDI IN</span></div></div><div class="v-ports-right"><div class="v-port-row"><span class="v-port-label">USB OUT</span><div class="dot" id="ez1-out"></div></div></div></div>
+                </div>
+                <div class="v-node type-lpt border-usb"><div class="v-node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-cpu"></use></svg>Video Capture 2 (ezcap)</h4></div>
+                    <div class="v-ports"><div class="v-ports-left"><div class="v-port-row"><div class="dot" id="ez2-in"></div><span class="v-port-label">SDI IN</span></div></div><div class="v-ports-right"><div class="v-port-row"><span class="v-port-label">USB OUT</span><div class="dot" id="ez2-out"></div></div></div></div>
+                </div>
+                <div class="v-node type-dist border-sdi"><div class="v-node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-dist"></use></svg>SDI Distributor #2</h4></div>
+                    <div class="v-ports"><div class="v-ports-left"><div class="v-port-row"><div class="dot" id="d2-in"></div><span class="v-port-label">SDI IN</span></div></div>
+                        <div class="v-ports-right"><div class="v-port-row"><span class="v-port-label">TV Tengah</span><div class="dot" id="d2-o1"></div></div><div class="v-port-row"><span class="v-port-label">Ke Dist 3</span><div class="dot" id="d2-o2"></div></div></div>
+                    </div>
+                </div>
+                <div class="v-node type-dist border-sdi"><div class="v-node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-dist"></use></svg>SDI Distributor #5</h4></div>
+                    <div class="v-ports"><div class="v-ports-left"><div class="v-port-row"><div class="dot" id="d5-in"></div><span class="v-port-label">SDI IN</span></div></div>
+                        <div class="v-ports-right"><div class="v-port-row"><span class="v-port-label">TV P3K</span><div class="dot" id="d5-o1"></div></div><div class="v-port-row"><span class="v-port-label">TV Ibu Anak</span><div class="dot" id="d5-o2"></div></div></div>
+                    </div>
+                </div>
+                <div style="height: 45px;"></div> <div class="v-node type-mon border-hdmi"><div class="v-node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-mon"></use></svg>Monitor Kamera PTZ</h4><p>Multiview</p></div>
+                    <div class="v-ports"><div class="v-ports-left"><div class="v-port-row"><div class="dot" id="mcam-in"></div><span class="v-port-label">HDMI IN</span></div></div><div class="v-ports-right"></div></div>
+                </div>
+            </div>
+
+            <div class="v-column">
+                <div style="height: 350px;"></div> 
+                <div class="v-node type-lpt border-usb"><div class="v-node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-lpt"></use></svg>Laptop Streaming 1</h4></div><div class="v-ports"><div class="v-ports-left"><div class="v-port-row"><div class="dot" id="ls1-in"></div><span class="v-port-label">USB IN</span></div></div><div class="v-ports-right"></div></div></div>
+                <div class="v-node type-lpt border-usb"><div class="v-node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-lpt"></use></svg>Laptop Streaming 2</h4></div><div class="v-ports"><div class="v-ports-left"><div class="v-port-row"><div class="dot" id="ls2-in"></div><span class="v-port-label">USB IN</span></div></div><div class="v-ports-right"></div></div></div>
+                <div style="height: 20px;"></div>
+                <div class="v-node type-tv border-sdi"><div class="v-node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-tv"></use></svg>TV Tengah Area Hadirin (B3)</h4></div><div class="v-ports"><div class="v-ports-left"><div class="v-port-row"><div class="dot" id="tvt-in"></div><span class="v-port-label">SDI IN</span></div></div><div class="v-ports-right"></div></div></div>
+                <div class="v-node type-dist border-sdi"><div class="v-node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-dist"></use></svg>SDI Distributor #3</h4></div>
+                    <div class="v-ports"><div class="v-ports-left"><div class="v-port-row"><div class="dot" id="d3-in"></div><span class="v-port-label">SDI IN</span></div></div>
+                        <div class="v-ports-right"><div class="v-port-row"><span class="v-port-label">TV B1</span><div class="dot" id="d3-o1"></div></div><div class="v-port-row"><span class="v-port-label">TV B2</span><div class="dot" id="d3-o2"></div></div><div class="v-port-row"><span class="v-port-label">Ke Dist 4</span><div class="dot" id="d3-o3"></div></div></div>
+                    </div>
+                </div>
+                <div class="v-node type-tv border-sdi"><div class="v-node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-tv"></use></svg>TV Ruang P3K (B6)</h4></div><div class="v-ports"><div class="v-ports-left"><div class="v-port-row"><div class="dot" id="tvp-in"></div><span class="v-port-label">SDI IN</span></div></div><div class="v-ports-right"></div></div></div>
+                <div class="v-node type-tv border-sdi"><div class="v-node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-tv"></use></svg>TV Ruang Ibu & Anak</h4></div><div class="v-ports"><div class="v-ports-left"><div class="v-port-row"><div class="dot" id="tvi-in"></div><span class="v-port-label">SDI IN</span></div></div><div class="v-ports-right"></div></div></div>
+            </div>
+
+            <div class="v-column">
+                <div style="height: 605px;"></div> 
+                <div class="v-node type-tv border-sdi"><div class="v-node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-tv"></use></svg>TV B1</h4></div><div class="v-ports"><div class="v-ports-left"><div class="v-port-row"><div class="dot" id="tvb1-in"></div><span class="v-port-label">SDI IN</span></div></div><div class="v-ports-right"></div></div></div>
+                <div class="v-node type-tv border-sdi"><div class="v-node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-tv"></use></svg>TV B2</h4></div><div class="v-ports"><div class="v-ports-left"><div class="v-port-row"><div class="dot" id="tvb2-in"></div><span class="v-port-label">SDI IN</span></div></div><div class="v-ports-right"></div></div></div>
+                <div class="v-node type-dist border-sdi"><div class="v-node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-dist"></use></svg>SDI Distributor #4</h4></div>
+                    <div class="v-ports"><div class="v-ports-left"><div class="v-port-row"><div class="dot" id="d4-in"></div><span class="v-port-label">SDI IN</span></div></div>
+                        <div class="v-ports-right">
+                            <div class="v-port-row"><span class="v-port-label">TV A1</span><div class="dot" id="d4-o1"></div></div>
+                            <div class="v-port-row"><span class="v-port-label">TV A2</span><div class="dot" id="d4-o2"></div></div>
+                            <div class="v-port-row"><span class="v-port-label">TV A3</span><div class="dot" id="d4-o3"></div></div>
+                            <div class="v-port-row"><span class="v-port-label">TV A4</span><div class="dot" id="d4-o4"></div></div>
+                            <div class="v-port-row"><span class="v-port-label">TV A5</span><div class="dot" id="d4-o5"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="v-column">
+                <div style="height: 840px;"></div> 
+                <div class="v-node type-tv border-sdi"><div class="v-node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-tv"></use></svg>TV A1</h4></div><div class="v-ports"><div class="v-ports-left"><div class="v-port-row"><div class="dot" id="tva1-in"></div><span class="v-port-label">SDI IN</span></div></div><div class="v-ports-right"></div></div></div>
+                <div class="v-node type-tv border-sdi"><div class="v-node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-tv"></use></svg>TV A2</h4></div><div class="v-ports"><div class="v-ports-left"><div class="v-port-row"><div class="dot" id="tva2-in"></div><span class="v-port-label">SDI IN</span></div></div><div class="v-ports-right"></div></div></div>
+                <div class="v-node type-tv border-sdi"><div class="v-node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-tv"></use></svg>TV A3</h4></div><div class="v-ports"><div class="v-ports-left"><div class="v-port-row"><div class="dot" id="tva3-in"></div><span class="v-port-label">SDI IN</span></div></div><div class="v-ports-right"></div></div></div>
+                <div class="v-node type-tv border-sdi"><div class="v-node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-tv"></use></svg>TV A4</h4></div><div class="v-ports"><div class="v-ports-left"><div class="v-port-row"><div class="dot" id="tva4-in"></div><span class="v-port-label">SDI IN</span></div></div><div class="v-ports-right"></div></div></div>
+                <div class="v-node type-tv border-sdi"><div class="v-node-header"><h4><svg class="ico" viewBox="0 0 24 24"><use href="#i-tv"></use></svg>TV A5</h4></div><div class="v-ports"><div class="v-ports-left"><div class="v-port-row"><div class="dot" id="tva5-in"></div><span class="v-port-label">SDI IN</span></div></div><div class="v-ports-right"></div></div></div>
+            </div>
+
+        </div> </div> </div> <script>
+    // ==========================================
+    // DATA KABEL (GABUNGAN AUDIO, VIDEO, BRIDGE)
+    // ==========================================
+    const allCables = [
+        // --- CABLE BRIDGE (Audio to Video) ---
+        // Dari MX882 Out 4 -> ATEM XLR 1
+        { from: 't-split-o4', to: 'atem-xlr1', label: 'XLR L (Main to Video)', color: 'var(--c-aud)', route: 'bezier' },
+
+        // --- CABLES VIDEO ---
+        { from: 'ctrl1-o1', to: 'ptz1-lan', label: 'LAN', color: 'var(--c-lan)', route: 'bezier' },
+        { from: 'ctrl2-o1', to: 'ptz2-lan', label: 'LAN', color: 'var(--c-lan)', route: 'bezier' },
+        { from: 'ctrl2-o2', to: 'ptz3-lan', label: 'LAN', color: 'var(--c-lan)', route: 'bezier' },
+        { from: 'lu-out', to: 'atem-i1', label: 'HDMI', color: 'var(--c-hdmi)', route: 'bezier' },
+        { from: 'lb-out', to: 'atem-i2', label: 'HDMI', color: 'var(--c-hdmi)', route: 'bezier' },
+        { from: 'ptz1-sdi', to: 'atem-i5', label: 'SDI', color: 'var(--c-sdi)', route: 'bezier' },
+        { from: 'ptz2-sdi', to: 'atem-i6', label: 'SDI', color: 'var(--c-sdi)', route: 'bezier' },
+        { from: 'ptz3-sdi', to: 'atem-i7', label: 'SDI', color: 'var(--c-sdi)', route: 'bezier' },
+        { from: 'atem-o5', to: 'vp1-in', label: 'SDI', color: 'var(--c-sdi)', route: 'bezier' },  
+        { from: 'atem-o6', to: 'vp2-in', label: 'SDI', color: 'var(--c-sdi)', route: 'bezier' },  
+        { from: 'atem-o7', to: 'd1-in', label: 'SDI', color: 'var(--c-sdi)', route: 'bezier' },
+        { from: 'atem-smv', to: 'mcmv-in', label: 'SDI', color: 'var(--c-sdi)', route: 'bezier' },
+        { from: 'atem-hmv', to: 'msw-in', label: 'HDMI', color: 'var(--c-hdmi)', route: 'bezier' },
+        { from: 'vp1-out', to: 'led1-lan', label: 'LAN', color: 'var(--c-lan)', route: 'bezier' },
+        { from: 'vp2-out', to: 'led2-lan', label: 'LAN', color: 'var(--c-lan)', route: 'bezier' },
+        { from: 'mcmv-hdmi', to: 'mcam-in', label: 'HDMI', color: 'var(--c-hdmi)', route: 'bezier' }, 
+        { from: 'd1-o1', to: 'ez1-in', label: 'SDI', color: 'var(--c-sdi)', route: 'bezier' },
+        { from: 'd1-o2', to: 'ez2-in', label: 'SDI', color: 'var(--c-sdi)', route: 'bezier' },
+        { from: 'd1-o3', to: 'd2-in', label: 'SDI', color: 'var(--c-sdi)', route: 'bezier' },
+        { from: 'd1-o4', to: 'd5-in', label: 'SDI', color: 'var(--c-sdi)', route: 'bezier' },
+        { from: 'ez1-out', to: 'ls1-in', label: 'USB', color: 'var(--c-usb)', route: 'bezier' },
+        { from: 'ez2-out', to: 'ls2-in', label: 'USB', color: 'var(--c-usb)', route: 'bezier' },
+        { from: 'd2-o1', to: 'tvt-in', label: 'SDI', color: 'var(--c-sdi)', route: 'bezier' },
+        { from: 'd2-o2', to: 'd3-in', label: 'SDI', color: 'var(--c-sdi)', route: 'bezier' },
+        { from: 'd5-o1', to: 'tvp-in', label: 'SDI', color: 'var(--c-sdi)', route: 'bezier' },
+        { from: 'd5-o2', to: 'tvi-in', label: 'SDI', color: 'var(--c-sdi)', route: 'bezier' },
+        { from: 'd3-o1', to: 'tvb1-in', label: 'SDI', color: 'var(--c-sdi)', route: 'bezier' },
+        { from: 'd3-o2', to: 'tvb2-in', label: 'SDI', color: 'var(--c-sdi)', route: 'bezier' },
+        { from: 'd3-o3', to: 'd4-in', label: 'SDI', color: 'var(--c-sdi)', route: 'bezier' },
+        { from: 'd4-o1', to: 'tva1-in', label: 'SDI', color: 'var(--c-sdi)', route: 'bezier' },
+        { from: 'd4-o2', to: 'tva2-in', label: 'SDI', color: 'var(--c-sdi)', route: 'bezier' },
+        { from: 'd4-o3', to: 'tva3-in', label: 'SDI', color: 'var(--c-sdi)', route: 'bezier' },
+        { from: 'd4-o4', to: 'tva4-in', label: 'SDI', color: 'var(--c-sdi)', route: 'bezier' },
+        { from: 'd4-o5', to: 'tva5-in', label: 'SDI', color: 'var(--c-sdi)', route: 'bezier' },
+
+        // --- CABLES AUDIO ---
+        { from: 't-m1-out', to: 't-sb-m1', label: 'XLR', color: 'var(--c-mic)', route: 'bezier' },
+        { from: 't-m2-out', to: 't-sb-m2', label: 'XLR', color: 'var(--c-mic)', route: 'bezier' },
+        { from: 't-m3-out', to: 't-sb-m3', label: 'XLR', color: 'var(--c-mic)', route: 'bezier' },
+        { from: 't-m4-out', to: 't-sb-m4', label: 'XLR', color: 'var(--c-mic)', route: 'bezier' },
+        { from: 't-sb-o1', to: 't-mix-i1', label: 'CH 1', color: 'var(--c-mic)', route: 'bezier' },
+        { from: 't-sb-o2', to: 't-mix-i2', label: 'CH 2', color: 'var(--c-mic)', route: 'bezier' },
+        { from: 't-sb-o3', to: 't-mix-i3', label: 'CH 3', color: 'var(--c-mic)', route: 'bezier' },
+        { from: 't-sb-o4', to: 't-mix-i4', label: 'CH 4', color: 'var(--c-mic)', route: 'bezier' },
+        { from: 't-mu-L', to: 't-mix-i5', label: 'CH 5 (Main)', color: 'var(--c-media)', route: 'bezier' },
+        { from: 't-mu-R', to: 't-mix-i6', label: 'CH 6 (Audio Desc)', color: 'var(--c-media)', route: 'bezier' },
+        { from: 't-mb-L', to: 't-mix-i7', label: 'CH 7 (Main)', color: 'var(--c-media)', route: 'bezier' },
+        { from: 't-mb-R', to: 't-mix-i8', label: 'CH 8 (Audio Desc)', color: 'var(--c-media)', route: 'bezier' },
+        
+        { from: 't-mix-grp1', to: 't-iso-inL', label: 'Dual TRS to TRS', color: 'var(--c-tx)', route: 'elbow', xOffset: 50, labelOffsetY: -15 },
+        { from: 't-mix-grp2', to: 't-iso-inR', color: 'var(--c-tx)', route: 'elbow', xOffset: 65 },
+        { from: 't-iso-outL', to: 't-tx-in', label: 'TRS L/R to 3,5mm', color: 'var(--c-tx)', route: 'elbow', xOffset: 80, labelOffsetY: -15 },
+        { from: 't-iso-outR', to: 't-tx-in', color: 'var(--c-tx)', route: 'elbow', xOffset: 100 },
+        { from: 't-mix-mainL', to: 't-geq-inL', label: 'Stereo Out L/R', color: 'var(--c-mix)', route: 'bezier' },
+        { from: 't-mix-mainR', to: 't-geq-inR', color: 'var(--c-mix)', route: 'bezier' },
+        { from: 't-geq-outL', to: 't-dlms-inL', label: 'XLR L/R', color: 'var(--c-mix)', route: 'bezier' },
+        { from: 't-geq-outR', to: 't-dlms-inR', color: 'var(--c-mix)', route: 'bezier' },
+        
+        { from: 't-dlms-o5', to: 't-split-inL', label: 'Out 5/6: XLR', color: 'var(--c-dlms)', route: 'elbow', xOffset: 35 },
+        { from: 't-dlms-o6', to: 't-split-inR', color: 'var(--c-dlms)', route: 'elbow', xOffset: 45 },
+        
+        { from: 't-dlms-o1', to: 't-az3-in', label: 'Out 1: XLR to RCA', color: 'var(--c-dlms)', route: 'bezier' },
+        { from: 't-dlms-o2', to: 't-az4-in', label: 'Out 2: XLR to RCA', color: 'var(--c-dlms)', route: 'elbow', xOffset: 65 },
+        { from: 't-dlms-o3', to: 't-az5-in', label: 'Out 3: XLR to RCA', color: 'var(--c-dlms)', route: 'elbow', xOffset: 95 },
+        
+        { from: 't-split-retL', to: 't-sb-retL', label: 'Main Out L (Snake)', color: 'var(--c-split)', route: 'return-top', yOffset: 45 },
+        { from: 't-split-retR', to: 't-sb-retR', label: 'Main Out R (Snake)', color: 'var(--c-split)', route: 'return-top', yOffset: 25 },
+        { from: 't-sb-protL', to: 't-ap1-in', label: 'XLR L', color: 'var(--c-split)', route: 'under', underOffset: 120 },
+        { from: 't-sb-protR', to: 't-ap2-in', label: 'XLR R', color: 'var(--c-split)', route: 'under', underOffset: 95 },
+        
+        { from: 't-split-o1', to: 't-az1-in', label: 'Out 1: XLR to RCA', color: 'var(--c-split)', route: 'elbow', xOffset: 50 },
+        { from: 't-split-o2', to: 't-az2-in', label: 'Out 2: XLR to RCA', color: 'var(--c-split)', route: 'bezier' }, 
+        { from: 't-split-o3', to: 't-az6-in', label: 'Out 3: XLR to RCA', color: 'var(--c-split)', route: 'elbow', xOffset: 80 },
+        
+        { from: 't-ap1-out', to: 't-spk-fl', label: 'SpeakON', color: 'var(--c-spk)', route: 'elbow', xOffset: 40, dual: true },
+        { from: 't-ap2-out', to: 't-spk-fr', label: 'SpeakON', color: 'var(--c-spk)', route: 'elbow', xOffset: 80, dual: true },
+        { from: 't-az1-out', to: 't-spk-1', label: '100V Line', color: 'var(--c-spk)', dual: true, route: 'bezier' },
+        { from: 't-az2-out', to: 't-spk-2', label: '100V Line', color: 'var(--c-spk)', dual: true, route: 'bezier' },
+        { from: 't-az3-out', to: 't-spk-3', label: '100V Line', color: 'var(--c-spk)', dual: true, route: 'bezier' },
+        { from: 't-az4-out', to: 't-spk-4', label: '100V Line', color: 'var(--c-spk)', dual: true, route: 'bezier' },
+        { from: 't-az5-out', to: 't-spk-5', label: '100V Line', color: 'var(--c-spk)', dual: true, route: 'bezier' },
+        { from: 't-az6-out', to: 't-spk-6', label: '100V Line', color: 'var(--c-spk)', dual: true, route: 'bezier' },
+        
+        { from: 'z1-1', to: 'z1-2', color: 'var(--c-spk)', dual: true, route: 'jumper' },
+        { from: 'z1-2', to: 'z1-3', color: 'var(--c-spk)', dual: true, route: 'jumper' },
+        { from: 'z2-1', to: 'z2-2', color: 'var(--c-spk)', dual: true, route: 'jumper' },
+        { from: 'z3-1', to: 'z3-2', color: 'var(--c-spk)', dual: true, route: 'jumper' },
+        { from: 'z3-2', to: 'z3-3', color: 'var(--c-spk)', dual: true, route: 'jumper' },
+        { from: 'z4-1', to: 'z4-2', color: 'var(--c-spk)', dual: true, route: 'jumper' },
+        { from: 'z4-2', to: 'z4-3', color: 'var(--c-spk)', dual: true, route: 'jumper' },
+        { from: 'z4-3', to: 'z4-4', color: 'var(--c-spk)', dual: true, route: 'jumper' },
+        { from: 'z4-4', to: 'z4-5', color: 'var(--c-spk)', dual: true, route: 'jumper' },
+        { from: 'z5-1', to: 'z5-2', color: 'var(--c-spk)', dual: true, route: 'jumper' },
+        { from: 'z6-1', to: 'z6-2', color: 'var(--c-spk)', dual: true, route: 'jumper' }
+    ];
+
+    // ==========================================
+    // LOGIKA PEMBUATAN JALUR GARIS
+    // ==========================================
+    function createPathD(x1, y1, x2, y2, link, gridH) {
+        let pathD = ""; let labelX, labelY;
+
+        if (link.route === 'jumper') {
+            pathD = `M ${x1} ${y1} L ${x2} ${y2}`;
+            labelX = (x1 + x2) / 2; labelY = y2 - 10;
+        } else if (link.route === 'elbow') {
+            const dropX = x1 + (link.xOffset || 40);
+            let r = 15; 
+            const dirY = y2 > y1 ? 1 : -1; 
+            const dirX1 = dropX > x1 ? 1 : -1;
+            const dirX2 = x2 > dropX ? 1 : -1;
+
+            if (Math.abs(y2 - y1) < 10) {
+                pathD = `M ${x1} ${y1} L ${x2} ${y2}`;
+                labelX = (x1 + x2) / 2; labelY = y2;
+            } else {
+                if (Math.abs(y2 - y1) < r * 2) r = Math.abs(y2 - y1) / 2;
+                pathD = `M ${x1} ${y1} L ${dropX - (r * dirX1)} ${y1} Q ${dropX} ${y1} ${dropX} ${y1 + (r * dirY)} L ${dropX} ${y2 - (r * dirY)} Q ${dropX} ${y2} ${dropX + (r * dirX2)} ${y2} L ${x2} ${y2}`;
+                labelX = dropX + ((x2 - dropX) / 2); labelY = y2;
+            }
+        } else if (link.route === 'return-top') {
+            const dropX1 = x1 + 30; const dropX2 = x2 + 80;
+            const routeY = link.yOffset || 40; const r = 15;
+            pathD = `M ${x1} ${y1} L ${dropX1 - r} ${y1} Q ${dropX1} ${y1} ${dropX1} ${y1 - r} L ${dropX1} ${routeY + r} Q ${dropX1} ${routeY} ${dropX1 - r} ${routeY} L ${dropX2 + r} ${routeY} Q ${dropX2} ${routeY} ${dropX2} ${routeY + r} L ${dropX2} ${y2 - r} Q ${dropX2} ${y2} ${dropX2 - r} ${y2} L ${x2} ${y2}`;
+            labelX = (dropX1 + dropX2) / 2; labelY = routeY;
+        } else if (link.route === 'under') {
+            const dropX1 = x1 + 40; const dropX2 = x2 - 50; 
+            const routeY = gridH - (link.underOffset || 60); const r = 15;
+            pathD = `M ${x1} ${y1} L ${dropX1 - r} ${y1} Q ${dropX1} ${y1} ${dropX1} ${y1 + r} L ${dropX1} ${routeY - r} Q ${dropX1} ${routeY} ${dropX1 + r} ${routeY} L ${dropX2 - r} ${routeY} Q ${dropX2} ${routeY} ${dropX2} ${routeY - r} L ${dropX2} ${y2 + r} Q ${dropX2} ${y2} ${dropX2 + r} ${y2} L ${x2} ${y2}`;
+            labelX = (dropX1 + dropX2) / 2; labelY = routeY;
+        } else {
+            // Default Bezier Curve (cocok untuk kabel antar-board & Video)
+            const dist = Math.abs(x2 - x1);
+            const curveFactor = Math.max(dist * 0.45, 60); 
+            const cp1x = x1 < x2 ? x1 + curveFactor : x1 - curveFactor;
+            const cp2x = x1 < x2 ? x2 - curveFactor : x2 + curveFactor;
+            
+            // Sedikit tuning khusus curve agar kabel panjang (bridge) tidak terlalu menjuntai
+            const cp1y = dist > 400 ? y1 - (dist * 0.1) : y1;
+            const cp2y = dist > 400 ? y2 + (dist * 0.1) : y2;
+
+            pathD = `M ${x1} ${y1} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${x2} ${y2}`;
+            labelX = (x1 + x2) / 2; labelY = (y1 + y2) / 2;
+        }
+        return { pathD, labelX, labelY };
+    }
+
+    // ==========================================
+    // RENDER SEMUA KABEL KE SVG
+    // ==========================================
+    function drawUnifiedConnections() {
+        const svg = document.getElementById('unified-canvas');
+        const container = document.getElementById('unified-container');
+        const board = container.querySelector('.master-board');
+        const audioGridBox = container.querySelector('.audio-board').getBoundingClientRect();
+        
+        svg.style.width = Math.max(container.scrollWidth, board.scrollWidth) + 'px';
+        svg.style.height = Math.max(container.scrollHeight, board.scrollHeight) + 'px';
+        
+        const cRect = container.getBoundingClientRect();
+        
+        // Asumsi gridH hanya berpatokan pada tinggi area audio agar routing "under" tetap bekerja pas
+        const gridH = audioGridBox.height + 100; 
+        
+        let svgContent = '';
+
+        allCables.forEach(link => {
+            const elFrom = document.getElementById(link.from);
+            const elTo = document.getElementById(link.to);
+            if(!elFrom || !elTo) return;
+
+            const rectFrom = elFrom.getBoundingClientRect();
+            const rectTo = elTo.getBoundingClientRect();
+            
+            const x1 = rectFrom.left + rectFrom.width/2 - cRect.left + container.scrollLeft;
+            const y1 = rectFrom.top + rectFrom.height/2 - cRect.top + container.scrollTop;
+            const x2 = rectTo.left + rectTo.width/2 - cRect.left + container.scrollLeft;
+            const y2 = rectTo.top + rectTo.height/2 - cRect.top + container.scrollTop;
+            
+            let paths = []; let finalLabelX, finalLabelY;
+
+            if (link.dual) {
+                const gap = 12; 
+                const l1 = { ...link, xOffset: link.xOffset ? link.xOffset - gap/2 : undefined };
+                const l2 = { ...link, xOffset: link.xOffset ? link.xOffset + gap/2 : undefined };
+                const p1 = createPathD(x1, y1 - gap/2, x2, y2 - gap/2, l1, gridH);
+                const p2 = createPathD(x1, y1 + gap/2, x2, y2 + gap/2, l2, gridH);
+                paths.push(p1.pathD, p2.pathD);
+                finalLabelX = (p1.labelX + p2.labelX) / 2; finalLabelY = (p1.labelY + p2.labelY) / 2;
+            } else {
+                const p = createPathD(x1, y1, x2, y2, link, gridH);
+                paths.push(p.pathD); finalLabelX = p.labelX; finalLabelY = p.labelY;
+            }
+            
+            paths.forEach(d => {
+                const zClass = link.route === 'jumper' ? 'z-index: 1;' : '';
+                svgContent += `<path d="${d}" fill="none" stroke="${link.color}" stroke-width="6" stroke-linecap="round" opacity="0.3" style="transition: stroke 0.4s ease; ${zClass}" />`;
+                svgContent += `<path d="${d}" fill="none" stroke="${link.color}" stroke-width="2.5" stroke-linecap="round" class="cable-flow" style="transition: stroke 0.4s ease; ${zClass}" />`;
+            });
+                        
+            if (link.label) {
+                const labelWidth = link.label.length * 7.5 + 20; 
+                const offsetY = link.labelOffsetY || 0; 
+
+                svgContent += `
+                    <rect class="cable-label-bg" x="${finalLabelX - labelWidth/2}" y="${finalLabelY - 14 + offsetY}" width="${labelWidth}" height="28" rx="14" stroke="${link.color}" style="transition: fill 0.4s ease, stroke 0.4s ease;" />
+                    <text class="cable-label-text" x="${finalLabelX}" y="${finalLabelY + offsetY}" dominant-baseline="central" alignment-baseline="central" style="transition: fill 0.4s ease;">${link.label}</text>
+                `;
+            }
+        });
+        svg.innerHTML = svgContent;
+    }
+
+    // ==========================================
+    // INTERAKSI DRAG (MOUSE)
+    // ==========================================
+    const slider = document.getElementById('unified-container');
+    let isDown = false, startX, startY, scrollLeft, scrollTop;
+
+    slider.addEventListener('mousedown', (e) => {
+        isDown = true; 
+        slider.style.cursor = 'grabbing';
+        startX = e.pageX - slider.offsetLeft; 
+        startY = e.pageY - slider.offsetTop; 
+        scrollLeft = slider.scrollLeft; 
+        scrollTop = slider.scrollTop;
+    });
+    slider.addEventListener('mouseleave', () => { isDown = false; slider.style.cursor = 'grab'; });
+    slider.addEventListener('mouseup', () => { isDown = false; slider.style.cursor = 'grab'; });
+    slider.addEventListener('mousemove', (e) => {
+        if (!isDown) return; 
+        e.preventDefault(); 
+        slider.scrollLeft = scrollLeft - (e.pageX - slider.offsetLeft - startX) * 1.5; 
+        slider.scrollTop = scrollTop - (e.pageY - slider.offsetTop - startY) * 1.5;
+    });
+
+    // Observer Theme Changes
+    const observer = new MutationObserver(() => drawUnifiedConnections());
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class', 'data-theme', 'data-bs-theme'] });
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+
+    window.onload = () => { setTimeout(drawUnifiedConnections, 300); };
+    window.onresize = drawUnifiedConnections;
+</script>

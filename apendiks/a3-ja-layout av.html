@@ -83,6 +83,7 @@ location: "JA-01"
         padding: 20px;
         text-align: center;
         box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        margin-bottom: 25px; /* Menambahkan jarak antar kartu */
     }
     .layout-card img {
         width: 100%;
@@ -120,15 +121,20 @@ location: "JA-01"
             <div class="alert-icon">📌</div>
             <div class="alert-content">
                 <h4>Informasi: Tim Audio Video & Tata Kursi</h4>
-                <p>Pastikan penempatan perangkat Audio Video dan layout kursi penonton mengikuti panduan layout di bawah ini.</p>
+                <p>Pastikan penempatan perangkat Audio Video, rute kabel, dan layout kursi penonton mengikuti panduan manajemen layout di bawah ini.</p>
             </div>
         </div>
 
         <div class="layout-card">
-            <!-- Nama file di-encode %20 untuk menggantikan spasi agar path aman -->
             <img src="{{ '/assets/images/Layout%20Final%20AV%20JA%202026.png' | relative_url }}" alt="Layout Final AV dan Tata Kursi JA 2026">
             <h3>Denah Layout Final</h3>
             <p>Referensi resmi tata letak ruangan, panggung, posisi alat AV, dan zona kursi audiens.</p>
+        </div>
+
+        <div class="layout-card">
+            <img src="{{ '/assets/images/Layout%20Jalur%20Kabel%20Audio%20JA.png' | relative_url }}" alt="Layout Jalur Kabel Audio JA">
+            <h3>Skema Jalur Kabel Audio</h3>
+            <p>Referensi alur instalasi kabel, interkoneksi antar perangkat audio, dan jalur manajemen kabel di lapangan.</p>
         </div>
     </div>
 </div>

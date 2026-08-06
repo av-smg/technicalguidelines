@@ -8,47 +8,101 @@ location: "MASTER"
     {% include head.html %}
 
     <style>
-        /* KHUSUS HALAMAN INVENTORY - Tidak Mengganggu style.css Utama */
+        /* KHUSUS HALAMAN INVENTORY */
         .page-title-section { text-align: center; margin: 20px 0 30px; }
         .page-title-section h2 { font-weight: 800; letter-spacing: -1px; text-transform: uppercase; color: var(--text-dark); }
         
+        /* ==================================================
+           ✨ UI BARU: TOOLBAR KONTROL INVENTORY ✨
+           ================================================== */
         .controls-wrapper {
-            position: sticky; top: 75px; z-index: 900; background: var(--bg-color);
-            padding: 15px 0 10px; margin: 0 -15px 20px -15px; padding-inline: 15px;
-            transition: background 0.3s; border-bottom: 1px solid var(--border-color);
+            position: sticky; top: 75px; z-index: 900; 
+            margin: 0 -15px 25px -15px; padding: 15px 15px 20px 15px;
+            /* Efek blur transparan ala modern app */
+            background: rgba(255, 255, 255, 0.7); 
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
         }
         
-        .controls-container { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 15px; }
-        
-        .search-bar-inv { 
-            width: 100%; padding: 16px 24px; border-radius: 15px; border: 1px solid var(--border-color); 
-            outline: none; font-size: 16px; background: var(--card-bg); color: var(--text-dark);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03); transition: 0.3s;
+        .toolbar-card {
+            max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 15px;
+            background: var(--card-bg); padding: 16px; border-radius: 18px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.04); border: 1px solid var(--border-color);
         }
-        .search-bar-inv:focus { border-color: var(--primary-orange); }
-        
-        .filters { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: space-between; }
-        .filter-group { display: flex; gap: 10px; flex-wrap: wrap; flex: 1; }
-        .view-group { display: flex; gap: 10px; }
-        
-        .control-element { 
-            padding: 10px 16px; border-radius: 10px; border: 1px solid var(--border-color); 
-            background: var(--card-bg); font-size: 14px; font-weight: 600; 
-            color: var(--text-dark); cursor: pointer; outline: none; transition: 0.2s;
+
+        /* 1. Baris Atas: Pencarian */
+        .search-box-modern { position: relative; width: 100%; }
+        .search-box-modern i {
+            position: absolute; left: 18px; top: 50%; transform: translateY(-50%);
+            color: var(--text-gray); font-size: 16px; pointer-events: none;
         }
-        .control-element:focus, .control-element:hover { border-color: var(--primary-orange); }
-        .btn-view.active { background: var(--primary-orange); color: white; border-color: var(--primary-orange); }
+        .search-input-modern { 
+            width: 100%; padding: 14px 20px 14px 45px; 
+            border-radius: 12px; border: 1px solid var(--border-color); 
+            outline: none; font-size: 15px; background: var(--bg-color); color: var(--text-dark);
+            transition: all 0.3s ease; font-family: inherit; font-weight: 500;
+        }
+        .search-input-modern:focus { 
+            border-color: var(--primary-orange); 
+            box-shadow: 0 0 0 4px rgba(255,126,39,0.1); 
+            background: var(--card-bg);
+        }
+
+        /* 2. Baris Bawah: Filter & Actions */
+        .toolbar-bottom { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
         
-        /* Tombol Tambah Spesial */
-        .btn-add-item { background: #2ecc71; color: white; border-color: #2ecc71; font-weight: 800; }
-        .btn-add-item:hover { background: #27ae60; border-color: #27ae60; transform: translateY(-2px); }
+        .filter-group-modern { display: flex; gap: 10px; flex-wrap: wrap; flex: 1; }
+        
+        /* Custom Select bergaya Modern */
+        .select-modern {
+            appearance: none; -webkit-appearance: none;
+            background-color: var(--bg-color);
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat; background-position: right 14px center; background-size: 14px;
+            padding: 10px 38px 10px 16px; border-radius: 10px; border: 1px solid var(--border-color); 
+            font-size: 13px; font-weight: 700; color: var(--text-dark); cursor: pointer; outline: none; transition: 0.2s;
+            font-family: inherit;
+        }
+        .select-modern:focus, .select-modern:hover { border-color: var(--primary-orange); background-color: var(--card-bg); }
+
+        .action-group-modern { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+        /* Styling Tombol Modern */
+        .btn-mod {
+            padding: 10px 18px; border-radius: 10px; font-size: 13px; font-weight: 800; 
+            cursor: pointer; outline: none; transition: 0.3s; text-decoration: none !important;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        
+        /* Master Data Button (Secondary) */
+        .btn-mod-outline { background: var(--bg-color); color: var(--text-dark); border: 1px solid var(--border-color); }
+        .btn-mod-outline:hover { background: #0f172a; border-color: #0f172a; color: white; transform: translateY(-2px); }
+        
+        /* Tambah Barang Button (Primary Green) */
+        .btn-mod-primary { background: #2ecc71; color: white; border: 1px solid #2ecc71; box-shadow: 0 4px 10px rgba(46,204,113,0.2); }
+        .btn-mod-primary:hover { background: #27ae60; border-color: #27ae60; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(46,204,113,0.3); }
+
+        /* Segmented Control (Gallery / List) bergaya iOS */
+        .segmented-control {
+            display: flex; background: var(--bg-color); border: 1px solid var(--border-color); 
+            border-radius: 10px; padding: 4px; gap: 2px;
+        }
+        .seg-btn {
+            background: transparent; border: none; padding: 6px 14px; font-size: 12px; font-weight: 800; 
+            color: var(--text-gray); cursor: pointer; transition: 0.3s; border-radius: 6px; 
+            display: inline-flex; align-items: center; gap: 6px; font-family: inherit;
+        }
+        .seg-btn.active { background: var(--card-bg); color: var(--primary-orange); box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+        .seg-btn:hover:not(.active) { color: var(--text-dark); }
+        /* ================================================== */
 
         /* GRID & LIST CARDS */
         .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; padding-bottom: 40px; }
         .list-view { display: flex; flex-direction: column; gap: 12px; max-width: 1200px; margin: 0 auto; padding-bottom: 40px; }
         
         .mission-card { background: var(--card-bg); border-radius: 20px; padding: 15px; cursor: pointer; transition: 0.3s; border: 1px solid var(--border-color); display: flex; flex-direction: column; }
-        .mission-card:hover { transform: translateY(-5px); border-color: var(--primary-orange); }
+        .mission-card:hover { transform: translateY(-5px); border-color: var(--primary-orange); box-shadow: 0 10px 25px rgba(255,126,39,0.05); }
         .card-img { width: 100%; height: 180px; object-fit: cover; border-radius: 15px; background: #eee; margin-bottom: 15px; }
 
         .list-item { display: flex; align-items: center; gap: 15px; background: var(--card-bg); padding: 15px; border-radius: 15px; cursor: pointer; border: 1px solid var(--border-color); transition: 0.3s; }
@@ -69,8 +123,8 @@ location: "MASTER"
         .modal-overlay.active { display: flex; }
         .modal-content { background: var(--card-bg); border-radius: 25px; width: 100%; max-width: 900px; max-height: 90vh; overflow-y: auto; position: relative; border: 1px solid var(--border-color); }
         .modal-header { padding: 20px 30px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--card-bg); z-index: 10; }
-        .close-x { font-size: 28px; cursor: pointer; border: none; background: none; color: var(--text-gray); }
-        .close-x:hover { color: var(--primary-orange); }
+        .close-x { font-size: 28px; cursor: pointer; border: none; background: none; color: var(--text-gray); transition: 0.3s; }
+        .close-x:hover { color: var(--primary-orange); transform: rotate(90deg); }
         .modal-body { display: flex; flex-wrap: wrap; padding: 20px; gap: 25px; }
         
         /* Modal Edit Specifics */
@@ -82,10 +136,10 @@ location: "MASTER"
         .thumb-img:hover, .thumb-img.active { border-color: var(--primary-orange); opacity: 1; }
         
         .img-edit-controls { display: flex; gap: 10px; }
-        .btn-img { flex: 1; padding: 10px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-dark); }
+        .btn-img { flex: 1; padding: 10px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-dark); transition: 0.2s; }
         .btn-img:hover { border-color: var(--primary-orange); color: var(--primary-orange); }
         .btn-img-danger { color: #e74c3c; }
-        .btn-img-danger:hover { border-color: #e74c3c; background: #fdedf0; }
+        .btn-img-danger:hover { border-color: #e74c3c; background: #fdedf0; color: #e74c3c; }
 
         .modal-right { flex: 1.2; min-width: 300px; }
         .label-tag { font-size: 11px; font-weight: 800; color: var(--text-gray); text-transform: uppercase; margin-bottom: 8px; display: block; }
@@ -100,42 +154,49 @@ location: "MASTER"
         .qty-info strong { color: var(--text-dark); font-size: 14px; }
         .qty-info span { color: var(--text-gray); font-size: 12px; }
 
-        .input-text { width: 100%; padding: 12px 15px; border-radius: 12px; border: 2px solid var(--border-color); background: var(--card-bg); color: var(--text-dark); font-size: 14px; outline: none; margin-bottom: 20px; font-family: inherit; }
-        .input-text:focus { border-color: var(--primary-orange); }
+        .input-text { width: 100%; padding: 12px 15px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-dark); font-size: 14px; outline: none; margin-bottom: 20px; font-family: inherit; font-weight: 500; transition: 0.3s; }
+        .input-text:focus { border-color: var(--primary-orange); background: var(--card-bg); }
+        textarea.input-text { resize: vertical; min-height: 80px; }
 
-        .status-toggle { display: flex; align-items: center; gap: 10px; background: var(--bg-color); padding: 12px 15px; border-radius: 12px; border: 1px solid var(--border-color); cursor: pointer; }
+        .status-toggle { display: flex; align-items: center; gap: 10px; background: var(--bg-color); padding: 12px 15px; border-radius: 12px; border: 1px solid var(--border-color); cursor: pointer; transition: 0.3s; }
+        .status-toggle:hover { border-color: var(--primary-orange); }
         .status-toggle input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--primary-orange); cursor: pointer; }
         .status-toggle span { font-size: 14px; font-weight: 700; color: var(--text-dark); }
 
         .modal-footer { display: flex; flex-wrap: wrap; gap: 10px; padding: 0 20px 25px; }
-        .btn { flex: 1; padding: 16px; border-radius: 15px; font-weight: 800; border: none; cursor: pointer; transition: 0.3s; font-size: 15px; min-width: 150px; }
+        .btn { flex: 1; padding: 16px; border-radius: 15px; font-weight: 800; border: none; cursor: pointer; transition: 0.3s; font-size: 14px; min-width: 150px; text-transform: uppercase; }
         .btn-save { background: var(--primary-orange); color: white; }
-        .btn-save:hover { transform: translateY(-2px); box-shadow: 0 12px 20px rgba(255,126,39,0.3); }
+        .btn-save:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(255,126,39,0.25); }
         .btn-save:disabled { background: #ccc; cursor: not-allowed; transform: none; box-shadow: none; }
         .btn-cancel { background: var(--bg-color); color: var(--text-dark); border: 1px solid var(--border-color); }
-        .btn-danger { background: #e74c3c; color: white; border: 1px solid #e74c3c; flex-basis: 100%; }
-        .btn-danger:hover { background: #c0392b; transform: translateY(-2px); }
+        .btn-cancel:hover { background: var(--border-color); }
+        .btn-danger { background: #fff; color: #e74c3c; border: 1px solid #e74c3c; flex-basis: 100%; }
+        .btn-danger:hover { background: #e74c3c; color: #fff; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(231,76,60,0.2); }
         
         /* KHUSUS MODAL TAMBAH (Photo Grid) */
         .photo-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
-        .photo-box { aspect-ratio: 1/1; border-radius: 12px; border: 2px dashed var(--border-color); display: flex; align-items: center; justify-content: center; background: var(--bg-color); cursor: pointer; overflow: hidden; position: relative; }
+        .photo-box { aspect-ratio: 1/1; border-radius: 12px; border: 2px dashed var(--border-color); display: flex; align-items: center; justify-content: center; background: var(--bg-color); cursor: pointer; overflow: hidden; position: relative; transition: 0.2s; }
+        .photo-box:hover { border-color: var(--primary-orange); background: var(--card-bg); }
         .photo-box img { width: 100%; height: 100%; object-fit: cover; }
-        .photo-box span { font-size: 24px; color: var(--text-gray); }
+        .photo-box span { font-size: 24px; color: var(--text-gray); transition: 0.2s; }
+        .photo-box:hover span { color: var(--primary-orange); }
 
         #loading { text-align: center; padding: 100px 20px; font-weight: 700; color: var(--text-gray); }
 
         /* FULLSCREEN OVERLAY */
-        .fs-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.95); display: none; flex-direction: column; z-index: 99999; justify-content: center; align-items: center; padding: 20px; }
+        .fs-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.95); display: none; flex-direction: column; z-index: 99999; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(10px); }
         .fs-overlay.active { display: flex; }
         .fs-header { width: 100%; position: absolute; top: 0; left: 0; padding: 20px; }
-        .btn-back-fs { background: rgba(255, 255, 255, 0.2); color: white; border: 2px solid white; padding: 10px 20px; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 14px; display: inline-block; }
-        .fs-image { max-width: 100%; max-height: 85vh; object-fit: contain; border-radius: 10px; }
+        .btn-back-fs { background: rgba(255, 255, 255, 0.15); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 10px 20px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 14px; transition: 0.3s; }
+        .btn-back-fs:hover { background: rgba(255,255,255,0.3); }
+        .fs-image { max-width: 100%; max-height: 85vh; object-fit: contain; border-radius: 12px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
 
         @media (max-width: 768px) {
             .modal-body { flex-direction: column; }
-            .filters { flex-direction: column; align-items: stretch; }
-            .view-group { justify-content: space-between; flex-wrap: wrap; }
-            .btn-add-item { width: 100%; }
+            .toolbar-bottom { flex-direction: column; align-items: stretch; }
+            .filter-group-modern { flex-direction: column; }
+            .action-group-modern { justify-content: space-between; }
+            .btn-mod-primary { flex: 1; }
         }
     </style>
 </head>
@@ -146,39 +207,62 @@ location: "MASTER"
     <main style="padding: 0 15px;">
         <div class="page-title-section">
             <h2>Inventory Portal</h2>
-            <p style="font-size: 12px; font-weight: 700; color: var(--text-gray);">Audio Video & Inventory Team Semarang</p>
+            <p style="font-size: 13px; font-weight: 700; color: var(--text-gray);">Audio Video & Inventory Team Semarang</p>
         </div>
 
+        <!-- AREA TOOLBAR UI BARU -->
         <div class="controls-wrapper">
-            <div class="controls-container">
-                <input type="text" id="searchInput" class="search-bar-inv" placeholder="Cari nama barang..." oninput="applyFilters()">
-                <div class="filters">
-                    <div class="filter-group">
-                        <select id="sortSelect" class="control-element" onchange="applyFilters()">
-                            <option value="default">Urutan Default</option>
-                            <option value="az">A - Z</option>
-                            <option value="za">Z - A</option>
-                        </select>
-                        <select id="teamSelect" class="control-element" onchange="applyFilters()">
-                            <option value="all">Semua Tim</option>
-                        </select>
-                        <select id="ownerSelect" class="control-element" onchange="applyFilters()">
-                            <option value="all">Semua Sumber</option>
-                        </select>
-                    </div>
-                    <div class="view-group">
-                        <!-- Tombol Master Database Baru -->
-                        <a href="../inventaris/masterdatabase.html" class="control-element btn-master">
-                            <i class="fa-solid fa-database" style="margin-right: 5px;"></i> MASTER DATA
-                        </a>
-                        
-                        <button onclick="openAddModal()" class="control-element btn-add-item">+ TAMBAH BARANG</button>
-                        <button onclick="toggleView('gallery')" id="btnGallery" class="control-element btn-view active">Gallery</button>
-                        <button onclick="toggleView('list')" id="btnList" class="control-element btn-view">List</button>
+            <div class="toolbar-card">
+                
+                <!-- Search Bar -->
+                <div class="toolbar-top">
+                    <div class="search-box-modern">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="searchInput" class="search-input-modern" placeholder="Cari nama barang, spesifikasi, atau tim..." oninput="applyFilters()">
                     </div>
                 </div>
+
+                <!-- Filters & Actions -->
+                <div class="toolbar-bottom">
+                    <div class="filter-group-modern">
+                        <select id="sortSelect" class="select-modern" onchange="applyFilters()">
+                            <option value="default">Urutan Default</option>
+                            <option value="az">Sortir: A - Z</option>
+                            <option value="za">Sortir: Z - A</option>
+                        </select>
+                        <select id="teamSelect" class="select-modern" onchange="applyFilters()">
+                            <option value="all">Semua Tim (All)</option>
+                        </select>
+                        <select id="ownerSelect" class="select-modern" onchange="applyFilters()">
+                            <option value="all">Semua Sumber (All)</option>
+                        </select>
+                    </div>
+
+                    <div class="action-group-modern">
+                        <!-- Tombol Master Data kini berdesain solid elegan -->
+                        <a href="../inventaris/masterdatabase.html" class="btn-mod btn-mod-outline">
+                            <i class="fa-solid fa-database"></i> Master Data
+                        </a>
+                        
+                        <button onclick="openAddModal()" class="btn-mod btn-mod-primary">
+                            <i class="fa-solid fa-plus"></i> Tambah Barang
+                        </button>
+                        
+                        <!-- Segmented Control untuk View Toggle -->
+                        <div class="segmented-control">
+                            <button onclick="toggleView('gallery')" id="btnGallery" class="seg-btn active">
+                                <i class="fa-solid fa-border-all"></i> Gallery
+                            </button>
+                            <button onclick="toggleView('list')" id="btnList" class="seg-btn">
+                                <i class="fa-solid fa-list-ul"></i> List
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
+        <!-- AKHIR AREA TOOLBAR -->
 
         <div id="loading">Meminta akses dan mengunduh data...</div>
         <div id="dataContainer" class="grid-cards"></div>
@@ -190,7 +274,7 @@ location: "MASTER"
     <div id="modalEdit" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 style="font-weight: 800;">EDIT DATA BARANG</h3>
+                <h3 style="font-weight: 800; font-size: 18px;">EDIT DATA BARANG</h3>
                 <button onclick="closeModalEdit()" class="close-x">✕</button>
             </div>
             
@@ -213,7 +297,6 @@ location: "MASTER"
                 </div>
 
                 <div class="modal-right">
-                    <!-- Semua field dibuat bisa diedit -->
                     <span class="label-tag">Nama Barang</span>
                     <input type="text" id="m-nama" class="input-text" style="font-weight: 700; font-size: 15px;">
 
@@ -224,7 +307,7 @@ location: "MASTER"
                         </div>
                         <div class="flex-col">
                             <span class="label-tag">Kondisi</span>
-                            <select id="m-kondisi" class="input-text" style="margin-bottom: 0;">
+                            <select id="m-kondisi" class="input-text select-modern" style="margin-bottom: 0;">
                                 <option value="Bagus">Bagus</option>
                                 <option value="Periksa">Periksa</option>
                                 <option value="Rusak">Rusak</option>
@@ -249,7 +332,7 @@ location: "MASTER"
                     <div class="flex-row-input">
                         <div class="flex-col">
                             <span class="label-tag">Lokasi Saat Ini</span>
-                            <select id="m-lokasi" class="input-text" style="margin-bottom: 0;"></select>
+                            <select id="m-lokasi" class="input-text select-modern" style="margin-bottom: 0;"></select>
                         </div>
                         <div class="flex-col">
                             <span class="label-tag">Status Barang</span>
@@ -280,7 +363,9 @@ location: "MASTER"
             <div class="modal-footer">
                 <button onclick="closeModalEdit()" class="btn btn-cancel">BATAL / TUTUP</button>
                 <button id="saveBtn" class="btn btn-save">SIMPAN PERUBAHAN</button>
-                <button id="deleteBtn" class="btn btn-danger">🗑️ HAPUS BARANG</button>
+                <button id="deleteBtn" class="btn btn-danger">
+                    <i class="fa-solid fa-trash" style="margin-right: 5px;"></i> HAPUS BARANG
+                </button>
             </div>
         </div>
     </div>
@@ -291,7 +376,7 @@ location: "MASTER"
     <div id="modalAdd" class="modal-overlay">
         <div class="modal-content" style="max-width: 600px;">
             <div class="modal-header">
-                <h3 style="font-weight: 800;">TAMBAH INVENTARIS</h3>
+                <h3 style="font-weight: 800; font-size: 18px;">TAMBAH INVENTARIS</h3>
                 <button onclick="closeAddModal()" class="close-x">✕</button>
             </div>
             
@@ -306,7 +391,7 @@ location: "MASTER"
                     </div>
                     <div class="flex-col">
                         <span class="label-tag">Kondisi</span>
-                        <select id="add-kondisi" class="input-text">
+                        <select id="add-kondisi" class="input-text select-modern">
                             <option value="Bagus">Bagus</option>
                             <option value="Periksa">Periksa</option>
                             <option value="Rusak">Rusak</option>
@@ -335,7 +420,9 @@ location: "MASTER"
     <!-- FULLSCREEN OVERLAY -->
     <div id="fsOverlay" class="fs-overlay">
         <div class="fs-header">
-            <button onclick="closeFullscreen()" class="btn-back-fs">⬅ Kembali</button>
+            <button onclick="closeFullscreen()" class="btn-back-fs">
+                <i class="fa-solid fa-arrow-left" style="margin-right:5px;"></i> Kembali
+            </button>
         </div>
         <img id="fsImage" class="fs-image" src="" alt="Fullscreen View">
     </div>
@@ -426,12 +513,12 @@ location: "MASTER"
     function populateFilters() {
         const teams = [...new Set(allItems.map(i => i.tim).filter(Boolean))];
         const teamSelect = document.getElementById("teamSelect");
-        teamSelect.innerHTML = `<option value="all">Semua Tim</option>`;
+        teamSelect.innerHTML = `<option value="all">Semua Tim (All)</option>`;
         teams.forEach(t => teamSelect.innerHTML += `<option value="${t}">${t}</option>`);
 
         const owners = [...new Set(allItems.map(i => i.barang_milik).filter(Boolean))];
         const ownerSelect = document.getElementById("ownerSelect");
-        ownerSelect.innerHTML = `<option value="all">Semua Sumber</option>`;
+        ownerSelect.innerHTML = `<option value="all">Semua Sumber (All)</option>`;
         owners.forEach(o => ownerSelect.innerHTML += `<option value="${o}">${o}</option>`);
     }
 
@@ -450,7 +537,7 @@ location: "MASTER"
         const ownerVal = document.getElementById("ownerSelect").value;
 
         let filtered = allItems.filter(i => {
-            const matchQ = i.nama_barang.toLowerCase().includes(q) || (i.tim || "").toLowerCase().includes(q);
+            const matchQ = i.nama_barang.toLowerCase().includes(q) || (i.tim || "").toLowerCase().includes(q) || (i.keterangan_ref || "").toLowerCase().includes(q);
             const matchTeam = (teamVal === 'all') || (i.tim === teamVal);
             const matchOwner = (ownerVal === 'all') || (i.barang_milik && i.barang_milik === ownerVal);
             return matchQ && matchTeam && matchOwner;
@@ -486,38 +573,38 @@ location: "MASTER"
                 ? `<span class="badge-status-on">Aktif/Digunakan</span>`
                 : `<span class="badge-status-off">Standby</span>`;
 
-            const ownerBadge = item.barang_milik ? `<span class="badge-owner">📦 ${item.barang_milik}</span>` : "";
-            const locBadge = item.lokasi ? `<span class="badge-owner">📍 ${item.lokasi}</span>` : "";
+            const ownerBadge = item.barang_milik ? `<span class="badge-owner"><i class="fa-solid fa-box" style="margin-right:3px;"></i> ${item.barang_milik}</span>` : "";
+            const locBadge = item.lokasi ? `<span class="badge-owner"><i class="fa-solid fa-location-dot" style="margin-right:3px;"></i> ${item.lokasi}</span>` : "";
             
             if (currentView === 'gallery') {
                 card.className = "mission-card";
                 card.innerHTML = `
-                    <img src="${imageSrc}" class="card-img">
+                    <img src="${imageSrc}" class="card-img" loading="lazy">
                     <div style="flex: 1;">
                         <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:5px;">
-                            <h4 style="font-weight:800; font-size:15px; margin:0;">${item.nama_barang}</h4>
+                            <h4 style="font-weight:800; font-size:15px; margin:0; line-height:1.3;">${item.nama_barang}</h4>
                             ${activeLabel}
                         </div>
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
-                            <span style="font-size:12px; color:var(--text-gray);">${item.tim || '-'}</span>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px; margin-top: 8px;">
+                            <span style="font-size:12px; color:var(--text-gray);"><i class="fa-solid fa-users" style="margin-right:4px;"></i> ${item.tim || '-'}</span>
                             <span class="badge-qty">Stok: ${total}</span>
                         </div>
                     </div>
-                    <div style="display:flex; flex-direction:column; gap:6px; border-top: 1px solid var(--border-color); padding-top: 10px; margin-top: auto;">
-                        <div style="display:flex; justify-content:space-between;">${ownerBadge} ${locBadge}</div>
+                    <div style="display:flex; flex-direction:column; gap:8px; border-top: 1px solid var(--border-color); padding-top: 12px; margin-top: auto;">
+                        <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:5px;">${ownerBadge} ${locBadge}</div>
                         ${statusBadge}
                     </div>
                 `;
             } else {
                 card.className = "list-item";
                 card.innerHTML = `
-                    <img src="${imageSrc}" class="list-img">
+                    <img src="${imageSrc}" class="list-img" loading="lazy">
                     <div class="list-info">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
                             <h4 style="font-weight: 800; font-size: 15px; margin:0;">${item.nama_barang}</h4>
                             ${activeLabel}
                         </div>
-                        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top: 5px;">
+                        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top: 6px;">
                             <span class="badge-qty">Total: ${total} Pcs</span>
                             <span style="color:var(--text-gray);">|</span>
                             ${locBadge}
@@ -594,7 +681,7 @@ location: "MASTER"
 
         const btn = this;
         btn.disabled = true;
-        btn.innerText = "PROSES MENYIMPAN...";
+        btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> MENYIMPAN...`;
 
         const payload = {
             action: "add_item",
@@ -800,7 +887,7 @@ location: "MASTER"
         const newStatus = document.getElementById("m-status-digunakan")?.checked || false;
 
         btn.disabled = true;
-        btn.innerText = "PROSES MENYIMPAN...";
+        btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> PROSES MENYIMPAN...`;
 
         const payload = {
             action: "update_item",
@@ -852,7 +939,7 @@ location: "MASTER"
 
         const btn = this;
         btn.disabled = true;
-        btn.innerText = "MENGHAPUS...";
+        btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> MENGHAPUS...`;
 
         const payload = {
             action: "delete_item",
@@ -875,12 +962,12 @@ location: "MASTER"
             } else {
                 alert("❌ Gagal Menghapus: " + data.message);
                 btn.disabled = false;
-                btn.innerText = "🗑️ HAPUS BARANG";
+                btn.innerHTML = `<i class="fa-solid fa-trash" style="margin-right: 5px;"></i> HAPUS BARANG`;
             }
         } catch (e) {
             alert("⚠️ Gagal terhubung. Periksa koneksi internetmu.");
             btn.disabled = false;
-            btn.innerText = "🗑️ HAPUS BARANG";
+            btn.innerHTML = `<i class="fa-solid fa-trash" style="margin-right: 5px;"></i> HAPUS BARANG`;
         }
     };
 </script>

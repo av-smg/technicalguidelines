@@ -342,7 +342,8 @@ location: "MASTER"
 
 <script>
     // URL WEBHOOK BARU ANDA
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxB5OoDZqwKLceNFIr4Xen1Rff2hn5j5lYkik20abDXFip9c-LM-iuU9MXf7Sw22E1XqQ/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4C90tXAuT7iuFHZjOmgtYhoQqfNUosnEqMAm9l2Cn-VyjbPivKkf5Tv69qCtun441g/exec";
+    
     const VALID_PINS = [
       "4m9k2b", "7p4v1c", "9h2n8f", "2y6r5w", "8b3t9m",
       "1q8x4d", "6j5p7z", "3c9g2k", "5n1m8v", "4t7f3q",
@@ -395,10 +396,20 @@ location: "MASTER"
     async function loadData() {
         try {
             document.getElementById("loading").style.display = "block";
+            document.getElementById("loading").innerText = "Meminta akses dan mengunduh data...";
             document.getElementById("dataContainer").innerHTML = "";
 
-            const res = await fetch(SCRIPT_URL + "?action=api&nocache=" + new Date().getTime());
+            const res = await fetch(SCRIPT_URL + "?action=api&nocache=" + new Date().getTime(), {
+                method: "GET",
+                redirect: "follow"
+            });
             const rawData = await res.json();
+            
+            // CEK APAKAH ADA ERROR DARI GOOGLE SCRIPT
+            if (rawData.error_message) {
+                document.getElementById("loading").innerHTML = `<span style="color:#e74c3c;"><b>Peringatan Sistem (Cek ID Sheet/Rumus):</b><br>${rawData.error_message}</span>`;
+                return;
+            }
             
             allItems = rawData.inventory.filter(item => item.nama_barang && item.nama_barang.toLowerCase() !== 'nama barang');
             optionsData = rawData.dropdowns || { lokasi: ["Gudang", "Gedung"], kepemilikan: [] };
@@ -407,7 +418,8 @@ location: "MASTER"
             populateFilters();
             applyFilters();
         } catch (e) {
-            document.getElementById("loading").innerText = "Gagal memuat data. Periksa koneksi Internet.";
+            console.error(e);
+            document.getElementById("loading").innerHTML = `<span style="color:#e74c3c;"><b>Gagal memuat data.</b><br>Pastikan kamu sudah deploy Apps Script sebagai 'New Version'.</span>`;
         }
     }
 
@@ -615,7 +627,6 @@ location: "MASTER"
             btn.innerText = "SIMPAN BARANG";
         }
     };
-
 
     // ==========================================
     // LOGIKA MODAL EDIT & HAPUS

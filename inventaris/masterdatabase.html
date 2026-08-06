@@ -89,7 +89,6 @@ location: "MASTER"
 
         .modal-right { flex: 1.2; min-width: 300px; }
         .label-tag { font-size: 11px; font-weight: 800; color: var(--text-gray); text-transform: uppercase; margin-bottom: 8px; display: block; }
-        .ref-box { background: var(--bg-color); padding: 15px; border-radius: 12px; border-left: 4px solid var(--primary-orange); font-size: 14px; margin-bottom: 20px; line-height: 1.5; color: var(--text-dark); }
         
         .flex-row-input { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
         .flex-col { flex: 1; min-width: 140px; }
@@ -101,19 +100,21 @@ location: "MASTER"
         .qty-info strong { color: var(--text-dark); font-size: 14px; }
         .qty-info span { color: var(--text-gray); font-size: 12px; }
 
-        .input-text { width: 100%; padding: 12px 15px; border-radius: 12px; border: 2px solid var(--border-color); background: var(--card-bg); color: var(--text-dark); font-size: 14px; outline: none; margin-bottom: 20px; }
+        .input-text { width: 100%; padding: 12px 15px; border-radius: 12px; border: 2px solid var(--border-color); background: var(--card-bg); color: var(--text-dark); font-size: 14px; outline: none; margin-bottom: 20px; font-family: inherit; }
         .input-text:focus { border-color: var(--primary-orange); }
 
         .status-toggle { display: flex; align-items: center; gap: 10px; background: var(--bg-color); padding: 12px 15px; border-radius: 12px; border: 1px solid var(--border-color); cursor: pointer; }
         .status-toggle input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--primary-orange); cursor: pointer; }
         .status-toggle span { font-size: 14px; font-weight: 700; color: var(--text-dark); }
 
-        .modal-footer { display: flex; gap: 10px; padding: 0 20px 25px; }
-        .btn { flex: 1; padding: 16px; border-radius: 15px; font-weight: 800; border: none; cursor: pointer; transition: 0.3s; font-size: 15px; }
+        .modal-footer { display: flex; flex-wrap: wrap; gap: 10px; padding: 0 20px 25px; }
+        .btn { flex: 1; padding: 16px; border-radius: 15px; font-weight: 800; border: none; cursor: pointer; transition: 0.3s; font-size: 15px; min-width: 150px; }
         .btn-save { background: var(--primary-orange); color: white; }
         .btn-save:hover { transform: translateY(-2px); box-shadow: 0 12px 20px rgba(255,126,39,0.3); }
         .btn-save:disabled { background: #ccc; cursor: not-allowed; transform: none; box-shadow: none; }
         .btn-cancel { background: var(--bg-color); color: var(--text-dark); border: 1px solid var(--border-color); }
+        .btn-danger { background: #e74c3c; color: white; border: 1px solid #e74c3c; flex-basis: 100%; }
+        .btn-danger:hover { background: #c0392b; transform: translateY(-2px); }
         
         /* KHUSUS MODAL TAMBAH (Photo Grid) */
         .photo-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
@@ -189,7 +190,7 @@ location: "MASTER"
     <div id="modalEdit" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="m-name" style="font-weight: 800;">DETAIL BARANG</h3>
+                <h3 style="font-weight: 800;">EDIT DATA BARANG</h3>
                 <button onclick="closeModalEdit()" class="close-x">✕</button>
             </div>
             
@@ -212,22 +213,38 @@ location: "MASTER"
                 </div>
 
                 <div class="modal-right">
-                    <div style="display: flex; gap: 10px; margin-bottom: 20px; background: var(--bg-color); padding: 15px; border-radius: 12px; border: 1px solid var(--border-color);">
-                        <div style="flex: 1;">
-                            <span style="font-size: 10px; font-weight: 800; color: var(--text-gray); text-transform: uppercase;">Aset Milik</span>
-                            <div id="m-owner" style="font-size: 14px; font-weight: 700; color: var(--text-dark); margin-top: 4px;">-</div>
+                    <!-- Semua field dibuat bisa diedit -->
+                    <span class="label-tag">Nama Barang</span>
+                    <input type="text" id="m-nama" class="input-text" style="font-weight: 700; font-size: 15px;">
+
+                    <div class="flex-row-input">
+                        <div class="flex-col">
+                            <span class="label-tag">Jumlah Total</span>
+                            <input type="number" id="m-jumlah" class="input-text" style="margin-bottom: 0;" oninput="updateMaxTerpakai()">
                         </div>
-                        <div style="flex: 1; border-left: 1px solid var(--border-color); padding-left: 10px;">
-                            <span style="font-size: 10px; font-weight: 800; color: var(--text-gray); text-transform: uppercase;">Tim Pengguna</span>
-                            <div id="m-team" style="font-size: 14px; font-weight: 700; color: var(--text-dark); margin-top: 4px;">-</div>
-                        </div>
-                        <div style="flex: 1.2; border-left: 1px solid var(--border-color); padding-left: 10px;">
-                            <span style="font-size: 10px; font-weight: 800; color: var(--text-gray); text-transform: uppercase;">Tgl Input Awal</span>
-                            <div id="m-date" style="font-size: 13px; font-weight: 600; color: var(--text-dark); margin-top: 4px;">-</div>
+                        <div class="flex-col">
+                            <span class="label-tag">Kondisi</span>
+                            <select id="m-kondisi" class="input-text" style="margin-bottom: 0;">
+                                <option value="Bagus">Bagus</option>
+                                <option value="Periksa">Periksa</option>
+                                <option value="Rusak">Rusak</option>
+                            </select>
                         </div>
                     </div>
+
+                    <div class="flex-row-input">
+                        <div class="flex-col">
+                            <span class="label-tag">Aset Milik</span>
+                            <input type="text" id="m-owner" class="input-text" style="margin-bottom: 0;" placeholder="Milik siapa...">
+                        </div>
+                        <div class="flex-col">
+                            <span class="label-tag">Tim Pengguna</span>
+                            <input type="text" id="m-team" class="input-text" style="margin-bottom: 0;" placeholder="Digunakan tim...">
+                        </div>
+                    </div>
+                    
                     <span class="label-tag">Keterangan Teknis</span>
-                    <div id="m-ref" class="ref-box"></div>
+                    <textarea id="m-ref" class="input-text" rows="2" placeholder="Spesifikasi teknis..."></textarea>
 
                     <div class="flex-row-input">
                         <div class="flex-col">
@@ -252,10 +269,10 @@ location: "MASTER"
                         </div>
                     </div>
 
-                    <span class="label-tag">Catatan</span>
+                    <span class="label-tag">Catatan Tambahan (Bila ada)</span>
                     <textarea id="m-desc" class="input-text" rows="3" placeholder="Contoh: Konektor hilang, atau 1 kabel rusak..."></textarea>
 
-                    <span class="label-tag">Histori Update Terakhir</span>
+                    <span class="label-tag">Histori Update Terakhir <span id="m-date" style="float: right; color: var(--primary-orange);"></span></span>
                     <div id="m-system-log" style="font-size: 12px; color: var(--text-gray); background: var(--bg-color); padding: 12px; border-radius: 12px; border: 1px dashed var(--border-color); max-height: 100px; overflow-y: auto; white-space: pre-wrap; line-height: 1.6; margin-bottom: 20px;">Belum ada histori.</div>
                 </div>
             </div>
@@ -263,6 +280,7 @@ location: "MASTER"
             <div class="modal-footer">
                 <button onclick="closeModalEdit()" class="btn btn-cancel">BATAL / TUTUP</button>
                 <button id="saveBtn" class="btn btn-save">SIMPAN PERUBAHAN</button>
+                <button id="deleteBtn" class="btn btn-danger">🗑️ HAPUS BARANG</button>
             </div>
         </div>
     </div>
@@ -323,8 +341,8 @@ location: "MASTER"
     </div>
 
 <script>
-    // URL WEBHOOK BARU ANDA (PASTIKAN MENGGUNAKAN VERSI API TERBARU)
-    const SCRIPT_URL = "https://script.google.com/macros/library/d/1W8h0WJfCbDjXAYpxCqijPjIMkXmZYfdFk06IFTMWGAJOhniHT5Hn24iX/1";
+    // URL WEBHOOK BARU ANDA
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxB5OoDZqwKLceNFIr4Xen1Rff2hn5j5lYkik20abDXFip9c-LM-iuU9MXf7Sw22E1XqQ/exec";
     const VALID_PINS = [
       "4m9k2b", "7p4v1c", "9h2n8f", "2y6r5w", "8b3t9m",
       "1q8x4d", "6j5p7z", "3c9g2k", "5n1m8v", "4t7f3q",
@@ -504,7 +522,7 @@ location: "MASTER"
     }
 
     // ==========================================
-    // FUNGSI KOMPRESI GAMBAR (Digunakan Add & Edit)
+    // FUNGSI KOMPRESI GAMBAR
     // ==========================================
     function compressImage(base64, maxDim, quality, callback) {
         const img = new Image();
@@ -586,7 +604,7 @@ location: "MASTER"
             if(data.status === "success") {
                 alert("✅ Barang Baru Berhasil Disimpan!");
                 closeAddModal();
-                loadData(); // Refresh data dari server
+                loadData(); 
             } else {
                 alert("❌ Gagal: " + (data.message === "WRONG_PIN" ? "PIN Akses Salah!" : data.message));
             }
@@ -600,11 +618,19 @@ location: "MASTER"
 
 
     // ==========================================
-    // LOGIKA MODAL EDIT
+    // LOGIKA MODAL EDIT & HAPUS
     // ==========================================
+    function updateMaxTerpakai() {
+        const jumlahInput = document.getElementById("m-jumlah").value;
+        const terpakaiInput = document.getElementById("m-terpakai");
+        terpakaiInput.max = jumlahInput || 0;
+        document.getElementById("m-max-text").innerText = `Total persediaan: ${jumlahInput || 0} Pcs`;
+        calculateSisa();
+    }
+
     function calculateSisa() {
         if (!currentItem) return;
-        let total = parseInt(currentItem.jumlah) || 0;
+        let total = parseInt(document.getElementById("m-jumlah").value) || 0;
         let inputTerpakai = parseInt(document.getElementById("m-terpakai").value) || 0;
         
         if (inputTerpakai > total) {
@@ -664,12 +690,7 @@ location: "MASTER"
         const reader = new FileReader();
         reader.onload = ev => {
             compressImage(ev.target.result, 800, 0.7, (compressedBase64) => {
-                pendingFotoUpdate = {
-                    index: currentFotoIndex,
-                    base64: compressedBase64,
-                    hapus: false
-                };
-                
+                pendingFotoUpdate = { index: currentFotoIndex, base64: compressedBase64, hapus: false };
                 document.getElementById("m-main-img").src = compressedBase64;
                 const activeThumb = document.querySelectorAll('.thumb-img')[currentFotoIndex];
                 activeThumb.innerHTML = `<img src="${compressedBase64}" style="width:100%; height:100%; border-radius:6px; object-fit:cover;">`;
@@ -695,10 +716,15 @@ location: "MASTER"
         currentFotoIndex = 0;
         
         buildThumbnails(item.fotos);
-        document.getElementById("m-name").innerText = item.nama_barang;
-        document.getElementById("m-owner").innerText = item.barang_milik || "Tidak ada data";
-        document.getElementById("m-team").innerText = item.tim || "Tidak ada data";
-        document.getElementById("m-date").innerText = item.timestamp ? item.timestamp.toString().split(" ")[0] : "Tidak ada data";
+        
+        // Populate Data Input
+        document.getElementById("m-nama").value = item.nama_barang || "";
+        document.getElementById("m-jumlah").value = item.jumlah || 0;
+        document.getElementById("m-kondisi").value = item.kondisi || "Bagus";
+        document.getElementById("m-owner").value = item.barang_milik || "";
+        document.getElementById("m-team").value = item.tim || "";
+        document.getElementById("m-ref").value = item.keterangan_ref || "";
+        document.getElementById("m-date").innerText = item.timestamp ? " (Sejak: " + item.timestamp.toString().split(" ")[0] + ")" : "";
         
         let historiValid = (item.log_history && item.log_history !== "undefined") ? item.log_history : "Belum ada histori update.";
         document.getElementById("m-system-log").innerText = historiValid;
@@ -745,22 +771,22 @@ location: "MASTER"
         document.getElementById("fsOverlay").classList.remove("active");
     }
 
-    // --- PROSES SIMPAN EDIT DENGAN JSON BUKAN NO-CORS ---
+    // --- PROSES SIMPAN EDIT ---
     document.getElementById("saveBtn").onclick = async function() {
         const btn = this;
+        
+        // Ambil Data Field
+        const newNama = document.getElementById("m-nama").value.trim();
+        const newJumlah = parseInt(document.getElementById("m-jumlah").value || 0);
+        const newKondisi = document.getElementById("m-kondisi").value;
+        const newOwner = document.getElementById("m-owner").value;
+        const newTeam = document.getElementById("m-team").value;
+        const newRef = document.getElementById("m-ref").value;
+        
         const qtyTerpakai = parseInt(document.getElementById("m-terpakai")?.value || 0);
         const newDesc = document.getElementById("m-desc")?.value || "";
         const newLokasi = document.getElementById("m-lokasi")?.value || "";
         const newStatus = document.getElementById("m-status-digunakan")?.checked || false;
-
-        let daftarPerubahan = [];
-        if (qtyTerpakai !== (parseInt(currentItem.terpakai) || 0)) daftarPerubahan.push("Ubah terpakai jadi " + qtyTerpakai);
-        if (newDesc !== (currentItem.keterangan_edit || "")) daftarPerubahan.push("Ubah catatan");
-        if (newLokasi !== (currentItem.lokasi || "")) daftarPerubahan.push("Pindah ke " + newLokasi);
-        
-        let statusLama = (currentItem.status_digunakan === true || currentItem.status_digunakan === "TRUE");
-        if (newStatus !== statusLama) daftarPerubahan.push("Status jadi " + (newStatus ? "Aktif" : "Standby"));
-        if (pendingFotoUpdate) daftarPerubahan.push("Update Foto " + (pendingFotoUpdate.index + 1));
 
         btn.disabled = true;
         btn.innerText = "PROSES MENYIMPAN...";
@@ -769,6 +795,12 @@ location: "MASTER"
             action: "update_item",
             pin: userPin,
             row_index: currentItem.row_index,
+            nama: newNama,
+            jumlah: newJumlah,
+            kondisi: newKondisi,
+            keterangan_ref: newRef,
+            barang_milik: newOwner,
+            tim: newTeam,
             terpakai: qtyTerpakai, 
             lokasi: newLokasi,
             status_digunakan: newStatus,
@@ -780,7 +812,6 @@ location: "MASTER"
         }
 
         try {
-            // Perbaikan krusial: Membaca respons dari Google Script
             const response = await fetch(SCRIPT_URL, {
                 method: "POST",
                 headers: { "Content-Type": "text/plain;charset=utf-8" },
@@ -789,33 +820,9 @@ location: "MASTER"
             const data = await response.json();
             
             if(data.status === "success") {
-                currentItem.terpakai = qtyTerpakai;
-                currentItem.keterangan_edit = newDesc;
-                currentItem.lokasi = newLokasi;
-                currentItem.status_digunakan = newStatus;
-                
-                if(pendingFotoUpdate) {
-                    if(!currentItem.fotos) currentItem.fotos = ["", "", "", ""];
-                    if(pendingFotoUpdate.hapus) {
-                        currentItem.fotos[pendingFotoUpdate.index] = "";
-                    } else {
-                        currentItem.fotos[pendingFotoUpdate.index] = pendingFotoUpdate.base64;
-                    }
-                }
-
-                if (daftarPerubahan.length > 0) {
-                    let waktuLokal = new Date().toLocaleDateString("id-ID") + " " + new Date().toLocaleTimeString("id-ID", {hour: '2-digit', minute:'2-digit'}).replace(/\./g, ':');
-                    let logSimulasi = "[" + waktuLokal + "] Anda ; " + daftarPerubahan.join(", ");
-                    let historiLama = (currentItem.log_history && currentItem.log_history !== "undefined") ? currentItem.log_history : "";
-                    currentItem.log_history = historiLama ? logSimulasi + "\n" + historiLama : logSimulasi;
-                }
-                
-                let logBox = document.getElementById("m-system-log");
-                if (logBox) logBox.innerText = currentItem.log_history || "Belum ada histori update.";
-                
                 alert("✅ Perubahan berhasil disinkronkan ke Spreadsheet!");
                 closeModalEdit();
-                applyFilters(); 
+                loadData(); // Refresh UI langsung dari server agar data sinkron total
             } else {
                 alert("❌ Gagal: " + (data.message === "WRONG_PIN" ? "PIN Akses Salah!" : data.message));
             }
@@ -825,6 +832,44 @@ location: "MASTER"
         } finally {
             btn.disabled = false;
             btn.innerText = "SIMPAN PERUBAHAN";
+        }
+    };
+
+    // --- PROSES HAPUS BARANG ---
+    document.getElementById("deleteBtn").onclick = async function() {
+        if(!confirm("⚠️ YAKIN INGIN MENGHAPUS BARANG INI?\nData yang dihapus akan hilang dari sistem dan tidak bisa dikembalikan!")) return;
+
+        const btn = this;
+        btn.disabled = true;
+        btn.innerText = "MENGHAPUS...";
+
+        const payload = {
+            action: "delete_item",
+            pin: userPin,
+            row_index: currentItem.row_index
+        };
+
+        try {
+            const response = await fetch(SCRIPT_URL, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify(payload)
+            });
+            const data = await response.json();
+            
+            if(data.status === "success") {
+                alert("✅ Barang berhasil dihapus!");
+                closeModalEdit();
+                loadData(); // Tarik data baru dari server
+            } else {
+                alert("❌ Gagal Menghapus: " + data.message);
+                btn.disabled = false;
+                btn.innerText = "🗑️ HAPUS BARANG";
+            }
+        } catch (e) {
+            alert("⚠️ Gagal terhubung. Periksa koneksi internetmu.");
+            btn.disabled = false;
+            btn.innerText = "🗑️ HAPUS BARANG";
         }
     };
 </script>

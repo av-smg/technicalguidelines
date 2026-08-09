@@ -9,11 +9,11 @@ location: "MISSION CARD"
     <style>
         body { background: #f8fafc; font-family: 'Inter', sans-serif; }
         
-        .header-mc { background: linear-gradient(135deg, #1e293b, #0f172a); padding: 40px 20px 30px; text-align: center; color: white; border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .header-mc { background: linear-gradient(135deg, #1e293b, #0f172a); padding: 40px 20px 30px; text-align: center; color: white; border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-bottom: -30px; padding-bottom: 70px; }
         .header-mc h1 { font-weight: 900; margin: 0; font-size: 26px; letter-spacing: -1px; text-transform: uppercase; color: var(--primary-orange); }
         .header-mc p { margin: 5px 0 0 0; font-size: 13px; opacity: 0.8; }
 
-        .container-mc { max-width: 800px; margin: -20px auto 40px auto; padding: 0 15px; position: relative; z-index: 10; }
+        .container-mc { max-width: 800px; margin: 0 auto; padding: 0 15px; position: relative; z-index: 10; }
 
         /* TOOLBAR FILTER & LOGIN */
         .toolbar-mc { background: white; padding: 15px; border-radius: 18px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; margin-bottom: 25px; }
@@ -113,10 +113,7 @@ location: "MISSION CARD"
     </main>
 
 <script>
-    // ========================================================
-    // ⚠️ GANTI URL INI DENGAN LINK APPS SCRIPT KAMU YANG BARU
-    // ========================================================
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyg6ntp8BPWPP8qm9IfpN62Rwd272tAEiTM0Qgl1GQQkUqJGcViG-FnewlFqFTjZ4w-Zg/exec"; 
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyg6ntp8BPWPP8qm9IfpN62Rwd272tAEiTM0Qgl1GQQkUqJGcViG-FnewlFqFTjZ4w-Zg/exec"; // <-- PASTE URL WEBHOOK KAMU DI SINI
     
     // 🛠️ 15 PIN KHUSUS KAPTEN TIM
     const VALID_PINS = [
@@ -208,8 +205,6 @@ location: "MISSION CARD"
         }
 
         let globalApdSet = new Set();
-        globalApdSet.add('🥾 Sepatu Safety');
-        globalApdSet.add('👷 Helm');
 
         filteredTasks.forEach(task => {
             const isDone = (task.status === "Selesai" || task.status === "TRUE" || task.status === true);
@@ -217,43 +212,16 @@ location: "MISSION CARD"
             card.className = "task-card " + (isDone ? "task-completed" : "");
             card.id = `card-${task.row_index}`;
 
-            let rawText = task.deskripsi || "Tidak ada detail tugas.";
-            let imgUrls = [];
-            
-            // REGEX BARU: Mencari SEMUA teks [img: ...]
-            let imgRegex = /\[img:\s*(.+?)\]/gi;
-            let matchImg;
-            
-            while ((matchImg = imgRegex.exec(rawText)) !== null) {
-                let extractedUrl = matchImg[1].match(/https?:\/\/[^\s\]\)]+/); 
-                if (extractedUrl) {
-                    imgUrls.push(extractedUrl[0]);
-                } else {
-                    imgUrls.push(matchImg[1].replace(/[\[\]\(\)]/g, '')); 
-                }
-            }
-            
-            // Hapus semua [img: ...] dari rawText agar tidak muncul sebagai tulisan
-            rawText = rawText.replace(/\[img:\s*(.+?)\]/gi, "");
-
+            // PENGOLAHAN ALAT
             let toolsHtml = '';
-            let stepsHtml = rawText;
-            
-            let splitRegex = /Peralatan:([\s\S]*?)(Langkah:|Instruksi:|$)/i;
-            let matchSplit = rawText.match(splitRegex);
-            
-            if (matchSplit && matchSplit[1].trim() !== '') {
-                let alatRaw = matchSplit[1].trim().replace(/\.$/, "");
-                let alatArray = alatRaw.split(',').map(i => i.trim()).filter(i => i !== "");
-
+            if (task.peralatan && task.peralatan.trim() !== '') {
+                let alatArray = task.peralatan.split(',').map(i => i.trim()).filter(i => i !== "");
                 let cables = [];
                 let others = [];
                 
                 alatArray.forEach(item => {
                     let lowerItem = item.toLowerCase();
-                    if (lowerItem.includes('helm') || lowerItem.includes('sarung tangan') || lowerItem.includes('sepatu')) {
-                        globalApdSet.add(item); 
-                    } else if (lowerItem.includes('kabel')) {
+                    if (lowerItem.includes('kabel')) {
                         cables.push(`<span class="tool-item cable">🔌 ${item}</span>`);
                     } else {
                         let icon = '🛠️';
@@ -268,24 +236,31 @@ location: "MISSION CARD"
                     toolsHtml += cables.join('') + others.join('');
                     toolsHtml += `</div></div>`;
                 }
-
-                let keyword = matchSplit[2];
-                if (keyword) {
-                    let textSteps = rawText.substring(rawText.indexOf(keyword)).replace(new RegExp(keyword, 'i'), '').trim();
-                    stepsHtml = `<span class="tool-label" style="margin-top:10px;">${keyword}</span><div class="steps-box">${textSteps.replace(/\n/g, '<br>')}</div>`;
-                } else { stepsHtml = ""; }
-            } else {
-                stepsHtml = `<div class="steps-box">${rawText.replace(/\n/g, '<br>')}</div>`;
             }
 
-            // HTML UNTUK GALERI FOTO KECIL
+            // PENGOLAHAN APD
+            if (task.apd && task.apd.trim() !== '') {
+                let apdArray = task.apd.split(',').map(i => i.trim()).filter(i => i !== "");
+                apdArray.forEach(item => globalApdSet.add(item));
+            }
+
+            // PENGOLAHAN LANGKAH
+            let stepsHtml = '';
+            if (task.langkah && task.langkah.trim() !== '') {
+                stepsHtml = `<span class="tool-label" style="margin-top:10px;">Langkah / Instruksi</span><div class="steps-box">${task.langkah.replace(/\n/g, '<br>')}</div>`;
+            }
+
+            // PENGOLAHAN GAMBAR
             let imgHtml = '';
-            if (imgUrls.length > 0) {
-                imgHtml = `<div class="task-img-gallery">`;
-                imgUrls.forEach(url => {
-                    imgHtml += `<img src="${url}" class="task-img-small" onclick="window.open('${url}', '_blank')" title="Klik untuk memperbesar gambar">`;
-                });
-                imgHtml += `</div>`;
+            if (task.gambar && task.gambar.trim() !== '') {
+                let imgUrls = task.gambar.split(/,|\n/).map(u => u.trim()).filter(u => u.startsWith('http'));
+                if (imgUrls.length > 0) {
+                    imgHtml = `<div class="task-img-gallery">`;
+                    imgUrls.forEach(url => {
+                        imgHtml += `<img src="${url}" class="task-img-small" onclick="window.open('${url}', '_blank')" title="Klik untuk memperbesar gambar">`;
+                    });
+                    imgHtml += `</div>`;
+                }
             }
 
             let asetHtml = task.kode_alokasi ? `<span class="asset-badge">Aset: ${task.kode_alokasi}</span>` : '';
@@ -302,7 +277,7 @@ location: "MISSION CARD"
                             <span class="checkmark"></span>
                         </label>
                         <div>
-                            <h3 class="task-title">${task.nama_barang || "Tugas Teknis"}</h3>
+                            <h3 class="task-title">${task.nama_tugas || "Tugas Teknis"}</h3>
                             <div style="margin-top:5px; font-size:12px; color:#64748b; font-weight:700;">Tim: ${task.tim || "-"}</div>
                         </div>
                     </div>
@@ -315,14 +290,24 @@ location: "MISSION CARD"
                 ${imgHtml}
                 ${stepsHtml}
                 
-                ${task.teknisi ? `<div style="margin-top:15px; font-size:11px; color:#94a3b8; font-weight:bold;">Diselesaikan oleh: Kapten Lapangan (${task.waktu_selesai})</div>` : ''}
+                ${task.teknisi ? `<div style="margin-top:15px; font-size:11px; color:#94a3b8; font-weight:bold;">Diselesaikan oleh: ${task.teknisi} (${task.waktu_selesai})</div>` : ''}
             `;
             container.appendChild(card);
         });
 
         if (globalApdSet.size > 0) {
             document.getElementById("safetyBanner").style.display = "flex";
-            document.getElementById("apdItems").innerHTML = Array.from(globalApdSet).map(item => `<span class="apd-badge">${item}</span>`).join('');
+            document.getElementById("apdItems").innerHTML = Array.from(globalApdSet).map(item => {
+                let icon = '';
+                let itemLow = item.toLowerCase();
+                if(itemLow.includes('helm')) icon = '👷 ';
+                else if(itemLow.includes('sepatu')) icon = '🥾 ';
+                else if(itemLow.includes('sarung tangan')) icon = '🧤 ';
+                else icon = '⚠️ ';
+                return `<span class="apd-badge">${icon}${item}</span>`;
+            }).join('');
+        } else {
+            document.getElementById("safetyBanner").style.display = "none";
         }
     }
 

@@ -6,7 +6,7 @@ location: "MASTER"
 <html lang="id">
 <head>
     {% include head.html %}
-    <!-- SCRIPT UNTUK BACA QR CODE YANG LEBIH STABIL -->
+    <!-- SCRIPT UNTUK BACA QR CODE -->
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 
     <style>
@@ -144,9 +144,6 @@ location: "MASTER"
 
     {% include navbar.html %}
 
-    <datalist id="list-owner"></datalist>
-    <datalist id="list-team"></datalist>
-
     <main style="padding: 0 15px;">
         <div class="page-title-section">
             <h2>Inventory Portal</h2>
@@ -216,7 +213,7 @@ location: "MASTER"
                 <button onclick="closeScannerModal()" class="close-x">✕</button>
             </div>
             <div id="qr-reader"></div>
-            <p style="font-size: 12px; color: gray; margin-top: 15px;">Arahkan kamera ke stiker QR Code Barang / Box untuk melakukan pencarian cepat.</p>
+            <p style="font-size: 12px; color: gray; margin-top: 15px;">Arahkan kamera ke stiker QR/Barcode Barang untuk pencarian cepat.</p>
         </div>
     </div>
 
@@ -231,7 +228,6 @@ location: "MASTER"
             <div class="modal-body">
                 <div class="modal-left">
                     <span class="label-tag">Foto Barang & Wadah</span>
-                    <!-- DITAMBAHKAN ONCLICK AGAR BISA ZOOM -->
                     <div class="main-image-box" onclick="openFullscreen()" style="cursor: zoom-in;">
                         <img id="m-main-img" src="">
                         <div id="parent-photo-badge" style="display:none; position:absolute; top:10px; right:10px; background:rgba(37, 99, 235, 0.9); color:white; padding:4px 8px; border-radius:5px; font-size:10px; font-weight:bold;">📦 FOTO WADAH</div>
@@ -293,21 +289,20 @@ location: "MASTER"
                     <div class="flex-row-input">
                         <div class="flex-col">
                             <span class="label-tag">Tim</span>
-                            <input type="text" id="m-team" list="list-team" class="input-text" style="margin-bottom: 0;">
+                            <!-- Diubah ke Dropdown Select -->
+                            <select id="m-team" class="input-text select-modern" style="margin-bottom: 0;" onchange="handleNewOption(this)"></select>
                         </div>
                         <div class="flex-col">
-                            <span class="label-tag">Event Tujuan (Booking)</span>
-                            <input type="text" id="m-tujuan" class="input-text" style="margin-bottom: 0;" placeholder="Event Oktober...">
+                            <span class="label-tag">Event Berikutnya?</span>
+                            <input type="text" id="m-tujuan" class="input-text" style="margin-bottom: 0;" placeholder="Bila sudah direncanakan...">
                         </div>
                     </div>
                     
-                    <span class="label-tag">Keterangan Teknis</span>
-                    <textarea id="m-ref" class="input-text" rows="2" placeholder="Panjang kabel, dsb..."></textarea>
-
                     <div class="flex-row-input">
                         <div class="flex-col">
                             <span class="label-tag">Barang Milik</span>
-                            <input type="text" id="m-owner" list="list-owner" class="input-text" style="margin-bottom: 0;">
+                            <!-- Diubah ke Dropdown Select -->
+                            <select id="m-owner" class="input-text select-modern" style="margin-bottom: 0;" onchange="handleNewOption(this)"></select>
                         </div>
                         <div class="flex-col">
                             <span class="label-tag">Lokasi Terakhir</span>
@@ -323,6 +318,9 @@ location: "MASTER"
                             <span id="m-max-text">Total persediaan: 0 Pcs</span>
                         </div>
                     </div>
+                    
+                    <span class="label-tag">Keterangan Teknis</span>
+                    <textarea id="m-ref" class="input-text" rows="2" placeholder="Panjang kabel, dsb..."></textarea>
 
                     <span class="label-tag">Catatan Tambahan (Misal: Hilang 2)</span>
                     <textarea id="m-desc" class="input-text" rows="2"></textarea>
@@ -339,7 +337,7 @@ location: "MASTER"
         </div>
     </div>
 
-    <!-- MODAL TAMBAH BARANG (SEKARANG SUDAH SAMA LENGKAPNYA) -->
+    <!-- MODAL TAMBAH BARANG -->
     <div id="modalAdd" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
@@ -356,9 +354,8 @@ location: "MASTER"
                         <div class="photo-box" id="add-box4" style="border-color:#2563eb; background:#eff6ff;"><span>📦</span></div>
                         <div class="photo-box" id="add-box5" style="border-color:#2563eb; background:#eff6ff;"><span>📦</span></div>
                     </div>
-                    <!-- Dihapus atribut capture biar bisa buka galeri langsung -->
                     <input type="file" id="add-fileInput" style="display: none;" accept="image/*" multiple>
-                    <p style="font-size:10px; color:gray;">Kotak biru (Foto 4 & 5) khusus untuk foto koper/wadah (jika ada).</p>
+                    <p style="font-size:10px; color:gray;">Kotak biru khusus untuk foto koper/wadah (jika ada).</p>
                 </div>
 
                 <div class="modal-right">
@@ -405,10 +402,10 @@ location: "MASTER"
                     <div class="flex-row-input">
                         <div class="flex-col">
                             <span class="label-tag">Tim</span>
-                            <input type="text" id="add-team" list="list-team" class="input-text" style="margin-bottom: 0;">
+                            <select id="add-team" class="input-text select-modern" style="margin-bottom: 0;" onchange="handleNewOption(this)"></select>
                         </div>
                         <div class="flex-col">
-                            <span class="label-tag">Event Tujuan (Booking)</span>
+                            <span class="label-tag">Event Berikutnya?</span>
                             <input type="text" id="add-tujuan" class="input-text" style="margin-bottom: 0;" placeholder="Bila sudah direncanakan...">
                         </div>
                     </div>
@@ -416,7 +413,7 @@ location: "MASTER"
                     <div class="flex-row-input">
                         <div class="flex-col">
                             <span class="label-tag">Barang Milik</span>
-                            <input type="text" id="add-owner" list="list-owner" class="input-text" style="margin-bottom: 0;">
+                            <select id="add-owner" class="input-text select-modern" style="margin-bottom: 0;" onchange="handleNewOption(this)"></select>
                         </div>
                         <div class="flex-col">
                             <span class="label-tag">Lokasi Awal</span>
@@ -428,7 +425,7 @@ location: "MASTER"
                     <div class="qty-control" style="margin-bottom: 20px;">
                         <input type="number" id="add-terpakai" class="qty-input" min="0" value="0" oninput="calculateAddSisa()">
                         <div class="qty-info">
-                            <strong id="add-sisa-text">Sisa: 0 Pcs</strong>
+                            <strong id="add-sisa-text">Sisa Tersedia: 0 Pcs</strong>
                             <span id="add-max-text">Total persediaan: 0 Pcs</span>
                         </div>
                     </div>
@@ -447,10 +444,19 @@ location: "MASTER"
         </div>
     </div>
 
+    <!-- FULLSCREEN OVERLAY UNTUK ZOOM FOTO -->
+    <div id="fsOverlay" class="fs-overlay" style="position: fixed; inset: 0; background: rgba(0, 0, 0, 0.95); display: none; flex-direction: column; z-index: 99999; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(10px);">
+        <div class="fs-header" style="width: 100%; position: absolute; top: 0; left: 0; padding: 20px;">
+            <button onclick="closeFullscreen()" style="background: rgba(255, 255, 255, 0.15); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 10px 20px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 14px;">
+                <i class="fa-solid fa-arrow-left" style="margin-right:5px;"></i> Kembali
+            </button>
+        </div>
+        <img id="fsImage" src="" style="max-width: 100%; max-height: 85vh; object-fit: contain; border-radius: 12px; box-shadow: 0 20px 50px rgba(0,0,0,0.5);">
+    </div>
+
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4C90tXAuT7iuFHZjOmgtYhoQqfNUosnEqMAm9l2Cn-VyjbPivKkf5Tv69qCtun441g/exec";
     
-    // PIN GABUNGAN
     const VALID_PINS = [
       "4m9k2b", "7p4v1c", "9h2n8f", "2y6r5w", "8b3t9m", "1q8x4d", "6j5p7z", "3c9g2k", "5n1m8v", "4t7f3q",
       "x2m8q9", "5w1n7k", "8z4j3p", "v9t6c2", "3r7f5b", "5x7z2y", "3f8g1k", "8r2m9p", "2v9w4x", "7k3n8p", 
@@ -514,22 +520,65 @@ location: "MASTER"
         }
     }
 
+    // FUNGSI JIKA USER MEMILIH "TAMBAH BARU" DI DROPDOWN
+    function handleNewOption(selectObj) {
+        if (selectObj.value === "NEW") {
+            let newVal = prompt("Ketik nama data baru:");
+            if (newVal && newVal.trim() !== "") {
+                newVal = newVal.trim();
+                const newOpt = new Option(newVal, newVal);
+                selectObj.insertBefore(newOpt, selectObj.lastElementChild);
+                selectObj.value = newVal;
+            } else {
+                selectObj.selectedIndex = 0; // Kembalikan ke opsi pertama jika batal
+            }
+        }
+    }
+
+    // FUNGSI UNTUK MEMASTIKAN VALUE LAMA TETAP MUNCUL DI DROPDOWN
+    function setSelectValueWithCheck(selectId, value) {
+        const sel = document.getElementById(selectId);
+        if(!sel) return;
+        if(!value) { sel.value = ""; return; }
+        
+        let exists = Array.from(sel.options).some(opt => opt.value === value);
+        if(!exists) {
+            const newOpt = new Option(value, value);
+            sel.insertBefore(newOpt, sel.lastElementChild);
+        }
+        sel.value = value;
+    }
+
     function populateFilters() {
         const teams = [...new Set(allItems.map(i => i.tim).filter(Boolean))];
+        const owners = [...new Set(allItems.map(i => i.barang_milik).filter(Boolean))];
+        
+        // Filter Tim di Toolbar Atas
         const teamSelect = document.getElementById("teamSelect");
         teamSelect.innerHTML = `<option value="all">Semua Tim</option>`;
         teams.forEach(t => teamSelect.innerHTML += `<option value="${t}">${t}</option>`);
 
-        const owners = [...new Set(allItems.map(i => i.barang_milik).filter(Boolean))];
-        const dlTeam = document.getElementById("list-team");
-        if(dlTeam) { dlTeam.innerHTML = ""; teams.forEach(t => dlTeam.innerHTML += `<option value="${t}">`); }
-        
-        const dlOwner = document.getElementById("list-owner");
-        if(dlOwner) {
-            dlOwner.innerHTML = "";
-            owners.forEach(o => dlOwner.innerHTML += `<option value="${o}">`);
-            optionsData.kepemilikan.forEach(o => { if(!owners.includes(o)) dlOwner.innerHTML += `<option value="${o}">`; });
-        }
+        // Populate Dropdown Tim di Form Add & Edit
+        const teamFormSelects = [document.getElementById("m-team"), document.getElementById("add-team")];
+        teamFormSelects.forEach(sel => {
+            if(!sel) return;
+            sel.innerHTML = `<option value="">-- Pilih Tim --</option>`;
+            teams.forEach(t => sel.innerHTML += `<option value="${t}">${t}</option>`);
+            sel.innerHTML += `<option value="NEW" style="color:var(--primary-orange); font-weight:bold;">+ Tambah Tim Baru...</option>`;
+        });
+
+        // Populate Dropdown Kepemilikan di Form Add & Edit
+        const ownerFormSelects = [document.getElementById("m-owner"), document.getElementById("add-owner")];
+        ownerFormSelects.forEach(sel => {
+            if(!sel) return;
+            sel.innerHTML = `<option value="">-- Pilih Pemilik --</option>`;
+            owners.forEach(o => sel.innerHTML += `<option value="${o}">${o}</option>`);
+            // Tambahkan dari Pilihan_Dropdown jika belum ada
+            optionsData.kepemilikan.forEach(o => {
+                if(!owners.includes(o)) sel.innerHTML += `<option value="${o}">${o}</option>`;
+            });
+            sel.innerHTML += `<option value="NEW" style="color:var(--primary-orange); font-weight:bold;">+ Tambah Pemilik Baru...</option>`;
+        });
     }
 
     function toggleView(viewType) {
@@ -648,7 +697,6 @@ location: "MASTER"
         document.getElementById("modalScanner").classList.remove("active");
     }
 
-    // --- KOMPRESI GAMBAR TINGKAT TINGGI (PROMISE BASE) ---
     function compressImage(base64, maxDim, quality) {
         return new Promise((resolve) => {
             const img = new Image();
@@ -675,7 +723,6 @@ location: "MASTER"
         
         thumbs.innerHTML = "";
         
-        // 🔮 MAGIC TRICK PARENT-CHILD (CARI FOTO KOPER INDUK)
         let parentBox = null;
         if (item.kode_wadah) {
             parentBox = allItems.find(x => x.kode_barang === item.kode_wadah);
@@ -753,7 +800,7 @@ location: "MASTER"
         }
     }
 
-    // FUNGSI ZOOM / FULLSCREEN UNTUK GAMBAR
+    // ZOOM FOTO
     function openFullscreen() {
         const imgSrc = document.getElementById("m-main-img").src;
         if(!imgSrc.includes('text=')) { 
@@ -777,8 +824,6 @@ location: "MASTER"
         document.getElementById("m-wadah").value = item.kode_wadah || "";
         document.getElementById("m-jumlah").value = item.jumlah || 0;
         document.getElementById("m-kondisi").value = item.kondisi || "Bagus";
-        document.getElementById("m-owner").value = item.barang_milik || "";
-        document.getElementById("m-team").value = item.tim || "";
         document.getElementById("m-tujuan").value = item.rencana_tujuan || "";
         document.getElementById("m-ref").value = item.keterangan_ref || "";
         document.getElementById("m-status-digunakan").value = item.status_digunakan || "Di Gudang";
@@ -787,7 +832,10 @@ location: "MASTER"
         locSelect.innerHTML = ""; optionsData.lokasi.forEach(loc => { locSelect.innerHTML += `<option value="${loc}">${loc}</option>`; });
         if(item.lokasi) locSelect.value = item.lokasi;
 
-        // Populate field terpakai 
+        // Panggil fungsi setSelectValueWithCheck untuk Tim & Owner agar jika datanya unik tetap masuk opsi dropdown
+        setSelectValueWithCheck("m-team", item.tim);
+        setSelectValueWithCheck("m-owner", item.barang_milik);
+
         let total = parseInt(item.jumlah) || 0;
         let terpakai = parseInt(item.terpakai) || 0;
         const inputQty = document.getElementById("m-terpakai");
@@ -860,9 +908,6 @@ location: "MASTER"
         finally { btn.disabled = false; btn.innerText = "SIMPAN STATUS & DATA"; }
     };
 
-    // ==========================================
-    // LOGIKA MODAL TAMBAH BARANG
-    // ==========================================
     function openAddModal() {
         if (!checkAndRequestPin()) return;
         document.getElementById("modalAdd").classList.add("active");
@@ -872,9 +917,13 @@ location: "MASTER"
 
         document.getElementById("add-nama").value = ""; document.getElementById("add-kode").value = "";
         document.getElementById("add-wadah").value = ""; document.getElementById("add-ref").value = "";
-        document.getElementById("add-tujuan").value = ""; document.getElementById("add-owner").value = "";
-        document.getElementById("add-desc").value = ""; document.getElementById("add-terpakai").value = 0;
+        document.getElementById("add-tujuan").value = ""; document.getElementById("add-desc").value = ""; 
+        document.getElementById("add-terpakai").value = 0;
         
+        // Reset Dropdown
+        document.getElementById("add-team").selectedIndex = 0;
+        document.getElementById("add-owner").selectedIndex = 0;
+
         updateAddMaxTerpakai();
 
         addSelectedFiles = []; 
@@ -903,12 +952,10 @@ location: "MASTER"
         document.getElementById("add-sisa-text").innerText = `Sisa Tersedia: ${total - inputTerpakai} Pcs`;
     }
 
-    // BACA 5 FOTO SEKALIGUS (BERURUTAN)
     document.getElementById('add-fileInput').onchange = async function(e) {
         const files = Array.from(e.target.files).slice(0, 5);
         if (files.length === 0) return;
 
-        // Kunci tombol simpan agar tidak disubmit sebelum kompresi selesai
         const btnSave = document.getElementById("addSaveBtn");
         btnSave.disabled = true;
         btnSave.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> MEMPROSES FOTO...`;
@@ -934,7 +981,6 @@ location: "MASTER"
             document.getElementById('add-box'+(i+1)).innerHTML = `<img src="${compressedBase64}" style="width:100%; height:100%; object-fit:cover; border-radius:10px;">`;
         }
 
-        // Buka kembali tombol simpan
         btnSave.disabled = false;
         btnSave.innerText = "SIMPAN BARANG BARU";
     };

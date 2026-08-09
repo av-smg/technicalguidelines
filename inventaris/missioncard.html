@@ -1,0 +1,307 @@
+---
+location: "MISSION CARD"
+---
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    {% include head.html %}
+    <style>
+        body { background: #f8fafc; font-family: 'Inter', sans-serif; }
+        
+        .header-mc { background: linear-gradient(135deg, #1e293b, #0f172a); padding: 40px 20px; text-align: center; color: white; border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-bottom: -30px; padding-bottom: 70px; }
+        .header-mc h1 { font-weight: 900; margin: 0; font-size: 28px; letter-spacing: -1px; text-transform: uppercase; color: var(--primary-orange); }
+        .header-mc p { margin: 5px 0 0 0; font-size: 14px; opacity: 0.8; }
+
+        .container-mc { max-width: 800px; margin: 0 auto; padding: 0 15px; position: relative; z-index: 10; }
+
+        /* FORM LOGIN / PILIH TIM */
+        .login-card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.08); text-align: center; border: 1px solid #e2e8f0; }
+        .login-card h3 { font-weight: 800; color: #1e293b; margin-top: 0; margin-bottom: 20px; }
+        .login-input { width: 100%; padding: 15px 20px; border-radius: 12px; border: 2px solid #e2e8f0; font-size: 16px; margin-bottom: 15px; outline: none; transition: 0.3s; font-family: inherit; font-weight: 600; text-align: center; }
+        .login-input:focus { border-color: var(--primary-orange); }
+        .btn-mc { background: var(--primary-orange); color: white; border: none; padding: 15px 30px; border-radius: 12px; font-weight: 800; font-size: 16px; cursor: pointer; width: 100%; transition: 0.3s; text-transform: uppercase; box-shadow: 0 8px 20px rgba(230, 126, 34, 0.25); }
+        .btn-mc:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(230, 126, 34, 0.4); }
+
+        /* BANNER APD */
+        .safety-banner { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-left: 5px solid #ef4444; padding: 15px 20px; border-radius: 15px; box-shadow: 0 8px 25px rgba(239, 68, 68, 0.15); margin-bottom: 25px; display: none; align-items: center; gap: 15px; flex-wrap: wrap; border-right: 1px solid #fee2e2; border-top: 1px solid #fee2e2; border-bottom: 1px solid #fee2e2; }
+        .safety-label { font-weight: 900; color: #b91c1c; font-size: 14px; text-transform: uppercase; }
+        .apd-badge { background: #fee2e2; color: #991b1b; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 800; border: 1px solid #fecaca; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+
+        /* KARTU TUGAS */
+        .task-card { background: white; border-radius: 20px; padding: 20px; margin-bottom: 20px; border: 1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(0,0,0,0.03); transition: 0.3s; position: relative; overflow: hidden; }
+        .task-card:hover { border-color: #cbd5e1; box-shadow: 0 10px 25px rgba(0,0,0,0.08); transform: translateY(-3px); }
+        .task-completed { opacity: 0.7; background: #f8fafc; border-color: #e2e8f0; }
+        .task-completed .task-title { text-decoration: line-through; color: #94a3b8; }
+        
+        .task-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 15px; border-bottom: 1px solid #f1f5f9; padding-bottom: 15px; margin-bottom: 15px; }
+        .task-title-group { display: flex; gap: 15px; flex: 1; align-items: flex-start; }
+        
+        /* CHECKBOX CUSTOM */
+        .custom-checkbox { position: relative; width: 32px; height: 32px; flex-shrink: 0; cursor: pointer; }
+        .custom-checkbox input { opacity: 0; width: 0; height: 0; position: absolute; }
+        .checkmark { position: absolute; top: 0; left: 0; width: 32px; height: 32px; background-color: #f1f5f9; border: 2px solid #cbd5e1; border-radius: 10px; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
+        .custom-checkbox input:checked ~ .checkmark { background-color: #10b981; border-color: #10b981; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3); }
+        .checkmark:after { content: "✓"; color: white; font-weight: 900; font-size: 18px; display: none; }
+        .custom-checkbox input:checked ~ .checkmark:after { display: block; }
+        .custom-checkbox:hover .checkmark { border-color: #10b981; }
+
+        .task-title { margin: 0; font-size: 18px; font-weight: 800; color: #1e293b; line-height: 1.4; }
+        
+        .zone-badge { background: #e0e7ff; color: #3730a3; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 800; border: 1px solid #c7d2fe; white-space: nowrap; text-transform: uppercase; }
+        .asset-badge { background: #fff7ed; color: #c2410c; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 800; border: 1px solid #ffedd5; margin-left: 5px; }
+
+        .task-img { width: 100%; max-height: 250px; object-fit: cover; border-radius: 12px; margin: 15px 0; border: 1px solid #e2e8f0; }
+
+        .tools-box { background: #f8fafc; padding: 15px; border-radius: 12px; border: 1px dashed #cbd5e1; margin-bottom: 15px; }
+        .tool-label { font-size: 11px; font-weight: 900; color: #64748b; text-transform: uppercase; margin-bottom: 10px; display: block; letter-spacing: 0.5px; }
+        .tool-list { display: flex; flex-wrap: wrap; gap: 8px; }
+        .tool-item { background: white; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; color: #334155; border: 1px solid #e2e8f0; box-shadow: 0 2px 5px rgba(0,0,0,0.02); display: flex; align-items: center; gap: 5px; }
+        .tool-item.cable { background: #ecfdf5; color: #065f46; border-color: #a7f3d0; }
+
+        .steps-box { font-size: 14px; line-height: 1.6; color: #475569; font-weight: 500; }
+        
+        /* OVERLAY LOADING */
+        .sync-overlay { position: absolute; inset: 0; background: rgba(255,255,255,0.8); z-index: 10; display: none; align-items: center; justify-content: center; border-radius: 20px; backdrop-filter: blur(3px); }
+        .sync-overlay span { font-weight: 800; color: var(--primary-orange); font-size: 14px; background: white; padding: 10px 20px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+
+    {% include navbar.html %}
+
+    <div class="header-mc">
+        <h1>Rencana Kerja</h1>
+        <p>Akses sinkronisasi lapangan khusus Tim Teknisi A/V</p>
+    </div>
+
+    <main class="container-mc">
+        
+        <!-- STEP 1: LOGIN & PILIH TIM -->
+        <div id="loginSection" class="login-card">
+            <h3>Pilih Sektor Kerja</h3>
+            <input type="password" id="pinInput" class="login-input" placeholder="Masukkan PIN Petugas" maxlength="6">
+            <select id="teamSelect" class="login-input">
+                <option value="">-- Sedang Memuat Daftar Tim... --</option>
+            </select>
+            <button onclick="loadMissionCards()" class="btn-mc" id="btnLoad">Buka Mission Card</button>
+        </div>
+
+        <!-- STEP 2: DAFTAR TUGAS -->
+        <div id="taskSection" style="display: none;">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="font-weight: 900; margin: 0; color: #1e293b; font-size: 20px;" id="teamTitle">Tim: Audio-Array</h3>
+                <button onclick="location.reload()" style="background:none; border:none; color:#64748b; font-weight:bold; cursor:pointer;">Ganti Tim ↺</button>
+            </div>
+
+            <!-- BANNER APD -->
+            <div id="safetyBanner" class="safety-banner">
+                <div class="safety-label">⚠️ WAJIB PAKAI APD:</div>
+                <div id="apdItems" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
+            </div>
+
+            <div id="taskList"></div>
+            
+        </div>
+    </main>
+
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4C90tXAuT7iuFHZjOmgtYhoQqfNUosnEqMAm9l2Cn-VyjbPivKkf5Tv69qCtun441g/exec";
+    
+    let allTasks = [];
+    let savedPin = localStorage.getItem("AV_INVENTORY_PIN") || "";
+
+    window.onload = async () => {
+        if (savedPin) document.getElementById("pinInput").value = savedPin;
+
+        // Ambil daftar tim dari database
+        try {
+            const res = await fetch(SCRIPT_URL + "?action=api");
+            const data = await res.json();
+            
+            const select = document.getElementById("teamSelect");
+            select.innerHTML = '<option value="">-- Pilih Sektor Tim --</option>';
+            
+            if(data.dropdowns && data.dropdowns.tim) {
+                data.dropdowns.tim.sort().forEach(t => {
+                    select.innerHTML += `<option value="${t}">${t}</option>`;
+                });
+            }
+            
+            if(data.mission_cards) {
+                allTasks = data.mission_cards;
+            }
+        } catch (e) {
+            alert("Gagal terhubung ke database. Periksa internet.");
+        }
+    };
+
+    function loadMissionCards() {
+        const pin = document.getElementById("pinInput").value.trim();
+        const tim = document.getElementById("teamSelect").value;
+        
+        if (!pin || !tim) { alert("Harap isi PIN dan pilih Tim!"); return; }
+        
+        localStorage.setItem("AV_INVENTORY_PIN", pin);
+        
+        document.getElementById("loginSection").style.display = "none";
+        document.getElementById("taskSection").style.display = "block";
+        document.getElementById("teamTitle").innerText = `Tugas: ${tim}`;
+
+        renderTasks(tim);
+    }
+
+    function renderTasks(timDipilih) {
+        const container = document.getElementById("taskList");
+        container.innerHTML = "";
+
+        const teamTasks = allTasks.filter(t => t.tim === timDipilih);
+
+        if (teamTasks.length === 0) {
+            container.innerHTML = `<div class="login-card"><p style="color:#64748b; font-weight:bold; margin:0;">Belum ada tugas yang dialokasikan untuk tim ini.</p></div>`;
+            return;
+        }
+
+        let globalApdSet = new Set();
+        globalApdSet.add('🥾 Sepatu Safety');
+        globalApdSet.add('👷 Helm');
+
+        teamTasks.forEach(task => {
+            const isDone = (task.status === "Selesai" || task.status === "TRUE" || task.status === true);
+            const card = document.createElement("div");
+            card.className = "task-card " + (isDone ? "task-completed" : "");
+            card.id = `card-${task.row_index}`;
+
+            // PARSER TEXT (Sihir Parsing Lama yang Disempurnakan)
+            let rawText = task.deskripsi || "Tidak ada deskripsi";
+            let imgSrc = "";
+            let imgRegex = /\[img:\s*(.+?)\]/i;
+            let matchImg = rawText.match(imgRegex);
+            if (matchImg) {
+                imgSrc = matchImg[1];
+                rawText = rawText.replace(matchImg[0], "");
+            }
+
+            let toolsHtml = '';
+            let stepsHtml = rawText;
+            
+            let splitRegex = /Peralatan:([\s\S]*?)(Langkah:|Instruksi:|$)/i;
+            let matchSplit = rawText.match(splitRegex);
+            
+            if (matchSplit && matchSplit[1].trim() !== '') {
+                let alatRaw = matchSplit[1].trim().replace(/\.$/, "");
+                let alatArray = alatRaw.split(',').map(i => i.trim()).filter(i => i !== "");
+
+                let cables = [];
+                let others = [];
+                
+                alatArray.forEach(item => {
+                    let lowerItem = item.toLowerCase();
+                    if (lowerItem.includes('helm') || lowerItem.includes('sarung tangan') || lowerItem.includes('sepatu')) {
+                        globalApdSet.add(item); // Tarik APD ke atas
+                    } else if (lowerItem.includes('kabel')) {
+                        cables.push(`<span class="tool-item cable">🔌 ${item}</span>`);
+                    } else {
+                        let icon = '🛠️';
+                        if(lowerItem.includes('speaker')||lowerItem.includes('toa')) icon = '🔊';
+                        else if(lowerItem.includes('mic')) icon = '🎤';
+                        others.push(`<span class="tool-item">${icon} ${item}</span>`);
+                    }
+                });
+
+                if (cables.length > 0 || others.length > 0) {
+                    toolsHtml = `<div class="tools-box"><span class="tool-label">Persiapan Aset & Alat</span><div class="tool-list">`;
+                    toolsHtml += cables.join('') + others.join('');
+                    toolsHtml += `</div></div>`;
+                }
+
+                // Ambil Instruksinya Saja
+                let keyword = matchSplit[2];
+                if (keyword) {
+                    let textSteps = rawText.substring(rawText.indexOf(keyword)).replace(new RegExp(keyword, 'i'), '').trim();
+                    stepsHtml = `<span class="tool-label" style="margin-top:10px;">${keyword}</span><div class="steps-box">${textSteps.replace(/\n/g, '<br>')}</div>`;
+                } else { stepsHtml = ""; }
+            } else {
+                stepsHtml = `<div class="steps-box">${rawText.replace(/\n/g, '<br>')}</div>`;
+            }
+
+            let imgHtml = imgSrc ? `<img src="${imgSrc}" class="task-img">` : '';
+            let asetHtml = task.kode_alokasi ? `<span class="asset-badge">Aset: ${task.kode_alokasi}</span>` : '';
+
+            card.innerHTML = `
+                <div class="sync-overlay" id="sync-${task.row_index}">
+                    <span><i class="fa-solid fa-circle-notch fa-spin"></i> Menyinkronkan ke Gudang...</span>
+                </div>
+                <div class="task-header">
+                    <div class="task-title-group">
+                        <label class="custom-checkbox">
+                            <input type="checkbox" id="check-${task.row_index}" ${isDone ? 'checked' : ''} onchange="toggleTask(${task.row_index})">
+                            <span class="checkmark"></span>
+                        </label>
+                        <h3 class="task-title">${task.nama_barang || "Tugas Teknis"}</h3>
+                    </div>
+                    <div style="text-align: right;">
+                        <span class="zone-badge">📍 ${task.zona || "TBA"}</span>
+                        ${asetHtml}
+                    </div>
+                </div>
+                ${toolsHtml}
+                ${imgHtml}
+                ${stepsHtml}
+                
+                ${task.teknisi ? `<div style="margin-top:15px; font-size:11px; color:#94a3b8; font-weight:bold;">Diselesaikan oleh: ${task.teknisi} (${task.waktu_selesai})</div>` : ''}
+            `;
+            container.appendChild(card);
+        });
+
+        // Render APD Banner
+        if (globalApdSet.size > 0) {
+            document.getElementById("safetyBanner").style.display = "flex";
+            document.getElementById("apdItems").innerHTML = Array.from(globalApdSet).map(item => `<span class="apd-badge">${item}</span>`).join('');
+        }
+    }
+
+    async function toggleTask(rowIndex) {
+        const checkbox = document.getElementById(`check-${rowIndex}`);
+        const card = document.getElementById(`card-${rowIndex}`);
+        const syncLayer = document.getElementById(`sync-${rowIndex}`);
+        
+        const isSelesai = checkbox.checked;
+        const pin = document.getElementById("pinInput").value;
+
+        // Tampilkan animasi sinkronisasi
+        syncLayer.style.display = "flex";
+
+        const payload = {
+            action: "update_task",
+            pin: pin,
+            row_index: rowIndex,
+            selesai: isSelesai
+        };
+
+        try {
+            const response = await fetch(SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
+            const data = await response.json();
+            
+            if (data.status === "success") {
+                // Berhasil! Ubah warna kartu
+                if (isSelesai) card.classList.add("task-completed");
+                else card.classList.remove("task-completed");
+            } else {
+                alert("Gagal: " + (data.message === "WRONG_PIN" ? "PIN Salah!" : data.message));
+                checkbox.checked = !isSelesai; // Kembalikan centang
+            }
+        } catch (e) {
+            alert("Gagal terhubung ke server.");
+            checkbox.checked = !isSelesai;
+        } finally {
+            syncLayer.style.display = "none";
+        }
+    }
+</script>
+</body>
+</html>

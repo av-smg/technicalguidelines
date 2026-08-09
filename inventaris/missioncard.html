@@ -56,7 +56,10 @@ location: "MISSION CARD"
         .zone-badge { background: #e0e7ff; color: #3730a3; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 800; border: 1px solid #c7d2fe; white-space: nowrap; text-transform: uppercase; }
         .asset-badge { background: #fff7ed; color: #c2410c; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 800; border: 1px solid #ffedd5; margin-left: 5px; }
 
-        .task-img { width: 100%; max-height: 250px; object-fit: cover; border-radius: 12px; margin: 15px 0; border: 1px solid #e2e8f0; }
+        /* GALERI FOTO KECIL */
+        .task-img-gallery { display: flex; gap: 10px; flex-wrap: wrap; margin: 15px 0; }
+        .task-img-small { width: 100px; height: 100px; object-fit: cover; border-radius: 12px; border: 2px solid #e2e8f0; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .task-img-small:hover { transform: scale(1.05); border-color: var(--primary-orange); box-shadow: 0 8px 15px rgba(230, 126, 34, 0.2); }
 
         .tools-box { background: #f8fafc; padding: 15px; border-radius: 12px; border: 1px dashed #cbd5e1; margin-bottom: 15px; }
         .tool-label { font-size: 11px; font-weight: 900; color: #64748b; text-transform: uppercase; margin-bottom: 10px; display: block; letter-spacing: 0.5px; }
@@ -157,7 +160,7 @@ location: "MISSION CARD"
             renderTasks();
 
         } catch (e) {
-            document.getElementById("taskList").innerHTML = '<div class="login-card" style="color:red; font-weight:bold;">Gagal memuat data dari server.</div>';
+            document.getElementById("taskList").innerHTML = '<div style="background:white; padding:30px; text-align:center; border-radius:15px; color:#ef4444; font-weight:bold; border:1px solid #fee2e2;">Gagal memuat data dari server. Periksa koneksi internet Anda.</div>';
         }
     };
 
@@ -215,19 +218,23 @@ location: "MISSION CARD"
             card.id = `card-${task.row_index}`;
 
             let rawText = task.deskripsi || "Tidak ada detail tugas.";
-            let imgSrc = "";
-            let imgRegex = /\[img:\s*(.+?)\]/i;
-            let matchImg = rawText.match(imgRegex);
+            let imgUrls = [];
             
-            if (matchImg) {
+            // REGEX BARU: Mencari SEMUA teks [img: ...]
+            let imgRegex = /\[img:\s*(.+?)\]/gi;
+            let matchImg;
+            
+            while ((matchImg = imgRegex.exec(rawText)) !== null) {
                 let extractedUrl = matchImg[1].match(/https?:\/\/[^\s\]\)]+/); 
                 if (extractedUrl) {
-                    imgSrc = extractedUrl[0];
+                    imgUrls.push(extractedUrl[0]);
                 } else {
-                    imgSrc = matchImg[1].replace(/[\[\]\(\)]/g, ''); 
+                    imgUrls.push(matchImg[1].replace(/[\[\]\(\)]/g, '')); 
                 }
-                rawText = rawText.replace(matchImg[0], ""); 
             }
+            
+            // Hapus semua [img: ...] dari rawText agar tidak muncul sebagai tulisan
+            rawText = rawText.replace(/\[img:\s*(.+?)\]/gi, "");
 
             let toolsHtml = '';
             let stepsHtml = rawText;
@@ -271,9 +278,17 @@ location: "MISSION CARD"
                 stepsHtml = `<div class="steps-box">${rawText.replace(/\n/g, '<br>')}</div>`;
             }
 
-            let imgHtml = imgSrc ? `<img src="${imgSrc}" class="task-img">` : '';
-            let asetHtml = task.kode_alokasi ? `<span class="asset-badge">Aset: ${task.kode_alokasi}</span>` : '';
+            // HTML UNTUK GALERI FOTO KECIL
+            let imgHtml = '';
+            if (imgUrls.length > 0) {
+                imgHtml = `<div class="task-img-gallery">`;
+                imgUrls.forEach(url => {
+                    imgHtml += `<img src="${url}" class="task-img-small" onclick="window.open('${url}', '_blank')" title="Klik untuk memperbesar gambar">`;
+                });
+                imgHtml += `</div>`;
+            }
 
+            let asetHtml = task.kode_alokasi ? `<span class="asset-badge">Aset: ${task.kode_alokasi}</span>` : '';
             let checkDisabled = isEditMode ? "" : "disabled title='Gunakan PIN Kapten untuk merubah status'";
 
             card.innerHTML = `
@@ -300,7 +315,7 @@ location: "MISSION CARD"
                 ${imgHtml}
                 ${stepsHtml}
                 
-                ${task.teknisi ? `<div style="margin-top:15px; font-size:11px; color:#94a3b8; font-weight:bold;">Diselesaikan oleh: ${task.teknisi} (${task.waktu_selesai})</div>` : ''}
+                ${task.teknisi ? `<div style="margin-top:15px; font-size:11px; color:#94a3b8; font-weight:bold;">Diselesaikan oleh: Kapten Lapangan (${task.waktu_selesai})</div>` : ''}
             `;
             container.appendChild(card);
         });

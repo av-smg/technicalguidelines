@@ -9,29 +9,23 @@ location: "MISSION CARD"
     <style>
         body { background: #f8fafc; font-family: 'Inter', sans-serif; }
         
-        .header-mc { background: linear-gradient(135deg, #1e293b, #0f172a); padding: 40px 20px; text-align: center; color: white; border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-bottom: -30px; padding-bottom: 70px; }
-        .header-mc h1 { font-weight: 900; margin: 0; font-size: 28px; letter-spacing: -1px; text-transform: uppercase; color: var(--primary-orange); }
-        .header-mc p { margin: 5px 0 0 0; font-size: 14px; opacity: 0.8; }
+        .header-mc { background: linear-gradient(135deg, #1e293b, #0f172a); padding: 40px 20px 30px; text-align: center; color: white; border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .header-mc h1 { font-weight: 900; margin: 0; font-size: 26px; letter-spacing: -1px; text-transform: uppercase; color: var(--primary-orange); }
+        .header-mc p { margin: 5px 0 0 0; font-size: 13px; opacity: 0.8; }
 
-        .container-mc { max-width: 800px; margin: 0 auto; padding: 0 15px; position: relative; z-index: 10; }
+        .container-mc { max-width: 800px; margin: -20px auto 40px auto; padding: 0 15px; position: relative; z-index: 10; }
 
-        /* FORM LOGIN / PILIH TIM */
-        .login-card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.08); text-align: center; border: 1px solid #e2e8f0; }
-        .login-card h3 { font-weight: 800; color: #1e293b; margin-top: 0; margin-bottom: 20px; font-size: 20px; }
-        .login-input { width: 100%; padding: 15px 20px; border-radius: 12px; border: 2px solid #e2e8f0; font-size: 16px; margin-bottom: 15px; outline: none; transition: 0.3s; font-family: inherit; font-weight: 600; text-align: center; }
-        .login-input:focus { border-color: var(--primary-orange); }
+        /* TOOLBAR FILTER & LOGIN */
+        .toolbar-mc { background: white; padding: 15px; border-radius: 18px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; margin-bottom: 25px; }
         
-        .btn-mc { color: white; border: none; padding: 14px 20px; border-radius: 12px; font-weight: 800; font-size: 14px; cursor: pointer; width: 100%; transition: 0.3s; text-transform: uppercase; margin-bottom: 10px; }
-        .btn-mc:hover { transform: translateY(-3px); }
-        
-        .btn-view { background: #64748b; box-shadow: 0 6px 15px rgba(100, 116, 139, 0.25); }
-        .btn-view:hover { background: #475569; box-shadow: 0 8px 20px rgba(100, 116, 139, 0.35); }
-        
-        .btn-edit { background: var(--primary-orange); box-shadow: 0 6px 15px rgba(230, 126, 34, 0.25); }
-        .btn-edit:hover { background: #d35400; box-shadow: 0 8px 20px rgba(230, 126, 34, 0.35); }
+        .select-modern { flex: 1; min-width: 200px; appearance: none; -webkit-appearance: none; background-color: #f8fafc; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 14px center; background-size: 14px; padding: 12px 38px 12px 16px; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 14px; font-weight: 700; color: #1e293b; cursor: pointer; outline: none; transition: 0.2s; font-family: inherit; }
+        .select-modern:focus { border-color: var(--primary-orange); background-color: white; box-shadow: 0 0 0 4px rgba(230, 126, 34, 0.1); }
 
-        .divider { border-top: 2px dashed #e2e8f0; margin: 25px 0; position: relative; }
-        .divider span { background: white; padding: 0 15px; position: relative; top: -10px; font-size: 12px; font-weight: 800; color: #94a3b8; }
+        .btn-auth { padding: 12px 20px; border-radius: 12px; font-size: 13px; font-weight: 800; cursor: pointer; border: none; transition: 0.3s; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+        .btn-auth.locked { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+        .btn-auth.locked:hover { background: #e2e8f0; color: #1e293b; }
+        .btn-auth.unlocked { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; box-shadow: 0 4px 10px rgba(5, 150, 105, 0.1); }
+        .btn-auth.unlocked:hover { background: #d1fae5; }
 
         /* BANNER APD */
         .safety-banner { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-left: 5px solid #ef4444; padding: 15px 20px; border-radius: 15px; box-shadow: 0 8px 25px rgba(239, 68, 68, 0.15); margin-bottom: 25px; display: none; align-items: center; gap: 15px; flex-wrap: wrap; border-right: 1px solid #fee2e2; border-top: 1px solid #fee2e2; border-bottom: 1px solid #fee2e2; }
@@ -40,7 +34,7 @@ location: "MISSION CARD"
 
         /* KARTU TUGAS */
         .task-card { background: white; border-radius: 20px; padding: 20px; margin-bottom: 20px; border: 1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(0,0,0,0.03); transition: 0.3s; position: relative; overflow: hidden; }
-        .task-card:hover { border-color: #cbd5e1; box-shadow: 0 10px 25px rgba(0,0,0,0.08); transform: translateY(-3px); }
+        .task-card:hover { border-color: #cbd5e1; box-shadow: 0 10px 25px rgba(0,0,0,0.08); transform: translateY(-2px); }
         .task-completed { opacity: 0.7; background: #f8fafc; border-color: #e2e8f0; }
         .task-completed .task-title { text-decoration: line-through; color: #94a3b8; }
         
@@ -52,7 +46,7 @@ location: "MISSION CARD"
         .custom-checkbox input { opacity: 0; width: 0; height: 0; position: absolute; }
         .checkmark { position: absolute; top: 0; left: 0; width: 32px; height: 32px; background-color: #f1f5f9; border: 2px solid #cbd5e1; border-radius: 10px; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
         .custom-checkbox input:checked ~ .checkmark { background-color: #10b981; border-color: #10b981; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3); }
-        .custom-checkbox input:disabled ~ .checkmark { background-color: #e2e8f0; cursor: not-allowed; border-color: #cbd5e1; }
+        .custom-checkbox input:disabled ~ .checkmark { background-color: #e2e8f0; border-color: #cbd5e1; cursor: not-allowed; opacity: 0.6; }
         .checkmark:after { content: "✓"; color: white; font-weight: 900; font-size: 18px; display: none; }
         .custom-checkbox input:checked ~ .checkmark:after { display: block; }
         .custom-checkbox:hover input:not(:disabled) ~ .checkmark { border-color: #10b981; }
@@ -82,133 +76,131 @@ location: "MISSION CARD"
     {% include navbar.html %}
 
     <div class="header-mc">
-        <h1>Rencana Kerja</h1>
-        <p>Sistem Sinkronisasi Lapangan & Gudang</p>
+        <h1>Mission Card</h1>
+        <p>Akses Terbuka. Gunakan PIN untuk merubah status.</p>
     </div>
 
     <main class="container-mc">
         
-        <!-- STEP 1: LOGIN & PILIH TIM -->
-        <div id="loginSection" class="login-card">
-            <h3>Pilih Sektor Tim Kerja</h3>
-            <select id="teamSelect" class="login-input">
-                <option value="">-- Sedang Memuat Daftar Tim... --</option>
+        <!-- TOOLBAR: FILTER TIM & LOGIN -->
+        <div class="toolbar-mc">
+            <select id="teamSelect" class="select-modern" onchange="renderTasks()">
+                <option value="all">Semua Tim (Loading...)</option>
             </select>
-
-            <button onclick="loadMissionCards(false)" class="btn-mc btn-view">👁️ Lihat Saja (Mode Pengamat)</button>
             
-            <div class="divider"><span>ATAU</span></div>
-            
-            <input type="password" id="pinInput" class="login-input" placeholder="Masukkan PIN Teknisi Anda" maxlength="6">
-            <button onclick="loadMissionCards(true)" class="btn-mc btn-edit">🛠️ Mulai Bekerja (Mode Edit)</button>
+            <button id="btnAuth" class="btn-auth locked" onclick="loginKapten()">
+                🔒 Kunci: Mode Pengamat
+            </button>
+            <input type="hidden" id="secretPin">
         </div>
 
-        <!-- STEP 2: DAFTAR TUGAS -->
-        <div id="taskSection" style="display: none;">
-            
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
-                <div>
-                    <h3 style="font-weight: 900; margin: 0 0 5px 0; color: #1e293b; font-size: 22px;" id="teamTitle">Tim: Audio-Array</h3>
-                    <div id="modeStatus"></div>
-                </div>
-                <button onclick="location.reload()" style="background:none; border:none; color:#64748b; font-weight:bold; cursor:pointer; font-size: 14px;"><i class="fa-solid fa-arrow-left"></i> Ganti Tim / Mode</button>
-            </div>
-
-            <!-- BANNER APD -->
-            <div id="safetyBanner" class="safety-banner">
-                <div class="safety-label">⚠️ WAJIB PAKAI APD:</div>
-                <div id="apdItems" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
-            </div>
-
-            <div id="taskList"></div>
-            
+        <!-- BANNER APD -->
+        <div id="safetyBanner" class="safety-banner">
+            <div class="safety-label">⚠️ WAJIB PAKAI APD:</div>
+            <div id="apdItems" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
         </div>
+
+        <!-- DAFTAR TUGAS -->
+        <div id="taskList" style="min-height: 200px;">
+            <div style="text-align: center; padding: 50px; color: gray; font-weight: bold;">
+                <i class="fa-solid fa-circle-notch fa-spin"></i> Mengunduh Rencana Kerja...
+            </div>
+        </div>
+            
     </main>
 
 <script>
     // ========================================================
     // ⚠️ GANTI URL INI DENGAN LINK APPS SCRIPT KAMU YANG BARU
     // ========================================================
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4C90tXAuT7iuFHZjOmgtYhoQqfNUosnEqMAm9l2Cn-VyjbPivKkf5Tv69qCtun441g/exec"; 
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyg6ntp8BPWPP8qm9IfpN62Rwd272tAEiTM0Qgl1GQQkUqJGcViG-FnewlFqFTjZ4w-Zg/exec"; 
     
-    // DAFTAR PIN
+    // 🛠️ 15 PIN KHUSUS KAPTEN TIM
     const VALID_PINS = [
-      "4m9k2b", "7p4v1c", "9h2n8f", "2y6r5w", "8b3t9m", "1q8x4d", "6j5p7z", "3c9g2k", "5n1m8v", "4t7f3q",
-      "x2m8q9", "5w1n7k", "8z4j3p", "v9t6c2", "3r7f5b", "5x7z2y", "3f8g1k", "8r2m9p", "2v9w4x", "7k3n8p", 
-      "5a9b3c", "6e2g8q", "9t4v1w", "3d7h2k", "18k7md", "m1n2b3", "c4x5z6", "p7l8k9", "o0i9u8", "y7t6r5", 
-      "e4w3q2", "a1s2d3", "f4g5h6", "j7k8l9", "z0x9c8"
+      "z1y2x3", "y2x3w4", "x3w4v5", "w4v5u6", "v5u6t7",
+      "u6t7s8", "t7s8r9", "s8r9q0", "r9q0p1", "q0p1o2",
+      "p1o2n3", "o2n3m4", "n3m4l5", "m4l5k6", "l5k6j7"
     ];
 
     let allTasks = [];
     let isEditMode = false;
-    let savedPin = localStorage.getItem("AV_INVENTORY_PIN") || "";
 
     window.onload = async () => {
-        if (savedPin) document.getElementById("pinInput").value = savedPin;
+        let savedPin = localStorage.getItem("AV_MISSION_PIN") || "";
+        if (savedPin && VALID_PINS.includes(savedPin)) {
+            isEditMode = true;
+            document.getElementById("secretPin").value = savedPin;
+            document.getElementById("btnAuth").innerHTML = "🔓 Aktif: Mode Kapten";
+            document.getElementById("btnAuth").className = "btn-auth unlocked";
+        }
 
         try {
             const res = await fetch(SCRIPT_URL + "?action=api");
             const data = await res.json();
             
             const select = document.getElementById("teamSelect");
-            select.innerHTML = '<option value="">-- Pilih Sektor Tim --</option>';
+            select.innerHTML = '<option value="all">-- Tampilkan Semua Tim --</option>';
             
             if(data.mission_cards) {
                 allTasks = data.mission_cards;
                 
-                // MENGGABUNGKAN TIM DARI MISSION CARD & DROPDOWN
                 let teamsFromTasks = allTasks.map(t => t.tim).filter(Boolean);
                 let teamsFromDropdown = (data.dropdowns && data.dropdowns.tim) ? data.dropdowns.tim : [];
                 
-                // Hapus duplikat & urutkan abjad
                 let uniqueTeams = [...new Set([...teamsFromTasks, ...teamsFromDropdown])].sort();
 
                 uniqueTeams.forEach(t => {
                     select.innerHTML += `<option value="${t}">${t}</option>`;
                 });
             }
+            
+            renderTasks();
+
         } catch (e) {
-            alert("Gagal terhubung ke database. Periksa internet.");
-            document.getElementById("teamSelect").innerHTML = '<option value="">Gagal memuat. Refresh halaman.</option>';
+            document.getElementById("taskList").innerHTML = '<div class="login-card" style="color:red; font-weight:bold;">Gagal memuat data dari server.</div>';
         }
     };
 
-    function loadMissionCards(wantsEdit) {
-        const tim = document.getElementById("teamSelect").value;
-        if (!tim) { alert("Harap pilih Sektor Tim terlebih dahulu!"); return; }
-        
-        // Cek PIN jika memilih Mode Teknisi
-        if (wantsEdit) {
-            const pin = document.getElementById("pinInput").value.trim().toLowerCase();
-            if (!pin) { alert("Harap isi PIN Teknisi untuk Mode Edit!"); return; }
-            if (!VALID_PINS.includes(pin)) { alert("PIN Salah! Akses ditolak."); return; }
-            
-            localStorage.setItem("AV_INVENTORY_PIN", pin);
-            isEditMode = true;
-        } else {
+    function loginKapten() {
+        if (isEditMode) {
             isEditMode = false;
+            localStorage.removeItem("AV_MISSION_PIN");
+            document.getElementById("secretPin").value = "";
+            document.getElementById("btnAuth").innerHTML = "🔒 Kunci: Mode Pengamat";
+            document.getElementById("btnAuth").className = "btn-auth locked";
+            renderTasks(); 
+            return;
         }
-        
-        document.getElementById("loginSection").style.display = "none";
-        document.getElementById("taskSection").style.display = "block";
-        document.getElementById("teamTitle").innerText = `Tugas: ${tim}`;
-        
-        // Tampilkan Indikator Mode
-        document.getElementById("modeStatus").innerHTML = isEditMode 
-            ? `<span style="color:#10b981; font-size:13px; font-weight:800; background:#ecfdf5; padding:4px 10px; border-radius:6px; border:1px solid #a7f3d0;">🟢 Mode Teknisi (Bisa Centang Tugas)</span>`
-            : `<span style="color:#eab308; font-size:13px; font-weight:800; background:#fefce8; padding:4px 10px; border-radius:6px; border:1px solid #fef08a;">🟡 Mode Pengamat (Hanya Melihat)</span>`;
 
-        renderTasks(tim);
+        let pin = prompt("Masukkan 6 Digit PIN Kapten Tim:");
+        if (!pin) return;
+        pin = pin.trim().toLowerCase();
+
+        if (VALID_PINS.includes(pin)) {
+            isEditMode = true;
+            localStorage.setItem("AV_MISSION_PIN", pin);
+            document.getElementById("secretPin").value = pin;
+            document.getElementById("btnAuth").innerHTML = "🔓 Aktif: Mode Kapten";
+            document.getElementById("btnAuth").className = "btn-auth unlocked";
+            renderTasks(); 
+        } else {
+            alert("PIN Salah! Akses khusus Kapten Tim Lapangan.");
+        }
     }
 
-    function renderTasks(timDipilih) {
+    function renderTasks() {
+        const timDipilih = document.getElementById("teamSelect").value;
         const container = document.getElementById("taskList");
         container.innerHTML = "";
 
-        const teamTasks = allTasks.filter(t => t.tim === timDipilih);
+        let filteredTasks = allTasks;
+        if (timDipilih !== "all") {
+            filteredTasks = allTasks.filter(t => t.tim === timDipilih);
+        }
 
-        if (teamTasks.length === 0) {
-            container.innerHTML = `<div class="login-card"><p style="color:#64748b; font-weight:bold; margin:0;">Belum ada tugas yang dialokasikan untuk tim ini.</p></div>`;
+        if (filteredTasks.length === 0) {
+            container.innerHTML = `<div style="background:white; padding:30px; text-align:center; border-radius:15px; color:#64748b; font-weight:bold; border:1px solid #e2e8f0;">Belum ada rencana kerja untuk tim ini.</div>`;
+            document.getElementById("safetyBanner").style.display = "none";
             return;
         }
 
@@ -216,19 +208,25 @@ location: "MISSION CARD"
         globalApdSet.add('🥾 Sepatu Safety');
         globalApdSet.add('👷 Helm');
 
-        teamTasks.forEach(task => {
+        filteredTasks.forEach(task => {
             const isDone = (task.status === "Selesai" || task.status === "TRUE" || task.status === true);
             const card = document.createElement("div");
             card.className = "task-card " + (isDone ? "task-completed" : "");
             card.id = `card-${task.row_index}`;
 
-            let rawText = task.deskripsi || "Tidak ada deskripsi";
+            let rawText = task.deskripsi || "Tidak ada detail tugas.";
             let imgSrc = "";
             let imgRegex = /\[img:\s*(.+?)\]/i;
             let matchImg = rawText.match(imgRegex);
+            
             if (matchImg) {
-                imgSrc = matchImg[1];
-                rawText = rawText.replace(matchImg[0], "");
+                let extractedUrl = matchImg[1].match(/https?:\/\/[^\s\]\)]+/); 
+                if (extractedUrl) {
+                    imgSrc = extractedUrl[0];
+                } else {
+                    imgSrc = matchImg[1].replace(/[\[\]\(\)]/g, ''); 
+                }
+                rawText = rawText.replace(matchImg[0], ""); 
             }
 
             let toolsHtml = '';
@@ -252,7 +250,7 @@ location: "MISSION CARD"
                         cables.push(`<span class="tool-item cable">🔌 ${item}</span>`);
                     } else {
                         let icon = '🛠️';
-                        if(lowerItem.includes('speaker')||lowerItem.includes('toa')) icon = '🔊';
+                        if(lowerItem.includes('speaker')||lowerItem.includes('toa')||lowerItem.includes('array')) icon = '🔊';
                         else if(lowerItem.includes('mic')) icon = '🎤';
                         others.push(`<span class="tool-item">${icon} ${item}</span>`);
                     }
@@ -276,8 +274,7 @@ location: "MISSION CARD"
             let imgHtml = imgSrc ? `<img src="${imgSrc}" class="task-img">` : '';
             let asetHtml = task.kode_alokasi ? `<span class="asset-badge">Aset: ${task.kode_alokasi}</span>` : '';
 
-            // Jika Mode Pengamat, Checkbox di-disable (digembok)
-            let checkDisabled = isEditMode ? "" : "disabled";
+            let checkDisabled = isEditMode ? "" : "disabled title='Gunakan PIN Kapten untuk merubah status'";
 
             card.innerHTML = `
                 <div class="sync-overlay" id="sync-${task.row_index}">
@@ -289,7 +286,10 @@ location: "MISSION CARD"
                             <input type="checkbox" id="check-${task.row_index}" ${isDone ? 'checked' : ''} ${checkDisabled} onchange="toggleTask(${task.row_index})">
                             <span class="checkmark"></span>
                         </label>
-                        <h3 class="task-title">${task.nama_barang || "Tugas Teknis"}</h3>
+                        <div>
+                            <h3 class="task-title">${task.nama_barang || "Tugas Teknis"}</h3>
+                            <div style="margin-top:5px; font-size:12px; color:#64748b; font-weight:700;">Tim: ${task.tim || "-"}</div>
+                        </div>
                     </div>
                     <div style="text-align: right;">
                         <span class="zone-badge">📍 ${task.zona || "TBA"}</span>
@@ -312,14 +312,18 @@ location: "MISSION CARD"
     }
 
     async function toggleTask(rowIndex) {
-        if (!isEditMode) return; // Keamanan ganda
+        if (!isEditMode) {
+            alert("Akses Ditolak! Anda dalam Mode Pengamat.");
+            document.getElementById(`check-${rowIndex}`).checked = !document.getElementById(`check-${rowIndex}`).checked;
+            return;
+        }
 
         const checkbox = document.getElementById(`check-${rowIndex}`);
         const card = document.getElementById(`card-${rowIndex}`);
         const syncLayer = document.getElementById(`sync-${rowIndex}`);
         
         const isSelesai = checkbox.checked;
-        const pin = document.getElementById("pinInput").value;
+        const pin = document.getElementById("secretPin").value;
 
         syncLayer.style.display = "flex";
 
@@ -341,7 +345,7 @@ location: "MISSION CARD"
                 if (isSelesai) card.classList.add("task-completed");
                 else card.classList.remove("task-completed");
             } else {
-                alert("Gagal: " + (data.message === "WRONG_PIN" ? "PIN Salah!" : data.message));
+                alert("Gagal: " + (data.message === "PIN_KAPTEN_SALAH" ? "PIN Kapten Tidak Valid / Ditolak!" : data.message));
                 checkbox.checked = !isSelesai; 
             }
         } catch (e) {

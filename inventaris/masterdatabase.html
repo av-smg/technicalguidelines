@@ -6,89 +6,63 @@ location: "MASTER"
 <html lang="id">
 <head>
     {% include head.html %}
+    <!-- SCRIPT UNTUK BACA QR CODE (VERSI LEBIH STABIL & PUNYA UI BUTTON) -->
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 
     <style>
-        /* KHUSUS HALAMAN INVENTORY */
         .page-title-section { text-align: center; margin: 20px 0 30px; }
         .page-title-section h2 { font-weight: 800; letter-spacing: -1px; text-transform: uppercase; color: var(--text-dark); }
         
-        /* ==================================================
-           ✨ UI BARU: TOOLBAR KONTROL INVENTORY ✨
-           ================================================== */
         .controls-wrapper {
             position: sticky; top: 75px; z-index: 900; 
             margin: 0 -15px 25px -15px; padding: 15px 15px 20px 15px;
-            background: rgba(255, 255, 255, 0.7); 
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(0,0,0,0.05);
+            background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(0,0,0,0.05);
         }
-        
         .toolbar-card {
             max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 15px;
             background: var(--card-bg); padding: 16px; border-radius: 18px;
             box-shadow: 0 8px 30px rgba(0,0,0,0.04); border: 1px solid var(--border-color);
         }
 
-        .search-box-modern { position: relative; width: 100%; }
-        .search-box-modern i {
-            position: absolute; left: 18px; top: 50%; transform: translateY(-50%);
-            color: var(--text-gray); font-size: 16px; pointer-events: none;
-        }
+        .search-box-modern { display: flex; width: 100%; gap: 10px; }
+        .search-input-wrapper { position: relative; flex: 1; }
+        .search-input-wrapper i { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: var(--text-gray); font-size: 16px; pointer-events: none; }
         .search-input-modern { 
-            width: 100%; padding: 14px 20px 14px 45px; 
-            border-radius: 12px; border: 1px solid var(--border-color); 
+            width: 100%; padding: 14px 20px 14px 45px; border-radius: 12px; border: 1px solid var(--border-color); 
             outline: none; font-size: 15px; background: var(--bg-color); color: var(--text-dark);
             transition: all 0.3s ease; font-family: inherit; font-weight: 500;
         }
-        .search-input-modern:focus { 
-            border-color: var(--primary-orange); 
-            box-shadow: 0 0 0 4px rgba(255,126,39,0.1); 
-            background: var(--card-bg);
+        .search-input-modern:focus { border-color: var(--primary-orange); box-shadow: 0 0 0 4px rgba(255,126,39,0.1); background: var(--card-bg); }
+        
+        .btn-scan {
+            background: var(--text-dark); color: white; border: none; border-radius: 12px; padding: 0 20px;
+            font-size: 18px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center;
         }
+        .btn-scan:hover { background: var(--primary-orange); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255,126,39,0.3); }
 
         .toolbar-bottom { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
         .filter-group-modern { display: flex; gap: 10px; flex-wrap: wrap; flex: 1; }
         
         .select-modern {
-            appearance: none; -webkit-appearance: none;
-            background-color: var(--bg-color);
+            appearance: none; -webkit-appearance: none; background-color: var(--bg-color);
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
             background-repeat: no-repeat; background-position: right 14px center; background-size: 14px;
             padding: 10px 38px 10px 16px; border-radius: 10px; border: 1px solid var(--border-color); 
-            font-size: 13px; font-weight: 700; color: var(--text-dark); cursor: pointer; outline: none; transition: 0.2s;
-            font-family: inherit;
+            font-size: 13px; font-weight: 700; color: var(--text-dark); cursor: pointer; outline: none; transition: 0.2s; font-family: inherit;
         }
         .select-modern:focus, .select-modern:hover { border-color: var(--primary-orange); background-color: var(--card-bg); }
 
         .action-group-modern { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-
-        .btn-mod {
-            padding: 10px 18px; border-radius: 10px; font-size: 13px; font-weight: 800; 
-            cursor: pointer; outline: none; transition: 0.3s; text-decoration: none !important;
-            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-        }
-        
+        .btn-mod { padding: 10px 18px; border-radius: 10px; font-size: 13px; font-weight: 800; cursor: pointer; outline: none; transition: 0.3s; text-decoration: none !important; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
         .btn-mod-outline { background: var(--bg-color); color: var(--text-dark); border: 1px solid var(--border-color); }
         .btn-mod-outline:hover { background: #0f172a; border-color: #0f172a; color: white; transform: translateY(-2px); }
-        
         .btn-mod-primary { background: #2ecc71; color: white; border: 1px solid #2ecc71; box-shadow: 0 4px 10px rgba(46,204,113,0.2); }
         .btn-mod-primary:hover { background: #27ae60; border-color: #27ae60; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(46,204,113,0.3); }
 
-        .segmented-control {
-            display: flex; background: var(--bg-color); border: 1px solid var(--border-color); 
-            border-radius: 10px; padding: 4px; gap: 2px;
-        }
-        .seg-btn {
-            background: transparent; border: none; padding: 6px 14px; font-size: 12px; font-weight: 800; 
-            color: var(--text-gray); cursor: pointer; transition: 0.3s; border-radius: 6px; 
-            display: inline-flex; align-items: center; gap: 6px; font-family: inherit;
-        }
+        .segmented-control { display: flex; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 10px; padding: 4px; gap: 2px; }
+        .seg-btn { background: transparent; border: none; padding: 6px 14px; font-size: 12px; font-weight: 800; color: var(--text-gray); cursor: pointer; transition: 0.3s; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; font-family: inherit; }
         .seg-btn.active { background: var(--card-bg); color: var(--primary-orange); box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
-        .seg-btn:hover:not(.active) { color: var(--text-dark); }
-        /* ================================================== */
 
-        /* GRID & LIST CARDS */
         .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; padding-bottom: 40px; }
         .list-view { display: flex; flex-direction: column; gap: 12px; max-width: 1200px; margin: 0 auto; padding-bottom: 40px; }
         
@@ -101,93 +75,61 @@ location: "MASTER"
         .list-img { width: 70px; height: 70px; object-fit: cover; border-radius: 10px; background: #eee; flex-shrink: 0; }
         .list-info { flex: 1; display: flex; flex-direction: column; gap: 4px; color: var(--text-dark); }
         
-        /* BADGES */
-        .badge-qty { background: var(--text-dark); color: var(--bg-color); font-size: 10px; padding: 3px 8px; border-radius: 5px; font-weight: 700; }
-        .badge-used { color: var(--primary-orange); font-size: 11px; font-weight: 800; }
-        .badge-avail { color: #2ecc71; font-size: 11px; font-weight: 800; }
-        .badge-owner { color: var(--text-gray); font-size: 12px; }
-        .badge-status-on { background: #e8f8f5; color: #1abc9c; padding: 3px 8px; border-radius: 5px; font-size: 10px; font-weight: 800; border: 1px solid #1abc9c; }
-        .badge-status-off { background: #fdf2e9; color: #e67e22; padding: 3px 8px; border-radius: 5px; font-size: 10px; font-weight: 800; border: 1px solid #e67e22; }
+        .badge-status { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 800; border: 1px solid transparent; }
+        .status-gudang { background: #f1f5f9; color: #64748b; border-color: #cbd5e1; }
+        .status-keranjang { background: #fff7ed; color: #ea580c; border-color: #fdba74; }
+        .status-lokasi { background: #eff6ff; color: #2563eb; border-color: #93c5fd; }
+        .status-dipakai { background: #f0fdf4; color: #16a34a; border-color: #86efac; }
 
-        /* MODAL COMMON */
+        .badge-owner { color: var(--text-gray); font-size: 12px; }
+        .badge-qty { background: var(--text-dark); color: var(--bg-color); font-size: 10px; padding: 3px 8px; border-radius: 5px; font-weight: 700; }
+
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 99990; backdrop-filter: blur(5px); padding: 15px; }
         .modal-overlay.active { display: flex; }
         .modal-content { background: var(--card-bg); border-radius: 25px; width: 100%; max-width: 900px; max-height: 90vh; overflow-y: auto; position: relative; border: 1px solid var(--border-color); }
         .modal-header { padding: 20px 30px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--card-bg); z-index: 10; }
         .close-x { font-size: 28px; cursor: pointer; border: none; background: none; color: var(--text-gray); transition: 0.3s; }
-        .close-x:hover { color: var(--primary-orange); transform: rotate(90deg); }
         .modal-body { display: flex; flex-wrap: wrap; padding: 20px; gap: 25px; }
         
-        /* Modal Edit & Add Specifics */
         .modal-left { flex: 1; min-width: 300px; }
-        .main-image-box { width: 100%; height: 280px; border-radius: 15px; overflow: hidden; background: #eee; margin-bottom: 10px; cursor: zoom-in; }
+        .main-image-box { width: 100%; height: 280px; border-radius: 15px; overflow: hidden; background: #eee; margin-bottom: 10px; cursor: zoom-in; position: relative; }
         .main-image-box img { width: 100%; height: 100%; object-fit: cover; }
         .thumb-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; }
-        .thumb-img { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; cursor: pointer; border: 2px solid transparent; opacity: 0.6; transition: 0.2s; background: #f0f0f0; display: flex; justify-content: center; align-items: center; font-size: 20px; color: #ccc;}
+        .thumb-img { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; cursor: pointer; border: 2px solid transparent; opacity: 0.6; transition: 0.2s; background: #f0f0f0; display: flex; justify-content: center; align-items: center; font-size: 16px; color: #ccc; position: relative;}
         .thumb-img:hover, .thumb-img.active { border-color: var(--primary-orange); opacity: 1; }
-        
-        .img-edit-controls { display: flex; gap: 10px; }
-        .btn-img { flex: 1; padding: 10px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-dark); transition: 0.2s; }
-        .btn-img:hover { border-color: var(--primary-orange); color: var(--primary-orange); }
-        .btn-img-danger { color: #e74c3c; }
-        .btn-img-danger:hover { border-color: #e74c3c; background: #fdedf0; color: #e74c3c; }
+        .thumb-label { position: absolute; bottom: -15px; font-size: 8px; width: 100%; text-align: center; color: var(--text-gray); white-space: nowrap; }
 
+        .img-edit-controls { display: flex; gap: 10px; margin-top: 10px; }
+        .btn-img { flex: 1; padding: 10px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-dark); transition: 0.2s; }
+        .btn-img:disabled { opacity: 0.5; cursor: not-allowed; }
+        
         .modal-right { flex: 1.2; min-width: 300px; }
         .label-tag { font-size: 11px; font-weight: 800; color: var(--text-gray); text-transform: uppercase; margin-bottom: 8px; display: block; }
-        
         .flex-row-input { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
         .flex-col { flex: 1; min-width: 140px; }
-
-        .qty-control { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; background: var(--bg-color); padding: 15px; border-radius: 15px; border: 1px solid var(--border-color); }
-        .qty-input { width: 80px; padding: 10px; border-radius: 8px; border: 2px solid var(--border-color); font-size: 16px; font-weight: 700; text-align: center; color: var(--text-dark); background: var(--card-bg); outline: none; }
-        .qty-input:focus { border-color: var(--primary-orange); }
-        .qty-info { display: flex; flex-direction: column; }
-        .qty-info strong { color: var(--text-dark); font-size: 14px; }
-        .qty-info span { color: var(--text-gray); font-size: 12px; }
-
         .input-text { width: 100%; padding: 12px 15px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-dark); font-size: 14px; outline: none; margin-bottom: 20px; font-family: inherit; font-weight: 500; transition: 0.3s; }
         .input-text:focus { border-color: var(--primary-orange); background: var(--card-bg); }
-        textarea.input-text { resize: vertical; min-height: 80px; }
-
-        .status-toggle { display: flex; align-items: center; gap: 10px; background: var(--bg-color); padding: 12px 15px; border-radius: 12px; border: 1px solid var(--border-color); cursor: pointer; transition: 0.3s; }
-        .status-toggle:hover { border-color: var(--primary-orange); }
-        .status-toggle input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--primary-orange); cursor: pointer; }
-        .status-toggle span { font-size: 14px; font-weight: 700; color: var(--text-dark); }
 
         .modal-footer { display: flex; flex-wrap: wrap; gap: 10px; padding: 0 20px 25px; }
         .btn { flex: 1; padding: 16px; border-radius: 15px; font-weight: 800; border: none; cursor: pointer; transition: 0.3s; font-size: 14px; min-width: 150px; text-transform: uppercase; }
         .btn-save { background: var(--primary-orange); color: white; }
-        .btn-save:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(255,126,39,0.25); }
-        .btn-save:disabled { background: #ccc; cursor: not-allowed; transform: none; box-shadow: none; }
         .btn-cancel { background: var(--bg-color); color: var(--text-dark); border: 1px solid var(--border-color); }
-        .btn-cancel:hover { background: var(--border-color); }
         .btn-danger { background: #fff; color: #e74c3c; border: 1px solid #e74c3c; flex-basis: 100%; }
-        .btn-danger:hover { background: #e74c3c; color: #fff; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(231,76,60,0.2); }
-        
-        /* KHUSUS MODAL TAMBAH (Photo Grid) */
-        .photo-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
-        .photo-box { aspect-ratio: 1/1; border-radius: 12px; border: 2px dashed var(--border-color); display: flex; align-items: center; justify-content: center; background: var(--bg-color); cursor: pointer; overflow: hidden; position: relative; transition: 0.2s; }
-        .photo-box:hover { border-color: var(--primary-orange); background: var(--card-bg); }
+
+        .photo-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 20px; }
+        .photo-box { aspect-ratio: 1/1; border-radius: 12px; border: 2px dashed var(--border-color); display: flex; align-items: center; justify-content: center; background: var(--bg-color); cursor: pointer; overflow: hidden; position: relative; }
         .photo-box img { width: 100%; height: 100%; object-fit: cover; }
-        .photo-box span { font-size: 24px; color: var(--text-gray); transition: 0.2s; }
-        .photo-box:hover span { color: var(--primary-orange); }
 
-        #loading { text-align: center; padding: 100px 20px; font-weight: 700; color: var(--text-gray); }
-
-        /* FULLSCREEN OVERLAY */
-        .fs-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.95); display: none; flex-direction: column; z-index: 99999; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(10px); }
-        .fs-overlay.active { display: flex; }
-        .fs-header { width: 100%; position: absolute; top: 0; left: 0; padding: 20px; }
-        .btn-back-fs { background: rgba(255, 255, 255, 0.15); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 10px 20px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 14px; transition: 0.3s; }
-        .btn-back-fs:hover { background: rgba(255,255,255,0.3); }
-        .fs-image { max-width: 100%; max-height: 85vh; object-fit: contain; border-radius: 12px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        /* SCANNER CAMERA OVERLAY */
+        #qr-reader { width: 100%; max-width: 500px; margin: 0 auto; border-radius: 15px; overflow: hidden; border: none !important; }
+        #qr-reader__dashboard_section_csr span { color: var(--text-dark); font-family: inherit; }
+        #qr-reader__dashboard_section_swaplink { text-decoration: none; color: var(--primary-orange); font-weight: bold; margin-top: 10px; display: inline-block; }
+        #qr-reader button { background: var(--primary-orange); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
 
         @media (max-width: 768px) {
             .modal-body { flex-direction: column; }
             .toolbar-bottom { flex-direction: column; align-items: stretch; }
             .filter-group-modern { flex-direction: column; }
-            .action-group-modern { justify-content: space-between; }
-            .btn-mod-primary { flex: 1; }
         }
     </style>
 </head>
@@ -195,54 +137,59 @@ location: "MASTER"
 
     {% include navbar.html %}
 
-    <!-- Auto-Complete Datalist (Memunculkan Suggestion yang Pernah Ada) -->
     <datalist id="list-owner"></datalist>
     <datalist id="list-team"></datalist>
 
     <main style="padding: 0 15px;">
         <div class="page-title-section">
             <h2>Inventory Portal</h2>
-            <p style="font-size: 13px; font-weight: 700; color: var(--text-gray);">Audio Video & Inventory Team Semarang</p>
+            <p style="font-size: 13px; font-weight: 700; color: var(--text-gray);">Manajemen Aset & Keranjang Loading</p>
         </div>
 
         <div class="controls-wrapper">
             <div class="toolbar-card">
+                
                 <div class="toolbar-top">
                     <div class="search-box-modern">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        <!-- Pencarian sekarang mencakup Kode Barang -->
-                        <input type="text" id="searchInput" class="search-input-modern" placeholder="Cari nama barang, KODE, atau tim..." oninput="applyFilters()">
+                        <div class="search-input-wrapper">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="searchInput" class="search-input-modern" placeholder="Cari nama, Box, Kode, Event..." oninput="applyFilters()">
+                        </div>
+                        <button onclick="openScannerModal()" class="btn-scan" title="Scan QR Code">
+                            <i class="fa-solid fa-qrcode"></i>
+                        </button>
                     </div>
                 </div>
 
                 <div class="toolbar-bottom">
                     <div class="filter-group-modern">
+                        <select id="statusSelect" class="select-modern" onchange="applyFilters()">
+                            <option value="all">Semua Status</option>
+                            <option value="Di Gudang">🏢 Di Gudang</option>
+                            <option value="Siap Dibawa">🛒 Keranjang (Siap Dibawa)</option>
+                            <option value="Di Lokasi">📍 Di Lokasi Event</option>
+                            <option value="Sedang Dipakai">🔌 Terpasang / Dipakai</option>
+                        </select>
                         <select id="sortSelect" class="select-modern" onchange="applyFilters()">
                             <option value="default">Urutan Default</option>
                             <option value="az">Sortir: A - Z</option>
                             <option value="za">Sortir: Z - A</option>
                         </select>
                         <select id="teamSelect" class="select-modern" onchange="applyFilters()">
-                            <option value="all">Semua Tim (All)</option>
-                        </select>
-                        <select id="ownerSelect" class="select-modern" onchange="applyFilters()">
-                            <option value="all">Semua Sumber (All)</option>
+                            <option value="all">Semua Tim</option>
                         </select>
                     </div>
 
                     <div class="action-group-modern">
-                        <a href="../inventaris/masterdatabase.html" class="btn-mod btn-mod-outline">
-                            <i class="fa-solid fa-database"></i> Master Data
-                        </a>
                         <button onclick="openAddModal()" class="btn-mod btn-mod-primary">
-                            <i class="fa-solid fa-plus"></i> Tambah Barang
+                            <i class="fa-solid fa-plus"></i> Tambah
                         </button>
                         <div class="segmented-control">
                             <button onclick="toggleView('gallery')" id="btnGallery" class="seg-btn active">
-                                <i class="fa-solid fa-border-all"></i> Gallery
+                                <i class="fa-solid fa-border-all"></i>
                             </button>
                             <button onclick="toggleView('list')" id="btnList" class="seg-btn">
-                                <i class="fa-solid fa-list-ul"></i> List
+                                <i class="fa-solid fa-list-ul"></i>
                             </button>
                         </div>
                     </div>
@@ -250,36 +197,46 @@ location: "MASTER"
             </div>
         </div>
 
-        <div id="loading">Meminta akses dan mengunduh data...</div>
+        <div id="loading" style="text-align: center; padding: 50px; font-weight: 700; color: gray;">Meminta akses dan mengunduh data...</div>
         <div id="dataContainer" class="grid-cards"></div>
     </main>
 
-    <!-- ============================================== -->
+    <!-- MODAL SCANNER QR -->
+    <div id="modalScanner" class="modal-overlay">
+        <div class="modal-content" style="max-width: 500px; padding: 20px; text-align: center;">
+            <div class="modal-header" style="padding: 0 0 15px 0;">
+                <h3 style="font-weight: 800; font-size: 16px;">🔍 SCAN QR CODE</h3>
+                <button onclick="closeScannerModal()" class="close-x">✕</button>
+            </div>
+            <div id="qr-reader"></div>
+            <p style="font-size: 12px; color: gray; margin-top: 15px;">Arahkan kamera ke stiker QR Code Barang / Box untuk melakukan pencarian cepat.</p>
+        </div>
+    </div>
+
     <!-- MODAL EDIT / DETAIL BARANG -->
-    <!-- ============================================== -->
     <div id="modalEdit" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 style="font-weight: 800; font-size: 18px;">EDIT DATA BARANG</h3>
+                <h3 style="font-weight: 800; font-size: 18px;">EDIT / UPDATE BARANG</h3>
                 <button onclick="closeModalEdit()" class="close-x">✕</button>
             </div>
             
             <div class="modal-body">
                 <div class="modal-left">
-                    <span class="label-tag">Foto 1 - 4</span>
-                    <div class="main-image-box" onclick="openFullscreen()">
-                        <img id="m-main-img" src="" alt="Main Image">
+                    <span class="label-tag">Foto Barang & Wadah</span>
+                    <div class="main-image-box">
+                        <img id="m-main-img" src="">
+                        <div id="parent-photo-badge" style="display:none; position:absolute; top:10px; right:10px; background:rgba(37, 99, 235, 0.9); color:white; padding:4px 8px; border-radius:5px; font-size:10px; font-weight:bold;">📦 FOTO WADAH</div>
                     </div>
                     <div id="m-thumbnails" class="thumb-row"></div>
                     <div class="img-edit-controls">
-                        <button class="btn-img" onclick="document.getElementById('img-camera').click()">📷 Kamera</button>
-                        <button class="btn-img" onclick="document.getElementById('img-gallery').click()">🖼️ Galeri</button>
-                        <button class="btn-img btn-img-danger" onclick="hapusFotoAktif()">🗑️ Hapus</button>
-                        
+                        <button id="btnCam" class="btn-img" onclick="document.getElementById('img-camera').click()">📷 Kamera</button>
+                        <button id="btnGal" class="btn-img" onclick="document.getElementById('img-gallery').click()">🖼️ Galeri</button>
+                        <button id="btnDel" class="btn-img btn-img-danger" onclick="hapusFotoAktif()">🗑️ Hapus</button>
                         <input type="file" id="img-camera" accept="image/*" capture="environment" style="display:none;" onchange="prosesGantiFoto(event)">
                         <input type="file" id="img-gallery" accept="image/*" style="display:none;" onchange="prosesGantiFoto(event)">
                     </div>
-                    <p style="font-size: 11px; color: var(--text-gray); margin-top: 5px;">Pilih thumbnail di atas lalu klik Ganti/Hapus.</p>
+                    <p id="foto-locked-msg" style="display:none; font-size:11px; color:#e74c3c; margin-top:5px; font-weight:bold;">Foto ini tidak bisa diubah karena milik Koper Induk.</p>
                 </div>
 
                 <div class="modal-right">
@@ -289,15 +246,31 @@ location: "MASTER"
                             <input type="text" id="m-nama" class="input-text" style="font-weight: 700; font-size: 15px; margin-bottom: 0;">
                         </div>
                         <div class="flex-col" style="flex: 1;">
-                            <span class="label-tag">Kode Barang</span>
-                            <input type="text" id="m-kode" class="input-text" style="font-weight: 800; font-size: 14px; color: var(--primary-orange); margin-bottom: 0;" placeholder="Contoh: SPKHX2">
+                            <span class="label-tag">Status Inventaris</span>
+                            <select id="m-status-digunakan" class="input-text select-modern" style="margin-bottom: 0; border: 2px solid var(--primary-orange);">
+                                <option value="Di Gudang">🏢 Di Gudang</option>
+                                <option value="Siap Dibawa">🛒 Siap Dibawa (Keranjang)</option>
+                                <option value="Di Lokasi">📍 Di Lokasi Event</option>
+                                <option value="Sedang Dipakai">🔌 Sedang Dipakai / Pasang</option>
+                            </select>
                         </div>
                     </div>
 
                     <div class="flex-row-input">
                         <div class="flex-col">
-                            <span class="label-tag">Jumlah</span>
-                            <input type="number" id="m-jumlah" class="input-text" style="margin-bottom: 0;" oninput="updateMaxTerpakai()">
+                            <span class="label-tag">Kode Barang (Satuan)</span>
+                            <input type="text" id="m-kode" class="input-text" style="color: var(--primary-orange); font-weight: bold; margin-bottom: 0;">
+                        </div>
+                        <div class="flex-col">
+                            <span class="label-tag">Kode Wadah / Box</span>
+                            <input type="text" id="m-wadah" class="input-text" style="color: #2563eb; font-weight: bold; margin-bottom: 0;" placeholder="Contoh: BOX-KBL-A">
+                        </div>
+                    </div>
+
+                    <div class="flex-row-input">
+                        <div class="flex-col">
+                            <span class="label-tag">Jumlah Item</span>
+                            <input type="number" id="m-jumlah" class="input-text" style="margin-bottom: 0;">
                         </div>
                         <div class="flex-col">
                             <span class="label-tag">Kondisi</span>
@@ -311,98 +284,95 @@ location: "MASTER"
 
                     <div class="flex-row-input">
                         <div class="flex-col">
-                            <span class="label-tag">Barang Milik</span>
-                            <input type="text" id="m-owner" list="list-owner" class="input-text" style="margin-bottom: 0;" placeholder="Ketik/pilih milik siapa...">
+                            <span class="label-tag">Tim</span>
+                            <input type="text" id="m-team" list="list-team" class="input-text" style="margin-bottom: 0;">
                         </div>
                         <div class="flex-col">
-                            <span class="label-tag">Tim</span>
-                            <input type="text" id="m-team" list="list-team" class="input-text" style="margin-bottom: 0;" placeholder="Ketik/pilih tim...">
+                            <span class="label-tag">Event Tujuan (Booking)</span>
+                            <input type="text" id="m-tujuan" class="input-text" style="margin-bottom: 0;" placeholder="Event Oktober...">
                         </div>
                     </div>
                     
                     <span class="label-tag">Keterangan Teknis</span>
-                    <textarea id="m-ref" class="input-text" rows="2" placeholder="Ketik spesifikasi teknis..."></textarea>
+                    <textarea id="m-ref" class="input-text" rows="2" placeholder="Panjang kabel, dsb..."></textarea>
 
                     <div class="flex-row-input">
                         <div class="flex-col">
-                            <span class="label-tag">Lokasi Saat Ini</span>
-                            <select id="m-lokasi" class="input-text select-modern" style="margin-bottom: 0;"></select>
+                            <span class="label-tag">Barang Milik</span>
+                            <input type="text" id="m-owner" list="list-owner" class="input-text" style="margin-bottom: 0;">
                         </div>
                         <div class="flex-col">
-                            <span class="label-tag">Status Digunakan</span>
-                            <label class="status-toggle">
-                                <input type="checkbox" id="m-status-digunakan">
-                                <span>Aktif Digunakan</span>
-                            </label>
+                            <span class="label-tag">Lokasi Terakhir</span>
+                            <select id="m-lokasi" class="input-text select-modern" style="margin-bottom: 0;"></select>
                         </div>
                     </div>
 
-                    <span class="label-tag">Jumlah Dipakai</span>
-                    <div class="qty-control">
-                        <input type="number" id="m-terpakai" class="qty-input" min="0" value="0" oninput="calculateSisa()">
-                        <div class="qty-info">
-                            <strong id="m-sisa-text">Sisa: 0 Pcs</strong>
-                            <span id="m-max-text">Total persediaan: 0 Pcs</span>
-                        </div>
-                    </div>
+                    <span class="label-tag">Catatan Tambahan (Misal: Hilang 2)</span>
+                    <textarea id="m-desc" class="input-text" rows="2"></textarea>
 
-                    <span class="label-tag">Catatan Update</span>
-                    <textarea id="m-desc" class="input-text" rows="3" placeholder="Ketik catatan tambahan..."></textarea>
-
-                    <span class="label-tag">Histori Log Sistem <span id="m-date" style="float: right; color: var(--primary-orange);"></span></span>
-                    <div id="m-system-log" style="font-size: 12px; color: var(--text-gray); background: var(--bg-color); padding: 12px; border-radius: 12px; border: 1px dashed var(--border-color); max-height: 100px; overflow-y: auto; white-space: pre-wrap; line-height: 1.6; margin-bottom: 20px;">Belum ada histori.</div>
+                    <span class="label-tag">Histori Log Sistem</span>
+                    <div id="m-system-log" style="font-size: 11px; color: gray; background: var(--bg-color); padding: 10px; border-radius: 8px; border: 1px dashed #ccc; max-height: 80px; overflow-y: auto; white-space: pre-wrap;"></div>
                 </div>
             </div>
-
             <div class="modal-footer">
-                <button onclick="closeModalEdit()" class="btn btn-cancel">BATAL / TUTUP</button>
-                <button id="saveBtn" class="btn btn-save">SIMPAN PERUBAHAN</button>
-                <button id="deleteBtn" class="btn btn-danger">
-                    <i class="fa-solid fa-trash" style="margin-right: 5px;"></i> HAPUS BARANG
-                </button>
+                <button onclick="closeModalEdit()" class="btn btn-cancel">BATAL</button>
+                <button id="saveBtn" class="btn btn-save">SIMPAN STATUS & DATA</button>
+                <button id="deleteBtn" class="btn btn-danger"><i class="fa-solid fa-trash"></i> HAPUS</button>
             </div>
         </div>
     </div>
 
-    <!-- ============================================== -->
-    <!-- MODAL TAMBAH DATA BARU LENGKAP -->
-    <!-- ============================================== -->
+    <!-- MODAL TAMBAH BARANG -->
     <div id="modalAdd" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 style="font-weight: 800; font-size: 18px;">TAMBAH INVENTARIS</h3>
+                <h3 style="font-weight: 800; font-size: 18px;">TAMBAH BARANG BARU</h3>
                 <button onclick="closeAddModal()" class="close-x">✕</button>
             </div>
-            
             <div class="modal-body">
                 <div class="modal-left">
-                    <span class="label-tag">Foto 1 - 4 (Opsional)</span>
+                    <span class="label-tag">Foto (Pilih 1 sampai 5 foto sekaligus)</span>
                     <div class="photo-grid" onclick="document.getElementById('add-fileInput').click()">
                         <div class="photo-box" id="add-box1"><span>+</span></div>
                         <div class="photo-box" id="add-box2"><span>+</span></div>
                         <div class="photo-box" id="add-box3"><span>+</span></div>
-                        <div class="photo-box" id="add-box4"><span>+</span></div>
+                        <div class="photo-box" id="add-box4" style="border-color:#2563eb; background:#eff6ff;"><span>📦</span></div>
+                        <div class="photo-box" id="add-box5" style="border-color:#2563eb; background:#eff6ff;"><span>📦</span></div>
                     </div>
                     <input type="file" id="add-fileInput" style="display: none;" accept="image/*" multiple capture="environment">
-                    <p style="font-size: 11px; color: var(--text-gray); margin-top: -5px;">Tap kotak untuk mengambil dari galeri atau kamera.</p>
+                    <p style="font-size:10px; color:gray;">Kotak biru khusus untuk foto koper/wadah (jika ada).</p>
                 </div>
 
                 <div class="modal-right">
                     <div class="flex-row-input">
                         <div class="flex-col" style="flex: 1.5;">
                             <span class="label-tag">Nama Barang</span>
-                            <input type="text" id="add-nama" class="input-text" style="font-weight: 700; font-size: 15px; margin-bottom: 0;" placeholder="Ketik nama item...">
+                            <input type="text" id="add-nama" class="input-text" style="font-weight: 700; margin-bottom: 0;">
                         </div>
                         <div class="flex-col" style="flex: 1;">
-                            <span class="label-tag">Kode Barang</span>
-                            <input type="text" id="add-kode" class="input-text" style="font-weight: 800; font-size: 14px; color: var(--primary-orange); margin-bottom: 0;" placeholder="Contoh: SPKHX2">
+                            <span class="label-tag">Status Awal</span>
+                            <select id="add-status" class="input-text select-modern" style="margin-bottom: 0;">
+                                <option value="Di Gudang">🏢 Di Gudang</option>
+                                <option value="Siap Dibawa">🛒 Siap Dibawa</option>
+                            </select>
                         </div>
                     </div>
                     
                     <div class="flex-row-input">
                         <div class="flex-col">
-                            <span class="label-tag">Jumlah Awal (Stok)</span>
-                            <input type="number" id="add-jumlah" class="input-text" placeholder="0" style="margin-bottom: 0;" oninput="updateAddMaxTerpakai()">
+                            <span class="label-tag">Kode Barang</span>
+                            <input type="text" id="add-kode" class="input-text" style="margin-bottom: 0;">
+                        </div>
+                        <div class="flex-col">
+                            <span class="label-tag">Kode Wadah / Box</span>
+                            <input type="text" id="add-wadah" class="input-text" style="margin-bottom: 0;">
+                        </div>
+                    </div>
+
+                    <div class="flex-row-input">
+                        <div class="flex-col">
+                            <span class="label-tag">Jumlah</span>
+                            <input type="number" id="add-jumlah" class="input-text" value="1" style="margin-bottom: 0;">
                         </div>
                         <div class="flex-col">
                             <span class="label-tag">Kondisi</span>
@@ -416,46 +386,22 @@ location: "MASTER"
 
                     <div class="flex-row-input">
                         <div class="flex-col">
-                            <span class="label-tag">Barang Milik</span>
-                            <input type="text" id="add-owner" list="list-owner" class="input-text" placeholder="Ketik/pilih milik siapa..." style="margin-bottom: 0;">
+                            <span class="label-tag">Tim</span>
+                            <input type="text" id="add-team" list="list-team" class="input-text" style="margin-bottom: 0;">
                         </div>
                         <div class="flex-col">
-                            <span class="label-tag">Tim</span>
-                            <input type="text" id="add-team" list="list-team" class="input-text" placeholder="Ketik/pilih tim..." style="margin-bottom: 0;">
+                            <span class="label-tag">Event Tujuan (Booking)</span>
+                            <input type="text" id="add-tujuan" class="input-text" style="margin-bottom: 0;" placeholder="Bila sudah direncanakan...">
                         </div>
                     </div>
+
+                    <span class="label-tag">Lokasi Awal</span>
+                    <select id="add-lokasi" class="input-text select-modern" style="margin-bottom: 20px;"></select>
 
                     <span class="label-tag">Keterangan Teknis</span>
-                    <textarea id="add-ref" class="input-text" rows="2" placeholder="Ketik spesifikasi teknis..."></textarea>
-
-                    <div class="flex-row-input">
-                        <div class="flex-col">
-                            <span class="label-tag">Lokasi Awal</span>
-                            <select id="add-lokasi" class="input-text select-modern" style="margin-bottom: 0;"></select>
-                        </div>
-                        <div class="flex-col">
-                            <span class="label-tag">Status Digunakan</span>
-                            <label class="status-toggle">
-                                <input type="checkbox" id="add-status">
-                                <span>Aktif Digunakan</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <span class="label-tag">Jumlah Dipakai Awal</span>
-                    <div class="qty-control">
-                        <input type="number" id="add-terpakai" class="qty-input" min="0" value="0" oninput="calculateAddSisa()">
-                        <div class="qty-info">
-                            <strong id="add-sisa-text">Sisa: 0 Pcs</strong>
-                            <span id="add-max-text">Total persediaan: 0 Pcs</span>
-                        </div>
-                    </div>
-
-                    <span class="label-tag">Catatan Update</span>
-                    <textarea id="add-desc" class="input-text" rows="3" placeholder="Ketik catatan tambahan..."></textarea>
+                    <textarea id="add-ref" class="input-text" rows="2"></textarea>
                 </div>
             </div>
-
             <div class="modal-footer">
                 <button onclick="closeAddModal()" class="btn btn-cancel">BATAL</button>
                 <button id="addSaveBtn" class="btn btn-save" style="background: #2ecc71;">SIMPAN BARANG BARU</button>
@@ -463,49 +409,29 @@ location: "MASTER"
         </div>
     </div>
 
-    <!-- FULLSCREEN OVERLAY -->
-    <div id="fsOverlay" class="fs-overlay">
-        <div class="fs-header">
-            <button onclick="closeFullscreen()" class="btn-back-fs">
-                <i class="fa-solid fa-arrow-left" style="margin-right:5px;"></i> Kembali
-            </button>
-        </div>
-        <img id="fsImage" class="fs-image" src="" alt="Fullscreen View">
-    </div>
-
 <script>
-    // URL WEBHOOK BARU ANDA
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw78t0nPSpS4rmctBzWAn4vxOIy88LCPuJaQ1HTHdB0jQYK-3IxpH7TSEoVyPamUJeEqQ/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzHNknniYCfVXIbHaQEIPrr29sRdYJ1sdKcRx2tChP3XsEflq4ePL6PG79jLBp-5-Si7A/exec";
     
-    // Total 40 PIN (25 Lama + 15 Baru)
     const VALID_PINS = [
-      "4m9k2b", "7p4v1c", "9h2n8f", "2y6r5w", "8b3t9m",
-      "1q8x4d", "6j5p7z", "3c9g2k", "5n1m8v", "4t7f3q",
-      "x2m8q9", "5w1n7k", "8z4j3p", "v9t6c2", "3r7f5b",
-      "5x7z2y", "3f8g1k", "8r2m9p", "2v9w4x", "7k3n8p", 
-      "5a9b3c", "6e2g8q", "9t4v1w", "3d7h2k", "18k7md",
-      "m1n2b3", "c4x5z6", "p7l8k9", "o0i9u8", "y7t6r5", 
-      "e4w3q2", "a1s2d3", "f4g5h6", "j7k8l9", "z0x9c8", 
-      "v7b6n5", "m4q3w2", "e1r2t3", "y4u5i6", "o7p8a9"
+      "4m9k2b", "7p4v1c", "9h2n8f", "2y6r5w", "8b3t9m", "1q8x4d", "6j5p7z", "3c9g2k", "5n1m8v", "4t7f3q",
+      "x2m8q9", "5w1n7k", "8z4j3p", "v9t6c2", "3r7f5b", "5x7z2y", "3f8g1k", "8r2m9p", "2v9w4x", "7k3n8p", 
+      "5a9b3c", "6e2g8q", "9t4v1w", "3d7h2k", "18k7md", "m1n2b3", "c4x5z6", "p7l8k9", "o0i9u8", "y7t6r5", 
+      "e4w3q2", "a1s2d3", "f4g5h6", "j7k8l9", "z0x9c8"
     ];
 
     let allItems = [];
     let optionsData = { lokasi: [], kepemilikan: [] };
-    
     let currentItem = null;
     let currentView = 'gallery';
-    let userPin = ""; 
+    let userPin = localStorage.getItem("AV_INVENTORY_PIN") || ""; 
     
     let currentFotoIndex = 0; 
     let pendingFotoUpdate = null; 
     let addSelectedFiles = [];
+    let html5QrcodeScanner = null;
 
     window.onload = () => {
-        if (checkAndRequestPin()) {
-            loadData();
-        } else {
-            document.getElementById("loading").innerText = "Akses ditolak. Silakan refresh halaman untuk mencoba lagi.";
-        }
+        if (checkAndRequestPin()) loadData();
     };
 
     function checkAndRequestPin() {
@@ -513,15 +439,13 @@ location: "MASTER"
             while (true) {
                 let input = prompt("Masukkan PIN Keamanan Petugas:");
                 if (input === null) {
-                    alert("Akses dibatalkan. Anda memerlukan PIN untuk melihat/mengedit data.");
-                    return false;
+                    alert("Akses dibatalkan."); return false;
                 }
                 if (VALID_PINS.includes(input.trim().toLowerCase())) {
                     userPin = input.trim().toLowerCase();
+                    localStorage.setItem("AV_INVENTORY_PIN", userPin);
                     break;
-                } else {
-                    alert("PIN Salah! Silakan coba lagi.");
-                }
+                } else alert("PIN Salah! Silakan coba lagi.");
             }
         }
         return true;
@@ -530,17 +454,13 @@ location: "MASTER"
     async function loadData() {
         try {
             document.getElementById("loading").style.display = "block";
-            document.getElementById("loading").innerText = "Meminta akses dan mengunduh data...";
             document.getElementById("dataContainer").innerHTML = "";
 
-            const res = await fetch(SCRIPT_URL + "?action=api&nocache=" + new Date().getTime(), {
-                method: "GET",
-                redirect: "follow"
-            });
+            const res = await fetch(SCRIPT_URL + "?action=api&nocache=" + new Date().getTime());
             const rawData = await res.json();
             
             if (rawData.error_message) {
-                document.getElementById("loading").innerHTML = `<span style="color:#e74c3c;"><b>Peringatan Sistem:</b><br>${rawData.error_message}</span>`;
+                document.getElementById("loading").innerHTML = `<span style="color:red;">Error: ${rawData.error_message}</span>`;
                 return;
             }
             
@@ -551,35 +471,25 @@ location: "MASTER"
             populateFilters();
             applyFilters();
         } catch (e) {
-            console.error(e);
-            document.getElementById("loading").innerHTML = `<span style="color:#e74c3c;"><b>Gagal memuat data.</b><br>Pastikan kamu sudah deploy Apps Script sebagai 'New Version'.</span>`;
+            document.getElementById("loading").innerHTML = `<span style="color:red;">Gagal memuat data. Cek koneksi / Deploy Apps Script.</span>`;
         }
     }
 
     function populateFilters() {
         const teams = [...new Set(allItems.map(i => i.tim).filter(Boolean))];
-        const owners = [...new Set(allItems.map(i => i.barang_milik).filter(Boolean))];
-        
         const teamSelect = document.getElementById("teamSelect");
-        teamSelect.innerHTML = `<option value="all">Semua Tim (All)</option>`;
+        teamSelect.innerHTML = `<option value="all">Semua Tim</option>`;
         teams.forEach(t => teamSelect.innerHTML += `<option value="${t}">${t}</option>`);
 
-        const ownerSelect = document.getElementById("ownerSelect");
-        ownerSelect.innerHTML = `<option value="all">Semua Sumber (All)</option>`;
-        owners.forEach(o => ownerSelect.innerHTML += `<option value="${o}">${o}</option>`);
-        
+        const owners = [...new Set(allItems.map(i => i.barang_milik).filter(Boolean))];
         const dlTeam = document.getElementById("list-team");
-        if(dlTeam) {
-            dlTeam.innerHTML = "";
-            teams.forEach(t => dlTeam.innerHTML += `<option value="${t}">`);
-        }
+        if(dlTeam) { dlTeam.innerHTML = ""; teams.forEach(t => dlTeam.innerHTML += `<option value="${t}">`); }
+        
         const dlOwner = document.getElementById("list-owner");
         if(dlOwner) {
             dlOwner.innerHTML = "";
             owners.forEach(o => dlOwner.innerHTML += `<option value="${o}">`);
-            optionsData.kepemilikan.forEach(o => {
-                if(!owners.includes(o)) dlOwner.innerHTML += `<option value="${o}">`;
-            });
+            optionsData.kepemilikan.forEach(o => { if(!owners.includes(o)) dlOwner.innerHTML += `<option value="${o}">`; });
         }
     }
 
@@ -595,22 +505,30 @@ location: "MASTER"
         const q = document.getElementById("searchInput").value.toLowerCase();
         const sortVal = document.getElementById("sortSelect").value;
         const teamVal = document.getElementById("teamSelect").value;
-        const ownerVal = document.getElementById("ownerSelect").value;
+        const statusVal = document.getElementById("statusSelect").value;
 
         let filtered = allItems.filter(i => {
-            const matchQ = i.nama_barang.toLowerCase().includes(q) || (i.kode_barang || "").toLowerCase().includes(q) || (i.tim || "").toLowerCase().includes(q);
+            const matchQ = i.nama_barang.toLowerCase().includes(q) || 
+                           (i.kode_barang || "").toLowerCase().includes(q) || 
+                           (i.kode_wadah || "").toLowerCase().includes(q) || 
+                           (i.rencana_tujuan || "").toLowerCase().includes(q) ||
+                           (i.tim || "").toLowerCase().includes(q);
             const matchTeam = (teamVal === 'all') || (i.tim === teamVal);
-            const matchOwner = (ownerVal === 'all') || (i.barang_milik && i.barang_milik === ownerVal);
-            return matchQ && matchTeam && matchOwner;
+            const matchStatus = (statusVal === 'all') || (i.status_digunakan === statusVal);
+            return matchQ && matchTeam && matchStatus;
         });
 
-        if (sortVal === 'az') {
-            filtered.sort((a, b) => a.nama_barang.localeCompare(b.nama_barang));
-        } else if (sortVal === 'za') {
-            filtered.sort((a, b) => b.nama_barang.localeCompare(a.nama_barang));
-        }
+        if (sortVal === 'az') filtered.sort((a, b) => a.nama_barang.localeCompare(b.nama_barang));
+        else if (sortVal === 'za') filtered.sort((a, b) => b.nama_barang.localeCompare(a.nama_barang));
 
         render(filtered);
+    }
+
+    function getStatusClass(status) {
+        if(status === 'Siap Dibawa') return 'badge-status status-keranjang';
+        if(status === 'Di Lokasi') return 'badge-status status-lokasi';
+        if(status === 'Sedang Dipakai') return 'badge-status status-dipakai';
+        return 'badge-status status-gudang'; 
     }
 
     function render(data) {
@@ -620,24 +538,13 @@ location: "MASTER"
         data.forEach(item => {
             const card = document.createElement("div");
             const imageSrc = item.fotos && item.fotos[0] ? item.fotos[0] : 'https://placehold.co/300x180/EEEEEE/999999?text=NO+IMAGE';
+            const statusLabel = item.status_digunakan || "Di Gudang";
             
-            let total = parseInt(item.jumlah) || 0;
-            let terpakai = parseInt(item.terpakai) || 0;
-            let sisa = total - terpakai;
-            if (sisa < 0) sisa = 0; 
+            const badgeClass = getStatusClass(statusLabel);
+            const statusHtml = `<span class="${badgeClass}">${statusLabel}</span>`;
             
-            let statusBadge = terpakai > 0 
-                ? `<span class="badge-used">● ${terpakai} Dipakai (Sisa: ${sisa})</span>` 
-                : `<span class="badge-avail">○ Sisa Lengkap (${sisa})</span>`;
-                
-            let activeLabel = (item.status_digunakan === true || item.status_digunakan === "TRUE") 
-                ? `<span class="badge-status-on">Aktif Digunakan</span>`
-                : `<span class="badge-status-off">Standby</span>`;
-
-            const ownerBadge = item.barang_milik ? `<span class="badge-owner"><i class="fa-solid fa-box" style="margin-right:3px;"></i> ${item.barang_milik}</span>` : "";
-            const locBadge = item.lokasi ? `<span class="badge-owner"><i class="fa-solid fa-location-dot" style="margin-right:3px;"></i> ${item.lokasi}</span>` : "";
-            const kodeBadge = item.kode_barang ? `<br><span style="color:var(--primary-orange); font-size:11px; font-weight:800; letter-spacing:1px;">#${item.kode_barang}</span>` : "";
-            const kodeBadgeList = item.kode_barang ? `<span style="color:var(--primary-orange); font-size:13px; font-weight:800; margin-left:8px; letter-spacing:1px;">#${item.kode_barang}</span>` : "";
+            const wadahBadge = item.kode_wadah ? `<span style="color:#2563eb; font-size:11px; font-weight:800;">📦 ${item.kode_wadah}</span>` : "";
+            const kodeBadge = item.kode_barang ? `<span style="color:var(--primary-orange); font-size:11px; font-weight:800;">#${item.kode_barang}</span>` : "";
 
             if (currentView === 'gallery') {
                 card.className = "mission-card";
@@ -645,19 +552,18 @@ location: "MASTER"
                     <img src="${imageSrc}" class="card-img" loading="lazy">
                     <div style="flex: 1;">
                         <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:5px;">
-                            <h4 style="font-weight:800; font-size:15px; margin:0; line-height:1.3;">
-                                ${item.nama_barang} ${kodeBadge}
-                            </h4>
-                            ${activeLabel}
+                            <h4 style="font-weight:800; font-size:15px; margin:0; line-height:1.3;">${item.nama_barang}</h4>
                         </div>
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px; margin-top: 8px;">
-                            <span style="font-size:12px; color:var(--text-gray);"><i class="fa-solid fa-users" style="margin-right:4px;"></i> ${item.tim || '-'}</span>
-                            <span class="badge-qty">Stok: ${total}</span>
+                        <div style="display:flex; gap: 8px; margin-bottom: 8px;">${kodeBadge} ${wadahBadge}</div>
+                        
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
+                            <span style="font-size:12px; color:var(--text-gray);"><i class="fa-solid fa-users"></i> ${item.tim || '-'}</span>
+                            <span class="badge-qty">Total: ${item.jumlah || 0}</span>
                         </div>
                     </div>
-                    <div style="display:flex; flex-direction:column; gap:8px; border-top: 1px solid var(--border-color); padding-top: 12px; margin-top: auto;">
-                        <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:5px;">${ownerBadge} ${locBadge}</div>
-                        ${statusBadge}
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-top: 1px solid var(--border-color); padding-top: 12px; margin-top: auto;">
+                        ${statusHtml}
+                        <span style="font-size:11px; font-weight:700; color:var(--text-gray); text-align:right;">${item.rencana_tujuan || ""}</span>
                     </div>
                 `;
             } else {
@@ -666,17 +572,13 @@ location: "MASTER"
                     <img src="${imageSrc}" class="list-img" loading="lazy">
                     <div class="list-info">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <h4 style="font-weight: 800; font-size: 15px; margin:0;">
-                                ${item.nama_barang} ${kodeBadgeList}
-                            </h4>
-                            ${activeLabel}
+                            <h4 style="font-weight: 800; font-size: 15px; margin:0;">${item.nama_barang} ${kodeBadge}</h4>
+                            ${statusHtml}
                         </div>
                         <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top: 6px;">
-                            <span class="badge-qty">Total: ${total} Pcs</span>
-                            <span style="color:var(--text-gray);">|</span>
-                            ${locBadge}
-                            <span style="color:var(--text-gray);">|</span>
-                            ${statusBadge}
+                            ${wadahBadge}
+                            <span class="badge-qty">Total: ${item.jumlah || 0}</span>
+                            <span style="color:var(--text-gray); font-size: 12px;">| ${item.rencana_tujuan || ""}</span>
                         </div>
                     </div>
                 `;
@@ -687,198 +589,78 @@ location: "MASTER"
         });
     }
 
-    function compressImage(base64, maxDim, quality, callback) {
-        const img = new Image();
-        img.src = base64;
-        img.onload = () => {
-            const canvas = document.createElement('canvas');
-            let w = img.width, h = img.height;
-            if (w > h && w > maxDim) { h *= maxDim / w; w = maxDim; }
-            else if (h > maxDim) { w *= maxDim / h; h = maxDim; }
-            canvas.width = w; canvas.height = h;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, w, h);
-            callback(canvas.toDataURL('image/jpeg', quality));
-        };
-    }
-
-    // ==========================================
-    // LOGIKA MODAL TAMBAH BARU LENGKAP
-    // ==========================================
-    function openAddModal() {
-        if (!checkAndRequestPin()) return;
-        document.getElementById("modalAdd").classList.add("active");
+    function openScannerModal() {
+        document.getElementById("modalScanner").classList.add("active");
         
-        const locSelect = document.getElementById("add-lokasi");
-        locSelect.innerHTML = "";
-        optionsData.lokasi.forEach(loc => {
-            locSelect.innerHTML += `<option value="${loc}">${loc}</option>`;
+        html5QrcodeScanner = new Html5QrcodeScanner(
+            "qr-reader", { fps: 10, qrbox: 250, aspectRatio: 1.0 }, false);
+            
+        html5QrcodeScanner.render((decodedText) => {
+            closeScannerModal();
+            document.getElementById('searchInput').value = decodedText;
+            applyFilters();
         });
-
-        document.getElementById("add-nama").value = "";
-        document.getElementById("add-kode").value = "";
-        document.getElementById("add-jumlah").value = "";
-        document.getElementById("add-kondisi").selectedIndex = 0;
-        document.getElementById("add-owner").value = "";
-        document.getElementById("add-team").value = "";
-        document.getElementById("add-ref").value = "";
-        document.getElementById("add-desc").value = "";
-        document.getElementById("add-terpakai").value = 0;
-        document.getElementById("add-status").checked = false;
-        
-        updateAddMaxTerpakai();
-        
-        addSelectedFiles = [];
-        for(let i=1; i<=4; i++) document.getElementById('add-box'+i).innerHTML = '<span>+</span>';
     }
 
-    function closeAddModal() {
-        document.getElementById("modalAdd").classList.remove("active");
-    }
-
-    function updateAddMaxTerpakai() {
-        const jumlahInput = document.getElementById("add-jumlah").value;
-        const terpakaiInput = document.getElementById("add-terpakai");
-        terpakaiInput.max = jumlahInput || 0;
-        document.getElementById("add-max-text").innerText = `Total persediaan: ${jumlahInput || 0} Pcs`;
-        calculateAddSisa();
-    }
-
-    function calculateAddSisa() {
-        let total = parseInt(document.getElementById("add-jumlah").value) || 0;
-        let inputTerpakai = parseInt(document.getElementById("add-terpakai").value) || 0;
-        
-        if (inputTerpakai > total) {
-            inputTerpakai = total; document.getElementById("add-terpakai").value = total;
-        } else if (inputTerpakai < 0) {
-            inputTerpakai = 0; document.getElementById("add-terpakai").value = 0;
+    function closeScannerModal() {
+        if (html5QrcodeScanner) {
+            html5QrcodeScanner.clear();
         }
-        
-        let sisa = total - inputTerpakai;
-        document.getElementById("add-sisa-text").innerText = `Sisa Tersedia: ${sisa} Pcs`;
+        document.getElementById("modalScanner").classList.remove("active");
     }
 
-    document.getElementById('add-fileInput').onchange = function(e) {
-        const files = Array.from(e.target.files).slice(0, 4);
-        addSelectedFiles = [];
-        for(let i=1; i<=4; i++) document.getElementById('add-box'+i).innerHTML = '<span>+</span>';
-        
-        files.forEach((file, i) => {
-            const reader = new FileReader();
-            reader.onload = ev => {
-                compressImage(ev.target.result, 800, 0.7, (blob) => {
-                    addSelectedFiles.push(blob);
-                    document.getElementById('add-box'+(i+1)).innerHTML = `<img src="${blob}">`;
-                });
+    function compressImage(base64, maxDim, quality) {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.src = base64;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let w = img.width, h = img.height;
+                if (w > h && w > maxDim) { h *= maxDim / w; w = maxDim; }
+                else if (h > maxDim) { w *= maxDim / h; h = maxDim; }
+                canvas.width = w; canvas.height = h;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, w, h);
+                resolve(canvas.toDataURL('image/jpeg', quality));
             };
-            reader.readAsDataURL(file);
         });
-    };
-
-    document.getElementById("addSaveBtn").onclick = async function() {
-        const nama = document.getElementById("add-nama").value.trim();
-        const kode = document.getElementById("add-kode").value.trim();
-        const jumlah = document.getElementById("add-jumlah").value;
-        const kondisi = document.getElementById("add-kondisi").value;
-        const owner = document.getElementById("add-owner").value;
-        const team = document.getElementById("add-team").value;
-        const ref = document.getElementById("add-ref").value;
-        const lokasi = document.getElementById("add-lokasi").value;
-        const terpakai = parseInt(document.getElementById("add-terpakai").value) || 0;
-        const status_digunakan = document.getElementById("add-status").checked || false;
-        const desc = document.getElementById("add-desc").value;
-
-        if(!nama || !jumlah) { alert("Lengkapi Nama dan Jumlah barang!"); return; }
-
-        const btn = this;
-        btn.disabled = true;
-        btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> MENYIMPAN...`;
-
-        const payload = {
-            action: "add_item",
-            pin: userPin,
-            nama: nama,
-            kode: kode,
-            jumlah: jumlah,
-            kondisi: kondisi,
-            barang_milik: owner,
-            tim: team,
-            keterangan_ref: ref,
-            lokasi: lokasi,
-            terpakai: terpakai,
-            status_digunakan: status_digunakan,
-            keterangan: desc,
-            fotos: addSelectedFiles
-        };
-
-        try {
-            const response = await fetch(SCRIPT_URL, {
-                method: "POST",
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
-                body: JSON.stringify(payload)
-            });
-            const data = await response.json();
-
-            if(data.status === "success") {
-                alert("✅ Barang Baru Berhasil Disimpan!");
-                closeAddModal();
-                loadData(); 
-            } else {
-                alert("❌ Gagal: " + (data.message === "WRONG_PIN" ? "PIN Akses Salah!" : data.message));
-            }
-        } catch (e) {
-            alert("⚠️ Gagal terhubung. Periksa koneksi internetmu.");
-        } finally {
-            btn.disabled = false;
-            btn.innerText = "SIMPAN BARANG BARU";
-        }
-    };
-
-    // ==========================================
-    // LOGIKA MODAL EDIT & HAPUS
-    // ==========================================
-    function updateMaxTerpakai() {
-        const jumlahInput = document.getElementById("m-jumlah").value;
-        const terpakaiInput = document.getElementById("m-terpakai");
-        terpakaiInput.max = jumlahInput || 0;
-        document.getElementById("m-max-text").innerText = `Total persediaan: ${jumlahInput || 0} Pcs`;
-        calculateSisa();
     }
 
-    function calculateSisa() {
-        if (!currentItem) return;
-        let total = parseInt(document.getElementById("m-jumlah").value) || 0;
-        let inputTerpakai = parseInt(document.getElementById("m-terpakai").value) || 0;
-        
-        if (inputTerpakai > total) {
-            inputTerpakai = total; document.getElementById("m-terpakai").value = total;
-        } else if (inputTerpakai < 0) {
-            inputTerpakai = 0; document.getElementById("m-terpakai").value = 0;
-        }
-        
-        let sisa = total - inputTerpakai;
-        document.getElementById("m-sisa-text").innerText = `Sisa Tersedia: ${sisa} Pcs`;
-    }
-
-    function buildThumbnails(fotos) {
+    function buildThumbnails(item) {
+        const fotos = item.fotos || [];
         const mainImg = document.getElementById("m-main-img");
         const thumbs = document.getElementById("m-thumbnails");
+        
         thumbs.innerHTML = "";
         
-        for(let i=0; i<4; i++) {
-            const url = fotos && fotos[i] ? fotos[i] : null;
-            const thumbDiv = document.createElement("div");
+        // 🔮 MAGIC TRICK PARENT-CHILD (CARI FOTO KOPER INDUK)
+        let parentBox = null;
+        if (item.kode_wadah) {
+            parentBox = allItems.find(x => x.kode_barang === item.kode_wadah);
+        }
+        
+        for(let i=0; i<5; i++) {
+            let url = fotos[i] ? fotos[i] : null;
+            let isParentPhoto = false;
             
-            if (url) {
-                thumbDiv.innerHTML = `<img src="${url}" style="width:100%; height:100%; border-radius:6px; object-fit:cover;">`;
-            } else {
-                thumbDiv.innerHTML = `<span>+</span>`; 
+            if (parentBox && (i === 3 || i === 4)) {
+                let parentUrl = parentBox.fotos ? parentBox.fotos[i - 3] : null;
+                if (parentUrl) { url = parentUrl; isParentPhoto = true; }
             }
-            
+
+            const thumbDiv = document.createElement("div");
             thumbDiv.className = "thumb-img";
+            thumbDiv.innerHTML = url ? `<img src="${url}" style="width:100%; height:100%; border-radius:6px; object-fit:cover;">` : `<span>+</span>`; 
+            
+            if (i === 3 || i === 4) {
+                thumbDiv.style.borderColor = "#93c5fd";
+                thumbDiv.innerHTML += `<div class="thumb-label">Wadah</div>`;
+            }
+
             if (i === currentFotoIndex) {
                 thumbDiv.classList.add("active");
                 mainImg.src = url || 'https://placehold.co/300x180/EEEEEE/999999?text=KOSONG';
+                togglePhotoLock(isParentPhoto);
             }
             
             thumbDiv.onclick = () => {
@@ -886,201 +668,191 @@ location: "MASTER"
                 document.querySelectorAll('.thumb-img').forEach(t => t.classList.remove('active'));
                 thumbDiv.classList.add('active');
                 
-                if(pendingFotoUpdate && pendingFotoUpdate.index === i && !pendingFotoUpdate.hapus) {
-                    mainImg.src = pendingFotoUpdate.base64;
-                } else if (pendingFotoUpdate && pendingFotoUpdate.index === i && pendingFotoUpdate.hapus) {
-                    mainImg.src = 'https://placehold.co/300x180/EEEEEE/999999?text=DIHAPUS';
-                } else {
-                    mainImg.src = url || 'https://placehold.co/300x180/EEEEEE/999999?text=KOSONG';
-                }
+                togglePhotoLock(isParentPhoto);
+
+                if(pendingFotoUpdate && pendingFotoUpdate.index === i && !pendingFotoUpdate.hapus) mainImg.src = pendingFotoUpdate.base64;
+                else if (pendingFotoUpdate && pendingFotoUpdate.index === i && pendingFotoUpdate.hapus) mainImg.src = 'https://placehold.co/300x180/EEEEEE/999999?text=DIHAPUS';
+                else mainImg.src = url || 'https://placehold.co/300x180/EEEEEE/999999?text=KOSONG';
             };
             thumbs.appendChild(thumbDiv);
         }
     }
+    
+    function togglePhotoLock(isLocked) {
+        document.getElementById("btnCam").disabled = isLocked;
+        document.getElementById("btnGal").disabled = isLocked;
+        document.getElementById("btnDel").disabled = isLocked;
+        document.getElementById("parent-photo-badge").style.display = isLocked ? "block" : "none";
+        document.getElementById("foto-locked-msg").style.display = isLocked ? "block" : "none";
+    }
 
-    function prosesGantiFoto(event) {
+    async function prosesGantiFoto(event) {
         const file = event.target.files[0];
         if(!file) return;
         
         const reader = new FileReader();
-        reader.onload = ev => {
-            compressImage(ev.target.result, 800, 0.7, (compressedBase64) => {
-                pendingFotoUpdate = { index: currentFotoIndex, base64: compressedBase64, hapus: false };
-                document.getElementById("m-main-img").src = compressedBase64;
-                const activeThumb = document.querySelectorAll('.thumb-img')[currentFotoIndex];
-                activeThumb.innerHTML = `<img src="${compressedBase64}" style="width:100%; height:100%; border-radius:6px; object-fit:cover;">`;
-            });
-        };
-        reader.readAsDataURL(file);
+        const rawBase64 = await new Promise((resolve) => {
+            reader.onload = ev => resolve(ev.target.result);
+            reader.readAsDataURL(file);
+        });
+
+        const compressedBase64 = await compressImage(rawBase64, 600, 0.6); 
+        
+        pendingFotoUpdate = { index: currentFotoIndex, base64: compressedBase64, hapus: false };
+        document.getElementById("m-main-img").src = compressedBase64;
+        document.querySelectorAll('.thumb-img')[currentFotoIndex].innerHTML = `<img src="${compressedBase64}" style="width:100%; height:100%; border-radius:6px; object-fit:cover;">`;
     }
 
     function hapusFotoAktif() {
-        if(confirm("Yakin ingin mengosongkan slot foto ini?")) {
+        if(confirm("Yakin hapus foto ini?")) {
             pendingFotoUpdate = { index: currentFotoIndex, base64: null, hapus: true };
             document.getElementById("m-main-img").src = 'https://placehold.co/300x180/EEEEEE/999999?text=DIHAPUS';
-            const activeThumb = document.querySelectorAll('.thumb-img')[currentFotoIndex];
-            activeThumb.innerHTML = `<span>+</span>`;
+            document.querySelectorAll('.thumb-img')[currentFotoIndex].innerHTML = `<span>+</span>`;
         }
     }
 
     function openModalEdit(item) {
         if (!checkAndRequestPin()) return;
-
-        currentItem = item;
-        pendingFotoUpdate = null; 
-        currentFotoIndex = 0;
+        currentItem = item; pendingFotoUpdate = null; currentFotoIndex = 0;
         
-        buildThumbnails(item.fotos);
+        buildThumbnails(item);
         
         document.getElementById("m-nama").value = item.nama_barang || "";
         document.getElementById("m-kode").value = item.kode_barang || "";
+        document.getElementById("m-wadah").value = item.kode_wadah || "";
         document.getElementById("m-jumlah").value = item.jumlah || 0;
         document.getElementById("m-kondisi").value = item.kondisi || "Bagus";
         document.getElementById("m-owner").value = item.barang_milik || "";
         document.getElementById("m-team").value = item.tim || "";
+        document.getElementById("m-tujuan").value = item.rencana_tujuan || "";
         document.getElementById("m-ref").value = item.keterangan_ref || "";
-        document.getElementById("m-date").innerText = item.timestamp ? " (Sejak: " + item.timestamp.toString().split(" ")[0] + ")" : "";
-        
-        let historiValid = (item.log_history && item.log_history !== "undefined") ? item.log_history : "Belum ada histori update.";
-        document.getElementById("m-system-log").innerText = historiValid;
+        document.getElementById("m-status-digunakan").value = item.status_digunakan || "Di Gudang";
         
         const locSelect = document.getElementById("m-lokasi");
-        locSelect.innerHTML = "";
-        optionsData.lokasi.forEach(loc => {
-            locSelect.innerHTML += `<option value="${loc}">${loc}</option>`;
-        });
+        locSelect.innerHTML = ""; optionsData.lokasi.forEach(loc => { locSelect.innerHTML += `<option value="${loc}">${loc}</option>`; });
         if(item.lokasi) locSelect.value = item.lokasi;
 
-        const statusCheckbox = document.getElementById("m-status-digunakan");
-        statusCheckbox.checked = (item.status_digunakan === true || item.status_digunakan === "TRUE");
-
-        let total = parseInt(item.jumlah) || 0;
-        let terpakai = parseInt(item.terpakai) || 0;
-        
-        const inputQty = document.getElementById("m-terpakai");
-        inputQty.max = total;
-        inputQty.value = terpakai;
-        document.getElementById("m-max-text").innerText = `Total persediaan: ${total} Pcs`;
-        
         document.getElementById("m-desc").value = item.keterangan_edit || "";
+        document.getElementById("m-system-log").innerText = (item.log_history && item.log_history !== "undefined") ? item.log_history : "Belum ada histori update.";
         
-        calculateSisa(); 
         document.getElementById("modalEdit").classList.add("active");
     }
 
     function closeModalEdit() {
         document.getElementById("modalEdit").classList.remove("active");
-        document.getElementById("img-camera").value = ""; 
-        document.getElementById("img-gallery").value = ""; 
-    }
-
-    function openFullscreen() {
-        const imgSrc = document.getElementById("m-main-img").src;
-        if(!imgSrc.includes('text=')) { 
-            document.getElementById("fsImage").src = imgSrc;
-            document.getElementById("fsOverlay").classList.add("active");
-        }
-    }
-
-    function closeFullscreen() {
-        document.getElementById("fsOverlay").classList.remove("active");
+        document.getElementById("img-camera").value = ""; document.getElementById("img-gallery").value = ""; 
     }
 
     document.getElementById("saveBtn").onclick = async function() {
-        const btn = this;
-        
-        const newNama = document.getElementById("m-nama").value.trim();
-        const newKode = document.getElementById("m-kode").value.trim();
-        const newJumlah = parseInt(document.getElementById("m-jumlah").value || 0);
-        const newKondisi = document.getElementById("m-kondisi").value;
-        const newOwner = document.getElementById("m-owner").value;
-        const newTeam = document.getElementById("m-team").value;
-        const newRef = document.getElementById("m-ref").value;
-        const qtyTerpakai = parseInt(document.getElementById("m-terpakai")?.value || 0);
-        const newDesc = document.getElementById("m-desc")?.value || "";
-        const newLokasi = document.getElementById("m-lokasi")?.value || "";
-        const newStatus = document.getElementById("m-status-digunakan")?.checked || false;
-
-        btn.disabled = true;
-        btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> PROSES MENYIMPAN...`;
+        const btn = this; btn.disabled = true; btn.innerHTML = `PROSES...`;
 
         const payload = {
-            action: "update_item",
-            pin: userPin,
-            row_index: currentItem.row_index,
-            nama: newNama,
-            kode: newKode,
-            jumlah: newJumlah,
-            kondisi: newKondisi,
-            keterangan_ref: newRef,
-            barang_milik: newOwner,
-            tim: newTeam,
-            terpakai: qtyTerpakai, 
-            lokasi: newLokasi,
-            status_digunakan: newStatus,
-            keterangan: newDesc
+            action: "update_item", pin: userPin, row_index: currentItem.row_index,
+            nama: document.getElementById("m-nama").value.trim(),
+            kode_barang: document.getElementById("m-kode").value.trim(),
+            kode_wadah: document.getElementById("m-wadah").value.trim(),
+            jumlah: document.getElementById("m-jumlah").value,
+            kondisi: document.getElementById("m-kondisi").value,
+            keterangan_ref: document.getElementById("m-ref").value,
+            barang_milik: document.getElementById("m-owner").value,
+            tim: document.getElementById("m-team").value,
+            lokasi: document.getElementById("m-lokasi").value,
+            rencana_tujuan: document.getElementById("m-tujuan").value,
+            status_digunakan: document.getElementById("m-status-digunakan").value,
+            keterangan: document.getElementById("m-desc").value
         };
 
         if (pendingFotoUpdate) payload.update_foto = pendingFotoUpdate;
 
         try {
-            const response = await fetch(SCRIPT_URL, {
-                method: "POST",
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
-                body: JSON.stringify(payload)
-            });
+            const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
             const data = await response.json();
+            if(data.status === "success") { closeModalEdit(); loadData(); }
+            else alert("Gagal: " + data.message);
+        } catch (e) { alert("Gagal terhubung."); } 
+        finally { btn.disabled = false; btn.innerText = "SIMPAN STATUS & DATA"; }
+    };
+
+    function openAddModal() {
+        if (!checkAndRequestPin()) return;
+        document.getElementById("modalAdd").classList.add("active");
+        
+        const locSelect = document.getElementById("add-lokasi");
+        locSelect.innerHTML = ""; optionsData.lokasi.forEach(loc => { locSelect.innerHTML += `<option value="${loc}">${loc}</option>`; });
+
+        document.getElementById("add-nama").value = ""; document.getElementById("add-kode").value = "";
+        document.getElementById("add-wadah").value = ""; document.getElementById("add-ref").value = "";
+        document.getElementById("add-tujuan").value = "";
+        
+        addSelectedFiles = []; 
+        for(let i=1; i<=5; i++) {
+            let inner = '<span>+</span>';
+            if(i === 4 || i === 5) inner = '<span>📦</span>';
+            document.getElementById('add-box'+i).innerHTML = inner;
+        }
+    }
+    function closeAddModal() { document.getElementById("modalAdd").classList.remove("active"); }
+
+    document.getElementById('add-fileInput').onchange = async function(e) {
+        const files = Array.from(e.target.files).slice(0, 5);
+        
+        addSelectedFiles = []; 
+        for(let i=1; i<=5; i++) {
+            document.getElementById('add-box'+i).innerHTML = (i===4||i===5) ? '<span>📦</span>' : '<span>+</span>';
+        }
+
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            document.getElementById('add-box'+(i+1)).innerHTML = `<span style="font-size:10px;">Loading..</span>`;
             
-            if(data.status === "success") {
-                alert("✅ Perubahan berhasil disinkronkan ke Spreadsheet!");
-                closeModalEdit();
-                loadData(); 
-            } else {
-                alert("❌ Gagal: " + (data.message === "WRONG_PIN" ? "PIN Akses Salah!" : data.message));
-            }
-        } catch (e) {
-            alert("⚠️ Gagal terhubung. Periksa koneksi internetmu.");
-        } finally {
-            btn.disabled = false;
-            btn.innerText = "SIMPAN PERUBAHAN";
+            const reader = new FileReader();
+            const rawBase64 = await new Promise((resolve) => {
+                reader.onload = ev => resolve(ev.target.result);
+                reader.readAsDataURL(file);
+            });
+
+            const compressedBase64 = await compressImage(rawBase64, 600, 0.6);
+            addSelectedFiles.push(compressedBase64);
+            
+            document.getElementById('add-box'+(i+1)).innerHTML = `<img src="${compressedBase64}" style="width:100%; height:100%; object-fit:cover; border-radius:10px;">`;
         }
     };
 
-    document.getElementById("deleteBtn").onclick = async function() {
-        if(!confirm("⚠️ YAKIN INGIN MENGHAPUS BARANG INI?\nData yang dihapus akan hilang dari sistem dan tidak bisa dikembalikan!")) return;
+    document.getElementById("addSaveBtn").onclick = async function() {
+        const nama = document.getElementById("add-nama").value.trim();
+        if(!nama) { alert("Lengkapi Nama barang!"); return; }
 
-        const btn = this;
-        btn.disabled = true;
-        btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> MENGHAPUS...`;
+        const btn = this; btn.disabled = true; btn.innerHTML = `MENYIMPAN...`;
 
         const payload = {
-            action: "delete_item",
-            pin: userPin,
-            row_index: currentItem.row_index
+            action: "add_item", pin: userPin, nama: nama,
+            kode_barang: document.getElementById("add-kode").value.trim(),
+            kode_wadah: document.getElementById("add-wadah").value.trim(),
+            jumlah: document.getElementById("add-jumlah").value,
+            kondisi: document.getElementById("add-kondisi").value,
+            tim: document.getElementById("add-team").value,
+            lokasi: document.getElementById("add-lokasi").value,
+            rencana_tujuan: document.getElementById("add-tujuan").value,
+            status_digunakan: document.getElementById("add-status").value,
+            keterangan_ref: document.getElementById("add-ref").value,
+            fotos: addSelectedFiles
         };
 
         try {
-            const response = await fetch(SCRIPT_URL, {
-                method: "POST",
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
-                body: JSON.stringify(payload)
-            });
+            const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
             const data = await response.json();
-            
-            if(data.status === "success") {
-                alert("✅ Barang berhasil dihapus!");
-                closeModalEdit();
-                loadData(); 
-            } else {
-                alert("❌ Gagal Menghapus: " + data.message);
-                btn.disabled = false;
-                btn.innerHTML = `<i class="fa-solid fa-trash" style="margin-right: 5px;"></i> HAPUS BARANG`;
-            }
-        } catch (e) {
-            alert("⚠️ Gagal terhubung. Periksa koneksi internetmu.");
-            btn.disabled = false;
-            btn.innerHTML = `<i class="fa-solid fa-trash" style="margin-right: 5px;"></i> HAPUS BARANG`;
-        }
+            if(data.status === "success") { closeAddModal(); loadData(); }
+        } catch (e) { alert("Gagal terhubung."); } 
+        finally { btn.disabled = false; btn.innerText = "SIMPAN BARANG BARU"; }
+    };
+
+    document.getElementById("deleteBtn").onclick = async function() {
+        if(!confirm("YAKIN HAPUS BARANG INI?")) return;
+        const btn = this; btn.disabled = true; btn.innerHTML = `MENGHAPUS...`;
+        try {
+            const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "delete_item", pin: userPin, row_index: currentItem.row_index }) });
+            if((await response.json()).status === "success") { closeModalEdit(); loadData(); }
+        } catch (e) { alert("Gagal terhubung."); btn.disabled = false; btn.innerText = "HAPUS"; }
     };
 </script>
 </body>

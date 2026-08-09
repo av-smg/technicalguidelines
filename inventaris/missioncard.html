@@ -17,11 +17,21 @@ location: "MISSION CARD"
 
         /* FORM LOGIN / PILIH TIM */
         .login-card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.08); text-align: center; border: 1px solid #e2e8f0; }
-        .login-card h3 { font-weight: 800; color: #1e293b; margin-top: 0; margin-bottom: 20px; }
+        .login-card h3 { font-weight: 800; color: #1e293b; margin-top: 0; margin-bottom: 20px; font-size: 20px; }
         .login-input { width: 100%; padding: 15px 20px; border-radius: 12px; border: 2px solid #e2e8f0; font-size: 16px; margin-bottom: 15px; outline: none; transition: 0.3s; font-family: inherit; font-weight: 600; text-align: center; }
         .login-input:focus { border-color: var(--primary-orange); }
-        .btn-mc { background: var(--primary-orange); color: white; border: none; padding: 15px 30px; border-radius: 12px; font-weight: 800; font-size: 16px; cursor: pointer; width: 100%; transition: 0.3s; text-transform: uppercase; box-shadow: 0 8px 20px rgba(230, 126, 34, 0.25); }
-        .btn-mc:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(230, 126, 34, 0.4); }
+        
+        .btn-mc { color: white; border: none; padding: 14px 20px; border-radius: 12px; font-weight: 800; font-size: 14px; cursor: pointer; width: 100%; transition: 0.3s; text-transform: uppercase; margin-bottom: 10px; }
+        .btn-mc:hover { transform: translateY(-3px); }
+        
+        .btn-view { background: #64748b; box-shadow: 0 6px 15px rgba(100, 116, 139, 0.25); }
+        .btn-view:hover { background: #475569; box-shadow: 0 8px 20px rgba(100, 116, 139, 0.35); }
+        
+        .btn-edit { background: var(--primary-orange); box-shadow: 0 6px 15px rgba(230, 126, 34, 0.25); }
+        .btn-edit:hover { background: #d35400; box-shadow: 0 8px 20px rgba(230, 126, 34, 0.35); }
+
+        .divider { border-top: 2px dashed #e2e8f0; margin: 25px 0; position: relative; }
+        .divider span { background: white; padding: 0 15px; position: relative; top: -10px; font-size: 12px; font-weight: 800; color: #94a3b8; }
 
         /* BANNER APD */
         .safety-banner { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-left: 5px solid #ef4444; padding: 15px 20px; border-radius: 15px; box-shadow: 0 8px 25px rgba(239, 68, 68, 0.15); margin-bottom: 25px; display: none; align-items: center; gap: 15px; flex-wrap: wrap; border-right: 1px solid #fee2e2; border-top: 1px solid #fee2e2; border-bottom: 1px solid #fee2e2; }
@@ -42,9 +52,10 @@ location: "MISSION CARD"
         .custom-checkbox input { opacity: 0; width: 0; height: 0; position: absolute; }
         .checkmark { position: absolute; top: 0; left: 0; width: 32px; height: 32px; background-color: #f1f5f9; border: 2px solid #cbd5e1; border-radius: 10px; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
         .custom-checkbox input:checked ~ .checkmark { background-color: #10b981; border-color: #10b981; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3); }
+        .custom-checkbox input:disabled ~ .checkmark { background-color: #e2e8f0; cursor: not-allowed; border-color: #cbd5e1; }
         .checkmark:after { content: "✓"; color: white; font-weight: 900; font-size: 18px; display: none; }
         .custom-checkbox input:checked ~ .checkmark:after { display: block; }
-        .custom-checkbox:hover .checkmark { border-color: #10b981; }
+        .custom-checkbox:hover input:not(:disabled) ~ .checkmark { border-color: #10b981; }
 
         .task-title { margin: 0; font-size: 18px; font-weight: 800; color: #1e293b; line-height: 1.4; }
         
@@ -72,27 +83,35 @@ location: "MISSION CARD"
 
     <div class="header-mc">
         <h1>Rencana Kerja</h1>
-        <p>Akses sinkronisasi lapangan khusus Tim Teknisi A/V</p>
+        <p>Sistem Sinkronisasi Lapangan & Gudang</p>
     </div>
 
     <main class="container-mc">
         
         <!-- STEP 1: LOGIN & PILIH TIM -->
         <div id="loginSection" class="login-card">
-            <h3>Pilih Sektor Kerja</h3>
-            <input type="password" id="pinInput" class="login-input" placeholder="Masukkan PIN Petugas" maxlength="6">
+            <h3>Pilih Sektor Tim Kerja</h3>
             <select id="teamSelect" class="login-input">
                 <option value="">-- Sedang Memuat Daftar Tim... --</option>
             </select>
-            <button onclick="loadMissionCards()" class="btn-mc" id="btnLoad">Buka Mission Card</button>
+
+            <button onclick="loadMissionCards(false)" class="btn-mc btn-view">👁️ Lihat Saja (Mode Pengamat)</button>
+            
+            <div class="divider"><span>ATAU</span></div>
+            
+            <input type="password" id="pinInput" class="login-input" placeholder="Masukkan PIN Teknisi Anda" maxlength="6">
+            <button onclick="loadMissionCards(true)" class="btn-mc btn-edit">🛠️ Mulai Bekerja (Mode Edit)</button>
         </div>
 
         <!-- STEP 2: DAFTAR TUGAS -->
         <div id="taskSection" style="display: none;">
             
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h3 style="font-weight: 900; margin: 0; color: #1e293b; font-size: 20px;" id="teamTitle">Tim: Audio-Array</h3>
-                <button onclick="location.reload()" style="background:none; border:none; color:#64748b; font-weight:bold; cursor:pointer;">Ganti Tim ↺</button>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+                <div>
+                    <h3 style="font-weight: 900; margin: 0 0 5px 0; color: #1e293b; font-size: 22px;" id="teamTitle">Tim: Audio-Array</h3>
+                    <div id="modeStatus"></div>
+                </div>
+                <button onclick="location.reload()" style="background:none; border:none; color:#64748b; font-weight:bold; cursor:pointer; font-size: 14px;"><i class="fa-solid fa-arrow-left"></i> Ganti Tim / Mode</button>
             </div>
 
             <!-- BANNER APD -->
@@ -107,15 +126,26 @@ location: "MISSION CARD"
     </main>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4C90tXAuT7iuFHZjOmgtYhoQqfNUosnEqMAm9l2Cn-VyjbPivKkf5Tv69qCtun441g/exec";
+    // ========================================================
+    // ⚠️ GANTI URL INI DENGAN LINK APPS SCRIPT KAMU YANG BARU
+    // ========================================================
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4C90tXAuT7iuFHZjOmgtYhoQqfNUosnEqMAm9l2Cn-VyjbPivKkf5Tv69qCtun441g/exec"; 
     
+    // DAFTAR PIN
+    const VALID_PINS = [
+      "4m9k2b", "7p4v1c", "9h2n8f", "2y6r5w", "8b3t9m", "1q8x4d", "6j5p7z", "3c9g2k", "5n1m8v", "4t7f3q",
+      "x2m8q9", "5w1n7k", "8z4j3p", "v9t6c2", "3r7f5b", "5x7z2y", "3f8g1k", "8r2m9p", "2v9w4x", "7k3n8p", 
+      "5a9b3c", "6e2g8q", "9t4v1w", "3d7h2k", "18k7md", "m1n2b3", "c4x5z6", "p7l8k9", "o0i9u8", "y7t6r5", 
+      "e4w3q2", "a1s2d3", "f4g5h6", "j7k8l9", "z0x9c8"
+    ];
+
     let allTasks = [];
+    let isEditMode = false;
     let savedPin = localStorage.getItem("AV_INVENTORY_PIN") || "";
 
     window.onload = async () => {
         if (savedPin) document.getElementById("pinInput").value = savedPin;
 
-        // Ambil daftar tim dari database
         try {
             const res = await fetch(SCRIPT_URL + "?action=api");
             const data = await res.json();
@@ -123,31 +153,50 @@ location: "MISSION CARD"
             const select = document.getElementById("teamSelect");
             select.innerHTML = '<option value="">-- Pilih Sektor Tim --</option>';
             
-            if(data.dropdowns && data.dropdowns.tim) {
-                data.dropdowns.tim.sort().forEach(t => {
+            if(data.mission_cards) {
+                allTasks = data.mission_cards;
+                
+                // MENGGABUNGKAN TIM DARI MISSION CARD & DROPDOWN
+                let teamsFromTasks = allTasks.map(t => t.tim).filter(Boolean);
+                let teamsFromDropdown = (data.dropdowns && data.dropdowns.tim) ? data.dropdowns.tim : [];
+                
+                // Hapus duplikat & urutkan abjad
+                let uniqueTeams = [...new Set([...teamsFromTasks, ...teamsFromDropdown])].sort();
+
+                uniqueTeams.forEach(t => {
                     select.innerHTML += `<option value="${t}">${t}</option>`;
                 });
             }
-            
-            if(data.mission_cards) {
-                allTasks = data.mission_cards;
-            }
         } catch (e) {
             alert("Gagal terhubung ke database. Periksa internet.");
+            document.getElementById("teamSelect").innerHTML = '<option value="">Gagal memuat. Refresh halaman.</option>';
         }
     };
 
-    function loadMissionCards() {
-        const pin = document.getElementById("pinInput").value.trim();
+    function loadMissionCards(wantsEdit) {
         const tim = document.getElementById("teamSelect").value;
+        if (!tim) { alert("Harap pilih Sektor Tim terlebih dahulu!"); return; }
         
-        if (!pin || !tim) { alert("Harap isi PIN dan pilih Tim!"); return; }
-        
-        localStorage.setItem("AV_INVENTORY_PIN", pin);
+        // Cek PIN jika memilih Mode Teknisi
+        if (wantsEdit) {
+            const pin = document.getElementById("pinInput").value.trim().toLowerCase();
+            if (!pin) { alert("Harap isi PIN Teknisi untuk Mode Edit!"); return; }
+            if (!VALID_PINS.includes(pin)) { alert("PIN Salah! Akses ditolak."); return; }
+            
+            localStorage.setItem("AV_INVENTORY_PIN", pin);
+            isEditMode = true;
+        } else {
+            isEditMode = false;
+        }
         
         document.getElementById("loginSection").style.display = "none";
         document.getElementById("taskSection").style.display = "block";
         document.getElementById("teamTitle").innerText = `Tugas: ${tim}`;
+        
+        // Tampilkan Indikator Mode
+        document.getElementById("modeStatus").innerHTML = isEditMode 
+            ? `<span style="color:#10b981; font-size:13px; font-weight:800; background:#ecfdf5; padding:4px 10px; border-radius:6px; border:1px solid #a7f3d0;">🟢 Mode Teknisi (Bisa Centang Tugas)</span>`
+            : `<span style="color:#eab308; font-size:13px; font-weight:800; background:#fefce8; padding:4px 10px; border-radius:6px; border:1px solid #fef08a;">🟡 Mode Pengamat (Hanya Melihat)</span>`;
 
         renderTasks(tim);
     }
@@ -173,7 +222,6 @@ location: "MISSION CARD"
             card.className = "task-card " + (isDone ? "task-completed" : "");
             card.id = `card-${task.row_index}`;
 
-            // PARSER TEXT (Sihir Parsing Lama yang Disempurnakan)
             let rawText = task.deskripsi || "Tidak ada deskripsi";
             let imgSrc = "";
             let imgRegex = /\[img:\s*(.+?)\]/i;
@@ -199,7 +247,7 @@ location: "MISSION CARD"
                 alatArray.forEach(item => {
                     let lowerItem = item.toLowerCase();
                     if (lowerItem.includes('helm') || lowerItem.includes('sarung tangan') || lowerItem.includes('sepatu')) {
-                        globalApdSet.add(item); // Tarik APD ke atas
+                        globalApdSet.add(item); 
                     } else if (lowerItem.includes('kabel')) {
                         cables.push(`<span class="tool-item cable">🔌 ${item}</span>`);
                     } else {
@@ -216,7 +264,6 @@ location: "MISSION CARD"
                     toolsHtml += `</div></div>`;
                 }
 
-                // Ambil Instruksinya Saja
                 let keyword = matchSplit[2];
                 if (keyword) {
                     let textSteps = rawText.substring(rawText.indexOf(keyword)).replace(new RegExp(keyword, 'i'), '').trim();
@@ -229,6 +276,9 @@ location: "MISSION CARD"
             let imgHtml = imgSrc ? `<img src="${imgSrc}" class="task-img">` : '';
             let asetHtml = task.kode_alokasi ? `<span class="asset-badge">Aset: ${task.kode_alokasi}</span>` : '';
 
+            // Jika Mode Pengamat, Checkbox di-disable (digembok)
+            let checkDisabled = isEditMode ? "" : "disabled";
+
             card.innerHTML = `
                 <div class="sync-overlay" id="sync-${task.row_index}">
                     <span><i class="fa-solid fa-circle-notch fa-spin"></i> Menyinkronkan ke Gudang...</span>
@@ -236,7 +286,7 @@ location: "MISSION CARD"
                 <div class="task-header">
                     <div class="task-title-group">
                         <label class="custom-checkbox">
-                            <input type="checkbox" id="check-${task.row_index}" ${isDone ? 'checked' : ''} onchange="toggleTask(${task.row_index})">
+                            <input type="checkbox" id="check-${task.row_index}" ${isDone ? 'checked' : ''} ${checkDisabled} onchange="toggleTask(${task.row_index})">
                             <span class="checkmark"></span>
                         </label>
                         <h3 class="task-title">${task.nama_barang || "Tugas Teknis"}</h3>
@@ -255,7 +305,6 @@ location: "MISSION CARD"
             container.appendChild(card);
         });
 
-        // Render APD Banner
         if (globalApdSet.size > 0) {
             document.getElementById("safetyBanner").style.display = "flex";
             document.getElementById("apdItems").innerHTML = Array.from(globalApdSet).map(item => `<span class="apd-badge">${item}</span>`).join('');
@@ -263,6 +312,8 @@ location: "MISSION CARD"
     }
 
     async function toggleTask(rowIndex) {
+        if (!isEditMode) return; // Keamanan ganda
+
         const checkbox = document.getElementById(`check-${rowIndex}`);
         const card = document.getElementById(`card-${rowIndex}`);
         const syncLayer = document.getElementById(`sync-${rowIndex}`);
@@ -270,7 +321,6 @@ location: "MISSION CARD"
         const isSelesai = checkbox.checked;
         const pin = document.getElementById("pinInput").value;
 
-        // Tampilkan animasi sinkronisasi
         syncLayer.style.display = "flex";
 
         const payload = {
@@ -288,12 +338,11 @@ location: "MISSION CARD"
             const data = await response.json();
             
             if (data.status === "success") {
-                // Berhasil! Ubah warna kartu
                 if (isSelesai) card.classList.add("task-completed");
                 else card.classList.remove("task-completed");
             } else {
                 alert("Gagal: " + (data.message === "WRONG_PIN" ? "PIN Salah!" : data.message));
-                checkbox.checked = !isSelesai; // Kembalikan centang
+                checkbox.checked = !isSelesai; 
             }
         } catch (e) {
             alert("Gagal terhubung ke server.");

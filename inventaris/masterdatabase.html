@@ -6,7 +6,7 @@ location: "MASTER"
 <html lang="id">
 <head>
     {% include head.html %}
-    <!-- SCRIPT UNTUK BACA QR CODE (VERSI LEBIH STABIL & PUNYA UI BUTTON) -->
+    <!-- SCRIPT UNTUK BACA QR CODE YANG LEBIH STABIL -->
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 
     <style>
@@ -120,6 +120,13 @@ location: "MASTER"
         .photo-box { aspect-ratio: 1/1; border-radius: 12px; border: 2px dashed var(--border-color); display: flex; align-items: center; justify-content: center; background: var(--bg-color); cursor: pointer; overflow: hidden; position: relative; }
         .photo-box img { width: 100%; height: 100%; object-fit: cover; }
 
+        .qty-control { display: flex; align-items: center; gap: 15px; background: var(--bg-color); padding: 15px; border-radius: 15px; border: 1px solid var(--border-color); }
+        .qty-input { width: 80px; padding: 10px; border-radius: 8px; border: 2px solid var(--border-color); font-size: 16px; font-weight: 700; text-align: center; color: var(--text-dark); background: var(--card-bg); outline: none; }
+        .qty-input:focus { border-color: var(--primary-orange); }
+        .qty-info { display: flex; flex-direction: column; }
+        .qty-info strong { color: var(--text-dark); font-size: 14px; }
+        .qty-info span { color: var(--text-gray); font-size: 12px; }
+
         /* SCANNER CAMERA OVERLAY */
         #qr-reader { width: 100%; max-width: 500px; margin: 0 auto; border-radius: 15px; overflow: hidden; border: none !important; }
         #qr-reader__dashboard_section_csr span { color: var(--text-dark); font-family: inherit; }
@@ -224,7 +231,8 @@ location: "MASTER"
             <div class="modal-body">
                 <div class="modal-left">
                     <span class="label-tag">Foto Barang & Wadah</span>
-                    <div class="main-image-box">
+                    <!-- DITAMBAHKAN ONCLICK AGAR BISA ZOOM -->
+                    <div class="main-image-box" onclick="openFullscreen()" style="cursor: zoom-in;">
                         <img id="m-main-img" src="">
                         <div id="parent-photo-badge" style="display:none; position:absolute; top:10px; right:10px; background:rgba(37, 99, 235, 0.9); color:white; padding:4px 8px; border-radius:5px; font-size:10px; font-weight:bold;">📦 FOTO WADAH</div>
                     </div>
@@ -270,7 +278,7 @@ location: "MASTER"
                     <div class="flex-row-input">
                         <div class="flex-col">
                             <span class="label-tag">Jumlah Item</span>
-                            <input type="number" id="m-jumlah" class="input-text" style="margin-bottom: 0;">
+                            <input type="number" id="m-jumlah" class="input-text" style="margin-bottom: 0;" oninput="updateMaxTerpakai()">
                         </div>
                         <div class="flex-col">
                             <span class="label-tag">Kondisi</span>
@@ -307,6 +315,15 @@ location: "MASTER"
                         </div>
                     </div>
 
+                    <span class="label-tag">Jumlah Dipakai</span>
+                    <div class="qty-control" style="margin-bottom: 20px;">
+                        <input type="number" id="m-terpakai" class="qty-input" min="0" value="0" oninput="calculateSisa()">
+                        <div class="qty-info">
+                            <strong id="m-sisa-text">Sisa: 0 Pcs</strong>
+                            <span id="m-max-text">Total persediaan: 0 Pcs</span>
+                        </div>
+                    </div>
+
                     <span class="label-tag">Catatan Tambahan (Misal: Hilang 2)</span>
                     <textarea id="m-desc" class="input-text" rows="2"></textarea>
 
@@ -322,7 +339,7 @@ location: "MASTER"
         </div>
     </div>
 
-    <!-- MODAL TAMBAH BARANG -->
+    <!-- MODAL TAMBAH BARANG (SEKARANG SUDAH SAMA LENGKAPNYA) -->
     <div id="modalAdd" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
@@ -339,8 +356,9 @@ location: "MASTER"
                         <div class="photo-box" id="add-box4" style="border-color:#2563eb; background:#eff6ff;"><span>📦</span></div>
                         <div class="photo-box" id="add-box5" style="border-color:#2563eb; background:#eff6ff;"><span>📦</span></div>
                     </div>
-                    <input type="file" id="add-fileInput" style="display: none;" accept="image/*" multiple capture="environment">
-                    <p style="font-size:10px; color:gray;">Kotak biru khusus untuk foto koper/wadah (jika ada).</p>
+                    <!-- Dihapus atribut capture biar bisa buka galeri langsung -->
+                    <input type="file" id="add-fileInput" style="display: none;" accept="image/*" multiple>
+                    <p style="font-size:10px; color:gray;">Kotak biru (Foto 4 & 5) khusus untuk foto koper/wadah (jika ada).</p>
                 </div>
 
                 <div class="modal-right">
@@ -351,7 +369,7 @@ location: "MASTER"
                         </div>
                         <div class="flex-col" style="flex: 1;">
                             <span class="label-tag">Status Awal</span>
-                            <select id="add-status" class="input-text select-modern" style="margin-bottom: 0;">
+                            <select id="add-status" class="input-text select-modern" style="margin-bottom: 0; border: 2px solid var(--primary-orange);">
                                 <option value="Di Gudang">🏢 Di Gudang</option>
                                 <option value="Siap Dibawa">🛒 Siap Dibawa</option>
                             </select>
@@ -360,19 +378,19 @@ location: "MASTER"
                     
                     <div class="flex-row-input">
                         <div class="flex-col">
-                            <span class="label-tag">Kode Barang</span>
-                            <input type="text" id="add-kode" class="input-text" style="margin-bottom: 0;">
+                            <span class="label-tag">Kode Barang (Satuan)</span>
+                            <input type="text" id="add-kode" class="input-text" style="color: var(--primary-orange); font-weight: bold; margin-bottom: 0;">
                         </div>
                         <div class="flex-col">
                             <span class="label-tag">Kode Wadah / Box</span>
-                            <input type="text" id="add-wadah" class="input-text" style="margin-bottom: 0;">
+                            <input type="text" id="add-wadah" class="input-text" style="color: #2563eb; font-weight: bold; margin-bottom: 0;">
                         </div>
                     </div>
 
                     <div class="flex-row-input">
                         <div class="flex-col">
-                            <span class="label-tag">Jumlah</span>
-                            <input type="number" id="add-jumlah" class="input-text" value="1" style="margin-bottom: 0;">
+                            <span class="label-tag">Jumlah Item</span>
+                            <input type="number" id="add-jumlah" class="input-text" value="1" style="margin-bottom: 0;" oninput="updateAddMaxTerpakai()">
                         </div>
                         <div class="flex-col">
                             <span class="label-tag">Kondisi</span>
@@ -395,11 +413,31 @@ location: "MASTER"
                         </div>
                     </div>
 
-                    <span class="label-tag">Lokasi Awal</span>
-                    <select id="add-lokasi" class="input-text select-modern" style="margin-bottom: 20px;"></select>
+                    <div class="flex-row-input">
+                        <div class="flex-col">
+                            <span class="label-tag">Barang Milik</span>
+                            <input type="text" id="add-owner" list="list-owner" class="input-text" style="margin-bottom: 0;">
+                        </div>
+                        <div class="flex-col">
+                            <span class="label-tag">Lokasi Awal</span>
+                            <select id="add-lokasi" class="input-text select-modern" style="margin-bottom: 0;"></select>
+                        </div>
+                    </div>
+
+                    <span class="label-tag">Jumlah Dipakai Awal</span>
+                    <div class="qty-control" style="margin-bottom: 20px;">
+                        <input type="number" id="add-terpakai" class="qty-input" min="0" value="0" oninput="calculateAddSisa()">
+                        <div class="qty-info">
+                            <strong id="add-sisa-text">Sisa: 0 Pcs</strong>
+                            <span id="add-max-text">Total persediaan: 0 Pcs</span>
+                        </div>
+                    </div>
 
                     <span class="label-tag">Keterangan Teknis</span>
                     <textarea id="add-ref" class="input-text" rows="2"></textarea>
+
+                    <span class="label-tag">Catatan Tambahan (Misal: Hilang 2)</span>
+                    <textarea id="add-desc" class="input-text" rows="2"></textarea>
                 </div>
             </div>
             <div class="modal-footer">
@@ -410,8 +448,9 @@ location: "MASTER"
     </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzHNknniYCfVXIbHaQEIPrr29sRdYJ1sdKcRx2tChP3XsEflq4ePL6PG79jLBp-5-Si7A/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4C90tXAuT7iuFHZjOmgtYhoQqfNUosnEqMAm9l2Cn-VyjbPivKkf5Tv69qCtun441g/exec";
     
+    // PIN GABUNGAN
     const VALID_PINS = [
       "4m9k2b", "7p4v1c", "9h2n8f", "2y6r5w", "8b3t9m", "1q8x4d", "6j5p7z", "3c9g2k", "5n1m8v", "4t7f3q",
       "x2m8q9", "5w1n7k", "8z4j3p", "v9t6c2", "3r7f5b", "5x7z2y", "3f8g1k", "8r2m9p", "2v9w4x", "7k3n8p", 
@@ -609,6 +648,7 @@ location: "MASTER"
         document.getElementById("modalScanner").classList.remove("active");
     }
 
+    // --- KOMPRESI GAMBAR TINGKAT TINGGI (PROMISE BASE) ---
     function compressImage(base64, maxDim, quality) {
         return new Promise((resolve) => {
             const img = new Image();
@@ -630,6 +670,8 @@ location: "MASTER"
         const fotos = item.fotos || [];
         const mainImg = document.getElementById("m-main-img");
         const thumbs = document.getElementById("m-thumbnails");
+        const badgeParent = document.getElementById("parent-photo-badge");
+        const lockMsg = document.getElementById("foto-locked-msg");
         
         thumbs.innerHTML = "";
         
@@ -711,6 +753,19 @@ location: "MASTER"
         }
     }
 
+    // FUNGSI ZOOM / FULLSCREEN UNTUK GAMBAR
+    function openFullscreen() {
+        const imgSrc = document.getElementById("m-main-img").src;
+        if(!imgSrc.includes('text=')) { 
+            document.getElementById("fsImage").src = imgSrc;
+            document.getElementById("fsOverlay").classList.add("active");
+        }
+    }
+
+    function closeFullscreen() {
+        document.getElementById("fsOverlay").classList.remove("active");
+    }
+
     function openModalEdit(item) {
         if (!checkAndRequestPin()) return;
         currentItem = item; pendingFotoUpdate = null; currentFotoIndex = 0;
@@ -732,10 +787,41 @@ location: "MASTER"
         locSelect.innerHTML = ""; optionsData.lokasi.forEach(loc => { locSelect.innerHTML += `<option value="${loc}">${loc}</option>`; });
         if(item.lokasi) locSelect.value = item.lokasi;
 
+        // Populate field terpakai 
+        let total = parseInt(item.jumlah) || 0;
+        let terpakai = parseInt(item.terpakai) || 0;
+        const inputQty = document.getElementById("m-terpakai");
+        inputQty.max = total; inputQty.value = terpakai;
+        document.getElementById("m-max-text").innerText = `Total persediaan: ${total} Pcs`;
+        calculateSisa();
+
         document.getElementById("m-desc").value = item.keterangan_edit || "";
         document.getElementById("m-system-log").innerText = (item.log_history && item.log_history !== "undefined") ? item.log_history : "Belum ada histori update.";
         
         document.getElementById("modalEdit").classList.add("active");
+    }
+
+    function updateMaxTerpakai() {
+        const jumlahInput = document.getElementById("m-jumlah").value;
+        const terpakaiInput = document.getElementById("m-terpakai");
+        terpakaiInput.max = jumlahInput || 0;
+        document.getElementById("m-max-text").innerText = `Total persediaan: ${jumlahInput || 0} Pcs`;
+        calculateSisa();
+    }
+
+    function calculateSisa() {
+        if (!currentItem) return;
+        let total = parseInt(document.getElementById("m-jumlah").value) || 0;
+        let inputTerpakai = parseInt(document.getElementById("m-terpakai").value) || 0;
+        
+        if (inputTerpakai > total) {
+            inputTerpakai = total; document.getElementById("m-terpakai").value = total;
+        } else if (inputTerpakai < 0) {
+            inputTerpakai = 0; document.getElementById("m-terpakai").value = 0;
+        }
+        
+        let sisa = total - inputTerpakai;
+        document.getElementById("m-sisa-text").innerText = `Sisa Tersedia: ${sisa} Pcs`;
     }
 
     function closeModalEdit() {
@@ -758,6 +844,7 @@ location: "MASTER"
             tim: document.getElementById("m-team").value,
             lokasi: document.getElementById("m-lokasi").value,
             rencana_tujuan: document.getElementById("m-tujuan").value,
+            terpakai: parseInt(document.getElementById("m-terpakai").value) || 0,
             status_digunakan: document.getElementById("m-status-digunakan").value,
             keterangan: document.getElementById("m-desc").value
         };
@@ -773,6 +860,9 @@ location: "MASTER"
         finally { btn.disabled = false; btn.innerText = "SIMPAN STATUS & DATA"; }
     };
 
+    // ==========================================
+    // LOGIKA MODAL TAMBAH BARANG
+    // ==========================================
     function openAddModal() {
         if (!checkAndRequestPin()) return;
         document.getElementById("modalAdd").classList.add("active");
@@ -782,8 +872,11 @@ location: "MASTER"
 
         document.getElementById("add-nama").value = ""; document.getElementById("add-kode").value = "";
         document.getElementById("add-wadah").value = ""; document.getElementById("add-ref").value = "";
-        document.getElementById("add-tujuan").value = "";
+        document.getElementById("add-tujuan").value = ""; document.getElementById("add-owner").value = "";
+        document.getElementById("add-desc").value = ""; document.getElementById("add-terpakai").value = 0;
         
+        updateAddMaxTerpakai();
+
         addSelectedFiles = []; 
         for(let i=1; i<=5; i++) {
             let inner = '<span>+</span>';
@@ -791,10 +884,34 @@ location: "MASTER"
             document.getElementById('add-box'+i).innerHTML = inner;
         }
     }
+    
     function closeAddModal() { document.getElementById("modalAdd").classList.remove("active"); }
 
+    function updateAddMaxTerpakai() {
+        const jumlahInput = document.getElementById("add-jumlah").value;
+        const terpakaiInput = document.getElementById("add-terpakai");
+        terpakaiInput.max = jumlahInput || 0;
+        document.getElementById("add-max-text").innerText = `Total persediaan: ${jumlahInput || 0} Pcs`;
+        calculateAddSisa();
+    }
+
+    function calculateAddSisa() {
+        let total = parseInt(document.getElementById("add-jumlah").value) || 0;
+        let inputTerpakai = parseInt(document.getElementById("add-terpakai").value) || 0;
+        if (inputTerpakai > total) { inputTerpakai = total; document.getElementById("add-terpakai").value = total; } 
+        else if (inputTerpakai < 0) { inputTerpakai = 0; document.getElementById("add-terpakai").value = 0; }
+        document.getElementById("add-sisa-text").innerText = `Sisa Tersedia: ${total - inputTerpakai} Pcs`;
+    }
+
+    // BACA 5 FOTO SEKALIGUS (BERURUTAN)
     document.getElementById('add-fileInput').onchange = async function(e) {
         const files = Array.from(e.target.files).slice(0, 5);
+        if (files.length === 0) return;
+
+        // Kunci tombol simpan agar tidak disubmit sebelum kompresi selesai
+        const btnSave = document.getElementById("addSaveBtn");
+        btnSave.disabled = true;
+        btnSave.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> MEMPROSES FOTO...`;
         
         addSelectedFiles = []; 
         for(let i=1; i<=5; i++) {
@@ -816,6 +933,10 @@ location: "MASTER"
             
             document.getElementById('add-box'+(i+1)).innerHTML = `<img src="${compressedBase64}" style="width:100%; height:100%; object-fit:cover; border-radius:10px;">`;
         }
+
+        // Buka kembali tombol simpan
+        btnSave.disabled = false;
+        btnSave.innerText = "SIMPAN BARANG BARU";
     };
 
     document.getElementById("addSaveBtn").onclick = async function() {
@@ -835,6 +956,9 @@ location: "MASTER"
             rencana_tujuan: document.getElementById("add-tujuan").value,
             status_digunakan: document.getElementById("add-status").value,
             keterangan_ref: document.getElementById("add-ref").value,
+            barang_milik: document.getElementById("add-owner").value.trim(),
+            terpakai: parseInt(document.getElementById("add-terpakai").value) || 0,
+            keterangan: document.getElementById("add-desc").value.trim(),
             fotos: addSelectedFiles
         };
 

@@ -6,111 +6,87 @@ location: "MASTER"
 <html lang="id">
 <head>
     {% include head.html %}
-    <!-- SCRIPT UNTUK BACA QR/BARCODE YANG LEBIH STABIL -->
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 
     <style>
         .page-title-section { text-align: center; margin: 20px 0 30px; }
-        .page-title-section h2 { font-weight: 800; letter-spacing: -1px; text-transform: uppercase; color: var(--text-dark); }
+        .page-title-section h2 { font-weight: 800; letter-spacing: -1px; text-transform: uppercase; color: var(--text-dark); margin-bottom: 5px;}
         
-        .controls-wrapper { position: sticky; top: 75px; z-index: 900; margin: 0 -15px 25px -15px; padding: 15px 15px 20px 15px; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(0,0,0,0.05); }
-        .toolbar-card { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 15px; background: var(--card-bg); padding: 16px; border-radius: 18px; box-shadow: 0 8px 30px rgba(0,0,0,0.04); border: 1px solid var(--border-color); }
-
+        /* TOOLBAR */
+        .controls-wrapper { position: sticky; top: 75px; z-index: 900; margin: 0 -15px 15px -15px; padding: 10px 15px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .toolbar-card { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; background: var(--card-bg); padding: 12px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); border: 1px solid var(--border-color); }
         .search-box-modern { display: flex; width: 100%; gap: 10px; }
         .search-input-wrapper { position: relative; flex: 1; }
-        .search-input-wrapper i { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: var(--text-gray); font-size: 16px; pointer-events: none; }
-        .search-input-modern { width: 100%; padding: 14px 20px 14px 45px; border-radius: 12px; border: 1px solid var(--border-color); outline: none; font-size: 15px; background: var(--bg-color); color: var(--text-dark); transition: all 0.3s ease; font-family: inherit; font-weight: 500; }
+        .search-input-wrapper i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-gray); font-size: 14px; pointer-events: none; }
+        .search-input-modern { width: 100%; padding: 12px 15px 12px 40px; border-radius: 10px; border: 1px solid var(--border-color); outline: none; font-size: 14px; background: var(--bg-color); color: var(--text-dark); transition: all 0.3s ease; font-family: inherit; font-weight: 500; }
         .search-input-modern:focus { border-color: var(--primary-orange); box-shadow: 0 0 0 4px rgba(255,126,39,0.1); background: var(--card-bg); }
         
-        .btn-scan { background: var(--text-dark); color: white; border: none; border-radius: 12px; padding: 0 20px; font-size: 18px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; }
+        .btn-scan { background: var(--text-dark); color: white; border: none; border-radius: 10px; padding: 0 15px; font-size: 16px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; }
         .btn-scan:hover { background: var(--primary-orange); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255,126,39,0.3); }
 
-        .toolbar-bottom { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
-        .filter-group-modern { display: flex; gap: 10px; flex-wrap: wrap; flex: 1; }
+        .toolbar-bottom { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .filter-group-modern { display: flex; gap: 8px; flex-wrap: wrap; flex: 1; }
         
-        .select-modern { appearance: none; -webkit-appearance: none; background-color: var(--bg-color); background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 14px center; background-size: 14px; padding: 10px 38px 10px 16px; border-radius: 10px; border: 1px solid var(--border-color); font-size: 13px; font-weight: 700; color: var(--text-dark); cursor: pointer; outline: none; transition: 0.2s; font-family: inherit; }
-        .select-modern:focus, .select-modern:hover { border-color: var(--primary-orange); background-color: var(--card-bg); }
-
-        .action-group-modern { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-        .btn-mod { padding: 10px 18px; border-radius: 10px; font-size: 13px; font-weight: 800; cursor: pointer; outline: none; transition: 0.3s; text-decoration: none !important; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
-        .btn-mod-outline { background: var(--bg-color); color: var(--text-dark); border: 1px solid var(--border-color); }
-        .btn-mod-outline:hover { background: #0f172a; border-color: #0f172a; color: white; transform: translateY(-2px); }
-        .btn-mod-primary { background: #2ecc71; color: white; border: 1px solid #2ecc71; box-shadow: 0 4px 10px rgba(46,204,113,0.2); }
-        .btn-mod-primary:hover { background: #27ae60; border-color: #27ae60; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(46,204,113,0.3); }
-
-        .segmented-control { display: flex; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 10px; padding: 4px; gap: 2px; }
-        .seg-btn { background: transparent; border: none; padding: 6px 14px; font-size: 12px; font-weight: 800; color: var(--text-gray); cursor: pointer; transition: 0.3s; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; font-family: inherit; }
-        .seg-btn.active { background: var(--card-bg); color: var(--primary-orange); box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
-
-        .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; padding-bottom: 40px; }
-        .list-view { display: flex; flex-direction: column; gap: 12px; max-width: 1200px; margin: 0 auto; padding-bottom: 40px; }
+        .select-modern { appearance: none; -webkit-appearance: none; background-color: var(--bg-color); background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 10px center; background-size: 12px; padding: 8px 30px 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 12px; font-weight: 700; color: var(--text-dark); cursor: pointer; outline: none; }
         
-        .mission-card { background: var(--card-bg); border-radius: 20px; padding: 15px; cursor: pointer; transition: 0.3s; border: 1px solid var(--border-color); display: flex; flex-direction: column; }
-        .mission-card:hover { transform: translateY(-5px); border-color: var(--primary-orange); box-shadow: 0 10px 25px rgba(255,126,39,0.05); }
-        .card-img { width: 100%; height: 180px; object-fit: cover; border-radius: 15px; background: #eee; margin-bottom: 15px; }
+        .action-group-modern { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .btn-mod { padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 800; cursor: pointer; outline: none; border: none; transition: 0.3s; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-mod-primary { background: #2ecc71; color: white; box-shadow: 0 4px 10px rgba(46,204,113,0.2); }
+        .btn-bulk { background: #3b82f6; color: white; }
+        .btn-bulk.active { background: #ef4444; }
 
-        .list-item { display: flex; align-items: center; gap: 15px; background: var(--card-bg); padding: 15px; border-radius: 15px; cursor: pointer; border: 1px solid var(--border-color); transition: 0.3s; }
-        .list-item:hover { transform: translateX(5px); border-color: var(--primary-orange); }
-        .list-img { width: 70px; height: 70px; object-fit: cover; border-radius: 10px; background: #eee; flex-shrink: 0; }
-        .list-info { flex: 1; display: flex; flex-direction: column; gap: 4px; color: var(--text-dark); }
+        /* GRID SYSTEM (Mobile 2 Kolom) */
+        .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; max-width: 1200px; margin: 0 auto; padding-bottom: 80px; }
         
-        .badge-status { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 800; border: 1px solid transparent; }
+        @media (max-width: 768px) {
+            .grid-cards { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .toolbar-bottom { flex-direction: column; align-items: stretch; }
+        }
+
+        .mission-card { background: var(--card-bg); border-radius: 12px; padding: 10px; cursor: pointer; transition: 0.2s; border: 2px solid var(--border-color); display: flex; flex-direction: column; position: relative; }
+        .mission-card.selected { border-color: #3b82f6; background: #eff6ff; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2); transform: scale(0.98); }
+        .mission-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.06); }
+        
+        .card-img { width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: 8px; background: #eee; margin-bottom: 10px; }
+        .mission-card h4 { font-weight: 800; font-size: 13px; margin: 0 0 5px 0; line-height: 1.3; color: var(--text-dark); }
+        
+        .badge-status { padding: 3px 6px; border-radius: 4px; font-size: 9px; font-weight: 800; border: 1px solid transparent; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; display: inline-block; }
         .status-gudang { background: #f1f5f9; color: #64748b; border-color: #cbd5e1; }
         .status-keranjang { background: #fff7ed; color: #ea580c; border-color: #fdba74; }
         .status-perjalanan { background: #f3e8ff; color: #7e22ce; border-color: #d8b4fe; }
         .status-lokasi { background: #eff6ff; color: #2563eb; border-color: #93c5fd; }
         .status-dipakai { background: #f0fdf4; color: #16a34a; border-color: #86efac; }
+        
+        .badge-qty { background: var(--text-dark); color: var(--bg-color); font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: 700; }
+        .card-codes { display:flex; gap: 5px; margin-bottom: 5px; flex-wrap: wrap; font-size: 10px; font-weight: 800; }
+        .card-codes span { background: #f8fafc; padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; }
 
-        .badge-owner { color: var(--text-gray); font-size: 12px; }
-        .badge-qty { background: var(--text-dark); color: var(--bg-color); font-size: 10px; padding: 3px 8px; border-radius: 5px; font-weight: 700; }
+        /* FLOATING BULK BAR */
+        .bulk-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 15px; box-shadow: 0 -5px 25px rgba(0,0,0,0.1); border-top: 1px solid #e2e8f0; display: none; justify-content: space-between; align-items: center; z-index: 9999; }
+        .bulk-bar.active { display: flex; }
+        .bulk-info { font-weight: 800; color: #1e293b; font-size: 14px; }
+        .btn-bulk-process { background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; font-size: 13px; cursor: pointer; }
 
+        /* MODALS */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 99990; backdrop-filter: blur(5px); padding: 15px; }
         .modal-overlay.active { display: flex; }
-        .modal-content { background: var(--card-bg); border-radius: 25px; width: 100%; max-width: 900px; max-height: 90vh; overflow-y: auto; position: relative; border: 1px solid var(--border-color); }
-        .modal-header { padding: 20px 30px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--card-bg); z-index: 10; }
-        .close-x { font-size: 28px; cursor: pointer; border: none; background: none; color: var(--text-gray); transition: 0.3s; }
-        .modal-body { display: flex; flex-wrap: wrap; padding: 20px; gap: 25px; }
+        .modal-content { background: var(--card-bg); border-radius: 20px; width: 100%; max-width: 900px; max-height: 90vh; overflow-y: auto; border: 1px solid var(--border-color); }
+        .modal-header { padding: 15px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--card-bg); z-index: 10; }
+        .close-x { font-size: 24px; cursor: pointer; border: none; background: none; color: var(--text-gray); }
+        .modal-body { padding: 20px; display: flex; flex-wrap: wrap; gap: 20px; }
+        .modal-footer { padding: 15px 20px; display: flex; gap: 10px; border-top: 1px solid var(--border-color); }
         
-        .modal-left { flex: 1; min-width: 300px; }
-        .main-image-box { width: 100%; height: 280px; border-radius: 15px; overflow: hidden; background: #eee; margin-bottom: 10px; cursor: zoom-in; position: relative; }
-        .main-image-box img { width: 100%; height: 100%; object-fit: cover; }
-        .thumb-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; }
-        .thumb-img { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; cursor: pointer; border: 2px solid transparent; opacity: 0.6; transition: 0.2s; background: #f0f0f0; display: flex; justify-content: center; align-items: center; font-size: 16px; color: #ccc; position: relative;}
-        .thumb-img:hover, .thumb-img.active { border-color: var(--primary-orange); opacity: 1; }
-        .thumb-label { position: absolute; bottom: -15px; font-size: 8px; width: 100%; text-align: center; color: var(--text-gray); white-space: nowrap; }
+        .input-text, .select-modern-form { width: 100%; padding: 12px 15px; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-color); font-size: 14px; outline: none; margin-bottom: 15px; font-weight: 500; font-family: inherit;}
+        .label-tag { font-size: 11px; font-weight: 800; color: var(--text-gray); text-transform: uppercase; margin-bottom: 5px; display: block; }
 
-        .img-edit-controls { display: flex; gap: 10px; margin-top: 10px; }
-        .btn-img { flex: 1; padding: 10px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-dark); transition: 0.2s; }
-        .btn-img:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-save { background: var(--primary-orange); color: white; flex:1; padding: 14px; border: none; border-radius: 10px; font-weight: bold; cursor:pointer;}
+        .btn-cancel { background: #e2e8f0; color: #475569; padding: 14px; border: none; border-radius: 10px; font-weight: bold; cursor:pointer;}
         
-        .modal-right { flex: 1.2; min-width: 300px; }
-        .label-tag { font-size: 11px; font-weight: 800; color: var(--text-gray); text-transform: uppercase; margin-bottom: 8px; display: block; }
-        .flex-row-input { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
-        .flex-col { flex: 1; min-width: 140px; }
-        .input-text { width: 100%; padding: 12px 15px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-dark); font-size: 14px; outline: none; margin-bottom: 20px; font-family: inherit; font-weight: 500; transition: 0.3s; }
-        .input-text:focus { border-color: var(--primary-orange); background: var(--card-bg); }
-
-        .modal-footer { display: flex; flex-wrap: wrap; gap: 10px; padding: 0 20px 25px; }
-        .btn { flex: 1; padding: 16px; border-radius: 15px; font-weight: 800; border: none; cursor: pointer; transition: 0.3s; font-size: 14px; min-width: 150px; text-transform: uppercase; }
-        .btn-save { background: var(--primary-orange); color: white; }
-        .btn-cancel { background: var(--bg-color); color: var(--text-dark); border: 1px solid var(--border-color); }
-        .btn-danger { background: #fff; color: #e74c3c; border: 1px solid #e74c3c; flex-basis: 100%; }
-
         .photo-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 20px; }
         .photo-box { aspect-ratio: 1/1; border-radius: 12px; border: 2px dashed var(--border-color); display: flex; align-items: center; justify-content: center; background: var(--bg-color); cursor: pointer; overflow: hidden; position: relative; }
         .photo-box img { width: 100%; height: 100%; object-fit: cover; }
-
-        .qty-control { display: flex; align-items: center; gap: 15px; background: var(--bg-color); padding: 15px; border-radius: 15px; border: 1px solid var(--border-color); }
-        .qty-input { width: 80px; padding: 10px; border-radius: 8px; border: 2px solid var(--border-color); font-size: 16px; font-weight: 700; text-align: center; color: var(--text-dark); background: var(--card-bg); outline: none; }
-        .qty-input:focus { border-color: var(--primary-orange); }
-        .qty-info { display: flex; flex-direction: column; }
-        .qty-info strong { color: var(--text-dark); font-size: 14px; }
-        .qty-info span { color: var(--text-gray); font-size: 12px; }
-
+        
         #qr-reader { width: 100%; max-width: 500px; margin: 0 auto; border-radius: 15px; overflow: hidden; border: none !important; }
-        #qr-reader__dashboard_section_csr span { color: var(--text-dark); font-family: inherit; }
-        #qr-reader__dashboard_section_swaplink { text-decoration: none; color: var(--primary-orange); font-weight: bold; margin-top: 10px; display: inline-block; }
-        #qr-reader button { background: var(--primary-orange); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -120,64 +96,77 @@ location: "MASTER"
     <main style="padding: 0 15px;">
         <div class="page-title-section">
             <h2>Inventory Portal</h2>
-            <p style="font-size: 13px; font-weight: 700; color: var(--text-gray);">Manajemen Aset & Keranjang Loading</p>
         </div>
 
         <div class="controls-wrapper">
             <div class="toolbar-card">
-                
-                <div class="toolbar-top">
-                    <div class="search-box-modern">
-                        <div class="search-input-wrapper">
-                            <i class="fa-solid fa-magnifying-glass"></i>
-                            <input type="text" id="searchInput" class="search-input-modern" placeholder="Cari nama, Box, Kode, Event..." oninput="applyFilters()">
-                        </div>
-                        <button onclick="openScannerModal()" class="btn-scan" title="Scan QR/Barcode">
-                            <i class="fa-solid fa-qrcode"></i>
-                        </button>
+                <div class="search-box-modern">
+                    <div class="search-input-wrapper">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="searchInput" class="search-input-modern" placeholder="Cari nama, Kode, Wadah..." oninput="applyFilters()">
                     </div>
+                    <button onclick="openScannerModal()" class="btn-scan"><i class="fa-solid fa-qrcode"></i></button>
                 </div>
 
                 <div class="toolbar-bottom">
                     <div class="filter-group-modern">
                         <select id="statusSelect" class="select-modern" onchange="applyFilters()">
                             <option value="all">Semua Status</option>
-                            <option value="Di Gudang">🏢 Di Gudang</option>
-                            <option value="Siap Dibawa">🛒 Keranjang (Siap Dibawa)</option>
-                            <option value="Dalam Perjalanan">🚚 Dalam Perjalanan</option>
-                            <option value="Di Lokasi">📍 Di Lokasi Event</option>
-                            <option value="Sedang Dipakai">🔌 Terpasang / Dipakai</option>
+                            <option value="Di Gudang">Di Gudang</option>
+                            <option value="Siap Dibawa">Keranjang (Siap Dibawa)</option>
+                            <option value="Dalam Perjalanan">Dalam Perjalanan</option>
+                            <option value="Di Gedung UTC">Di Gedung UTC</option>
+                            <option value="Perjalanan ke Yogya">Perjalanan ke Yogya</option>
+                            <option value="Gedung di Yogya">Gedung di Yogya</option>
+                            <option value="Di Lokasi">Di Lokasi Lainnya</option>
+                            <option value="Sedang Dipakai">Terpasang / Dipakai</option>
                         </select>
-                        <select id="sortSelect" class="select-modern" onchange="applyFilters()">
-                            <option value="default">Urutan Default</option>
-                            <option value="az">Sortir: A - Z</option>
-                            <option value="za">Sortir: Z - A</option>
-                        </select>
-                        <select id="teamSelect" class="select-modern" onchange="applyFilters()">
-                            <option value="all">Semua Tim</option>
-                        </select>
+                        <select id="teamSelect" class="select-modern" onchange="applyFilters()"><option value="all">Semua Tim</option></select>
                     </div>
 
                     <div class="action-group-modern">
-                        <button onclick="openAddModal()" class="btn-mod btn-mod-primary">
-                            <i class="fa-solid fa-plus"></i> Tambah
-                        </button>
-                        <div class="segmented-control">
-                            <button onclick="toggleView('gallery')" id="btnGallery" class="seg-btn active">
-                                <i class="fa-solid fa-border-all"></i>
-                            </button>
-                            <button onclick="toggleView('list')" id="btnList" class="seg-btn">
-                                <i class="fa-solid fa-list-ul"></i>
-                            </button>
-                        </div>
+                        <button onclick="openAddModal()" class="btn-mod btn-mod-primary"><i class="fa-solid fa-plus"></i> Baru</button>
+                        <button id="btnBulkMode" onclick="toggleBulkMode()" class="btn-mod btn-bulk"><i class="fa-solid fa-check-double"></i> Keranjang</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div id="loading" style="text-align: center; padding: 50px; font-weight: 700; color: gray;">Meminta akses dan mengunduh data...</div>
+        <div id="loading" style="text-align: center; padding: 50px; font-weight: 700; color: gray;">Memuat data...</div>
         <div id="dataContainer" class="grid-cards"></div>
     </main>
+
+    <!-- FLOATING BOTTOM BAR UNTUK BULK UPDATE -->
+    <div id="bulkBar" class="bulk-bar">
+        <span id="bulkCount" class="bulk-info">0 Terpilih</span>
+        <button onclick="openBulkUpdateModal()" class="btn-bulk-process">Ubah Status Bersamaan</button>
+    </div>
+
+    <!-- MODAL BULK UPDATE -->
+    <div id="modalBulk" class="modal-overlay">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3 style="font-weight: 800; font-size: 16px; margin:0;">UBAH STATUS BERSAMAAN</h3>
+                <button onclick="document.getElementById('modalBulk').classList.remove('active')" class="close-x">✕</button>
+            </div>
+            <div class="modal-body" style="display: block;">
+                <span class="label-tag">Pilih Status Baru:</span>
+                <select id="bulkNewStatus" class="select-modern-form">
+                    <option value="Siap Dibawa">🛒 Tambah ke Keranjang (Siap Dibawa)</option>
+                    <option value="Di Gudang">🏢 Kembalikan ke Gudang</option>
+                    <option value="Dalam Perjalanan">🚚 Dalam Perjalanan</option>
+                    <option value="Di Gedung UTC">📍 Di Gedung UTC</option>
+                    <option value="Perjalanan ke Yogya">🚚 Perjalanan ke Yogya</option>
+                    <option value="Gedung di Yogya">📍 Gedung di Yogya</option>
+                    <option value="Di Lokasi">📍 Di Lokasi Lainnya</option>
+                    <option value="Sedang Dipakai">🔌 Sedang Dipakai / Pasang</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button id="btnProsesBulk" class="btn-save" onclick="processBulkUpdate()" style="width: 100%;">PROSES UPDATE</button>
+            </div>
+        </div>
+    </div>
 
     <!-- MODAL SCANNER QR -->
     <div id="modalScanner" class="modal-overlay">
@@ -187,251 +176,49 @@ location: "MASTER"
                 <button onclick="closeScannerModal()" class="close-x">✕</button>
             </div>
             <div id="qr-reader"></div>
-            <p style="font-size: 12px; color: gray; margin-top: 15px;">Arahkan kamera ke stiker QR/Barcode Barang untuk pencarian cepat.</p>
         </div>
     </div>
 
-    <!-- MODAL EDIT / DETAIL BARANG -->
+    <!-- MODAL EDIT SATUAN -->
     <div id="modalEdit" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 style="font-weight: 800; font-size: 18px;">EDIT / UPDATE BARANG</h3>
+                <h3 style="font-weight: 800; font-size: 18px;">EDIT BARANG</h3>
                 <button onclick="closeModalEdit()" class="close-x">✕</button>
             </div>
-            
             <div class="modal-body">
-                <div class="modal-left">
-                    <span class="label-tag">Foto Barang & Wadah</span>
-                    <div class="main-image-box" onclick="openFullscreen()" style="cursor: zoom-in;">
-                        <img id="m-main-img" src="">
-                        <div id="parent-photo-badge" style="display:none; position:absolute; top:10px; right:10px; background:rgba(37, 99, 235, 0.9); color:white; padding:4px 8px; border-radius:5px; font-size:10px; font-weight:bold;">📦 FOTO WADAH</div>
-                    </div>
-                    <div id="m-thumbnails" class="thumb-row"></div>
-                    <div class="img-edit-controls">
-                        <button id="btnCam" class="btn-img" onclick="document.getElementById('img-camera').click()">📷 Kamera</button>
-                        <button id="btnGal" class="btn-img" onclick="document.getElementById('img-gallery').click()">🖼️ Galeri</button>
-                        <button id="btnDel" class="btn-img btn-img-danger" onclick="hapusFotoAktif()">🗑️ Hapus</button>
-                        <input type="file" id="img-camera" accept="image/*" capture="environment" style="display:none;" onchange="prosesGantiFoto(event)">
-                        <input type="file" id="img-gallery" accept="image/*" style="display:none;" onchange="prosesGantiFoto(event)">
-                    </div>
-                    <p id="foto-locked-msg" style="display:none; font-size:11px; color:#e74c3c; margin-top:5px; font-weight:bold;">Foto ini tidak bisa diubah karena milik Koper Induk.</p>
-                </div>
-
-                <div class="modal-right">
-                    <div class="flex-row-input">
-                        <div class="flex-col" style="flex: 1.5;">
-                            <span class="label-tag">Nama Barang</span>
-                            <input type="text" id="m-nama" class="input-text" style="font-weight: 700; font-size: 15px; margin-bottom: 0;">
-                        </div>
-                        <div class="flex-col" style="flex: 1;">
-                            <span class="label-tag">Status Inventaris</span>
-                            <select id="m-status-digunakan" class="input-text select-modern" style="margin-bottom: 0; border: 2px solid var(--primary-orange);">
-                                <option value="Di Gudang">🏢 Di Gudang</option>
-                                <option value="Siap Dibawa">🛒 Siap Dibawa (Keranjang)</option>
-                                <option value="Dalam Perjalanan">🚚 Dalam Perjalanan</option>
-                                <option value="Di Lokasi">📍 Di Lokasi Event</option>
-                                <option value="Sedang Dipakai">🔌 Sedang Dipakai / Pasang</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="flex-row-input">
-                        <div class="flex-col">
-                            <span class="label-tag">Kode Barang (Satuan)</span>
-                            <input type="text" id="m-kode" class="input-text" style="color: var(--primary-orange); font-weight: bold; margin-bottom: 0;">
-                        </div>
-                        <div class="flex-col">
-                            <span class="label-tag">Kode Wadah / Box</span>
-                            <input type="text" id="m-wadah" class="input-text" style="color: #2563eb; font-weight: bold; margin-bottom: 0;" placeholder="Contoh: BOX-KBL-A">
-                        </div>
-                    </div>
-
-                    <div class="flex-row-input">
-                        <div class="flex-col">
-                            <span class="label-tag">Jumlah Item</span>
-                            <input type="number" id="m-jumlah" class="input-text" style="margin-bottom: 0;" oninput="updateMaxTerpakai()">
-                        </div>
-                        <div class="flex-col">
-                            <span class="label-tag">Kondisi</span>
-                            <select id="m-kondisi" class="input-text select-modern" style="margin-bottom: 0;">
-                                <option value="Bagus">Bagus</option>
-                                <option value="Periksa">Periksa</option>
-                                <option value="Rusak">Rusak</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="flex-row-input">
-                        <div class="flex-col">
-                            <span class="label-tag">Tim</span>
-                            <select id="m-team" class="input-text select-modern" style="margin-bottom: 0;" onchange="handleNewOption(this)"></select>
-                        </div>
-                        <div class="flex-col">
-                            <span class="label-tag">Event Berikutnya?</span>
-                            <input type="text" id="m-tujuan" class="input-text" style="margin-bottom: 0;" placeholder="Bila sudah direncanakan...">
-                        </div>
-                    </div>
+                <div style="flex:1; min-width:300px;">
+                    <span class="label-tag">Status Inventaris</span>
+                    <select id="m-status-digunakan" class="select-modern-form" style="border: 2px solid var(--primary-orange);">
+                        <option value="Di Gudang">Di Gudang</option>
+                        <option value="Siap Dibawa">Siap Dibawa (Keranjang)</option>
+                        <option value="Dalam Perjalanan">Dalam Perjalanan</option>
+                        <option value="Di Gedung UTC">Di Gedung UTC</option>
+                        <option value="Perjalanan ke Yogya">Perjalanan ke Yogya</option>
+                        <option value="Gedung di Yogya">Gedung di Yogya</option>
+                        <option value="Di Lokasi">Di Lokasi Lainnya</option>
+                        <option value="Sedang Dipakai">Sedang Dipakai / Pasang</option>
+                    </select>
                     
-                    <div class="flex-row-input">
-                        <div class="flex-col">
-                            <span class="label-tag">Barang Milik</span>
-                            <select id="m-owner" class="input-text select-modern" style="margin-bottom: 0;" onchange="handleNewOption(this)"></select>
-                        </div>
-                        <div class="flex-col">
-                            <span class="label-tag">Lokasi Terkini</span>
-                            <select id="m-lokasi" class="input-text select-modern" style="margin-bottom: 0;" onchange="handleNewOption(this)"></select>
-                        </div>
-                    </div>
-
-                    <span class="label-tag">Jumlah Dipakai</span>
-                    <div class="qty-control" style="margin-bottom: 20px;">
-                        <input type="number" id="m-terpakai" class="qty-input" min="0" value="0" oninput="calculateSisa()">
-                        <div class="qty-info">
-                            <strong id="m-sisa-text">Sisa: 0 Pcs</strong>
-                            <span id="m-max-text">Total persediaan: 0 Pcs</span>
-                        </div>
-                    </div>
+                    <span class="label-tag">Nama Barang</span>
+                    <input type="text" id="m-nama" class="input-text">
                     
-                    <span class="label-tag">Keterangan Teknis</span>
-                    <textarea id="m-ref" class="input-text" rows="2" placeholder="Panjang kabel, dsb..."></textarea>
-
-                    <span class="label-tag">Catatan Tambahan (Misal: Hilang 2)</span>
-                    <textarea id="m-desc" class="input-text" rows="2"></textarea>
-
-                    <span class="label-tag">Histori Log Sistem</span>
-                    <div id="m-system-log" style="font-size: 11px; color: gray; background: var(--bg-color); padding: 10px; border-radius: 8px; border: 1px dashed #ccc; max-height: 80px; overflow-y: auto; white-space: pre-wrap;"></div>
+                    <span class="label-tag">Kode Wadah / Box</span>
+                    <input type="text" id="m-wadah" class="input-text" style="color: #2563eb; font-weight: bold;">
+                    
+                    <span class="label-tag">Kode Barang (Satuan)</span>
+                    <input type="text" id="m-kode" class="input-text" style="color: var(--primary-orange); font-weight: bold;">
                 </div>
             </div>
             <div class="modal-footer">
-                <button onclick="closeModalEdit()" class="btn btn-cancel">BATAL</button>
-                <button id="saveBtn" class="btn btn-save">SIMPAN STATUS & DATA</button>
-                <button id="deleteBtn" class="btn btn-danger"><i class="fa-solid fa-trash"></i> HAPUS</button>
+                <button onclick="closeModalEdit()" class="btn-cancel" style="flex:1;">BATAL</button>
+                <button id="saveBtn" class="btn-save" style="flex:2;">SIMPAN</button>
             </div>
         </div>
-    </div>
-
-    <!-- MODAL TAMBAH BARANG -->
-    <div id="modalAdd" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 style="font-weight: 800; font-size: 18px;">TAMBAH BARANG BARU</h3>
-                <button onclick="closeAddModal()" class="close-x">✕</button>
-            </div>
-            <div class="modal-body">
-                <div class="modal-left">
-                    <span class="label-tag">Foto (Pilih 1 sampai 5 foto sekaligus)</span>
-                    <div class="photo-grid" onclick="document.getElementById('add-fileInput').click()">
-                        <div class="photo-box" id="add-box1"><span>+</span></div>
-                        <div class="photo-box" id="add-box2"><span>+</span></div>
-                        <div class="photo-box" id="add-box3"><span>+</span></div>
-                        <div class="photo-box" id="add-box4" style="border-color:#2563eb; background:#eff6ff;"><span>📦</span></div>
-                        <div class="photo-box" id="add-box5" style="border-color:#2563eb; background:#eff6ff;"><span>📦</span></div>
-                    </div>
-                    <input type="file" id="add-fileInput" style="display: none;" accept="image/*" multiple>
-                    <p style="font-size:10px; color:gray;">Kotak biru khusus untuk foto koper/wadah (jika ada).</p>
-                </div>
-
-                <div class="modal-right">
-                    <div class="flex-row-input">
-                        <div class="flex-col" style="flex: 1.5;">
-                            <span class="label-tag">Nama Barang</span>
-                            <input type="text" id="add-nama" class="input-text" style="font-weight: 700; margin-bottom: 0;">
-                        </div>
-                        <div class="flex-col" style="flex: 1;">
-                            <span class="label-tag">Status Awal</span>
-                            <select id="add-status" class="input-text select-modern" style="margin-bottom: 0; border: 2px solid var(--primary-orange);">
-                                <option value="Di Gudang">🏢 Di Gudang</option>
-                                <option value="Siap Dibawa">🛒 Siap Dibawa</option>
-                                <option value="Dalam Perjalanan">🚚 Dalam Perjalanan</option>
-                                <option value="Di Lokasi">📍 Di Lokasi Event</option>
-                                <option value="Sedang Dipakai">🔌 Sedang Dipakai / Pasang</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="flex-row-input">
-                        <div class="flex-col">
-                            <span class="label-tag">Kode Barang (Satuan)</span>
-                            <input type="text" id="add-kode" class="input-text" style="color: var(--primary-orange); font-weight: bold; margin-bottom: 0;">
-                        </div>
-                        <div class="flex-col">
-                            <span class="label-tag">Kode Wadah / Box</span>
-                            <input type="text" id="add-wadah" class="input-text" style="color: #2563eb; font-weight: bold; margin-bottom: 0;">
-                        </div>
-                    </div>
-
-                    <div class="flex-row-input">
-                        <div class="flex-col">
-                            <span class="label-tag">Jumlah Item</span>
-                            <input type="number" id="add-jumlah" class="input-text" value="1" style="margin-bottom: 0;" oninput="updateAddMaxTerpakai()">
-                        </div>
-                        <div class="flex-col">
-                            <span class="label-tag">Kondisi</span>
-                            <select id="add-kondisi" class="input-text select-modern" style="margin-bottom: 0;">
-                                <option value="Bagus">Bagus</option>
-                                <option value="Periksa">Periksa</option>
-                                <option value="Rusak">Rusak</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="flex-row-input">
-                        <div class="flex-col">
-                            <span class="label-tag">Tim</span>
-                            <select id="add-team" class="input-text select-modern" style="margin-bottom: 0;" onchange="handleNewOption(this)"></select>
-                        </div>
-                        <div class="flex-col">
-                            <span class="label-tag">Event Berikutnya?</span>
-                            <input type="text" id="add-tujuan" class="input-text" style="margin-bottom: 0;" placeholder="Bila sudah direncanakan...">
-                        </div>
-                    </div>
-
-                    <div class="flex-row-input">
-                        <div class="flex-col">
-                            <span class="label-tag">Barang Milik</span>
-                            <select id="add-owner" class="input-text select-modern" style="margin-bottom: 0;" onchange="handleNewOption(this)"></select>
-                        </div>
-                        <div class="flex-col">
-                            <span class="label-tag">Lokasi Terkini</span>
-                            <select id="add-lokasi" class="input-text select-modern" style="margin-bottom: 0;" onchange="handleNewOption(this)"></select>
-                        </div>
-                    </div>
-
-                    <span class="label-tag">Jumlah Dipakai Awal</span>
-                    <div class="qty-control" style="margin-bottom: 20px;">
-                        <input type="number" id="add-terpakai" class="qty-input" min="0" value="0" oninput="calculateAddSisa()">
-                        <div class="qty-info">
-                            <strong id="add-sisa-text">Sisa Tersedia: 0 Pcs</strong>
-                            <span id="add-max-text">Total persediaan: 0 Pcs</span>
-                        </div>
-                    </div>
-
-                    <span class="label-tag">Keterangan Teknis</span>
-                    <textarea id="add-ref" class="input-text" rows="2"></textarea>
-
-                    <span class="label-tag">Catatan Tambahan (Misal: Hilang 2)</span>
-                    <textarea id="add-desc" class="input-text" rows="2"></textarea>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button onclick="closeAddModal()" class="btn btn-cancel">BATAL</button>
-                <button id="addSaveBtn" class="btn btn-save" style="background: #2ecc71;">SIMPAN BARANG BARU</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- FULLSCREEN OVERLAY UNTUK ZOOM FOTO -->
-    <div id="fsOverlay" class="fs-overlay" style="position: fixed; inset: 0; background: rgba(0, 0, 0, 0.95); display: none; flex-direction: column; z-index: 99999; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(10px);">
-        <div class="fs-header" style="width: 100%; position: absolute; top: 0; left: 0; padding: 20px;">
-            <button onclick="closeFullscreen()" style="background: rgba(255, 255, 255, 0.15); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 10px 20px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 14px;">
-                <i class="fa-solid fa-arrow-left" style="margin-right:5px;"></i> Kembali
-            </button>
-        </div>
-        <img id="fsImage" src="" style="max-width: 100%; max-height: 85vh; object-fit: contain; border-radius: 12px; box-shadow: 0 20px 50px rgba(0,0,0,0.5);">
     </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyg6ntp8BPWPP8qm9IfpN62Rwd272tAEiTM0Qgl1GQQkUqJGcViG-FnewlFqFTjZ4w-Zg/exec"; 
+    const SCRIPT_URL = ""; // <-- PASTE URL WEBHOOK KAMU DI SINI
     
     // 📦 25 PIN KHUSUS ADMIN INVENTARIS
     const VALID_PINS = [
@@ -439,19 +226,18 @@ location: "MASTER"
       "f6g7h8", "g7h8i9", "h8i9j0", "i9j0k1", "j0k1l2",
       "k1l2m3", "l2m3n4", "m3n4o5", "n4o5p6", "o5p6q7",
       "p6q7r8", "q7r8s9", "r8s9t0", "s9t0u1", "t0u1v2",
-      "u1v2w3", "v2w3x4", "w3x4y5", "x4y5z6", "y5z6a7"
+      "u1v2w3", "v2w3x4", "w3x4y5", "x4y5z6", "y5z6a7", "v9t6c2"
     ];
 
     let allItems = [];
-    let optionsData = { lokasi: [], kepemilikan: [], tim: [] };
-    let currentItem = null;
-    let currentView = 'gallery';
+    let optionsData = { tim: [] };
     let userPin = localStorage.getItem("AV_INVENTORY_PIN") || ""; 
-    
-    let currentFotoIndex = 0; 
-    let pendingFotoUpdate = null; 
-    let addSelectedFiles = [];
     let html5QrcodeScanner = null;
+    let currentItem = null;
+    
+    // VARIABEL BULK MODE
+    let isBulkMode = false;
+    let selectedRows = new Set();
 
     window.onload = () => {
         if (checkAndRequestPin()) loadData();
@@ -461,11 +247,11 @@ location: "MASTER"
         if (!userPin) {
             while (true) {
                 let input = prompt("Masukkan PIN Keamanan Petugas Gudang:");
-                if (input === null) { alert("Akses dibatalkan."); return false; }
+                if (input === null) return false;
                 if (VALID_PINS.includes(input.trim().toLowerCase())) {
                     userPin = input.trim().toLowerCase();
                     localStorage.setItem("AV_INVENTORY_PIN", userPin); break;
-                } else alert("PIN Salah! Akses khusus Admin Inventaris.");
+                } else alert("PIN Salah!");
             }
         }
         return true;
@@ -474,126 +260,109 @@ location: "MASTER"
     async function loadData() {
         try {
             document.getElementById("loading").style.display = "block";
-            document.getElementById("dataContainer").innerHTML = "";
-
             const res = await fetch(SCRIPT_URL + "?action=api&nocache=" + new Date().getTime());
             const rawData = await res.json();
             
-            if (rawData.error_message) {
-                document.getElementById("loading").innerHTML = `<span style="color:red;">Error: ${rawData.error_message}</span>`;
-                return;
-            }
-            
             allItems = rawData.inventory.filter(item => item.nama_barang && item.nama_barang.toLowerCase() !== 'nama barang');
-            optionsData = rawData.dropdowns || { lokasi: [], kepemilikan: [], tim: [] };
+            optionsData = rawData.dropdowns || { tim: [] };
             
             document.getElementById("loading").style.display = "none";
-            populateFilters();
+            
+            const dbTeams = [...new Set(allItems.map(i => i.tim).filter(Boolean))];
+            const finalTeams = [...new Set([...dbTeams, ...(optionsData.tim || [])])].sort();
+            const teamSelect = document.getElementById("teamSelect");
+            teamSelect.innerHTML = `<option value="all">Semua Tim</option>`;
+            finalTeams.forEach(t => teamSelect.innerHTML += `<option value="${t}">${t}</option>`);
+
             applyFilters();
         } catch (e) {
-            document.getElementById("loading").innerHTML = `<span style="color:red;">Gagal memuat data. Cek koneksi / Deploy Apps Script.</span>`;
+            document.getElementById("loading").innerHTML = `<span style="color:red;">Gagal memuat data.</span>`;
         }
     }
 
-    function handleNewOption(selectObj) {
-        if (selectObj.value === "NEW") {
-            let newVal = prompt("Ketik data baru (Pastikan ejaan benar):");
-            if (newVal && newVal.trim() !== "") {
-                newVal = newVal.trim();
-                const newOpt = new Option(newVal, newVal);
-                selectObj.insertBefore(newOpt, selectObj.lastElementChild);
-                selectObj.value = newVal;
-            } else {
-                selectObj.selectedIndex = 0; 
-            }
-        }
-    }
-
-    function setSelectValueWithCheck(selectId, value) {
-        const sel = document.getElementById(selectId);
-        if(!sel) return;
-        if(!value) { sel.value = ""; return; }
+    function toggleBulkMode() {
+        isBulkMode = !isBulkMode;
+        const btn = document.getElementById("btnBulkMode");
+        const bar = document.getElementById("bulkBar");
         
-        let exists = Array.from(sel.options).some(opt => opt.value === value);
-        if(!exists) {
-            const newOpt = new Option(value, value);
-            sel.insertBefore(newOpt, sel.lastElementChild);
+        if (isBulkMode) {
+            btn.classList.add("active");
+            btn.innerHTML = `<i class="fa-solid fa-xmark"></i> Batal Keranjang`;
+            bar.classList.add("active");
+        } else {
+            btn.classList.remove("active");
+            btn.innerHTML = `<i class="fa-solid fa-check-double"></i> Keranjang`;
+            bar.classList.remove("active");
+            selectedRows.clear();
+            updateBulkCount();
         }
-        sel.value = value;
+        applyFilters(); 
     }
 
-    function populateFilters() {
-        const dbTeams = [...new Set(allItems.map(i => i.tim).filter(Boolean))];
-        const dbOwners = [...new Set(allItems.map(i => i.barang_milik).filter(Boolean))];
-        const dbLokasi = [...new Set(allItems.map(i => i.lokasi).filter(Boolean))];
+    function toggleSelection(rowIndex) {
+        if (selectedRows.has(rowIndex)) selectedRows.delete(rowIndex);
+        else selectedRows.add(rowIndex);
         
-        const finalTeams = [...new Set([...dbTeams, ...(optionsData.tim || [])])].sort();
-        const finalOwners = [...new Set([...dbOwners, ...(optionsData.kepemilikan || [])])].sort();
-        const finalLokasi = [...new Set([...dbLokasi, ...(optionsData.lokasi || [])])].sort();
-
-        const teamSelect = document.getElementById("teamSelect");
-        teamSelect.innerHTML = `<option value="all">Semua Tim</option>`;
-        finalTeams.forEach(t => teamSelect.innerHTML += `<option value="${t}">${t}</option>`);
-
-        const teamFormSelects = [document.getElementById("m-team"), document.getElementById("add-team")];
-        teamFormSelects.forEach(sel => {
-            sel.innerHTML = `<option value="">-- Pilih Tim --</option>`;
-            finalTeams.forEach(t => sel.innerHTML += `<option value="${t}">${t}</option>`);
-            sel.innerHTML += `<option value="NEW" style="color:var(--primary-orange); font-weight:bold;">+ Tambah Tim Baru...</option>`;
-        });
-
-        const ownerFormSelects = [document.getElementById("m-owner"), document.getElementById("add-owner")];
-        ownerFormSelects.forEach(sel => {
-            sel.innerHTML = `<option value="">-- Pilih Pemilik --</option>`;
-            finalOwners.forEach(o => sel.innerHTML += `<option value="${o}">${o}</option>`);
-            sel.innerHTML += `<option value="NEW" style="color:var(--primary-orange); font-weight:bold;">+ Tambah Pemilik Baru...</option>`;
-        });
-
-        const locFormSelects = [document.getElementById("m-lokasi"), document.getElementById("add-lokasi")];
-        locFormSelects.forEach(sel => {
-            sel.innerHTML = `<option value="">-- Pilih Lokasi --</option>`;
-            finalLokasi.forEach(l => sel.innerHTML += `<option value="${l}">${l}</option>`);
-            sel.innerHTML += `<option value="NEW" style="color:var(--primary-orange); font-weight:bold;">+ Tambah Lokasi Baru...</option>`;
-        });
+        updateBulkCount();
+        applyFilters(); 
     }
 
-    function toggleView(viewType) {
-        currentView = viewType;
-        document.getElementById("btnGallery").classList.toggle("active", viewType === 'gallery');
-        document.getElementById("btnList").classList.toggle("active", viewType === 'list');
-        document.getElementById("dataContainer").className = viewType === 'gallery' ? 'grid-cards' : 'list-view';
-        applyFilters();
+    function updateBulkCount() {
+        document.getElementById("bulkCount").innerText = `${selectedRows.size} Barang Terpilih`;
+    }
+
+    function openBulkUpdateModal() {
+        if (selectedRows.size === 0) { alert("Pilih minimal 1 barang dulu!"); return; }
+        document.getElementById("modalBulk").classList.add("active");
+    }
+
+    async function processBulkUpdate() {
+        const btn = document.getElementById("btnProsesBulk");
+        const newStatus = document.getElementById("bulkNewStatus").value;
+        
+        btn.disabled = true; btn.innerText = "MEMPROSES...";
+
+        const payload = {
+            action: "bulk_update_status",
+            pin: userPin,
+            rows: Array.from(selectedRows),
+            new_status: newStatus
+        };
+
+        try {
+            const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
+            const data = await response.json();
+            if(data.status === "success") {
+                document.getElementById('modalBulk').classList.remove('active');
+                toggleBulkMode(); 
+                loadData(); 
+            } else alert("Gagal: " + data.message);
+        } catch (e) { alert("Error koneksi."); }
+        finally { btn.disabled = false; btn.innerText = "PROSES UPDATE"; }
     }
 
     function applyFilters() {
         const q = document.getElementById("searchInput").value.toLowerCase();
-        const sortVal = document.getElementById("sortSelect").value;
         const teamVal = document.getElementById("teamSelect").value;
         const statusVal = document.getElementById("statusSelect").value;
 
         let filtered = allItems.filter(i => {
-            const matchQ = i.nama_barang.toLowerCase().includes(q) || 
-                           (i.kode_barang || "").toLowerCase().includes(q) || 
-                           (i.kode_wadah || "").toLowerCase().includes(q) || 
-                           (i.rencana_tujuan || "").toLowerCase().includes(q) ||
-                           (i.tim || "").toLowerCase().includes(q);
+            const matchQ = i.nama_barang.toLowerCase().includes(q) || (i.kode_barang || "").toLowerCase().includes(q) || (i.kode_wadah || "").toLowerCase().includes(q);
             const matchTeam = (teamVal === 'all') || (i.tim === teamVal);
             const matchStatus = (statusVal === 'all') || (i.status_digunakan === statusVal);
             return matchQ && matchTeam && matchStatus;
         });
 
-        if (sortVal === 'az') filtered.sort((a, b) => a.nama_barang.localeCompare(b.nama_barang));
-        else if (sortVal === 'za') filtered.sort((a, b) => b.nama_barang.localeCompare(a.nama_barang));
-
         render(filtered);
     }
 
     function getStatusClass(status) {
+        if(!status) return 'badge-status status-gudang';
         if(status === 'Siap Dibawa') return 'badge-status status-keranjang';
-        if(status === 'Dalam Perjalanan') return 'badge-status status-perjalanan';
-        if(status === 'Di Lokasi') return 'badge-status status-lokasi';
+        if(status === 'Di Gudang') return 'badge-status status-gudang';
         if(status === 'Sedang Dipakai') return 'badge-status status-dipakai';
-        return 'badge-status status-gudang'; 
+        if(status.includes('Perjalanan')) return 'badge-status status-perjalanan';
+        return 'badge-status status-lokasi'; 
     }
 
     function render(data) {
@@ -602,65 +371,80 @@ location: "MASTER"
         
         data.forEach(item => {
             const card = document.createElement("div");
+            const isSelected = selectedRows.has(item.row_index);
+            
+            card.className = "mission-card " + (isSelected ? "selected" : "");
+            
             const imageSrc = item.fotos && item.fotos[0] ? item.fotos[0] : 'https://placehold.co/300x180/EEEEEE/999999?text=NO+IMAGE';
-            const statusLabel = item.status_digunakan || "Di Gudang";
+            const badgeClass = getStatusClass(item.status_digunakan);
             
-            const badgeClass = getStatusClass(statusLabel);
-            const statusHtml = `<span class="${badgeClass}">${statusLabel}</span>`;
-            
-            const wadahBadge = item.kode_wadah ? `<span style="color:#2563eb; font-size:11px; font-weight:800;">📦 ${item.kode_wadah}</span>` : "";
-            const kodeBadge = item.kode_barang ? `<span style="color:var(--primary-orange); font-size:11px; font-weight:800;">#${item.kode_barang}</span>` : "";
+            const wadahBadge = item.kode_wadah ? `<span>📦 ${item.kode_wadah}</span>` : "";
+            const kodeBadge = item.kode_barang ? `<span style="color:var(--primary-orange);">#${item.kode_barang}</span>` : "";
 
-            if (currentView === 'gallery') {
-                card.className = "mission-card";
-                card.innerHTML = `
-                    <img src="${imageSrc}" class="card-img" loading="lazy">
-                    <div style="flex: 1;">
-                        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:5px;">
-                            <h4 style="font-weight:800; font-size:15px; margin:0; line-height:1.3;">${item.nama_barang}</h4>
-                        </div>
-                        <div style="display:flex; gap: 8px; margin-bottom: 8px;">${kodeBadge} ${wadahBadge}</div>
-                        
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
-                            <span style="font-size:12px; color:var(--text-gray);"><i class="fa-solid fa-users"></i> ${item.tim || '-'}</span>
-                            <span class="badge-qty">Total: ${item.jumlah || 0}</span>
-                        </div>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; align-items:center; border-top: 1px solid var(--border-color); padding-top: 12px; margin-top: auto;">
-                        ${statusHtml}
-                        <span style="font-size:11px; font-weight:700; color:var(--text-gray); text-align:right;">${item.rencana_tujuan || ""}</span>
-                    </div>
-                `;
-            } else {
-                card.className = "list-item";
-                card.innerHTML = `
-                    <img src="${imageSrc}" class="list-img" loading="lazy">
-                    <div class="list-info">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <h4 style="font-weight: 800; font-size: 15px; margin:0;">${item.nama_barang} ${kodeBadge}</h4>
-                            ${statusHtml}
-                        </div>
-                        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top: 6px;">
-                            ${wadahBadge}
-                            <span class="badge-qty">Total: ${item.jumlah || 0}</span>
-                            <span style="color:var(--text-gray); font-size: 12px;">| ${item.rencana_tujuan || ""}</span>
-                        </div>
-                    </div>
-                `;
-            }
+            card.innerHTML = `
+                ${isSelected ? '<div style="position:absolute; top:5px; right:5px; background:#3b82f6; color:white; border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center; font-size:10px; z-index:5;">✓</div>' : ''}
+                <img src="${imageSrc}" class="card-img" loading="lazy">
+                <h4>${item.nama_barang}</h4>
+                <div class="card-codes">${kodeBadge} ${wadahBadge}</div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top: auto; padding-top:8px; border-top:1px solid #f1f5f9;">
+                    <span class="${badgeClass}">${item.status_digunakan || "Di Gudang"}</span>
+                    <span class="badge-qty">${item.jumlah || 0} Pcs</span>
+                </div>
+            `;
 
-            card.onclick = () => openModalEdit(item);
+            card.onclick = () => {
+                if (isBulkMode) toggleSelection(item.row_index);
+                else openModalEdit(item);
+            };
             container.appendChild(card);
         });
     }
+
+    function openModalEdit(item) {
+        currentItem = item;
+        document.getElementById("m-nama").value = item.nama_barang || "";
+        document.getElementById("m-kode").value = item.kode_barang || "";
+        document.getElementById("m-wadah").value = item.kode_wadah || "";
+        document.getElementById("m-status-digunakan").value = item.status_digunakan || "Di Gudang";
+        document.getElementById("modalEdit").classList.add("active");
+    }
+
+    function closeModalEdit() {
+        document.getElementById("modalEdit").classList.remove("active");
+    }
+
+    document.getElementById("saveBtn").onclick = async function() {
+        const btn = this; btn.disabled = true; btn.innerHTML = `PROSES...`;
+        const payload = {
+            action: "update_item", pin: userPin, row_index: currentItem.row_index,
+            nama: document.getElementById("m-nama").value.trim(),
+            kode_barang: document.getElementById("m-kode").value.trim(),
+            kode_wadah: document.getElementById("m-wadah").value.trim(),
+            status_digunakan: document.getElementById("m-status-digunakan").value
+        };
+        try {
+            const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
+            const data = await response.json();
+            if(data.status === "success") { closeModalEdit(); loadData(); }
+            else alert("Gagal: " + data.message);
+        } catch (e) { alert("Gagal terhubung."); } 
+        finally { btn.disabled = false; btn.innerText = "SIMPAN"; }
+    };
 
     function openScannerModal() {
         document.getElementById("modalScanner").classList.add("active");
         html5QrcodeScanner = new Html5QrcodeScanner("qr-reader", { fps: 10, qrbox: 250, aspectRatio: 1.0 }, false);
         html5QrcodeScanner.render((decodedText) => {
             closeScannerModal();
-            document.getElementById('searchInput').value = decodedText;
-            applyFilters();
+            document.getElementById('searchInput').value = decodedText; 
+            applyFilters(); 
+            
+            if (isBulkMode) {
+                const foundItem = allItems.find(i => i.kode_barang === decodedText || i.kode_wadah === decodedText);
+                if (foundItem && !selectedRows.has(foundItem.row_index)) {
+                    toggleSelection(foundItem.row_index);
+                }
+            }
         });
     }
 
@@ -668,322 +452,6 @@ location: "MASTER"
         if (html5QrcodeScanner) html5QrcodeScanner.clear();
         document.getElementById("modalScanner").classList.remove("active");
     }
-
-    function compressImage(base64, maxDim, quality) {
-        return new Promise((resolve) => {
-            const img = new Image();
-            img.src = base64;
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                let w = img.width, h = img.height;
-                if (w > h && w > maxDim) { h *= maxDim / w; w = maxDim; }
-                else if (h > maxDim) { w *= maxDim / h; h = maxDim; }
-                canvas.width = w; canvas.height = h;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, w, h);
-                resolve(canvas.toDataURL('image/jpeg', quality));
-            };
-        });
-    }
-
-    function buildThumbnails(item) {
-        const fotos = item.fotos || [];
-        const mainImg = document.getElementById("m-main-img");
-        const thumbs = document.getElementById("m-thumbnails");
-        
-        thumbs.innerHTML = "";
-        
-        let parentBox = null;
-        if (item.kode_wadah) parentBox = allItems.find(x => x.kode_barang === item.kode_wadah);
-        
-        for(let i=0; i<5; i++) {
-            let url = fotos[i] ? fotos[i] : null;
-            let isParentPhoto = false;
-            
-            if (parentBox && (i === 3 || i === 4)) {
-                let parentUrl = parentBox.fotos ? parentBox.fotos[i - 3] : null;
-                if (parentUrl) { url = parentUrl; isParentPhoto = true; }
-            }
-
-            const thumbDiv = document.createElement("div");
-            thumbDiv.className = "thumb-img";
-            thumbDiv.innerHTML = url ? `<img src="${url}" style="width:100%; height:100%; border-radius:6px; object-fit:cover;">` : `<span>+</span>`; 
-            
-            if (i === 3 || i === 4) {
-                thumbDiv.style.borderColor = "#93c5fd";
-                thumbDiv.innerHTML += `<div class="thumb-label">Wadah</div>`;
-            }
-
-            if (i === currentFotoIndex) {
-                thumbDiv.classList.add("active");
-                mainImg.src = url || 'https://placehold.co/300x180/EEEEEE/999999?text=KOSONG';
-                togglePhotoLock(isParentPhoto);
-            }
-            
-            thumbDiv.onclick = () => {
-                currentFotoIndex = i;
-                document.querySelectorAll('.thumb-img').forEach(t => t.classList.remove('active'));
-                thumbDiv.classList.add('active');
-                
-                togglePhotoLock(isParentPhoto);
-
-                if(pendingFotoUpdate && pendingFotoUpdate.index === i && !pendingFotoUpdate.hapus) mainImg.src = pendingFotoUpdate.base64;
-                else if (pendingFotoUpdate && pendingFotoUpdate.index === i && pendingFotoUpdate.hapus) mainImg.src = 'https://placehold.co/300x180/EEEEEE/999999?text=DIHAPUS';
-                else mainImg.src = url || 'https://placehold.co/300x180/EEEEEE/999999?text=KOSONG';
-            };
-            thumbs.appendChild(thumbDiv);
-        }
-    }
-    
-    function togglePhotoLock(isLocked) {
-        document.getElementById("btnCam").disabled = isLocked;
-        document.getElementById("btnGal").disabled = isLocked;
-        document.getElementById("btnDel").disabled = isLocked;
-        document.getElementById("parent-photo-badge").style.display = isLocked ? "block" : "none";
-        document.getElementById("foto-locked-msg").style.display = isLocked ? "block" : "none";
-    }
-
-    async function prosesGantiFoto(event) {
-        const file = event.target.files[0];
-        if(!file) return;
-        
-        const reader = new FileReader();
-        const rawBase64 = await new Promise((resolve) => {
-            reader.onload = ev => resolve(ev.target.result);
-            reader.readAsDataURL(file);
-        });
-
-        const compressedBase64 = await compressImage(rawBase64, 600, 0.6); 
-        
-        pendingFotoUpdate = { index: currentFotoIndex, base64: compressedBase64, hapus: false };
-        document.getElementById("m-main-img").src = compressedBase64;
-        document.querySelectorAll('.thumb-img')[currentFotoIndex].innerHTML = `<img src="${compressedBase64}" style="width:100%; height:100%; border-radius:6px; object-fit:cover;">`;
-    }
-
-    function hapusFotoAktif() {
-        if(confirm("Yakin hapus foto ini?")) {
-            pendingFotoUpdate = { index: currentFotoIndex, base64: null, hapus: true };
-            document.getElementById("m-main-img").src = 'https://placehold.co/300x180/EEEEEE/999999?text=DIHAPUS';
-            document.querySelectorAll('.thumb-img')[currentFotoIndex].innerHTML = `<span>+</span>`;
-        }
-    }
-
-    function openFullscreen() {
-        const imgSrc = document.getElementById("m-main-img").src;
-        if(!imgSrc.includes('text=')) { 
-            document.getElementById("fsImage").src = imgSrc;
-            document.getElementById("fsOverlay").classList.add("active");
-        }
-    }
-
-    function closeFullscreen() {
-        document.getElementById("fsOverlay").classList.remove("active");
-    }
-
-    function openModalEdit(item) {
-        if (!checkAndRequestPin()) return;
-        currentItem = item; pendingFotoUpdate = null; currentFotoIndex = 0;
-        
-        buildThumbnails(item);
-        
-        document.getElementById("m-nama").value = item.nama_barang || "";
-        document.getElementById("m-kode").value = item.kode_barang || "";
-        document.getElementById("m-wadah").value = item.kode_wadah || "";
-        document.getElementById("m-jumlah").value = item.jumlah || 0;
-        document.getElementById("m-kondisi").value = item.kondisi || "Bagus";
-        document.getElementById("m-tujuan").value = item.rencana_tujuan || "";
-        document.getElementById("m-ref").value = item.keterangan_ref || "";
-        document.getElementById("m-status-digunakan").value = item.status_digunakan || "Di Gudang";
-        
-        setSelectValueWithCheck("m-team", item.tim);
-        setSelectValueWithCheck("m-owner", item.barang_milik);
-        setSelectValueWithCheck("m-lokasi", item.lokasi);
-
-        let total = parseInt(item.jumlah) || 0;
-        let terpakai = parseInt(item.terpakai) || 0;
-        const inputQty = document.getElementById("m-terpakai");
-        inputQty.max = total; inputQty.value = terpakai;
-        document.getElementById("m-max-text").innerText = `Total persediaan: ${total} Pcs`;
-        calculateSisa();
-
-        document.getElementById("m-desc").value = item.keterangan_edit || "";
-        document.getElementById("m-system-log").innerText = (item.log_history && item.log_history !== "undefined") ? item.log_history : "Belum ada histori update.";
-        
-        document.getElementById("modalEdit").classList.add("active");
-    }
-
-    function updateMaxTerpakai() {
-        const jumlahInput = document.getElementById("m-jumlah").value;
-        const terpakaiInput = document.getElementById("m-terpakai");
-        terpakaiInput.max = jumlahInput || 0;
-        document.getElementById("m-max-text").innerText = `Total persediaan: ${jumlahInput || 0} Pcs`;
-        calculateSisa();
-    }
-
-    function calculateSisa() {
-        if (!currentItem) return;
-        let total = parseInt(document.getElementById("m-jumlah").value) || 0;
-        let inputTerpakai = parseInt(document.getElementById("m-terpakai").value) || 0;
-        
-        if (inputTerpakai > total) {
-            inputTerpakai = total; document.getElementById("m-terpakai").value = total;
-        } else if (inputTerpakai < 0) {
-            inputTerpakai = 0; document.getElementById("m-terpakai").value = 0;
-        }
-        
-        let sisa = total - inputTerpakai;
-        document.getElementById("m-sisa-text").innerText = `Sisa: ${sisa} Pcs`;
-    }
-
-    function closeModalEdit() {
-        document.getElementById("modalEdit").classList.remove("active");
-        document.getElementById("img-camera").value = ""; document.getElementById("img-gallery").value = ""; 
-    }
-
-    document.getElementById("saveBtn").onclick = async function() {
-        const btn = this; btn.disabled = true; btn.innerHTML = `PROSES...`;
-
-        const payload = {
-            action: "update_item", pin: userPin, row_index: currentItem.row_index,
-            nama: document.getElementById("m-nama").value.trim(),
-            kode_barang: document.getElementById("m-kode").value.trim(),
-            kode_wadah: document.getElementById("m-wadah").value.trim(),
-            jumlah: document.getElementById("m-jumlah").value,
-            kondisi: document.getElementById("m-kondisi").value,
-            keterangan_ref: document.getElementById("m-ref").value,
-            barang_milik: document.getElementById("m-owner").value,
-            tim: document.getElementById("m-team").value,
-            lokasi: document.getElementById("m-lokasi").value,
-            rencana_tujuan: document.getElementById("m-tujuan").value,
-            terpakai: parseInt(document.getElementById("m-terpakai").value) || 0,
-            status_digunakan: document.getElementById("m-status-digunakan").value,
-            keterangan: document.getElementById("m-desc").value
-        };
-
-        if (pendingFotoUpdate) payload.update_foto = pendingFotoUpdate;
-
-        try {
-            const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
-            const data = await response.json();
-            if(data.status === "success") { closeModalEdit(); loadData(); }
-            else alert("Gagal: " + data.message);
-        } catch (e) { alert("Gagal terhubung."); } 
-        finally { btn.disabled = false; btn.innerText = "SIMPAN STATUS & DATA"; }
-    };
-
-    function openAddModal() {
-        if (!checkAndRequestPin()) return;
-        document.getElementById("modalAdd").classList.add("active");
-        
-        document.getElementById("add-nama").value = ""; document.getElementById("add-kode").value = "";
-        document.getElementById("add-wadah").value = ""; document.getElementById("add-ref").value = "";
-        document.getElementById("add-tujuan").value = ""; document.getElementById("add-desc").value = ""; 
-        document.getElementById("add-terpakai").value = 0;
-        
-        document.getElementById("add-team").selectedIndex = 0;
-        document.getElementById("add-owner").selectedIndex = 0;
-        document.getElementById("add-lokasi").selectedIndex = 0;
-
-        updateAddMaxTerpakai();
-
-        addSelectedFiles = []; 
-        for(let i=1; i<=5; i++) {
-            let inner = '<span>+</span>';
-            if(i === 4 || i === 5) inner = '<span>📦</span>';
-            document.getElementById('add-box'+i).innerHTML = inner;
-        }
-    }
-    
-    function closeAddModal() { document.getElementById("modalAdd").classList.remove("active"); }
-
-    function updateAddMaxTerpakai() {
-        const jumlahInput = document.getElementById("add-jumlah").value;
-        const terpakaiInput = document.getElementById("add-terpakai");
-        terpakaiInput.max = jumlahInput || 0;
-        document.getElementById("add-max-text").innerText = `Total persediaan: ${jumlahInput || 0} Pcs`;
-        calculateAddSisa();
-    }
-
-    function calculateAddSisa() {
-        let total = parseInt(document.getElementById("add-jumlah").value) || 0;
-        let inputTerpakai = parseInt(document.getElementById("add-terpakai").value) || 0;
-        if (inputTerpakai > total) { inputTerpakai = total; document.getElementById("add-terpakai").value = total; } 
-        else if (inputTerpakai < 0) { inputTerpakai = 0; document.getElementById("add-terpakai").value = 0; }
-        document.getElementById("add-sisa-text").innerText = `Sisa Tersedia: ${total - inputTerpakai} Pcs`;
-    }
-
-    document.getElementById('add-fileInput').onchange = async function(e) {
-        const files = Array.from(e.target.files).slice(0, 5);
-        if (files.length === 0) return;
-
-        const btnSave = document.getElementById("addSaveBtn");
-        btnSave.disabled = true;
-        btnSave.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> MEMPROSES FOTO...`;
-        
-        addSelectedFiles = []; 
-        for(let i=1; i<=5; i++) {
-            document.getElementById('add-box'+i).innerHTML = (i===4||i===5) ? '<span>📦</span>' : '<span>+</span>';
-        }
-
-        for (let i = 0; i < files.length; i++) {
-            const file = files[i];
-            document.getElementById('add-box'+(i+1)).innerHTML = `<span style="font-size:10px;">Loading..</span>`;
-            
-            const reader = new FileReader();
-            const rawBase64 = await new Promise((resolve) => {
-                reader.onload = ev => resolve(ev.target.result);
-                reader.readAsDataURL(file);
-            });
-
-            const compressedBase64 = await compressImage(rawBase64, 600, 0.6);
-            addSelectedFiles.push(compressedBase64);
-            
-            document.getElementById('add-box'+(i+1)).innerHTML = `<img src="${compressedBase64}" style="width:100%; height:100%; object-fit:cover; border-radius:10px;">`;
-        }
-
-        btnSave.disabled = false;
-        btnSave.innerText = "SIMPAN BARANG BARU";
-    };
-
-    document.getElementById("addSaveBtn").onclick = async function() {
-        const nama = document.getElementById("add-nama").value.trim();
-        if(!nama) { alert("Lengkapi Nama barang!"); return; }
-
-        const btn = this; btn.disabled = true; btn.innerHTML = `MENYIMPAN...`;
-
-        const payload = {
-            action: "add_item", pin: userPin, nama: nama,
-            kode_barang: document.getElementById("add-kode").value.trim(),
-            kode_wadah: document.getElementById("add-wadah").value.trim(),
-            jumlah: document.getElementById("add-jumlah").value,
-            kondisi: document.getElementById("add-kondisi").value,
-            tim: document.getElementById("add-team").value,
-            lokasi: document.getElementById("add-lokasi").value,
-            rencana_tujuan: document.getElementById("add-tujuan").value,
-            status_digunakan: document.getElementById("add-status").value,
-            keterangan_ref: document.getElementById("add-ref").value,
-            barang_milik: document.getElementById("add-owner").value.trim(),
-            terpakai: parseInt(document.getElementById("add-terpakai").value) || 0,
-            keterangan: document.getElementById("add-desc").value.trim(),
-            fotos: addSelectedFiles
-        };
-
-        try {
-            const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
-            const data = await response.json();
-            if(data.status === "success") { closeAddModal(); loadData(); }
-        } catch (e) { alert("Gagal terhubung."); } 
-        finally { btn.disabled = false; btn.innerText = "SIMPAN BARANG BARU"; }
-    };
-
-    document.getElementById("deleteBtn").onclick = async function() {
-        if(!confirm("YAKIN HAPUS BARANG INI?")) return;
-        const btn = this; btn.disabled = true; btn.innerHTML = `MENGHAPUS...`;
-        try {
-            const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "delete_item", pin: userPin, row_index: currentItem.row_index }) });
-            if((await response.json()).status === "success") { closeModalEdit(); loadData(); }
-        } catch (e) { alert("Gagal terhubung."); btn.disabled = false; btn.innerText = "HAPUS"; }
-    };
 </script>
 </body>
 </html>

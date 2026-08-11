@@ -6,74 +6,76 @@ location: "MASTER"
 <html lang="id">
 <head>
     {% include head.html %}
-    <!-- SCRIPT UNTUK BACA QR/BARCODE YANG LEBIH STABIL -->
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 
     <style>
         .page-title-section { text-align: center; margin: 20px 0 30px; }
-        .page-title-section h2 { font-weight: 800; letter-spacing: -1px; text-transform: uppercase; color: var(--text-dark); margin-bottom: 5px; }
+        .page-title-section h2 { font-weight: 900; letter-spacing: -1px; text-transform: uppercase; color: var(--text-dark); margin-bottom: 5px;}
         
-        .controls-wrapper { position: sticky; top: 75px; z-index: 900; margin: 0 -15px 25px -15px; padding: 15px 15px 20px 15px; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(0,0,0,0.05); }
-        .toolbar-card { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 15px; background: var(--card-bg); padding: 16px; border-radius: 18px; box-shadow: 0 8px 30px rgba(0,0,0,0.04); border: 1px solid var(--border-color); }
-
+        /* TOOLBAR */
+        .controls-wrapper { position: sticky; top: 75px; z-index: 900; margin: 0 -15px 15px -15px; padding: 10px 15px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .toolbar-card { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; background: var(--card-bg); padding: 12px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); border: 1px solid var(--border-color); }
         .search-box-modern { display: flex; width: 100%; gap: 10px; }
         .search-input-wrapper { position: relative; flex: 1; }
-        .search-input-wrapper i { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: var(--text-gray); font-size: 16px; pointer-events: none; }
-        .search-input-modern { width: 100%; padding: 14px 20px 14px 45px; border-radius: 12px; border: 1px solid var(--border-color); outline: none; font-size: 15px; background: var(--bg-color); color: var(--text-dark); transition: all 0.3s ease; font-family: inherit; font-weight: 500; }
+        .search-input-wrapper i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-gray); font-size: 14px; pointer-events: none; }
+        .search-input-modern { width: 100%; padding: 12px 15px 12px 40px; border-radius: 10px; border: 1px solid var(--border-color); outline: none; font-size: 14px; background: var(--bg-color); color: var(--text-dark); transition: all 0.3s ease; font-family: inherit; font-weight: 500; }
         .search-input-modern:focus { border-color: var(--primary-orange); box-shadow: 0 0 0 4px rgba(255,126,39,0.1); background: var(--card-bg); }
         
-        .btn-scan { background: var(--text-dark); color: white; border: none; border-radius: 12px; padding: 0 20px; font-size: 18px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; }
+        .btn-scan { background: var(--text-dark); color: white; border: none; border-radius: 10px; padding: 0 15px; font-size: 16px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; }
         .btn-scan:hover { background: var(--primary-orange); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255,126,39,0.3); }
 
-        .toolbar-bottom { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
-        .filter-group-modern { display: flex; gap: 10px; flex-wrap: wrap; flex: 1; }
+        .toolbar-bottom { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .filter-group-modern { display: flex; gap: 8px; flex-wrap: wrap; flex: 1; }
         
-        .select-modern { appearance: none; -webkit-appearance: none; background-color: var(--bg-color); background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 14px center; background-size: 14px; padding: 10px 38px 10px 16px; border-radius: 10px; border: 1px solid var(--border-color); font-size: 13px; font-weight: 700; color: var(--text-dark); cursor: pointer; outline: none; transition: 0.2s; font-family: inherit; }
-        .select-modern:focus, .select-modern:hover { border-color: var(--primary-orange); background-color: var(--card-bg); }
-
-        .action-group-modern { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-        .btn-mod { padding: 10px 18px; border-radius: 10px; font-size: 13px; font-weight: 800; cursor: pointer; outline: none; transition: 0.3s; border: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+        .select-modern { appearance: none; -webkit-appearance: none; background-color: var(--bg-color); background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 10px center; background-size: 12px; padding: 8px 30px 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 12px; font-weight: 700; color: var(--text-dark); cursor: pointer; outline: none; }
+        
+        .action-group-modern { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: flex-end;}
+        .btn-mod { padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 800; cursor: pointer; outline: none; border: none; transition: 0.3s; display: inline-flex; align-items: center; gap: 6px; }
         .btn-mod-primary { background: #2ecc71; color: white; box-shadow: 0 4px 10px rgba(46,204,113,0.2); }
-        .btn-mod-primary:hover { background: #27ae60; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(46,204,113,0.3); }
-        
-        /* CSS TOMBOL KERANJANG */
-        .btn-bulk { background: #3b82f6; color: white; box-shadow: 0 4px 10px rgba(59,130,246,0.2); }
-        .btn-bulk.active { background: #ef4444; box-shadow: 0 4px 10px rgba(239,68,68,0.2); }
+        .btn-bulk { background: #3b82f6; color: white; }
+        .btn-bulk.active { background: #ef4444; }
 
-        .segmented-control { display: flex; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 10px; padding: 4px; gap: 2px; }
-        .seg-btn { background: transparent; border: none; padding: 6px 14px; font-size: 12px; font-weight: 800; color: var(--text-gray); cursor: pointer; transition: 0.3s; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; font-family: inherit; }
+        .segmented-control { display: flex; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 8px; padding: 3px; gap: 2px; }
+        .seg-btn { background: transparent; border: none; padding: 6px 12px; font-size: 12px; font-weight: 800; color: var(--text-gray); cursor: pointer; transition: 0.3s; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; font-family: inherit; }
         .seg-btn.active { background: var(--card-bg); color: var(--primary-orange); box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
 
-        /* GRID VIEW RESPONSIVE (2 KOLOM DI HP) */
-        .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; padding-bottom: 80px; }
+        /* GRID VIEW (DESAIN 2 KOLOM SHOPEE STYLE UNTUK MOBILE) */
+        .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; max-width: 1200px; margin: 0 auto; padding-bottom: 80px; }
+        
         @media (max-width: 768px) {
             .grid-cards { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .toolbar-bottom { flex-direction: column; align-items: stretch; }
+            .action-group-modern { justify-content: space-between; margin-top: 5px;}
         }
         
         .list-view { display: flex; flex-direction: column; gap: 12px; max-width: 1200px; margin: 0 auto; padding-bottom: 80px; }
         
-        .mission-card { background: var(--card-bg); border-radius: 20px; padding: 15px; cursor: pointer; transition: 0.3s; border: 2px solid var(--border-color); display: flex; flex-direction: column; position: relative; }
-        .mission-card.selected { border-color: #3b82f6; background: #eff6ff; box-shadow: 0 5px 20px rgba(59, 130, 246, 0.2); transform: scale(0.98); }
-        .mission-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        .mission-card { background: var(--card-bg); border-radius: 12px; padding: 10px; cursor: pointer; transition: 0.3s; border: 1px solid var(--border-color); display: flex; flex-direction: column; position: relative; box-shadow: 0 2px 8px rgba(0,0,0,0.04);}
+        .mission-card.selected { border-color: #3b82f6; background: #eff6ff; box-shadow: 0 5px 20px rgba(59, 130, 246, 0.2); transform: scale(0.97); border-width: 2px;}
         
-        /* Checkbox penanda kalau dipilih */
-        .card-check { position: absolute; top: 10px; right: 10px; background: #3b82f6; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 12px; z-index: 5; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .card-check { position: absolute; top: 8px; right: 8px; background: #3b82f6; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 12px; z-index: 5; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
 
-        .card-img { width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: 15px; background: #eee; margin-bottom: 12px; }
+        .card-img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 8px; background: #eee; margin-bottom: 8px; }
         
-        .list-item { display: flex; align-items: center; gap: 15px; background: var(--card-bg); padding: 15px; border-radius: 15px; cursor: pointer; border: 2px solid var(--border-color); transition: 0.3s; position: relative; }
-        .list-item.selected { border-color: #3b82f6; background: #eff6ff; }
-        .list-img { width: 70px; height: 70px; object-fit: cover; border-radius: 10px; background: #eee; flex-shrink: 0; }
-        .list-info { flex: 1; display: flex; flex-direction: column; gap: 4px; color: var(--text-dark); }
+        /* Truncate Title to 2 lines like e-commerce apps */
+        .card-title { font-weight: 800; font-size: 13px; margin: 0 0 5px 0; line-height: 1.3; color: var(--text-dark); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
         
-        .badge-status { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; border: 1px solid transparent; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+        .list-item { display: flex; align-items: center; gap: 12px; background: var(--card-bg); padding: 12px; border-radius: 12px; cursor: pointer; border: 1px solid var(--border-color); transition: 0.3s; position: relative; }
+        .list-item.selected { border-color: #3b82f6; background: #eff6ff; border-width: 2px;}
+        .list-img { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; background: #eee; flex-shrink: 0; }
+        .list-info { flex: 1; display: flex; flex-direction: column; gap: 4px; color: var(--text-dark); min-width: 0;} /* min-width 0 prevents flex overflow */
+        .list-title { font-weight: 800; font-size: 14px; margin:0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+
+        .badge-status { padding: 4px 0; border-radius: 6px; font-size: 10px; font-weight: 800; border: 1px solid transparent; display: block; text-align: center; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
         .status-gudang { background: #f1f5f9; color: #64748b; border-color: #cbd5e1; }
         .status-keranjang { background: #fff7ed; color: #ea580c; border-color: #fdba74; }
         .status-perjalanan { background: #f3e8ff; color: #7e22ce; border-color: #d8b4fe; }
         .status-lokasi { background: #eff6ff; color: #2563eb; border-color: #93c5fd; }
         .status-dipakai { background: #f0fdf4; color: #16a34a; border-color: #86efac; }
-
-        .badge-qty { background: var(--text-dark); color: var(--bg-color); font-size: 10px; padding: 3px 8px; border-radius: 5px; font-weight: 700; }
+        
+        .badge-qty { background: rgba(0,0,0,0.6); color: white; font-size: 10px; padding: 3px 6px; border-radius: 4px; font-weight: 700; backdrop-filter: blur(4px);}
+        .card-codes { display:flex; gap: 4px; margin-bottom: 8px; flex-wrap: wrap; font-size: 10px; font-weight: 800; }
+        .card-codes span { background: #f8fafc; padding: 3px 6px; border-radius: 4px; border: 1px solid #e2e8f0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;}
 
         /* FLOATING BULK BAR */
         .bulk-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 15px 20px; box-shadow: 0 -5px 25px rgba(0,0,0,0.1); border-top: 1px solid #e2e8f0; display: none; justify-content: space-between; align-items: center; z-index: 9000; }
@@ -81,54 +83,61 @@ location: "MASTER"
         .bulk-info { font-weight: 900; color: #1e293b; font-size: 14px; }
         .btn-bulk-process { background: #3b82f6; color: white; border: none; padding: 12px 24px; border-radius: 12px; font-weight: 800; font-size: 13px; cursor: pointer; text-transform: uppercase; }
 
-        /* MODALS */
+        /* TOAST NOTIFICATION */
+        .toast-msg { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #1e293b; color: white; padding: 12px 24px; border-radius: 30px; font-weight: bold; font-size: 14px; z-index: 99999; box-shadow: 0 5px 20px rgba(0,0,0,0.3); opacity: 0; transition: 0.3s; pointer-events: none; border: 2px solid #334155; }
+        .toast-msg.show { opacity: 1; top: 40px; }
+        .toast-success { background: #10b981; border-color: #059669; }
+        .toast-error { background: #ef4444; border-color: #b91c1c; }
+
+        /* FULL MODALS */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 99990; backdrop-filter: blur(5px); padding: 15px; }
         .modal-overlay.active { display: flex; }
-        .modal-content { background: var(--card-bg); border-radius: 25px; width: 100%; max-width: 900px; max-height: 90vh; overflow-y: auto; position: relative; border: 1px solid var(--border-color); }
-        .modal-header { padding: 20px 30px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--card-bg); z-index: 10; }
-        .close-x { font-size: 28px; cursor: pointer; border: none; background: none; color: var(--text-gray); transition: 0.3s; }
-        .modal-body { display: flex; flex-wrap: wrap; padding: 20px; gap: 25px; }
+        .modal-content { background: var(--card-bg); border-radius: 20px; width: 100%; max-width: 900px; max-height: 90vh; overflow-y: auto; position: relative; border: 1px solid var(--border-color); }
+        .modal-header { padding: 15px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--card-bg); z-index: 10; }
+        .close-x { font-size: 24px; cursor: pointer; border: none; background: none; color: var(--text-gray); }
+        .modal-body { padding: 20px; display: flex; flex-wrap: wrap; gap: 20px; }
+        .modal-footer { padding: 15px 20px; display: flex; gap: 10px; border-top: 1px solid var(--border-color); flex-wrap: wrap;}
         
-        .modal-left { flex: 1; min-width: 300px; }
-        .main-image-box { width: 100%; height: 280px; border-radius: 15px; overflow: hidden; background: #eee; margin-bottom: 10px; cursor: zoom-in; position: relative; }
+        .modal-left { flex: 1; min-width: 280px; }
+        .main-image-box { width: 100%; height: 250px; border-radius: 12px; overflow: hidden; background: #eee; margin-bottom: 10px; cursor: zoom-in; position: relative; }
         .main-image-box img { width: 100%; height: 100%; object-fit: cover; }
-        .thumb-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; }
+        .thumb-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; justify-content: center;}
         .thumb-img { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; cursor: pointer; border: 2px solid transparent; opacity: 0.6; transition: 0.2s; background: #f0f0f0; display: flex; justify-content: center; align-items: center; font-size: 16px; color: #ccc; position: relative;}
         .thumb-img:hover, .thumb-img.active { border-color: var(--primary-orange); opacity: 1; }
         .thumb-label { position: absolute; bottom: -15px; font-size: 8px; width: 100%; text-align: center; color: var(--text-gray); white-space: nowrap; }
 
-        .img-edit-controls { display: flex; gap: 10px; margin-top: 10px; }
-        .btn-img { flex: 1; padding: 10px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-dark); transition: 0.2s; }
+        .img-edit-controls { display: flex; gap: 8px; margin-top: 10px; }
+        .btn-img { flex: 1; padding: 8px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-dark); transition: 0.2s; }
         .btn-img:disabled { opacity: 0.5; cursor: not-allowed; }
         
-        .modal-right { flex: 1.2; min-width: 300px; }
-        .label-tag { font-size: 11px; font-weight: 800; color: var(--text-gray); text-transform: uppercase; margin-bottom: 8px; display: block; }
-        .flex-row-input { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
-        .flex-col { flex: 1; min-width: 140px; }
-        .input-text { width: 100%; padding: 12px 15px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-dark); font-size: 14px; outline: none; margin-bottom: 20px; font-family: inherit; font-weight: 500; transition: 0.3s; }
-        .input-text:focus { border-color: var(--primary-orange); background: var(--card-bg); }
+        .modal-right { flex: 1.2; min-width: 280px; }
+        .label-tag { font-size: 11px; font-weight: 800; color: var(--text-gray); text-transform: uppercase; margin-bottom: 5px; display: block; }
+        .flex-row-input { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+        .flex-col { flex: 1; min-width: 130px; }
+        
+        .input-text, .select-modern-form { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-dark); font-size: 13px; outline: none; margin-bottom: 15px; font-family: inherit; font-weight: 500; transition: 0.3s; }
+        .input-text:focus, .select-modern-form:focus { border-color: var(--primary-orange); background: var(--card-bg); }
 
-        .modal-footer { display: flex; flex-wrap: wrap; gap: 10px; padding: 0 20px 25px; }
-        .btn { flex: 1; padding: 16px; border-radius: 15px; font-weight: 800; border: none; cursor: pointer; transition: 0.3s; font-size: 14px; min-width: 150px; text-transform: uppercase; }
+        .btn { flex: 1; padding: 14px; border-radius: 12px; font-weight: 800; border: none; cursor: pointer; transition: 0.3s; font-size: 13px; text-transform: uppercase; min-width: 120px;}
         .btn-save { background: var(--primary-orange); color: white; }
         .btn-cancel { background: var(--bg-color); color: var(--text-dark); border: 1px solid var(--border-color); }
         .btn-danger { background: #fff; color: #e74c3c; border: 1px solid #e74c3c; flex-basis: 100%; }
 
-        .photo-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 20px; }
-        .photo-box { aspect-ratio: 1/1; border-radius: 12px; border: 2px dashed var(--border-color); display: flex; align-items: center; justify-content: center; background: var(--bg-color); cursor: pointer; overflow: hidden; position: relative; }
+        .photo-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 15px; }
+        .photo-box { aspect-ratio: 1/1; border-radius: 8px; border: 2px dashed var(--border-color); display: flex; align-items: center; justify-content: center; background: var(--bg-color); cursor: pointer; overflow: hidden; position: relative; font-size:18px; color:#aaa;}
         .photo-box img { width: 100%; height: 100%; object-fit: cover; }
 
-        .qty-control { display: flex; align-items: center; gap: 15px; background: var(--bg-color); padding: 15px; border-radius: 15px; border: 1px solid var(--border-color); }
-        .qty-input { width: 80px; padding: 10px; border-radius: 8px; border: 2px solid var(--border-color); font-size: 16px; font-weight: 700; text-align: center; color: var(--text-dark); background: var(--card-bg); outline: none; }
-        .qty-input:focus { border-color: var(--primary-orange); }
+        .qty-control { display: flex; align-items: center; gap: 15px; background: var(--bg-color); padding: 12px; border-radius: 10px; border: 1px solid var(--border-color); margin-bottom:15px;}
+        .qty-input { width: 70px; padding: 8px; border-radius: 6px; border: 2px solid var(--border-color); font-size: 14px; font-weight: 700; text-align: center; color: var(--text-dark); background: var(--card-bg); outline: none; }
         .qty-info { display: flex; flex-direction: column; }
-        .qty-info strong { color: var(--text-dark); font-size: 14px; }
-        .qty-info span { color: var(--text-gray); font-size: 12px; }
+        .qty-info strong { color: var(--text-dark); font-size: 13px; }
+        .qty-info span { color: var(--text-gray); font-size: 11px; }
 
         #qr-reader { width: 100%; max-width: 500px; margin: 0 auto; border-radius: 15px; overflow: hidden; border: none !important; }
-        #qr-reader__dashboard_section_csr span { color: var(--text-dark); font-family: inherit; }
-        #qr-reader__dashboard_section_swaplink { text-decoration: none; color: var(--primary-orange); font-weight: bold; margin-top: 10px; display: inline-block; }
-        #qr-reader button { background: var(--primary-orange); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+
+        /* LOADING ANIMATION */
+        .loader-spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary-orange); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -138,68 +147,55 @@ location: "MASTER"
     <main style="padding: 0 15px;">
         <div class="page-title-section">
             <h2>Inventory Portal</h2>
-            <p style="font-size: 13px; font-weight: 700; color: var(--text-gray);">Manajemen Aset & Keranjang Loading</p>
+            <p style="font-size: 12px; font-weight: 700; color: var(--text-gray); margin:0;">Manajemen Aset & Logistik</p>
         </div>
 
         <div class="controls-wrapper">
             <div class="toolbar-card">
-                
-                <div class="toolbar-top">
-                    <div class="search-box-modern">
-                        <div class="search-input-wrapper">
-                            <i class="fa-solid fa-magnifying-glass"></i>
-                            <input type="text" id="searchInput" class="search-input-modern" placeholder="Cari nama, Box, Kode, Event..." oninput="applyFilters()">
-                        </div>
-                        <button onclick="openScannerModal()" class="btn-scan" title="Scan QR/Barcode">
-                            <i class="fa-solid fa-qrcode"></i>
-                        </button>
+                <div class="search-box-modern">
+                    <div class="search-input-wrapper">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="searchInput" class="search-input-modern" placeholder="Cari nama, Kode, Wadah..." oninput="applyFilters()">
                     </div>
+                    <button onclick="openScannerModal()" class="btn-scan"><i class="fa-solid fa-qrcode"></i></button>
                 </div>
 
                 <div class="toolbar-bottom">
                     <div class="filter-group-modern">
                         <select id="statusSelect" class="select-modern" onchange="applyFilters()">
                             <option value="all">Semua Status</option>
-                            <option value="Di Gudang">🏢 Di Gudang</option>
-                            <option value="Siap Dibawa">🛒 Keranjang (Siap Dibawa)</option>
-                            <option value="Dalam Perjalanan">🚚 Dalam Perjalanan</option>
-                            <option value="Di Gedung UTC">📍 Di Gedung UTC</option>
-                            <option value="Perjalanan ke Yogya">🚚 Perjalanan ke Yogya</option>
-                            <option value="Gedung di Yogya">📍 Gedung di Yogya</option>
-                            <option value="Di Lokasi">📍 Di Lokasi Lainnya</option>
-                            <option value="Sedang Dipakai">🔌 Terpasang / Dipakai</option>
+                            <option value="Di Gudang">Di Gudang</option>
+                            <option value="Siap Dibawa">Keranjang (Siap Dibawa)</option>
+                            <option value="Dalam Perjalanan">Dalam Perjalanan</option>
+                            <option value="Di Gedung UTC">Di Gedung UTC</option>
+                            <option value="Perjalanan ke Yogya">Perjalanan ke Yogya</option>
+                            <option value="Gedung di Yogya">Gedung di Yogya</option>
+                            <option value="Di Lokasi">Di Lokasi Lainnya</option>
+                            <option value="Sedang Dipakai">Terpasang / Dipakai</option>
                         </select>
+                        <select id="teamSelect" class="select-modern" onchange="applyFilters()"><option value="all">Semua Tim</option></select>
                         <select id="sortSelect" class="select-modern" onchange="applyFilters()">
-                            <option value="default">Urutan Default</option>
-                            <option value="az">Sortir: A - Z</option>
-                            <option value="za">Sortir: Z - A</option>
-                        </select>
-                        <select id="teamSelect" class="select-modern" onchange="applyFilters()">
-                            <option value="all">Semua Tim</option>
+                            <option value="default">Sort: A-Z</option>
+                            <option value="za">Sort: Z-A</option>
                         </select>
                     </div>
 
                     <div class="action-group-modern">
-                        <button onclick="openAddModal()" class="btn-mod btn-mod-primary">
-                            <i class="fa-solid fa-plus"></i> Tambah
-                        </button>
-                        <button id="btnBulkMode" onclick="toggleBulkMode()" class="btn-mod btn-bulk">
-                            <i class="fa-solid fa-check-double"></i> Keranjang
-                        </button>
+                        <button onclick="openAddModal()" class="btn-mod btn-mod-primary"><i class="fa-solid fa-plus"></i> Baru</button>
+                        <button id="btnBulkMode" onclick="toggleBulkMode()" class="btn-mod btn-bulk"><i class="fa-solid fa-check-double"></i> Keranjang</button>
                         <div class="segmented-control">
-                            <button onclick="toggleView('gallery')" id="btnGallery" class="seg-btn active">
-                                <i class="fa-solid fa-border-all"></i>
-                            </button>
-                            <button onclick="toggleView('list')" id="btnList" class="seg-btn">
-                                <i class="fa-solid fa-list-ul"></i>
-                            </button>
+                            <button onclick="toggleView('gallery')" id="btnGallery" class="seg-btn active"><i class="fa-solid fa-border-all"></i></button>
+                            <button onclick="toggleView('list')" id="btnList" class="seg-btn"><i class="fa-solid fa-list-ul"></i></button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div id="loading" style="text-align: center; padding: 50px; font-weight: 700; color: gray;">Meminta akses dan mengunduh data...</div>
+        <div id="loading" style="text-align: center; padding: 50px; font-weight: 700; color: gray;">
+            <div class="loader-spinner"></div>
+            Menghubungkan ke Server Google...
+        </div>
         <div id="dataContainer" class="grid-cards"></div>
     </main>
 
@@ -211,14 +207,14 @@ location: "MASTER"
 
     <!-- MODAL BULK UPDATE -->
     <div id="modalBulk" class="modal-overlay">
-        <div class="modal-content" style="max-width: 400px; padding: 20px;">
-            <div class="modal-header" style="padding: 0 0 15px 0;">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
                 <h3 style="font-weight: 800; font-size: 16px; margin:0;">UBAH STATUS BERSAMAAN</h3>
                 <button onclick="document.getElementById('modalBulk').classList.remove('active')" class="close-x">✕</button>
             </div>
-            <div class="modal-body" style="padding: 15px 0; display: block;">
+            <div class="modal-body" style="display: block;">
                 <span class="label-tag">Pilih Status Baru:</span>
-                <select id="bulkNewStatus" class="input-text" style="margin-bottom: 0;">
+                <select id="bulkNewStatus" class="select-modern-form">
                     <option value="Siap Dibawa">🛒 Tambah ke Keranjang (Siap Dibawa)</option>
                     <option value="Di Gudang">🏢 Kembalikan ke Gudang</option>
                     <option value="Dalam Perjalanan">🚚 Dalam Perjalanan</option>
@@ -228,8 +224,9 @@ location: "MASTER"
                     <option value="Di Lokasi">📍 Di Lokasi Lainnya</option>
                     <option value="Sedang Dipakai">🔌 Sedang Dipakai / Pasang</option>
                 </select>
+                <p style="font-size:11px; color:gray; margin-top:10px;">Tips: Status "Sedang Dipakai" cocok untuk mencatat alat yang sedang di-setup di lapangan.</p>
             </div>
-            <div class="modal-footer" style="padding: 0; margin-top: 10px;">
+            <div class="modal-footer">
                 <button id="btnProsesBulk" class="btn btn-save" onclick="processBulkUpdate()" style="width: 100%;">PROSES UPDATE</button>
             </div>
         </div>
@@ -243,18 +240,22 @@ location: "MASTER"
                 <button onclick="closeScannerModal()" class="close-x">✕</button>
             </div>
             <div id="qr-reader"></div>
-            <p style="font-size: 12px; color: gray; margin-top: 15px;">Arahkan kamera ke stiker QR/Barcode Barang.</p>
+            <p style="font-size: 12px; color: gray; margin-top: 15px;" id="scanInstruksi">Arahkan kamera ke stiker QR/Barcode Barang.</p>
         </div>
     </div>
 
-    <!-- MODAL EDIT / DETAIL BARANG FULL -->
+    <!-- TOAST NOTIFICATION -->
+    <div id="toastMsg" class="toast-msg">Notifikasi</div>
+
+    <!-- ========================================== -->
+    <!-- MODAL EDIT / DETAIL BARANG FULL VERSION    -->
+    <!-- ========================================== -->
     <div id="modalEdit" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 style="font-weight: 800; font-size: 18px;">EDIT / UPDATE BARANG</h3>
+                <h3 style="font-weight: 800; font-size: 16px; margin:0;">EDIT / UPDATE BARANG</h3>
                 <button onclick="closeModalEdit()" class="close-x">✕</button>
             </div>
-            
             <div class="modal-body">
                 <div class="modal-left">
                     <span class="label-tag">Foto Barang & Wadah</span>
@@ -266,24 +267,24 @@ location: "MASTER"
                     <div class="img-edit-controls">
                         <button id="btnCam" class="btn-img" onclick="document.getElementById('img-camera').click()">📷 Kamera</button>
                         <button id="btnGal" class="btn-img" onclick="document.getElementById('img-gallery').click()">🖼️ Galeri</button>
-                        <button id="btnDel" class="btn-img btn-img-danger" onclick="hapusFotoAktif()" style="background:#fff; color:#e74c3c; border-color:#e74c3c;">🗑️ Hapus</button>
+                        <button id="btnDel" class="btn-img" onclick="hapusFotoAktif()" style="background:#fff; color:#e74c3c; border-color:#e74c3c;">🗑️ Hapus</button>
                         <input type="file" id="img-camera" accept="image/*" capture="environment" style="display:none;" onchange="prosesGantiFoto(event)">
                         <input type="file" id="img-gallery" accept="image/*" style="display:none;" onchange="prosesGantiFoto(event)">
                     </div>
-                    <p id="foto-locked-msg" style="display:none; font-size:11px; color:#e74c3c; margin-top:5px; font-weight:bold;">Foto ini tidak bisa diubah karena milik Koper Induk.</p>
+                    <p id="foto-locked-msg" style="display:none; font-size:10px; color:#e74c3c; margin-top:5px; font-weight:bold; text-align:center;">Foto wadah tidak bisa diubah dari sini.</p>
                 </div>
 
                 <div class="modal-right">
                     <div class="flex-row-input">
                         <div class="flex-col" style="flex: 1.5;">
                             <span class="label-tag">Nama Barang</span>
-                            <input type="text" id="m-nama" class="input-text" style="font-weight: 700; font-size: 15px; margin-bottom: 0;">
+                            <input type="text" id="m-nama" class="input-text" style="font-weight: 700; font-size: 14px;">
                         </div>
                         <div class="flex-col" style="flex: 1;">
                             <span class="label-tag">Status Inventaris</span>
-                            <select id="m-status-digunakan" class="input-text select-modern" style="margin-bottom: 0; border: 2px solid var(--primary-orange);">
+                            <select id="m-status-digunakan" class="select-modern-form" style="border: 2px solid var(--primary-orange);">
                                 <option value="Di Gudang">🏢 Di Gudang</option>
-                                <option value="Siap Dibawa">🛒 Siap Dibawa (Keranjang)</option>
+                                <option value="Siap Dibawa">🛒 Siap Dibawa</option>
                                 <option value="Dalam Perjalanan">🚚 Dalam Perjalanan</option>
                                 <option value="Di Gedung UTC">📍 Di Gedung UTC</option>
                                 <option value="Perjalanan ke Yogya">🚚 Perjalanan ke Yogya</option>
@@ -297,22 +298,22 @@ location: "MASTER"
                     <div class="flex-row-input">
                         <div class="flex-col">
                             <span class="label-tag">Kode Barang (Satuan)</span>
-                            <input type="text" id="m-kode" class="input-text" style="color: var(--primary-orange); font-weight: bold; margin-bottom: 0;">
+                            <input type="text" id="m-kode" class="input-text" style="color: var(--primary-orange); font-weight: bold;">
                         </div>
                         <div class="flex-col">
                             <span class="label-tag">Kode Wadah / Box</span>
-                            <input type="text" id="m-wadah" class="input-text" style="color: #2563eb; font-weight: bold; margin-bottom: 0;" placeholder="Contoh: BOX-KBL-A">
+                            <input type="text" id="m-wadah" class="input-text" style="color: #2563eb; font-weight: bold;">
                         </div>
                     </div>
 
                     <div class="flex-row-input">
                         <div class="flex-col">
                             <span class="label-tag">Jumlah Item</span>
-                            <input type="number" id="m-jumlah" class="input-text" style="margin-bottom: 0;" oninput="updateMaxTerpakai()">
+                            <input type="number" id="m-jumlah" class="input-text" oninput="updateMaxTerpakai()">
                         </div>
                         <div class="flex-col">
                             <span class="label-tag">Kondisi</span>
-                            <select id="m-kondisi" class="input-text select-modern" style="margin-bottom: 0;">
+                            <select id="m-kondisi" class="select-modern-form">
                                 <option value="Bagus">Bagus</option>
                                 <option value="Periksa">Periksa</option>
                                 <option value="Rusak">Rusak</option>
@@ -323,27 +324,27 @@ location: "MASTER"
                     <div class="flex-row-input">
                         <div class="flex-col">
                             <span class="label-tag">Tim</span>
-                            <select id="m-team" class="input-text select-modern" style="margin-bottom: 0;" onchange="handleNewOption(this)"></select>
+                            <select id="m-team" class="select-modern-form" onchange="handleNewOption(this)"></select>
                         </div>
                         <div class="flex-col">
                             <span class="label-tag">Event Berikutnya?</span>
-                            <input type="text" id="m-tujuan" class="input-text" style="margin-bottom: 0;" placeholder="Bila sudah direncanakan...">
+                            <input type="text" id="m-tujuan" class="input-text">
                         </div>
                     </div>
                     
                     <div class="flex-row-input">
                         <div class="flex-col">
                             <span class="label-tag">Barang Milik</span>
-                            <select id="m-owner" class="input-text select-modern" style="margin-bottom: 0;" onchange="handleNewOption(this)"></select>
+                            <select id="m-owner" class="select-modern-form" onchange="handleNewOption(this)"></select>
                         </div>
                         <div class="flex-col">
                             <span class="label-tag">Lokasi Terkini</span>
-                            <select id="m-lokasi" class="input-text select-modern" style="margin-bottom: 0;" onchange="handleNewOption(this)"></select>
+                            <select id="m-lokasi" class="select-modern-form" onchange="handleNewOption(this)"></select>
                         </div>
                     </div>
 
                     <span class="label-tag">Jumlah Dipakai</span>
-                    <div class="qty-control" style="margin-bottom: 20px;">
+                    <div class="qty-control">
                         <input type="number" id="m-terpakai" class="qty-input" min="0" value="0" oninput="calculateSisa()">
                         <div class="qty-info">
                             <strong id="m-sisa-text">Sisa: 0 Pcs</strong>
@@ -352,33 +353,35 @@ location: "MASTER"
                     </div>
                     
                     <span class="label-tag">Keterangan Teknis</span>
-                    <textarea id="m-ref" class="input-text" rows="2" placeholder="Panjang kabel, dsb..."></textarea>
+                    <textarea id="m-ref" class="input-text" rows="2" style="margin-bottom:10px;"></textarea>
 
-                    <span class="label-tag">Catatan Tambahan (Misal: Hilang 2)</span>
-                    <textarea id="m-desc" class="input-text" rows="2"></textarea>
+                    <span class="label-tag">Catatan Tambahan</span>
+                    <textarea id="m-desc" class="input-text" rows="2" style="margin-bottom:10px;"></textarea>
 
                     <span class="label-tag">Histori Log Sistem</span>
-                    <div id="m-system-log" style="font-size: 11px; color: gray; background: var(--bg-color); padding: 10px; border-radius: 8px; border: 1px dashed #ccc; max-height: 80px; overflow-y: auto; white-space: pre-wrap;"></div>
+                    <div id="m-system-log" style="font-size: 10px; color: gray; background: var(--bg-color); padding: 8px; border-radius: 8px; border: 1px dashed #ccc; max-height: 80px; overflow-y: auto; white-space: pre-wrap;"></div>
                 </div>
             </div>
             <div class="modal-footer">
                 <button onclick="closeModalEdit()" class="btn btn-cancel">BATAL</button>
-                <button id="saveBtn" class="btn btn-save">SIMPAN STATUS & DATA</button>
+                <button id="saveBtn" class="btn btn-save">SIMPAN DATA</button>
                 <button id="deleteBtn" class="btn btn-danger"><i class="fa-solid fa-trash"></i> HAPUS</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL TAMBAH BARANG FULL -->
+    <!-- ========================================== -->
+    <!-- MODAL TAMBAH BARANG FULL VERSION           -->
+    <!-- ========================================== -->
     <div id="modalAdd" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 style="font-weight: 800; font-size: 18px;">TAMBAH BARANG BARU</h3>
+                <h3 style="font-weight: 800; font-size: 16px; margin:0;">TAMBAH BARANG BARU</h3>
                 <button onclick="closeAddModal()" class="close-x">✕</button>
             </div>
             <div class="modal-body">
                 <div class="modal-left">
-                    <span class="label-tag">Foto (Pilih 1 sampai 5 foto sekaligus)</span>
+                    <span class="label-tag">Foto (Pilih 1-5 foto sekaligus)</span>
                     <div class="photo-grid" onclick="document.getElementById('add-fileInput').click()">
                         <div class="photo-box" id="add-box1"><span>+</span></div>
                         <div class="photo-box" id="add-box2"><span>+</span></div>
@@ -387,26 +390,20 @@ location: "MASTER"
                         <div class="photo-box" id="add-box5" style="border-color:#2563eb; background:#eff6ff;"><span>📦</span></div>
                     </div>
                     <input type="file" id="add-fileInput" style="display: none;" accept="image/*" multiple>
-                    <p style="font-size:10px; color:gray;">Kotak biru khusus untuk foto koper/wadah (jika ada).</p>
+                    <p style="font-size:10px; color:gray; text-align:center;">Kotak biru untuk foto koper/wadah (jika ada).</p>
                 </div>
 
                 <div class="modal-right">
                     <div class="flex-row-input">
                         <div class="flex-col" style="flex: 1.5;">
                             <span class="label-tag">Nama Barang</span>
-                            <input type="text" id="add-nama" class="input-text" style="font-weight: 700; margin-bottom: 0;">
+                            <input type="text" id="add-nama" class="input-text" style="font-weight: 700;">
                         </div>
                         <div class="flex-col" style="flex: 1;">
                             <span class="label-tag">Status Awal</span>
-                            <select id="add-status" class="input-text select-modern" style="margin-bottom: 0; border: 2px solid var(--primary-orange);">
+                            <select id="add-status" class="select-modern-form" style="border: 2px solid var(--primary-orange);">
                                 <option value="Di Gudang">🏢 Di Gudang</option>
                                 <option value="Siap Dibawa">🛒 Siap Dibawa</option>
-                                <option value="Dalam Perjalanan">🚚 Dalam Perjalanan</option>
-                                <option value="Di Gedung UTC">📍 Di Gedung UTC</option>
-                                <option value="Perjalanan ke Yogya">🚚 Perjalanan ke Yogya</option>
-                                <option value="Gedung di Yogya">📍 Gedung di Yogya</option>
-                                <option value="Di Lokasi">📍 Di Lokasi Event</option>
-                                <option value="Sedang Dipakai">🔌 Sedang Dipakai / Pasang</option>
                             </select>
                         </div>
                     </div>
@@ -414,22 +411,22 @@ location: "MASTER"
                     <div class="flex-row-input">
                         <div class="flex-col">
                             <span class="label-tag">Kode Barang (Satuan)</span>
-                            <input type="text" id="add-kode" class="input-text" style="color: var(--primary-orange); font-weight: bold; margin-bottom: 0;">
+                            <input type="text" id="add-kode" class="input-text" style="color: var(--primary-orange); font-weight: bold;">
                         </div>
                         <div class="flex-col">
                             <span class="label-tag">Kode Wadah / Box</span>
-                            <input type="text" id="add-wadah" class="input-text" style="color: #2563eb; font-weight: bold; margin-bottom: 0;">
+                            <input type="text" id="add-wadah" class="input-text" style="color: #2563eb; font-weight: bold;">
                         </div>
                     </div>
 
                     <div class="flex-row-input">
                         <div class="flex-col">
                             <span class="label-tag">Jumlah Item</span>
-                            <input type="number" id="add-jumlah" class="input-text" value="1" style="margin-bottom: 0;" oninput="updateAddMaxTerpakai()">
+                            <input type="number" id="add-jumlah" class="input-text" value="1" oninput="updateAddMaxTerpakai()">
                         </div>
                         <div class="flex-col">
                             <span class="label-tag">Kondisi</span>
-                            <select id="add-kondisi" class="input-text select-modern" style="margin-bottom: 0;">
+                            <select id="add-kondisi" class="select-modern-form">
                                 <option value="Bagus">Bagus</option>
                                 <option value="Periksa">Periksa</option>
                                 <option value="Rusak">Rusak</option>
@@ -440,27 +437,27 @@ location: "MASTER"
                     <div class="flex-row-input">
                         <div class="flex-col">
                             <span class="label-tag">Tim</span>
-                            <select id="add-team" class="input-text select-modern" style="margin-bottom: 0;" onchange="handleNewOption(this)"></select>
+                            <select id="add-team" class="select-modern-form" onchange="handleNewOption(this)"></select>
                         </div>
                         <div class="flex-col">
                             <span class="label-tag">Event Berikutnya?</span>
-                            <input type="text" id="add-tujuan" class="input-text" style="margin-bottom: 0;" placeholder="Bila sudah direncanakan...">
+                            <input type="text" id="add-tujuan" class="input-text">
                         </div>
                     </div>
 
                     <div class="flex-row-input">
                         <div class="flex-col">
                             <span class="label-tag">Barang Milik</span>
-                            <select id="add-owner" class="input-text select-modern" style="margin-bottom: 0;" onchange="handleNewOption(this)"></select>
+                            <select id="add-owner" class="select-modern-form" onchange="handleNewOption(this)"></select>
                         </div>
                         <div class="flex-col">
                             <span class="label-tag">Lokasi Terkini</span>
-                            <select id="add-lokasi" class="input-text select-modern" style="margin-bottom: 0;" onchange="handleNewOption(this)"></select>
+                            <select id="add-lokasi" class="select-modern-form" onchange="handleNewOption(this)"></select>
                         </div>
                     </div>
 
                     <span class="label-tag">Jumlah Dipakai Awal</span>
-                    <div class="qty-control" style="margin-bottom: 20px;">
+                    <div class="qty-control">
                         <input type="number" id="add-terpakai" class="qty-input" min="0" value="0" oninput="calculateAddSisa()">
                         <div class="qty-info">
                             <strong id="add-sisa-text">Sisa Tersedia: 0 Pcs</strong>
@@ -469,15 +466,15 @@ location: "MASTER"
                     </div>
 
                     <span class="label-tag">Keterangan Teknis</span>
-                    <textarea id="add-ref" class="input-text" rows="2"></textarea>
+                    <textarea id="add-ref" class="input-text" rows="2" style="margin-bottom:10px;"></textarea>
 
-                    <span class="label-tag">Catatan Tambahan (Misal: Hilang 2)</span>
+                    <span class="label-tag">Catatan Tambahan</span>
                     <textarea id="add-desc" class="input-text" rows="2"></textarea>
                 </div>
             </div>
             <div class="modal-footer">
                 <button onclick="closeAddModal()" class="btn btn-cancel">BATAL</button>
-                <button id="addSaveBtn" class="btn btn-save" style="background: #2ecc71;">SIMPAN BARANG BARU</button>
+                <button id="addSaveBtn" class="btn btn-save" style="background: #2ecc71;">SIMPAN BARU</button>
             </div>
         </div>
     </div>
@@ -516,23 +513,31 @@ location: "MASTER"
     let addSelectedFiles = [];
     let html5QrcodeScanner = null;
     
-    // VARIABEL BULK MODE
+    // VARIABEL BULK MODE & SCANNER
     let isBulkMode = false;
     let selectedRows = new Set();
+    let lastScanTime = 0;
 
     window.onload = () => {
         if (checkAndRequestPin()) loadData();
     };
 
+    function showToast(message, isSuccess = true) {
+        const toast = document.getElementById("toastMsg");
+        toast.innerText = message;
+        toast.className = "toast-msg show " + (isSuccess ? "toast-success" : "toast-error");
+        setTimeout(() => { toast.classList.remove("show"); }, 2000);
+    }
+
     function checkAndRequestPin() {
         if (!userPin) {
             while (true) {
                 let input = prompt("Masukkan PIN Keamanan Petugas Gudang:");
-                if (input === null) { alert("Akses dibatalkan."); return false; }
+                if (input === null) return false;
                 if (VALID_PINS.includes(input.trim().toLowerCase())) {
                     userPin = input.trim().toLowerCase();
                     localStorage.setItem("AV_INVENTORY_PIN", userPin); break;
-                } else alert("PIN Salah! Akses khusus Admin Inventaris.");
+                } else alert("PIN Salah!");
             }
         }
         return true;
@@ -558,7 +563,7 @@ location: "MASTER"
             populateFilters();
             applyFilters();
         } catch (e) {
-            document.getElementById("loading").innerHTML = `<span style="color:red;">Gagal memuat data. Cek koneksi internet.</span>`;
+            document.getElementById("loading").innerHTML = `<span style="color:red;">Gagal memuat data. Periksa koneksi internet Anda.</span>`;
         }
     }
 
@@ -572,14 +577,19 @@ location: "MASTER"
         
         if (isBulkMode) {
             btn.classList.add("active");
-            btn.innerHTML = `<i class="fa-solid fa-xmark"></i> Batal Keranjang`;
+            btn.innerHTML = `<i class="fa-solid fa-xmark"></i> Batal`;
             bar.classList.add("active");
+            // Disable Add Button when in bulk mode to avoid confusion
+            document.querySelector('.btn-mod-primary').style.opacity = "0.5";
+            document.querySelector('.btn-mod-primary').style.pointerEvents = "none";
         } else {
             btn.classList.remove("active");
             btn.innerHTML = `<i class="fa-solid fa-check-double"></i> Keranjang`;
             bar.classList.remove("active");
             selectedRows.clear();
             updateBulkCount();
+            document.querySelector('.btn-mod-primary').style.opacity = "1";
+            document.querySelector('.btn-mod-primary').style.pointerEvents = "auto";
         }
         applyFilters(); 
     }
@@ -721,7 +731,7 @@ location: "MASTER"
     }
 
     function getStatusClass(status) {
-        if(!status) return 'badge-status status-gudang';
+        if(!status || status === 'FALSE' || status === 'undefined') return 'badge-status status-gudang';
         if(status === 'Siap Dibawa') return 'badge-status status-keranjang';
         if(status === 'Di Gudang') return 'badge-status status-gudang';
         if(status === 'Sedang Dipakai') return 'badge-status status-dipakai';
@@ -740,35 +750,45 @@ location: "MASTER"
             card.className = "mission-card " + (isSelected ? "selected" : "");
             
             const imageSrc = item.fotos && item.fotos[0] ? item.fotos[0] : 'https://placehold.co/300x180/EEEEEE/999999?text=NO+IMAGE';
-            const badgeClass = getStatusClass(item.status_digunakan);
             
-            const wadahBadge = item.kode_wadah ? `<span style="color:#2563eb;">📦 ${item.kode_wadah}</span>` : "";
+            let finalStatus = item.status_digunakan;
+            if(!finalStatus || finalStatus === 'FALSE' || finalStatus === 'undefined' || finalStatus === false) {
+                finalStatus = "Di Gudang";
+            }
+            const badgeClass = getStatusClass(finalStatus);
+            
+            const wadahBadge = item.kode_wadah ? `<span>📦 ${item.kode_wadah}</span>` : "";
             const kodeBadge = item.kode_barang ? `<span style="color:var(--primary-orange);">#${item.kode_barang}</span>` : "";
 
             if (currentView === 'gallery') {
+                // UI SHOPEE GRID 2 KOLOM
                 card.innerHTML = `
                     ${isSelected ? '<div class="card-check">✓</div>' : ''}
-                    <img src="${imageSrc}" class="card-img" loading="lazy">
-                    <h4>${item.nama_barang}</h4>
-                    <div style="display:flex; gap:5px; margin-bottom:5px; font-size:10px; font-weight:800;">${kodeBadge} ${wadahBadge}</div>
-                    
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:auto; padding-top:8px; border-top:1px solid #f1f5f9;">
-                        <span class="${badgeClass}">${item.status_digunakan || "Di Gudang"}</span>
-                        <span class="badge-qty">${item.jumlah || 0} Pcs</span>
+                    <div style="position:relative;">
+                        <img src="${imageSrc}" class="card-img" loading="lazy">
+                        <div style="position:absolute; bottom:16px; right:4px;"><span class="badge-qty">${item.jumlah || 0} Pcs</span></div>
+                    </div>
+                    <div style="display:flex; flex-direction:column; flex:1; justify-content:space-between;">
+                        <div>
+                            <h4 class="card-title" title="${item.nama_barang}">${item.nama_barang}</h4>
+                            <div class="card-codes">${kodeBadge} ${wadahBadge}</div>
+                        </div>
+                        <div style="margin-top: 8px;">
+                            <span class="${badgeClass}">${finalStatus}</span>
+                        </div>
                     </div>
                 `;
             } else {
+                // UI LIST VIEW
                 card.classList.replace("mission-card", "list-item");
                 card.innerHTML = `
-                    ${isSelected ? '<div class="card-check" style="top:50%; transform:translateY(-50%); right:10px;">✓</div>' : ''}
+                    ${isSelected ? '<div class="card-check" style="top:50%; transform:translateY(-50%); right:15px;">✓</div>' : ''}
                     <img src="${imageSrc}" class="list-img" loading="lazy">
                     <div class="list-info">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <h4 style="font-weight: 800; font-size: 15px; margin:0;">${item.nama_barang} ${kodeBadge}</h4>
-                        </div>
-                        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top: 6px;">
-                            ${wadahBadge}
-                            <span class="${badgeClass}">${item.status_digunakan || "Di Gudang"}</span>
+                        <h4 class="list-title" title="${item.nama_barang}">${item.nama_barang}</h4>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-top: 4px; font-size:10px; font-weight:bold;">
+                            ${kodeBadge} ${wadahBadge}
+                            <span class="${badgeClass}">${finalStatus}</span>
                             <span class="badge-qty">Total: ${item.jumlah || 0}</span>
                         </div>
                     </div>
@@ -784,7 +804,7 @@ location: "MASTER"
     }
 
     // =====================================
-    // LOGIKA ZOOM FOTO & KAMERA
+    // LOGIKA ZOOM FOTO & KAMERA (UTUH)
     // =====================================
     function compressImage(base64, maxDim, quality) {
         return new Promise((resolve) => {
@@ -891,7 +911,7 @@ location: "MASTER"
     function closeFullscreen() { document.getElementById("fsOverlay").classList.remove("active"); }
 
     // =====================================
-    // LOGIKA MODAL EDIT & ADD
+    // LOGIKA MODAL EDIT (UTUH)
     // =====================================
     function openModalEdit(item) {
         if (!checkAndRequestPin()) return;
@@ -906,7 +926,10 @@ location: "MASTER"
         document.getElementById("m-kondisi").value = item.kondisi || "Bagus";
         document.getElementById("m-tujuan").value = item.rencana_tujuan || "";
         document.getElementById("m-ref").value = item.keterangan_ref || "";
-        document.getElementById("m-status-digunakan").value = item.status_digunakan || "Di Gudang";
+        
+        let finalStatus = item.status_digunakan;
+        if(!finalStatus || finalStatus === 'FALSE' || finalStatus === 'undefined' || finalStatus === false) finalStatus = "Di Gudang";
+        document.getElementById("m-status-digunakan").value = finalStatus;
         
         setSelectValueWithCheck("m-team", item.tim);
         setSelectValueWithCheck("m-owner", item.barang_milik);
@@ -975,10 +998,12 @@ location: "MASTER"
             if(data.status === "success") { closeModalEdit(); loadData(); }
             else alert("Gagal: " + data.message);
         } catch (e) { alert("Gagal terhubung."); } 
-        finally { btn.disabled = false; btn.innerText = "SIMPAN STATUS & DATA"; }
+        finally { btn.disabled = false; btn.innerText = "SIMPAN DATA"; }
     };
 
-    // FUNGSI ADD BARANG BARU
+    // =====================================
+    // LOGIKA MODAL ADD (UTUH)
+    // =====================================
     function openAddModal() {
         if (!checkAndRequestPin()) return;
         document.getElementById("modalAdd").classList.add("active");
@@ -1039,9 +1064,9 @@ location: "MASTER"
             });
             const compressedBase64 = await compressImage(rawBase64, 600, 0.6);
             addSelectedFiles.push(compressedBase64);
-            document.getElementById('add-box'+(i+1)).innerHTML = `<img src="${compressedBase64}" style="width:100%; height:100%; object-fit:cover; border-radius:10px;">`;
+            document.getElementById('add-box'+(i+1)).innerHTML = `<img src="${compressedBase64}" style="width:100%; height:100%; object-fit:cover; border-radius:8px;">`;
         }
-        btnSave.disabled = false; btnSave.innerText = "SIMPAN BARANG BARU";
+        btnSave.disabled = false; btnSave.innerText = "SIMPAN BARU";
     };
 
     document.getElementById("addSaveBtn").onclick = async function() {
@@ -1071,7 +1096,7 @@ location: "MASTER"
             const data = await response.json();
             if(data.status === "success") { closeAddModal(); loadData(); }
         } catch (e) { alert("Gagal terhubung."); } 
-        finally { btn.disabled = false; btn.innerText = "SIMPAN BARANG BARU"; }
+        finally { btn.disabled = false; btn.innerText = "SIMPAN BARU"; }
     };
 
     document.getElementById("deleteBtn").onclick = async function() {
@@ -1084,19 +1109,44 @@ location: "MASTER"
     };
 
     // =====================================
-    // LOGIKA SCANNER QR
+    // LOGIKA SCANNER CERDAS (AUTO-KERANJANG)
     // =====================================
     function openScannerModal() {
         document.getElementById("modalScanner").classList.add("active");
-        html5QrcodeScanner = new Html5QrcodeScanner("qr-reader", { fps: 10, qrbox: 250, aspectRatio: 1.0 }, false);
+        
+        if (isBulkMode) {
+            document.getElementById("scanInstruksi").innerHTML = "Arahkan kamera ke Barcode. Barang akan <strong style='color:#ea580c'>langsung masuk keranjang</strong> tanpa menutup kamera.";
+        } else {
+            document.getElementById("scanInstruksi").innerHTML = "Arahkan kamera ke stiker QR/Barcode Barang.";
+        }
+
+        html5QrcodeScanner = new Html5QrcodeScanner("qr-reader", { fps: 5, qrbox: 250, aspectRatio: 1.0 }, false);
         html5QrcodeScanner.render((decodedText) => {
-            closeScannerModal();
-            document.getElementById('searchInput').value = decodedText; 
-            applyFilters(); 
             
+            const now = Date.now();
+            if (now - lastScanTime < 2000) return; 
+            lastScanTime = now;
+
+            const foundItem = allItems.find(i => i.kode_barang === decodedText || i.kode_wadah === decodedText);
+
             if (isBulkMode) {
-                const foundItem = allItems.find(i => i.kode_barang === decodedText || i.kode_wadah === decodedText);
-                if (foundItem && !selectedRows.has(foundItem.row_index)) toggleSelection(foundItem.row_index);
+                if (foundItem) {
+                    if (!selectedRows.has(foundItem.row_index)) {
+                        selectedRows.add(foundItem.row_index);
+                        updateBulkCount();
+                        applyFilters();
+                        showToast(`✅ ${foundItem.nama_barang} ditambahkan!`);
+                        try { navigator.vibrate(100); } catch(e){}
+                    } else {
+                        showToast(`⚠️ ${foundItem.nama_barang} sudah ada di keranjang!`, false);
+                    }
+                } else {
+                    showToast(`❌ Kode ${decodedText} tidak dikenali!`, false);
+                }
+            } else {
+                closeScannerModal();
+                document.getElementById('searchInput').value = decodedText; 
+                applyFilters(); 
             }
         });
     }

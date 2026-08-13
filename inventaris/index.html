@@ -1,7 +1,6 @@
 ---
 location: "MASTER"
 ---
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -14,29 +13,29 @@ location: "MASTER"
         body.admin-mode-active .admin-only { display: inline-flex !important; }
         body.admin-mode-active .admin-only-block { display: flex !important; }
         
-        .btn-lock { 
-            background: #f1f5f9; border: 1px solid #cbd5e1; color: #334155;
-            padding: 6px 12px; border-radius: 8px; cursor: pointer; 
-            font-size: 12px; font-weight: 800; transition: 0.3s;
-        }
+        .btn-lock { background: #f1f5f9; border: 1px solid #cbd5e1; color: #334155; padding: 6px 12px; border-radius: 8px; font-weight: 800; cursor: pointer;}
         body.admin-mode-active .btn-lock { background: #f0fdf4; border-color: #22c55e; color: #16a34a; }
         
-        .form-input { width: 100%; padding: 10px; margin-bottom: 12px; border-radius: 8px; border: 1px solid #ccc; font-family: inherit; font-size: 12px;}
-        .form-label { font-size: 11px; font-weight: bold; color: #ea580c; display: block; text-align: left; margin-bottom: 4px; }
+        .form-input { width: 100%; padding: 10px; margin-bottom: 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 12px; }
+        .form-label { font-size: 11px; font-weight: bold; color: gray; display: block; margin-bottom: 4px; }
         
         .detail-gallery { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; scroll-snap-type: x mandatory; }
         .detail-gallery::-webkit-scrollbar { height: 6px; }
         .detail-gallery::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
-        .gallery-img { height: 160px; min-width: 160px; object-fit: cover; border-radius: 10px; scroll-snap-align: center; border: 1px solid #e2e8f0; }
+        .gallery-img { height: 160px; min-width: 160px; object-fit: cover; border-radius: 10px; scroll-snap-align: center; border: 1px solid #e2e8f0; cursor: zoom-in; }
         .gallery-box { position: relative; scroll-snap-align: center; }
-        .gallery-box img { border: 2px solid #ea580c; }
         .badge-wadah { position: absolute; bottom: 8px; left: 8px; background: rgba(234, 88, 12, 0.9); color: white; font-size: 10px; padding: 3px 6px; border-radius: 4px; font-weight: 900; }
+        
+        /* Modal Zoom Full Screen */
+        .zoom-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 999999; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: 0.3s; }
+        .zoom-overlay.active { opacity: 1; pointer-events: auto; }
+        .zoom-overlay img { max-width: 95vw; max-height: 90vh; object-fit: contain; border-radius: 8px; }
+        .btn-back-zoom { position: absolute; top: 20px; left: 20px; background: rgba(255,255,255,0.2); color: white; border: none; padding: 8px 15px; border-radius: 20px; font-weight: bold; font-size: 14px; backdrop-filter: blur(5px); cursor: pointer; }
     </style>
 </head>
 <body id="inventoryBody">
 
     {% include navbar.html %}
-
     <main style="padding: 0 15px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin:15px 0;">
             <div>
@@ -49,28 +48,13 @@ location: "MASTER"
         <div class="toolbar-card" style="margin-bottom:15px;">
             <div style="display:flex; gap:8px;">
                 <input type="text" id="searchInput" class="search-input-modern" placeholder="Cari alat, merk, atau kode..." oninput="applyFilters()" style="flex:1; padding:10px; border-radius:8px; border:1px solid #ccc;">
-                
-                <!-- Tombol Tambah (Hanya Admin) -->
                 <button onclick="openAddModal()" class="admin-only" style="padding:10px 15px; border-radius:8px; background:#16a34a; color:white; border:none; font-weight:bold;"><i class="fa-solid fa-plus"></i></button>
-                
-                <!-- Tombol Scanner (Terbuka untuk SEMUA ORANG untuk mencari barang) -->
                 <button onclick="openScannerModal()" style="padding:10px 15px; border-radius:8px; background:#1e293b; color:white; border:none;"><i class="fa-solid fa-qrcode"></i></button>
             </div>
-
             <div class="filter-pills-wrapper">
                 <button class="pill-btn active" onclick="setFilterPill('all', this)">Semua Alat</button>
                 <button class="pill-btn" onclick="setFilterPill('Siap Dibawa', this)">🛒 Siap Dibawa</button>
                 <button class="pill-btn" onclick="setFilterPill('Sedang Dipakai', this)">🔌 Dipakai</button>
-                <button class="pill-btn" onclick="setFilterPill('Di Gudang', this)">🏢 Di Gudang</button>
-                <button class="pill-btn admin-only" onclick="setFilterPill('Akan Dibuang', this)">🗑️ Karantina</button>
-            </div>
-
-            <div class="admin-only-block" style="display:none; justify-content:space-between; align-items:center; margin-top:10px; padding-top:10px; border-top:1px dashed #ccc;">
-                <select id="teamSelect" onchange="applyFilters()" style="padding:6px; border-radius:6px; font-size:11px;"><option value="all">Semua Tim</option></select>
-                <div style="display:flex; gap:6px;">
-                    <button onclick="selectAllVisible()" style="background:#e2e8f0; font-size:11px; padding:6px 10px; border-radius:6px; border:none; font-weight:bold;">☑️ Pilih Semua</button>
-                    <button id="btnBulkMode" onclick="toggleBulkMode()" style="font-size:11px; padding:6px 10px; border-radius:6px; background:#ea580c; color:white; border:none; font-weight:bold;">🛒 Mode Loading</button>
-                </div>
             </div>
         </div>
 
@@ -78,62 +62,48 @@ location: "MASTER"
         <div id="dataContainer" class="grid-cards"></div>
     </main>
 
-    <!-- MODAL TAMBAH BARANG -->
+    <!-- MODAL TAMBAH BARANG (HANYA 3 FOTO ALAT) -->
     <div id="modalAdd" class="modal-overlay">
-        <div class="modal-content" style="max-width:400px; max-height:85vh; overflow-y:auto; background:white; padding:20px; border-radius:15px; position:relative;">
-            <button onclick="closeAddModal()" style="position:absolute; top:15px; right:15px; border:none; background:#f1f5f9; width:30px; height:30px; border-radius:50%; font-weight:bold; cursor:pointer;">✕</button>
+        <div class="modal-content" style="max-width:400px; max-height:85vh; overflow-y:auto; background:white; padding:20px; border-radius:15px;">
             <h3 style="margin-top:0; color:#16a34a; margin-bottom:20px;">+ Tambah Alat Baru</h3>
             
             <form id="formAdd" onsubmit="submitNewItem(event)">
-                
                 <div style="background:#f8fafc; padding:10px; border-radius:8px; border:1px solid #e2e8f0; margin-bottom:15px;">
-                    <label class="form-label">📸 Foto Barang (Max 3)</label>
-                    <!-- Hapus capture="environment" supaya bisa pilih Kamera atau Galeri -->
+                    <label class="form-label" style="color:#1e293b;">📸 Foto Alat (Pilih Kamera/Galeri) - Maks 3</label>
                     <input type="file" id="addFoto1" class="form-input" accept="image/*" style="margin-bottom:5px;">
                     <input type="file" id="addFoto2" class="form-input" accept="image/*" style="margin-bottom:5px;">
                     <input type="file" id="addFoto3" class="form-input" accept="image/*">
-                </div>
-
-                <div style="background:#fff7ed; padding:10px; border-radius:8px; border:1px solid #fed7aa; margin-bottom:15px;">
-                    <label class="form-label" style="color:#ea580c;">📦 Foto Wadah / Hardcase (Max 2)</label>
-                    <input type="file" id="addFoto4" class="form-input" accept="image/*" style="margin-bottom:5px;">
-                    <input type="file" id="addFoto5" class="form-input" accept="image/*">
+                    <p style="font-size:10px; color:gray; margin:0;">*Foto Wadah akan otomatis ditarik dari Database berdasarkan Kode Wadah.</p>
                 </div>
                 
-                <label class="form-label" style="color:gray;">Nama Alat Utama *</label>
+                <label class="form-label">Nama Alat Utama *</label>
                 <input type="text" id="addNama" class="form-input" required placeholder="Contoh: Kabel XLR 10m">
                 
                 <div style="display:flex; gap:10px;">
-                    <div style="flex:1;">
-                        <label class="form-label" style="color:gray;">Kode (QR) *</label>
-                        <input type="text" id="addKode" class="form-input" required placeholder="XLR-01">
-                    </div>
-                    <div style="flex:1;">
-                        <label class="form-label" style="color:gray;">Wadah / Box</label>
-                        <input type="text" id="addWadah" class="form-input" placeholder="BOX-A">
-                    </div>
+                    <div style="flex:1;"><label class="form-label">Kode (QR) *</label><input type="text" id="addKode" class="form-input" required placeholder="XLR-01"></div>
+                    <div style="flex:1;"><label class="form-label">Kode Wadah</label><input type="text" id="addWadah" class="form-input" placeholder="BOX-A"></div>
                 </div>
 
                 <div style="display:flex; gap:10px;">
-                    <div style="flex:1;">
-                        <label class="form-label" style="color:gray;">Total (Qty)</label>
-                        <input type="number" id="addJumlah" class="form-input" value="1" required>
-                    </div>
-                    <div style="flex:1;">
-                        <label class="form-label" style="color:gray;">Kondisi</label>
-                        <select id="addKondisi" class="form-input">
-                            <option value="Bagus">Bagus</option>
-                            <option value="Rusak Ringan">Rusak Ringan</option>
-                        </select>
+                    <div style="flex:1;"><label class="form-label">Total (Qty)</label><input type="number" id="addJumlah" class="form-input" value="1" required></div>
+                    <div style="flex:1;"><label class="form-label">Kondisi</label>
+                        <select id="addKondisi" class="form-input"><option value="Bagus">Bagus</option><option value="Rusak Ringan">Rusak Ringan</option></select>
                     </div>
                 </div>
                 
-                <label class="form-label" style="color:gray;">Keterangan / Referensi Tambahan</label>
+                <label class="form-label">Keterangan / Ref</label>
                 <input type="text" id="addKet" class="form-input" placeholder="Tulis catatan jika ada...">
 
-                <button type="submit" id="btnSubmitAdd" style="width:100%; padding:14px; background:#16a34a; color:white; border:none; border-radius:8px; font-weight:900; margin-top:10px; font-size:14px;">💾 SIMPAN ALAT KE DATABASE</button>
+                <button type="submit" id="btnSubmitAdd" style="width:100%; padding:14px; background:#16a34a; color:white; border:none; border-radius:8px; font-weight:900; margin-top:10px;">💾 SIMPAN ALAT</button>
+                <button type="button" onclick="closeAddModal()" style="width:100%; padding:12px; background:#f1f5f9; color:#334155; border:none; border-radius:8px; font-weight:bold; margin-top:8px;">⬅ BATAL KEMBALI</button>
             </form>
         </div>
+    </div>
+
+    <!-- MODAL ZOOM GAMBAR -->
+    <div id="zoomModal" class="zoom-overlay" onclick="closeZoomModal()">
+        <button class="btn-back-zoom" onclick="closeZoomModal()">⬅ Kembali</button>
+        <img id="zoomImgSrc" src="">
     </div>
 
     <div id="toastMsg" class="toast-msg">Notifikasi</div>

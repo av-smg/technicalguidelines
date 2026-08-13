@@ -1,5 +1,5 @@
 // ==========================================
-// MESIN LOGIKA GUDANG & LOGISTIK (V.4 - THE ULTIMATE)
+// MESIN LOGIKA GUDANG & LOGISTIK (V.4.1 - UPDATE SCANNER PUBLIK)
 // ==========================================
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyg6ntp8BPWPP8qm9IfpN62Rwd272tAEiTM0Qgl1GQQkUqJGcViG-FnewlFqFTjZ4w-Zg/exec"; 
 
@@ -153,7 +153,7 @@ function render(data) {
     });
 }
 
-// --- POP-UP DETAIL (DENGAN 5 FOTO & INFO LENGKAP) ---
+// --- POP-UP DETAIL ---
 function openDetailModal(item) {
     const oldModal = document.getElementById("detailModal");
     if(oldModal) oldModal.remove();
@@ -161,36 +161,13 @@ function openDetailModal(item) {
     let finalStatus = item.status_digunakan || "Di Gudang";
     if(finalStatus === 'FALSE' || finalStatus === 'undefined') finalStatus = "Di Gudang";
 
-    // Merakit Galeri Foto
     let galleryHtml = `<div class="detail-gallery">`;
     let adaFoto = false;
-    
-    // Foto Barang (Index 0, 1, 2)
-    for(let i=0; i<3; i++) {
-        if(item.fotos && item.fotos[i]) {
-            galleryHtml += `<img src="${item.fotos[i]}" class="gallery-img">`;
-            adaFoto = true;
-        }
-    }
-    // Foto Wadah (Index 3, 4)
-    for(let i=3; i<5; i++) {
-        if(item.fotos && item.fotos[i]) {
-            galleryHtml += `
-            <div class="gallery-box">
-                <img src="${item.fotos[i]}" class="gallery-img">
-                <span class="badge-wadah">📦 WADAH</span>
-            </div>`;
-            adaFoto = true;
-        }
-    }
-    
-    // Jika tidak ada foto sama sekali
-    if(!adaFoto) {
-        galleryHtml += `<img src="https://placehold.co/300x200/EEEEEE/999999?text=Tidak+Ada+Foto" class="gallery-img" style="width:100%;">`;
-    }
+    for(let i=0; i<3; i++) { if(item.fotos && item.fotos[i]) { galleryHtml += `<img src="${item.fotos[i]}" class="gallery-img">`; adaFoto = true; } }
+    for(let i=3; i<5; i++) { if(item.fotos && item.fotos[i]) { galleryHtml += `<div class="gallery-box"><img src="${item.fotos[i]}" class="gallery-img"><span class="badge-wadah">📦 WADAH</span></div>`; adaFoto = true; } }
+    if(!adaFoto) { galleryHtml += `<img src="https://placehold.co/300x200/EEEEEE/999999?text=Tidak+Ada+Foto" class="gallery-img" style="width:100%;">`; }
     galleryHtml += `</div>`;
 
-    // Tombol Admin
     let actionButtons = isAdminMode ? `
         <div style="margin-top:15px; text-align:left; border-top:1px dashed #ccc; padding-top:15px;">
             <label style="font-size:11px; font-weight:bold; color:gray;">Ubah Status Cepat:</label>
@@ -205,7 +182,7 @@ function openDetailModal(item) {
             <button onclick="saveEdit(${item.row_index})" style="width:100%; padding:10px; background:#ea580c; color:white; border:none; border-radius:8px; font-weight:bold;">SIMPAN PERUBAHAN</button>
             <button onclick="deleteItem(${item.row_index})" style="width:100%; padding:10px; background:#fef2f2; color:#dc2626; border:1px solid #f87171; border-radius:8px; font-weight:bold; margin-top:8px;">🗑️ BUANG KE KARANTINA</button>
         </div>` 
-        : `<div style="margin-top:15px; padding:10px; background:#f1f5f9; border-radius:8px; font-size:12px; color:#64748b; text-align:center;">🔒 Login Akses untuk mengubah data.</div>`;
+        : `<div style="margin-top:15px; padding:10px; background:#f1f5f9; border-radius:8px; font-size:12px; color:#64748b; text-align:center;">🔒 Login Akses untuk mengubah status alat ini.</div>`;
 
     const modalHtml = `
     <div id="detailModal" class="modal-overlay active">
@@ -222,7 +199,7 @@ function openDetailModal(item) {
                 <div><span style="color:gray;">Kondisi:</span> <br><b>${item.kondisi || '-'}</b></div>
                 <div><span style="color:gray;">Pemilik:</span> <br><b>${item.barang_milik || '-'}</b></div>
                 <div><span style="color:gray;">Tim:</span> <br><b>${item.tim || '-'}</b></div>
-                <div style="grid-column: span 2;"><span style="color:gray;">Lokasi Penyimpanan:</span> <br><b>${item.lokasi || '-'}</b></div>
+                <div style="grid-column: span 2;"><span style="color:gray;">Lokasi Rak:</span> <br><b>${item.lokasi || '-'}</b></div>
             </div>
 
             <div style="text-align:left; margin-top:10px; font-size:11px; color:#475569; background:#fff7ed; padding:8px; border-radius:6px; border:1px solid #fed7aa;">
@@ -254,21 +231,14 @@ async function deleteItem(rowIndex) {
     } catch(e) { alert("Error koneksi!"); }
 }
 
-// --- TAMBAH BARANG BARU (5 SLOT FOTO) ---
-function openAddModal() {
-    if(!isAdminMode) return;
-    document.getElementById("formAdd").reset();
-    document.getElementById("modalAdd").classList.add("active");
-}
-
+// --- TAMBAH BARANG BARU ---
+function openAddModal() { if(!isAdminMode) return; document.getElementById("formAdd").reset(); document.getElementById("modalAdd").classList.add("active"); }
 function closeAddModal() { document.getElementById("modalAdd").classList.remove("active"); }
 
 function getBase64(file) {
     return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
+        const reader = new FileReader(); reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result); reader.onerror = error => reject(error);
     });
 }
 
@@ -279,37 +249,29 @@ async function submitNewItem(e) {
 
     try {
         let base64Fotos = ["", "", "", "", ""];
-        
-        // Looping untuk mengambil 5 foto
         for (let i = 1; i <= 5; i++) {
             const fileInput = document.getElementById("addFoto" + i);
-            if (fileInput && fileInput.files.length > 0) {
-                base64Fotos[i-1] = await getBase64(fileInput.files[0]);
-            }
+            if (fileInput && fileInput.files.length > 0) { base64Fotos[i-1] = await getBase64(fileInput.files[0]); }
         }
 
         const payload = {
             action: "add_item", pin: userPin,
-            nama: document.getElementById("addNama").value,
-            kode_barang: document.getElementById("addKode").value,
-            kode_wadah: document.getElementById("addWadah").value,
-            jumlah: document.getElementById("addJumlah").value,
-            kondisi: document.getElementById("addKondisi").value,
-            keterangan_ref: document.getElementById("addKet").value, // Kirim Keterangan
-            fotos: base64Fotos // Array 5 foto (Index 0-2 = Alat, 3-4 = Wadah)
+            nama: document.getElementById("addNama").value, kode_barang: document.getElementById("addKode").value,
+            kode_wadah: document.getElementById("addWadah").value, jumlah: document.getElementById("addJumlah").value,
+            kondisi: document.getElementById("addKondisi").value, keterangan_ref: document.getElementById("addKet").value,
+            fotos: base64Fotos
         };
 
         const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
         const data = await response.json();
         
-        if (data.status === "success") {
-            showToast("✅ Barang Baru Tersimpan!"); closeAddModal(); loadData();
-        } else { alert("Gagal: " + data.message); }
+        if (data.status === "success") { showToast("✅ Barang Baru Tersimpan!"); closeAddModal(); loadData(); } 
+        else { alert("Gagal: " + data.message); }
     } catch (err) { alert("Error Koneksi Upload!"); } 
     finally { btn.innerText = "💾 SIMPAN ALAT KE DATABASE"; btn.disabled = false; }
 }
 
-// --- KERANJANG (BULK) & SCANNER ---
+// --- KERANJANG (BULK) ---
 function toggleBulkMode() {
     isBulkMode = !isBulkMode;
     let bar = document.getElementById("bulkBar");
@@ -344,10 +306,12 @@ async function processBulkUpdate(btn) {
     } catch (e) { alert("Error koneksi!"); }
 }
 
+// --- SCANNER KASIR (DIPERBAIKI UNTUK SEMUA PENGGUNA) ---
 function openScannerModal() {
-    if(!isAdminMode) return;
+    // 🚨 HAPUS if(!isAdminMode) return; AGAR SEMUA BISA SCAN 🚨
+    
     let modal = document.createElement("div"); modal.id = "tempScannerModal"; modal.className = "modal-overlay active";
-    modal.innerHTML = `<div class="modal-content" style="max-width:400px; background:white; padding:15px; border-radius:15px; text-align:center; position:relative;"><button onclick="closeScannerModal()" style="position:absolute; top:10px; right:10px; border:none; background:#fef2f2; color:#dc2626; width:35px; height:35px; border-radius:50%; font-weight:bold; cursor:pointer; z-index:9999;">✕</button><h3 style="margin:0 0 10px 0; font-size:16px;">Scan Barcode</h3><div id="qr-reader" style="width:100%; border-radius:10px; overflow:hidden;"></div></div>`;
+    modal.innerHTML = `<div class="modal-content" style="max-width:400px; background:white; padding:15px; border-radius:15px; text-align:center; position:relative;"><button onclick="closeScannerModal()" style="position:absolute; top:10px; right:10px; border:none; background:#fef2f2; color:#dc2626; width:35px; height:35px; border-radius:50%; font-weight:bold; cursor:pointer; z-index:9999;">✕</button><h3 style="margin:0 0 10px 0; font-size:16px;">Scan Barcode / QR</h3><div id="qr-reader" style="width:100%; border-radius:10px; overflow:hidden;"></div><p style="font-size:11px; color:gray; margin-top:10px;">Otomatis menampilkan detail barang.</p></div>`;
     document.body.appendChild(modal);
 
     html5QrcodeScanner = new Html5QrcodeScanner("qr-reader", { fps: 10, qrbox: {width: 250, height: 250}, aspectRatio: 1.0, facingMode: "environment" }, false);
@@ -356,12 +320,17 @@ function openScannerModal() {
         const foundItem = allItems.find(i => i.kode_barang === decodedText || i.kode_wadah === decodedText);
 
         if (isBulkMode && foundItem) {
+            // Mode Keranjang Aktif (Hanya bisa kalau Admin)
             if (!selectedRows.has(foundItem.row_index)) {
                 selectedRows.add(foundItem.row_index); document.getElementById("bulkCount").innerText = `${selectedRows.size} Terpilih`;
                 applyFilters(); showToast(`✅ ${foundItem.nama_barang} ditambahkan!`); try { navigator.vibrate(100); } catch(e){}
             }
         } else if (foundItem) {
-            closeScannerModal(); document.getElementById('searchInput').value = decodedText; applyFilters(); openDetailModal(foundItem); 
+            // Mode Cari Biasa (Semua Pengguna)
+            closeScannerModal(); 
+            document.getElementById('searchInput').value = decodedText; 
+            applyFilters(); 
+            openDetailModal(foundItem); // Langsung buka detail!
         } else { showToast(`❌ Kode tidak dikenali!`, false); }
     });
 }

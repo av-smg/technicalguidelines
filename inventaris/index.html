@@ -41,6 +41,9 @@ location: "MASTER"
         .list-img { width: 70px; height: 70px; object-fit: cover; border-radius: 8px; border: 1px solid #f1f5f9; flex-shrink: 0; }
         .list-info { flex: 1; overflow: hidden; }
         .list-title { font-weight: 800; font-size: 13px; margin: 0 0 4px 0; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        /* FIX: PAKSA NOTIFIKASI TAMPIL DI DEPAN SCANNER */
+        .toast-msg { z-index: 9999999 !important; }
     </style>
 </head>
 <body id="inventoryBody">
@@ -165,7 +168,7 @@ location: "MASTER"
     </div>
 
     <div id="toastMsg" class="toast-msg">Notifikasi</div>
-    <!-- VERSI UPDATE 13.0 AGAR TIDAK PERLU HAPUS CACHE -->
-    <script src="{{ site.baseurl }}/assets/js/script-gudang.js?v=14.0"></script>
+    <!-- UPDATE CACHE V.17.0 -->
+    <script src="{{ site.baseurl }}/assets/js/script-gudang.js?v=17.0"></script>
 </body>
 </html>

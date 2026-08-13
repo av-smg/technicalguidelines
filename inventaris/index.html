@@ -19,7 +19,6 @@ location: "MASTER"
         .form-input { width: 100%; padding: 10px; margin-bottom: 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 12px; }
         .form-label { font-size: 11px; font-weight: bold; color: gray; display: block; margin-bottom: 4px; }
         
-        /* STYLE GALERI DETAIL & EDIT */
         .detail-gallery { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; scroll-snap-type: x mandatory; }
         .detail-gallery::-webkit-scrollbar { height: 6px; }
         .detail-gallery::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
@@ -31,13 +30,11 @@ location: "MASTER"
         .edit-foto-preview { width: 100%; height: 100px; object-fit: cover; border-radius: 6px; display: none; }
         .btn-remove-foto { position: absolute; top: 5px; right: 5px; background: #ef4444; color: white; border: none; width: 25px; height: 25px; border-radius: 50%; cursor: pointer; display: none; font-weight: bold;}
 
-        /* MODAL ZOOM FULL SCREEN */
         .zoom-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 999999; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: 0.3s; }
         .zoom-overlay.active { opacity: 1; pointer-events: auto; }
         .zoom-overlay img { max-width: 95vw; max-height: 90vh; object-fit: contain; border-radius: 8px; }
         .btn-back-zoom { position: absolute; top: 20px; left: 20px; background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.5); padding: 8px 15px; border-radius: 20px; font-weight: bold; font-size: 14px; backdrop-filter: blur(5px); cursor: pointer; }
 
-        /* STYLE LIST VIEW */
         .list-view-container { display: flex; flex-direction: column; gap: 10px; max-width: 1200px; margin: 0 auto; padding-bottom: 80px; }
         .list-item { display: flex; align-items: center; gap: 12px; background: white; padding: 10px; border-radius: 12px; border: 1px solid #e2e8f0; cursor: pointer; position: relative; }
         .list-item.selected { border-color: #3b82f6; background: #eff6ff; border-width: 2px; }
@@ -90,24 +87,21 @@ location: "MASTER"
         <div id="dataContainer" class="grid-cards"></div>
     </main>
 
-    <!-- MODAL TAMBAH BARANG (MULTI UPLOAD FOTO) -->
+    <!-- MODAL TAMBAH BARANG -->
     <div id="modalAdd" class="modal-overlay">
         <div class="modal-content" style="max-width:400px; max-height:85vh; overflow-y:auto; background:white; padding:20px; border-radius:15px;">
             <h3 style="margin-top:0; color:#16a34a; margin-bottom:20px;">➕ Tambah Alat Baru</h3>
             <form id="formAdd" onsubmit="submitNewItem(event)">
-                
-                <!-- UPLOAD FOTO MULTI-SELECT -->
                 <div style="background:#f8fafc; padding:10px; border-radius:8px; border:1px solid #e2e8f0; margin-bottom:15px;">
                     <label class="form-label" style="color:#1e293b;">📸 Pilih Foto Alat (Maks 3 Sekaligus)</label>
                     <input type="file" id="addFotosMultiple" class="form-input" accept="image/*" multiple style="margin-bottom:5px;">
-                    <p style="font-size:10px; color:gray; margin:0;">*Pilih beberapa foto sekaligus. Foto akan dikompres otomatis.</p>
                 </div>
                 
                 <label class="form-label">Nama Alat Utama *</label>
                 <input type="text" id="addNama" class="form-input" required>
                 
                 <div style="display:flex; gap:10px;">
-                    <div style="flex:1;"><label class="form-label">Kode (QR) *</label><input type="text" id="addKode" class="form-input" required></div>
+                    <div style="flex:1;"><label class="form-label">Kode Barang</label><input type="text" id="addKode" class="form-input"></div>
                     <div style="flex:1;"><label class="form-label">Kode Wadah</label><input type="text" id="addWadah" class="form-input"></div>
                 </div>
 
@@ -130,7 +124,7 @@ location: "MASTER"
         </div>
     </div>
 
-    <!-- MODAL EDIT FULL (FOTO SATUAN) -->
+    <!-- MODAL EDIT FULL -->
     <div id="modalEditFull" class="modal-overlay">
         <div class="modal-content" style="max-width:400px; max-height:85vh; overflow-y:auto; background:white; padding:20px; border-radius:15px;">
             <h3 style="margin-top:0; color:#ea580c; margin-bottom:20px;">✏️ Edit Data & Foto Alat</h3>
@@ -147,7 +141,7 @@ location: "MASTER"
                 <label class="form-label">Nama Alat Utama *</label>
                 <input type="text" id="editNama" class="form-input" required>
                 <div style="display:flex; gap:10px;">
-                    <div style="flex:1;"><label class="form-label">Kode (QR)</label><input type="text" id="editKode" class="form-input"></div>
+                    <div style="flex:1;"><label class="form-label">Kode Barang</label><input type="text" id="editKode" class="form-input"></div>
                     <div style="flex:1;"><label class="form-label">Kode Wadah</label><input type="text" id="editWadah" class="form-input"></div>
                 </div>
                 <div style="display:flex; gap:10px;">
@@ -171,8 +165,7 @@ location: "MASTER"
     </div>
 
     <div id="toastMsg" class="toast-msg">Notifikasi</div>
-    
-    <!-- PENDORONG CACHE AGAR TIDAK PERLU INCOGNITO: ?v=10.0 -->
-    <script src="{{ site.baseurl }}/assets/js/script-gudang.js?v=11.0"></script>
+    <!-- VERSI UPDATE 13.0 AGAR TIDAK PERLU HAPUS CACHE -->
+    <script src="{{ site.baseurl }}/assets/js/script-gudang.js?v=13.0"></script>
 </body>
 </html>

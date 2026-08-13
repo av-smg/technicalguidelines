@@ -1,0 +1,85 @@
+---
+location: "MASTER"
+---
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    {% include head.html %}
+    <!-- Mengambil alat Scanner QR -->
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <!-- Mengambil CSS Khusus Gudang -->
+    <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/custom-gudang.css">
+    
+    <style>
+        /* MENGUNCI TOMBOL RAHASIA (READ-ONLY MODE) */
+        .admin-only { display: none !important; }
+        
+        /* SAAT ADMIN AKTIF, TOMBOL MUNCUL */
+        body.admin-mode-active .admin-only { display: inline-flex !important; }
+        body.admin-mode-active .admin-only-block { display: flex !important; }
+        
+        .btn-lock { 
+            background: #f1f5f9; border: 1px solid #cbd5e1; color: #334155;
+            padding: 6px 12px; border-radius: 8px; cursor: pointer; 
+            font-size: 12px; font-weight: 800; transition: 0.3s;
+        }
+        body.admin-mode-active .btn-lock { background: #f0fdf4; border-color: #22c55e; color: #16a34a; }
+    </style>
+</head>
+<body id="inventoryBody">
+
+    {% include navbar.html %}
+
+    <main style="padding: 0 15px;">
+        <!-- BAGIAN HEADER & GEMBOK -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin:15px 0;">
+            <div>
+                <h2 style="font-weight:900; margin:0;">LOGISTIK UTAMA</h2>
+                <p style="font-size:11px; color:gray; margin:0;">Status: <span id="modeStatusText">🟢 Read-Only Mode</span></p>
+            </div>
+            <button id="btnUnlock" onclick="toggleAdminMode()" class="btn-lock">🔒 Buka Akses</button>
+        </div>
+
+        <!-- SEARCH & FILTER -->
+        <div class="toolbar-card" style="margin-bottom:15px;">
+            <div style="display:flex; gap:8px;">
+                <input type="text" id="searchInput" class="search-input-modern" placeholder="Cari alat, merk, atau kode..." oninput="applyFilters()" style="flex:1; padding:10px; border-radius:8px; border:1px solid #ccc;">
+                
+                <!-- TOMBOL SCANNER (Hanya muncul jika Admin) -->
+                <button onclick="openScannerModal()" class="admin-only" style="padding:10px 15px; border-radius:8px; background:#1e293b; color:white; border:none;"><i class="fa-solid fa-qrcode"></i></button>
+            </div>
+
+            <!-- FILTER PILLS SHOPEE STYLE -->
+            <div class="filter-pills-wrapper">
+                <button class="pill-btn active" onclick="setFilterPill('all', this)">Semua Alat</button>
+                <button class="pill-btn" onclick="setFilterPill('Siap Dibawa', this)">🛒 Siap Dibawa</button>
+                <button class="pill-btn" onclick="setFilterPill('Sedang Dipakai', this)">🔌 Dipakai</button>
+                <button class="pill-btn" onclick="setFilterPill('Di Gudang', this)">🏢 Di Gudang</button>
+                <button class="pill-btn admin-only" onclick="setFilterPill('Akan Dibuang', this)">🗑️ Karantina</button>
+            </div>
+
+            <!-- KONTROL KERANJANG BONGKAR-MUAT (Hanya muncul jika Admin) -->
+            <div class="admin-only-block" style="display:none; justify-content:space-between; align-items:center; margin-top:10px; padding-top:10px; border-top:1px dashed #ccc;">
+                <select id="teamSelect" onchange="applyFilters()" style="padding:6px; border-radius:6px; font-size:11px;"><option value="all">Semua Tim</option></select>
+                
+                <div style="display:flex; gap:6px;">
+                    <button onclick="selectAllVisible()" style="background:#e2e8f0; font-size:11px; padding:6px 10px; border-radius:6px; border:none; font-weight:bold;">☑️ Pilih Semua</button>
+                    <button id="btnBulkMode" onclick="toggleBulkMode()" style="font-size:11px; padding:6px 10px; border-radius:6px; background:#ea580c; color:white; border:none; font-weight:bold;">🛒 Mode Loading</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="loading" style="text-align: center; padding: 40px; color: gray; font-weight:bold;">Memuat Data Database...</div>
+        
+        <!-- CONTAINER KARTU BARANG -->
+        <div id="dataContainer" class="grid-cards"></div>
+    </main>
+
+    <!-- (Modals akan di-handle dari JavaScript agar HTML ini tetap bersih) -->
+    <div id="toastMsg" class="toast-msg">Notifikasi</div>
+
+    <!-- MENGAMBIL MESIN LOGIKA (Akan kita buat nanti) -->
+    <script src="{{ site.baseurl }}/assets/js/script-gudang.js"></script>
+</body>
+</html>

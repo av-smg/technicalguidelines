@@ -2,7 +2,7 @@
 // MESIN LOGIKA GUDANG (V.13.0 - STRICT PIN & SCANNER KEYBOARD)
 // ==========================================
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyg6ntp8BPWPP8qm9IfpN62Rwd272tAEiTM0Qgl1GQQkUqJGcViG-FnewlFqFTjZ4w-Zg/exec"; 
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzmIKgVmlGfBQdKjQhXHakzhCul8TYWGTV8LY9xde6LP5p92k0iPfoEOF87juhbrVxz3w/exec"; 
 
 // DAFTAR PIN FRONTEND (Disesuaikan dengan Backend)
 const VALID_PINS = ["a1b2c3", "v9t6c2", "123456"];

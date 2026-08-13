@@ -9,7 +9,6 @@ location: "MASTER"
     <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/custom-gudang.css">
     
     <style>
-        /* MENGATUR HAK AKSES */
         .admin-only { display: none !important; }
         body.admin-mode-active .admin-only { display: inline-flex !important; }
         body.admin-mode-active .admin-only-block { display: flex !important; }
@@ -28,7 +27,6 @@ location: "MASTER"
         .gallery-box { position: relative; scroll-snap-align: center; }
         .badge-wadah { position: absolute; bottom: 8px; left: 8px; background: rgba(234, 88, 12, 0.9); color: white; font-size: 10px; padding: 3px 6px; border-radius: 4px; font-weight: 900; }
         
-        /* FOTO DI FORM EDIT */
         .edit-foto-box { border: 1px dashed #ccc; padding: 10px; border-radius: 8px; text-align: center; margin-bottom: 8px; background: #f8fafc; position: relative; }
         .edit-foto-preview { width: 100%; height: 100px; object-fit: cover; border-radius: 6px; display: none; }
         .btn-remove-foto { position: absolute; top: 5px; right: 5px; background: #ef4444; color: white; border: none; width: 25px; height: 25px; border-radius: 50%; cursor: pointer; display: none; font-weight: bold;}
@@ -92,17 +90,17 @@ location: "MASTER"
         <div id="dataContainer" class="grid-cards"></div>
     </main>
 
-    <!-- MODAL TAMBAH BARANG -->
+    <!-- MODAL TAMBAH BARANG (MULTI UPLOAD FOTO) -->
     <div id="modalAdd" class="modal-overlay">
         <div class="modal-content" style="max-width:400px; max-height:85vh; overflow-y:auto; background:white; padding:20px; border-radius:15px;">
             <h3 style="margin-top:0; color:#16a34a; margin-bottom:20px;">➕ Tambah Alat Baru</h3>
             <form id="formAdd" onsubmit="submitNewItem(event)">
+                
+                <!-- UPLOAD FOTO MULTI-SELECT -->
                 <div style="background:#f8fafc; padding:10px; border-radius:8px; border:1px solid #e2e8f0; margin-bottom:15px;">
-                    <label class="form-label" style="color:#1e293b;">📸 Foto Alat (Otomatis Di-kompres)</label>
-                    <input type="file" id="addFoto1" class="form-input" accept="image/*" style="margin-bottom:5px;">
-                    <input type="file" id="addFoto2" class="form-input" accept="image/*" style="margin-bottom:5px;">
-                    <input type="file" id="addFoto3" class="form-input" accept="image/*">
-                    <p style="font-size:10px; color:gray; margin:0;">*Wadah ditarik otomatis dari kode</p>
+                    <label class="form-label" style="color:#1e293b;">📸 Pilih Foto Alat (Maks 3 Sekaligus)</label>
+                    <input type="file" id="addFotosMultiple" class="form-input" accept="image/*" multiple style="margin-bottom:5px;">
+                    <p style="font-size:10px; color:gray; margin:0;">*Pilih beberapa foto sekaligus. Foto akan dikompres otomatis.</p>
                 </div>
                 
                 <label class="form-label">Nama Alat Utama *</label>
@@ -132,61 +130,32 @@ location: "MASTER"
         </div>
     </div>
 
-    <!-- MODAL EDIT FULL (GANTI FOTO & DATA) -->
+    <!-- MODAL EDIT FULL (FOTO SATUAN) -->
     <div id="modalEditFull" class="modal-overlay">
         <div class="modal-content" style="max-width:400px; max-height:85vh; overflow-y:auto; background:white; padding:20px; border-radius:15px;">
             <h3 style="margin-top:0; color:#ea580c; margin-bottom:20px;">✏️ Edit Data & Foto Alat</h3>
             <form id="formEditFull" onsubmit="submitEditFull(event)">
                 <input type="hidden" id="editRowIndex">
                 
-                <!-- 3 SLOT FOTO YANG BISA DIHAPUS/DIGANTI -->
                 <div style="background:#f8fafc; padding:10px; border-radius:8px; border:1px solid #e2e8f0; margin-bottom:15px;">
-                    <label class="form-label" style="color:#ea580c;">📸 Kelola Foto Alat</label>
-                    
-                    <div class="edit-foto-box" id="boxFoto0">
-                        <img id="previewFoto0" class="edit-foto-preview">
-                        <button type="button" class="btn-remove-foto" id="btnRemove0" onclick="removeFotoEdit(0)">✕</button>
-                        <input type="file" id="editFoto0" class="form-input" accept="image/*" style="margin:0; display:none;" onchange="previewNewFoto(0)">
-                        <button type="button" id="btnUpload0" onclick="document.getElementById('editFoto0').click()" style="padding:8px; background:#e2e8f0; border:none; border-radius:6px; font-size:11px; font-weight:bold; width:100%;">+ Upload Foto 1</button>
-                        <input type="hidden" id="existingId0">
-                    </div>
-
-                    <div class="edit-foto-box" id="boxFoto1">
-                        <img id="previewFoto1" class="edit-foto-preview">
-                        <button type="button" class="btn-remove-foto" id="btnRemove1" onclick="removeFotoEdit(1)">✕</button>
-                        <input type="file" id="editFoto1" class="form-input" accept="image/*" style="margin:0; display:none;" onchange="previewNewFoto(1)">
-                        <button type="button" id="btnUpload1" onclick="document.getElementById('editFoto1').click()" style="padding:8px; background:#e2e8f0; border:none; border-radius:6px; font-size:11px; font-weight:bold; width:100%;">+ Upload Foto 2</button>
-                        <input type="hidden" id="existingId1">
-                    </div>
-
-                    <div class="edit-foto-box" id="boxFoto2">
-                        <img id="previewFoto2" class="edit-foto-preview">
-                        <button type="button" class="btn-remove-foto" id="btnRemove2" onclick="removeFotoEdit(2)">✕</button>
-                        <input type="file" id="editFoto2" class="form-input" accept="image/*" style="margin:0; display:none;" onchange="previewNewFoto(2)">
-                        <button type="button" id="btnUpload2" onclick="document.getElementById('editFoto2').click()" style="padding:8px; background:#e2e8f0; border:none; border-radius:6px; font-size:11px; font-weight:bold; width:100%;">+ Upload Foto 3</button>
-                        <input type="hidden" id="existingId2">
-                    </div>
+                    <label class="form-label" style="color:#ea580c;">📸 Kelola Foto (Ganti/Hapus)</label>
+                    <div class="edit-foto-box" id="boxFoto0"><img id="previewFoto0" class="edit-foto-preview"><button type="button" class="btn-remove-foto" id="btnRemove0" onclick="removeFotoEdit(0)">✕</button><input type="file" id="editFoto0" class="form-input" accept="image/*" style="margin:0; display:none;" onchange="previewNewFoto(0)"><button type="button" id="btnUpload0" onclick="document.getElementById('editFoto0').click()" style="padding:8px; background:#e2e8f0; border:none; border-radius:6px; font-size:11px; font-weight:bold; width:100%;">+ Upload Foto 1</button><input type="hidden" id="existingId0"></div>
+                    <div class="edit-foto-box" id="boxFoto1"><img id="previewFoto1" class="edit-foto-preview"><button type="button" class="btn-remove-foto" id="btnRemove1" onclick="removeFotoEdit(1)">✕</button><input type="file" id="editFoto1" class="form-input" accept="image/*" style="margin:0; display:none;" onchange="previewNewFoto(1)"><button type="button" id="btnUpload1" onclick="document.getElementById('editFoto1').click()" style="padding:8px; background:#e2e8f0; border:none; border-radius:6px; font-size:11px; font-weight:bold; width:100%;">+ Upload Foto 2</button><input type="hidden" id="existingId1"></div>
+                    <div class="edit-foto-box" id="boxFoto2"><img id="previewFoto2" class="edit-foto-preview"><button type="button" class="btn-remove-foto" id="btnRemove2" onclick="removeFotoEdit(2)">✕</button><input type="file" id="editFoto2" class="form-input" accept="image/*" style="margin:0; display:none;" onchange="previewNewFoto(2)"><button type="button" id="btnUpload2" onclick="document.getElementById('editFoto2').click()" style="padding:8px; background:#e2e8f0; border:none; border-radius:6px; font-size:11px; font-weight:bold; width:100%;">+ Upload Foto 3</button><input type="hidden" id="existingId2"></div>
                 </div>
                 
                 <label class="form-label">Nama Alat Utama *</label>
                 <input type="text" id="editNama" class="form-input" required>
-                
                 <div style="display:flex; gap:10px;">
                     <div style="flex:1;"><label class="form-label">Kode (QR)</label><input type="text" id="editKode" class="form-input"></div>
                     <div style="flex:1;"><label class="form-label">Kode Wadah</label><input type="text" id="editWadah" class="form-input"></div>
                 </div>
-
                 <div style="display:flex; gap:10px;">
                     <div style="flex:1;"><label class="form-label">Total Qty</label><input type="number" id="editJumlah" class="form-input" required></div>
                     <div style="flex:1;"><label class="form-label">Kondisi</label>
-                        <select id="editKondisi" class="form-input">
-                            <option value="Bagus">Bagus</option>
-                            <option value="Periksa">Periksa</option>
-                            <option value="Rusak">Rusak</option>
-                        </select>
+                        <select id="editKondisi" class="form-input"><option value="Bagus">Bagus</option><option value="Periksa">Periksa</option><option value="Rusak">Rusak</option></select>
                     </div>
                 </div>
-                
                 <label class="form-label">Keterangan / Ref</label>
                 <input type="text" id="editKet" class="form-input">
 
@@ -202,6 +171,8 @@ location: "MASTER"
     </div>
 
     <div id="toastMsg" class="toast-msg">Notifikasi</div>
-    <script src="{{ site.baseurl }}/assets/js/script-gudang.js"></script>
+    
+    <!-- PENDORONG CACHE AGAR TIDAK PERLU INCOGNITO: ?v=10.0 -->
+    <script src="{{ site.baseurl }}/assets/js/script-gudang.js?v=10.0"></script>
 </body>
 </html>

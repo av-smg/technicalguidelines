@@ -21,11 +21,9 @@ location: "MASTER"
         }
         body.admin-mode-active .btn-lock { background: #f0fdf4; border-color: #22c55e; color: #16a34a; }
         
-        /* Style Form Tambah Barang */
         .form-input { width: 100%; padding: 10px; margin-bottom: 12px; border-radius: 8px; border: 1px solid #ccc; font-family: inherit; font-size: 12px;}
         .form-label { font-size: 11px; font-weight: bold; color: #ea580c; display: block; text-align: left; margin-bottom: 4px; }
         
-        /* Style Foto Galeri di Detail */
         .detail-gallery { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; scroll-snap-type: x mandatory; }
         .detail-gallery::-webkit-scrollbar { height: 6px; }
         .detail-gallery::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
@@ -51,8 +49,12 @@ location: "MASTER"
         <div class="toolbar-card" style="margin-bottom:15px;">
             <div style="display:flex; gap:8px;">
                 <input type="text" id="searchInput" class="search-input-modern" placeholder="Cari alat, merk, atau kode..." oninput="applyFilters()" style="flex:1; padding:10px; border-radius:8px; border:1px solid #ccc;">
+                
+                <!-- Tombol Tambah (Hanya Admin) -->
                 <button onclick="openAddModal()" class="admin-only" style="padding:10px 15px; border-radius:8px; background:#16a34a; color:white; border:none; font-weight:bold;"><i class="fa-solid fa-plus"></i></button>
-                <button onclick="openScannerModal()" class="admin-only" style="padding:10px 15px; border-radius:8px; background:#1e293b; color:white; border:none;"><i class="fa-solid fa-qrcode"></i></button>
+                
+                <!-- Tombol Scanner (Terbuka untuk SEMUA ORANG untuk mencari barang) -->
+                <button onclick="openScannerModal()" style="padding:10px 15px; border-radius:8px; background:#1e293b; color:white; border:none;"><i class="fa-solid fa-qrcode"></i></button>
             </div>
 
             <div class="filter-pills-wrapper">
@@ -76,7 +78,7 @@ location: "MASTER"
         <div id="dataContainer" class="grid-cards"></div>
     </main>
 
-    <!-- MODAL TAMBAH BARANG (5 FOTO + INFO LENGKAP) -->
+    <!-- MODAL TAMBAH BARANG -->
     <div id="modalAdd" class="modal-overlay">
         <div class="modal-content" style="max-width:400px; max-height:85vh; overflow-y:auto; background:white; padding:20px; border-radius:15px; position:relative;">
             <button onclick="closeAddModal()" style="position:absolute; top:15px; right:15px; border:none; background:#f1f5f9; width:30px; height:30px; border-radius:50%; font-weight:bold; cursor:pointer;">✕</button>
@@ -86,15 +88,16 @@ location: "MASTER"
                 
                 <div style="background:#f8fafc; padding:10px; border-radius:8px; border:1px solid #e2e8f0; margin-bottom:15px;">
                     <label class="form-label">📸 Foto Barang (Max 3)</label>
-                    <input type="file" id="addFoto1" class="form-input" accept="image/*" capture="environment" style="margin-bottom:5px;">
-                    <input type="file" id="addFoto2" class="form-input" accept="image/*" capture="environment" style="margin-bottom:5px;">
-                    <input type="file" id="addFoto3" class="form-input" accept="image/*" capture="environment">
+                    <!-- Hapus capture="environment" supaya bisa pilih Kamera atau Galeri -->
+                    <input type="file" id="addFoto1" class="form-input" accept="image/*" style="margin-bottom:5px;">
+                    <input type="file" id="addFoto2" class="form-input" accept="image/*" style="margin-bottom:5px;">
+                    <input type="file" id="addFoto3" class="form-input" accept="image/*">
                 </div>
 
                 <div style="background:#fff7ed; padding:10px; border-radius:8px; border:1px solid #fed7aa; margin-bottom:15px;">
                     <label class="form-label" style="color:#ea580c;">📦 Foto Wadah / Hardcase (Max 2)</label>
-                    <input type="file" id="addFoto4" class="form-input" accept="image/*" capture="environment" style="margin-bottom:5px;">
-                    <input type="file" id="addFoto5" class="form-input" accept="image/*" capture="environment">
+                    <input type="file" id="addFoto4" class="form-input" accept="image/*" style="margin-bottom:5px;">
+                    <input type="file" id="addFoto5" class="form-input" accept="image/*">
                 </div>
                 
                 <label class="form-label" style="color:gray;">Nama Alat Utama *</label>

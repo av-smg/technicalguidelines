@@ -9,7 +9,7 @@ location: "MASTER"
     <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/custom-gudang.css">
     
     <style>
-        /* MENGATUR HAK AKSES TAMPILAN */
+        /* MENGATUR HAK AKSES */
         .admin-only { display: none !important; }
         body.admin-mode-active .admin-only { display: inline-flex !important; }
         body.admin-mode-active .admin-only-block { display: flex !important; }
@@ -47,7 +47,7 @@ location: "MASTER"
 
     {% include navbar.html %}
     <main style="padding: 0 15px;">
-        <!-- HEADER LOGISTIK -->
+        <!-- HEADER -->
         <div style="display:flex; justify-content:space-between; align-items:center; margin:15px 0;">
             <div>
                 <h2 style="font-weight:900; margin:0;">LOGISTIK UTAMA</h2>
@@ -56,25 +56,29 @@ location: "MASTER"
             <button id="btnUnlock" onclick="toggleAdminMode()" class="btn-lock">🔒 Buka Akses</button>
         </div>
 
-        <!-- TOOLBAR PENCARIAN & TOMBOL -->
+        <!-- TOOLBAR TATA LETAK BARU -->
         <div class="toolbar-card" style="margin-bottom:15px;">
-            <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                <input type="text" id="searchInput" class="search-input-modern" placeholder="Cari alat, merk, atau kode..." oninput="applyFilters()" style="flex:1; min-width: 200px; padding:10px; border-radius:8px; border:1px solid #ccc;">
-                
-                <!-- TOMBOL-TOMBOL UTAMA (Teks diperjelas) -->
-                <button onclick="openAddModal()" class="admin-only" style="padding:10px 15px; border-radius:8px; background:#16a34a; color:white; border:none; font-weight:bold; white-space:nowrap;">➕ Tambah</button>
-                <button onclick="openScannerModal()" style="padding:10px 15px; border-radius:8px; background:#1e293b; color:white; border:none; font-weight:bold; white-space:nowrap;">📷 Scan QR</button>
-                <button id="btnViewToggle" onclick="toggleViewMode()" style="padding:10px 15px; border-radius:8px; background:#f1f5f9; color:#334155; border:1px solid #ccc; font-weight:bold; white-space:nowrap;">📄 List View</button>
+            <!-- BARIS 1: Pencarian & Scan QR -->
+            <div style="display:flex; gap:8px; margin-bottom:10px;">
+                <input type="text" id="searchInput" class="search-input-modern" placeholder="Cari alat, merk, atau kode..." oninput="applyFilters()" style="flex:1; padding:10px; border-radius:8px; border:1px solid #ccc;">
+                <button onclick="openScannerModal()" style="padding:10px 15px; border-radius:8px; background:#1e293b; color:white; border:none; font-weight:bold; white-space:nowrap; display:flex; align-items:center; gap:5px;">📷 Scan QR</button>
             </div>
             
+            <!-- BARIS 2: Tambah Baru & List View -->
+            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
+                <button onclick="openAddModal()" class="admin-only" style="padding:10px 15px; border-radius:8px; background:#16a34a; color:white; border:none; font-weight:bold; align-items:center; gap:5px;">➕ Tambah Baru</button>
+                <button id="btnViewToggle" onclick="toggleViewMode()" style="padding:10px 15px; border-radius:8px; background:#f1f5f9; color:#334155; border:1px solid #ccc; font-weight:bold; display:flex; align-items:center; gap:5px;">📄 List View</button>
+            </div>
+            
+            <!-- FILTER PILLS -->
             <div class="filter-pills-wrapper" style="margin-top:12px;">
                 <button class="pill-btn active" onclick="setFilterPill('all', this)">Semua Alat</button>
-                <button class="pill-btn" onclick="setFilterPill('Siap Dibawa', this)">🛒 Siap Dibawa</button>
+                <button class="pill-btn" onclick="setFilterPill('Akan Dibawa', this)">🛒 Akan Dibawa</button>
                 <button class="pill-btn" onclick="setFilterPill('Sedang Dipakai', this)">🔌 Dipakai</button>
                 <button class="pill-btn" onclick="setFilterPill('Di Gudang', this)">🏢 Di Gudang</button>
             </div>
 
-            <!-- KONTROL KERANJANG (Tampil jika Admin) -->
+            <!-- KONTROL KERANJANG -->
             <div class="admin-only-block" style="display:none; justify-content:space-between; align-items:center; margin-top:10px; padding-top:10px; border-top:1px dashed #ccc;">
                 <select id="teamSelect" onchange="applyFilters()" style="padding:6px; border-radius:6px; font-size:11px;"><option value="all">Semua Tim</option></select>
                 <div style="display:flex; gap:6px;">
@@ -86,22 +90,22 @@ location: "MASTER"
 
         <div id="loading" style="text-align: center; padding: 40px; color: gray; font-weight:bold;">Memuat Data Database...</div>
         
-        <!-- TEMPAT KARTU BARANG MUNCUL -->
+        <!-- TEMPAT KARTU MUNCUL -->
         <div id="dataContainer" class="grid-cards"></div>
     </main>
 
-    <!-- MODAL TAMBAH BARANG (3 FOTO SAJA) -->
+    <!-- MODAL TAMBAH BARANG -->
     <div id="modalAdd" class="modal-overlay">
         <div class="modal-content" style="max-width:400px; max-height:85vh; overflow-y:auto; background:white; padding:20px; border-radius:15px;">
-            <h3 style="margin-top:0; color:#16a34a; margin-bottom:20px;">+ Tambah Alat Baru</h3>
+            <h3 style="margin-top:0; color:#16a34a; margin-bottom:20px;">➕ Tambah Alat Baru</h3>
             
             <form id="formAdd" onsubmit="submitNewItem(event)">
                 <div style="background:#f8fafc; padding:10px; border-radius:8px; border:1px solid #e2e8f0; margin-bottom:15px;">
-                    <label class="form-label" style="color:#1e293b;">📸 Foto Alat (Pilih Kamera/Galeri) - Maks 3</label>
+                    <label class="form-label" style="color:#1e293b;">📸 Foto Alat (Otomatis Di-kompres)</label>
                     <input type="file" id="addFoto1" class="form-input" accept="image/*" style="margin-bottom:5px;">
                     <input type="file" id="addFoto2" class="form-input" accept="image/*" style="margin-bottom:5px;">
                     <input type="file" id="addFoto3" class="form-input" accept="image/*">
-                    <p style="font-size:10px; color:gray; margin:0;">*Foto Wadah (4 & 5) otomatis ditarik dari Database Pusat.</p>
+                    <p style="font-size:10px; color:gray; margin:0;">*Foto Wadah akan otomatis ditarik dari Database Pusat.</p>
                 </div>
                 
                 <label class="form-label">Nama Alat Utama *</label>
@@ -116,7 +120,6 @@ location: "MASTER"
                     <div style="flex:1;"><label class="form-label">Total (Qty)</label><input type="number" id="addJumlah" class="form-input" value="1" required></div>
                     <div style="flex:1;">
                         <label class="form-label">Kondisi</label>
-                        <!-- OPSI KONDISI BARU -->
                         <select id="addKondisi" class="form-input">
                             <option value="Bagus">Bagus</option>
                             <option value="Periksa">Periksa</option>

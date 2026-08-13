@@ -6,7 +6,98 @@
   <head>
     {% include head.html %}
     <link rel="stylesheet" href="style.css" />
+    
+    <style>
+      /* CSS Khusus untuk Banner Event Teratas */
+      .event-highlight-card {
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        border-radius: 20px;
+        padding: 30px;
+        margin: -10px auto 30px auto; /* Mengangkat posisinya ke arah hero */
+        max-width: 900px;
+        color: white;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        border: 1px solid #334155;
+        text-align: center;
+      }
+      .event-label {
+        background: rgba(255, 126, 39, 0.15);
+        color: #ff7e27;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        display: inline-block;
+        margin-bottom: 15px;
+        border: 1px solid rgba(255, 126, 39, 0.3);
+      }
+      .event-highlight-card h2 {
+        font-size: 26px;
+        font-weight: 900;
+        margin: 0 0 10px 0;
+        color: white;
+      }
+      .event-highlight-card p {
+        color: #94a3b8;
+        font-size: 14px;
+        margin-bottom: 25px;
+        font-weight: 600;
+      }
+      .event-buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .btn-event {
+        padding: 12px 24px;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 800;
+        text-decoration: none !important;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .btn-inv {
+        background: #ff7e27;
+        color: white;
+        border: 2px solid #ff7e27;
+        box-shadow: 0 4px 15px rgba(255, 126, 39, 0.2);
+      }
+      .btn-inv:hover {
+        background: #e66a1e;
+        border-color: #e66a1e;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(255, 126, 39, 0.3);
+        color: white;
+      }
+      .btn-mc {
+        background: transparent;
+        color: white;
+        border: 2px solid #475569;
+      }
+      .btn-mc:hover {
+        border-color: white;
+        background: rgba(255,255,255,0.05);
+        transform: translateY(-3px);
+        color: white;
+      }
+      
+      /* Penyesuaian jarak hero section */
+      .hero { padding-bottom: 20px; }
+      
+      /* Responsif untuk layar HP */
+      @media (max-width: 600px) {
+        .event-buttons { flex-direction: column; }
+        .btn-event { width: 100%; justify-content: center; }
+      }
+    </style>
   </head>
+  
   <body>
     {% include navbar.html %}
 
@@ -17,6 +108,30 @@
       </section>
 
       <div class="content-container">
+          
+        <!-- ========================================== -->
+        <!-- BANNER EVENT UTAMA (HIGHLIGHT)             -->
+        <!-- ========================================== -->
+        <div class="event-highlight-card">
+          <span class="event-label">🗓️ Event Terdekat</span>
+          <h2>Pertemuan Wilayah 2026</h2>
+          <p>📅 3 & 4 Oktober 2026 &nbsp;|&nbsp; 📍 Semarang</p>
+          
+          <div class="event-buttons">
+            <!-- Link menuju folder inventaris (Berdasarkan struktur repo kamu) -->
+            <a href="inventaris/index.html" class="btn-event btn-inv">
+              📦 Buka Logistik & Inventaris
+            </a>
+            <!-- Link menuju file misi.html (Berdasarkan struktur repo kamu) -->
+            <a href="misi.html" class="btn-event btn-mc">
+              📋 Buka Mission Card
+            </a>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- KARTU REGIONAL (TETAP SEPERTI ASLINYA)     -->
+        <!-- ========================================== -->
         <a href="jw-08/index.html" class="location-main-card-link">
           <div class="location-main-card jw-card">
             <div class="card-content">

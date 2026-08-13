@@ -22,8 +22,17 @@ location: "MASTER"
         body.admin-mode-active .btn-lock { background: #f0fdf4; border-color: #22c55e; color: #16a34a; }
         
         /* Style Form Tambah Barang */
-        .form-input { width: 100%; padding: 10px; margin-bottom: 12px; border-radius: 8px; border: 1px solid #ccc; font-family: inherit; }
-        .form-label { font-size: 11px; font-weight: bold; color: gray; display: block; text-align: left; margin-bottom: 4px; }
+        .form-input { width: 100%; padding: 10px; margin-bottom: 12px; border-radius: 8px; border: 1px solid #ccc; font-family: inherit; font-size: 12px;}
+        .form-label { font-size: 11px; font-weight: bold; color: #ea580c; display: block; text-align: left; margin-bottom: 4px; }
+        
+        /* Style Foto Galeri di Detail */
+        .detail-gallery { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; scroll-snap-type: x mandatory; }
+        .detail-gallery::-webkit-scrollbar { height: 6px; }
+        .detail-gallery::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+        .gallery-img { height: 160px; min-width: 160px; object-fit: cover; border-radius: 10px; scroll-snap-align: center; border: 1px solid #e2e8f0; }
+        .gallery-box { position: relative; scroll-snap-align: center; }
+        .gallery-box img { border: 2px solid #ea580c; }
+        .badge-wadah { position: absolute; bottom: 8px; left: 8px; background: rgba(234, 88, 12, 0.9); color: white; font-size: 10px; padding: 3px 6px; border-radius: 4px; font-weight: 900; }
     </style>
 </head>
 <body id="inventoryBody">
@@ -42,13 +51,10 @@ location: "MASTER"
         <div class="toolbar-card" style="margin-bottom:15px;">
             <div style="display:flex; gap:8px;">
                 <input type="text" id="searchInput" class="search-input-modern" placeholder="Cari alat, merk, atau kode..." oninput="applyFilters()" style="flex:1; padding:10px; border-radius:8px; border:1px solid #ccc;">
-                
-                <!-- TOMBOL TAMBAH & SCANNER (Hanya muncul jika Admin) -->
                 <button onclick="openAddModal()" class="admin-only" style="padding:10px 15px; border-radius:8px; background:#16a34a; color:white; border:none; font-weight:bold;"><i class="fa-solid fa-plus"></i></button>
                 <button onclick="openScannerModal()" class="admin-only" style="padding:10px 15px; border-radius:8px; background:#1e293b; color:white; border:none;"><i class="fa-solid fa-qrcode"></i></button>
             </div>
 
-            <!-- FILTER PILLS SHOPEE STYLE -->
             <div class="filter-pills-wrapper">
                 <button class="pill-btn active" onclick="setFilterPill('all', this)">Semua Alat</button>
                 <button class="pill-btn" onclick="setFilterPill('Siap Dibawa', this)">🛒 Siap Dibawa</button>
@@ -57,7 +63,6 @@ location: "MASTER"
                 <button class="pill-btn admin-only" onclick="setFilterPill('Akan Dibuang', this)">🗑️ Karantina</button>
             </div>
 
-            <!-- KONTROL KERANJANG -->
             <div class="admin-only-block" style="display:none; justify-content:space-between; align-items:center; margin-top:10px; padding-top:10px; border-top:1px dashed #ccc;">
                 <select id="teamSelect" onchange="applyFilters()" style="padding:6px; border-radius:6px; font-size:11px;"><option value="all">Semua Tim</option></select>
                 <div style="display:flex; gap:6px;">
@@ -71,46 +76,59 @@ location: "MASTER"
         <div id="dataContainer" class="grid-cards"></div>
     </main>
 
-    <!-- MODAL TAMBAH BARANG (UPLOAD FOTO) -->
+    <!-- MODAL TAMBAH BARANG (5 FOTO + INFO LENGKAP) -->
     <div id="modalAdd" class="modal-overlay">
         <div class="modal-content" style="max-width:400px; max-height:85vh; overflow-y:auto; background:white; padding:20px; border-radius:15px; position:relative;">
             <button onclick="closeAddModal()" style="position:absolute; top:15px; right:15px; border:none; background:#f1f5f9; width:30px; height:30px; border-radius:50%; font-weight:bold; cursor:pointer;">✕</button>
-            <h3 style="margin-top:0; color:#ea580c;">+ Tambah Alat Baru</h3>
+            <h3 style="margin-top:0; color:#16a34a; margin-bottom:20px;">+ Tambah Alat Baru</h3>
             
             <form id="formAdd" onsubmit="submitNewItem(event)">
-                <label class="form-label">📸 Foto Barang (Bisa langsung jepret)</label>
-                <!-- accept="image/*" dan capture="environment" untuk otomatis buka kamera belakang -->
-                <input type="file" id="addFoto1" class="form-input" accept="image/*" capture="environment" style="background:#f8fafc;">
                 
-                <label class="form-label">Nama Alat *</label>
+                <div style="background:#f8fafc; padding:10px; border-radius:8px; border:1px solid #e2e8f0; margin-bottom:15px;">
+                    <label class="form-label">📸 Foto Barang (Max 3)</label>
+                    <input type="file" id="addFoto1" class="form-input" accept="image/*" capture="environment" style="margin-bottom:5px;">
+                    <input type="file" id="addFoto2" class="form-input" accept="image/*" capture="environment" style="margin-bottom:5px;">
+                    <input type="file" id="addFoto3" class="form-input" accept="image/*" capture="environment">
+                </div>
+
+                <div style="background:#fff7ed; padding:10px; border-radius:8px; border:1px solid #fed7aa; margin-bottom:15px;">
+                    <label class="form-label" style="color:#ea580c;">📦 Foto Wadah / Hardcase (Max 2)</label>
+                    <input type="file" id="addFoto4" class="form-input" accept="image/*" capture="environment" style="margin-bottom:5px;">
+                    <input type="file" id="addFoto5" class="form-input" accept="image/*" capture="environment">
+                </div>
+                
+                <label class="form-label" style="color:gray;">Nama Alat Utama *</label>
                 <input type="text" id="addNama" class="form-input" required placeholder="Contoh: Kabel XLR 10m">
                 
                 <div style="display:flex; gap:10px;">
                     <div style="flex:1;">
-                        <label class="form-label">Kode Stiker (QR)</label>
-                        <input type="text" id="addKode" class="form-input" placeholder="XLR-01">
+                        <label class="form-label" style="color:gray;">Kode (QR) *</label>
+                        <input type="text" id="addKode" class="form-input" required placeholder="XLR-01">
                     </div>
                     <div style="flex:1;">
-                        <label class="form-label">Wadah / Box</label>
+                        <label class="form-label" style="color:gray;">Wadah / Box</label>
                         <input type="text" id="addWadah" class="form-input" placeholder="BOX-A">
                     </div>
                 </div>
 
                 <div style="display:flex; gap:10px;">
                     <div style="flex:1;">
-                        <label class="form-label">Total (Qty)</label>
+                        <label class="form-label" style="color:gray;">Total (Qty)</label>
                         <input type="number" id="addJumlah" class="form-input" value="1" required>
                     </div>
                     <div style="flex:1;">
-                        <label class="form-label">Kondisi</label>
+                        <label class="form-label" style="color:gray;">Kondisi</label>
                         <select id="addKondisi" class="form-input">
                             <option value="Bagus">Bagus</option>
                             <option value="Rusak Ringan">Rusak Ringan</option>
                         </select>
                     </div>
                 </div>
+                
+                <label class="form-label" style="color:gray;">Keterangan / Referensi Tambahan</label>
+                <input type="text" id="addKet" class="form-input" placeholder="Tulis catatan jika ada...">
 
-                <button type="submit" id="btnSubmitAdd" style="width:100%; padding:12px; background:#16a34a; color:white; border:none; border-radius:8px; font-weight:bold; margin-top:10px;">💾 SIMPAN ALAT</button>
+                <button type="submit" id="btnSubmitAdd" style="width:100%; padding:14px; background:#16a34a; color:white; border:none; border-radius:8px; font-weight:900; margin-top:10px; font-size:14px;">💾 SIMPAN ALAT KE DATABASE</button>
             </form>
         </div>
     </div>

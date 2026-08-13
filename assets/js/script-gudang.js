@@ -1,36 +1,32 @@
 // ==========================================
-// MESIN LOGIKA GUDANG (V.10.1 - AUTO REFRESH & ERROR CATCHER)
+// MESIN LOGIKA GUDANG (V.13.0 - STRICT PIN & SCANNER KEYBOARD)
 // ==========================================
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyg6ntp8BPWPP8qm9IfpN62Rwd272tAEiTM0Qgl1GQQkUqJGcViG-FnewlFqFTjZ4w-Zg/exec"; 
+
+// DAFTAR PIN FRONTEND (Disesuaikan dengan Backend)
+const VALID_PINS = ["a1b2c3", "v9t6c2", "123456"];
 
 let allItems = [];
 let optionsData = { lokasi: [], tim: [] };
 let userPin = localStorage.getItem("AV_INVENTORY_PIN") || ""; 
 let html5QrcodeScanner = null;
-let isAdminMode = false;
-let isBulkMode = false;
-let selectedRows = new Set();
-let lastScanTime = 0;
-let activeFilterPill = 'all';
-let currentViewMode = 'grid'; 
+let isAdminMode = false, isBulkMode = false, selectedRows = new Set(), lastScanTime = 0, activeFilterPill = 'all', currentViewMode = 'grid'; 
 
-window.onload = () => { 
-    checkAdminStatus(); 
-    loadData(); 
-};
+window.onload = () => { checkAdminStatus(); loadData(); };
 
 // ==========================================
-// 1. SISTEM LOGIN PIN & AUTO-RENDER
+// 1. SISTEM LOGIN PIN KETAT
 // ==========================================
 function checkAdminStatus() {
-    if (userPin) {
+    if (userPin && VALID_PINS.includes(userPin)) {
         isAdminMode = true; 
         document.body.classList.add("admin-mode-active");
         document.getElementById("modeStatusText").innerHTML = "🔴 Admin Mode";
         document.getElementById("btnUnlock").innerText = "🔓 Tutup Akses";
     } else {
         isAdminMode = false; 
+        userPin = ""; // Reset if invalid
         document.body.classList.remove("admin-mode-active");
         document.getElementById("modeStatusText").innerHTML = "🟢 Read-Only Mode";
         document.getElementById("btnUnlock").innerText = "🔒 Buka Akses";
@@ -41,19 +37,22 @@ function toggleAdminMode() {
     if (isAdminMode) {
         if(confirm("Tutup akses Admin? Memori PIN akan dihapus.")) { 
             localStorage.removeItem("AV_INVENTORY_PIN"); 
-            userPin = ""; 
-            checkAdminStatus(); 
-            showToast("Mode Read-Only aktif."); 
-            applyFilters(); // <--- FIX: Otomatis membuang tombol admin di kartu
+            userPin = ""; checkAdminStatus(); showToast("Mode Read-Only aktif."); applyFilters();
         }
     } else {
         let input = prompt("Masukkan PIN Kapten / Admin:");
         if (input) { 
-            userPin = input.trim().toLowerCase(); // <--- FIX: Simpan PIN saat itu juga
-            localStorage.setItem("AV_INVENTORY_PIN", userPin); 
-            checkAdminStatus(); 
-            showToast("Akses Admin Terbuka!"); 
-            applyFilters(); // <--- FIX: Otomatis memunculkan tombol admin di kartu!
+            let pinAttempt = input.trim().toLowerCase();
+            // VALIDASI PIN SUPER KETAT
+            if (VALID_PINS.includes(pinAttempt)) {
+                userPin = pinAttempt;
+                localStorage.setItem("AV_INVENTORY_PIN", userPin); 
+                checkAdminStatus(); 
+                showToast("Akses Admin Terbuka!"); 
+                applyFilters();
+            } else {
+                alert("⛔ AKSES DITOLAK! PIN yang Anda masukkan salah.");
+            }
         }
     }
 }
@@ -65,7 +64,7 @@ function showToast(msg, isSuccess = true) {
 }
 
 // ==========================================
-// 2. AMBIL DATA SERVER
+// AMBIL DATA & FILTER
 // ==========================================
 async function loadData() {
     try {
@@ -79,9 +78,7 @@ async function loadData() {
         optionsData = data.dropdowns || { lokasi: [], tim: [] };
         document.getElementById("loading").style.display = "none";
         applyFilters();
-    } catch (e) { 
-        document.getElementById("loading").innerHTML = `<span style="color:red;">Gagal memuat data. Periksa koneksi internet.</span>`; 
-    }
+    } catch (e) { document.getElementById("loading").innerHTML = `<span style="color:red;">Gagal memuat data. Periksa koneksi internet.</span>`; }
 }
 
 function toggleViewMode() {
@@ -115,7 +112,7 @@ function getFilteredData() {
 function applyFilters() { render(getFilteredData()); }
 
 // ==========================================
-// 3. MENGGAMBAR KARTU (UI BERSIH)
+// MENGGAMBAR KARTU BARANG
 // ==========================================
 function getStatusClass(status) {
     if(status === 'Akan Dibawa') return 'badge-status status-keranjang';
@@ -131,7 +128,6 @@ function render(data) {
     data.forEach(item => {
         const card = document.createElement("div");
         const isSelected = selectedRows.has(item.row_index);
-        
         let stat = item.status_digunakan || "Di Gudang"; if(stat === 'FALSE') stat = "Di Gudang";
         let lok = item.lokasi || "Gudang KC";
 
@@ -144,7 +140,6 @@ function render(data) {
         let safeFileIds = item.file_ids || item.fotos || [];
         let firstFileId = safeFileIds.find(id => id && id.length > 5);
         let imageSrc = 'https://placehold.co/300x300/EEEEEE/999999?text=NO+IMAGE';
-        
         if (firstFileId) { imageSrc = firstFileId.includes("http") ? firstFileId : `https://drive.google.com/thumbnail?id=${firstFileId}&sz=w400`; }
         
         const kodeBadge = item.kode_barang ? `<span style="color:#ea580c; font-weight:900;">#${item.kode_barang}</span>` : "";
@@ -154,14 +149,10 @@ function render(data) {
             card.className = "mission-card " + (isSelected ? "selected " : "") + (stat === 'Akan Dibawa' ? "card-siap-dibawa " : "");
             card.innerHTML = `
                 ${isSelected ? '<div class="card-check">✓</div>' : ''}
-                <div style="position:relative;">
-                    <img src="${imageSrc}" class="card-img" loading="lazy">
-                    <div style="position:absolute; bottom:12px; right:4px;"><span class="badge-qty">Qty: ${item.jumlah || 0}</span></div>
-                </div>
+                <div style="position:relative;"><img src="${imageSrc}" class="card-img" loading="lazy">
+                <div style="position:absolute; bottom:12px; right:4px;"><span class="badge-qty">Qty: ${item.jumlah || 0}</span></div></div>
                 <h4 class="card-title">${item.nama_barang}</h4>
-                ${timeBadge}
-                <div class="card-codes">${kodeBadge}</div>
-                <div>${badgeLokasiHtml}</div>
+                ${timeBadge} <div class="card-codes">${kodeBadge}</div> <div>${badgeLokasiHtml}</div>
             `;
         } else {
             card.className = "list-item " + (isSelected ? "selected " : "") + (stat === 'Akan Dibawa' ? "card-siap-dibawa " : "");
@@ -186,7 +177,7 @@ function openZoomModal(imgUrl) { document.getElementById("zoomImgSrc").src = img
 function closeZoomModal() { document.getElementById("zoomModal").classList.remove("active"); setTimeout(() => { document.getElementById("zoomImgSrc").src = ""; }, 300); }
 
 // ==========================================
-// 4. POP-UP DETAIL & STATUS
+// POP-UP DETAIL
 // ==========================================
 function openDetailModal(item) {
     const oldModal = document.getElementById("detailModal"); if(oldModal) oldModal.remove();
@@ -254,12 +245,12 @@ async function saveEditLokasiStatus(rowIndex) {
         const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "update_status_lokasi", pin: userPin, rows: [rowIndex], new_lokasi: nLok, new_status: nStat }) });
         const data = await response.json();
         if(data.status === "success") { showToast("Lokasi & Status diperbarui!"); document.getElementById('detailModal').remove(); loadData(); }
-        else { alert("Gagal dari Server:\n" + data.message); } // <--- FIX ERROR MUNCUL
+        else { alert("Gagal:\n" + data.message); if(data.message==="PIN_SALAH") toggleAdminMode(); }
     } catch(e) { alert("Error Koneksi Internet!"); }
 }
 
 // ==========================================
-// 5. FITUR FULL EDIT & TAMBAH ALAT (MULTI UPLOAD)
+// FULL EDIT & KELOLA FOTO
 // ==========================================
 function openEditFullModal(item) {
     document.getElementById('detailModal').remove(); 
@@ -287,29 +278,23 @@ function openEditFullModal(item) {
             preview.style.display = "block"; btnRemove.style.display = "block"; btnUpload.style.display = "none";
             existInput.value = fileId; 
         } else {
-            preview.style.display = "none"; btnRemove.style.display = "none"; btnUpload.style.display = "block";
-            existInput.value = "";
+            preview.style.display = "none"; btnRemove.style.display = "none"; btnUpload.style.display = "block"; existInput.value = "";
         }
     }
 }
 function closeEditFullModal() { document.getElementById('modalEditFull').classList.remove("active"); }
 
 function removeFotoEdit(index) {
-    document.getElementById("previewFoto" + index).style.display = "none";
-    document.getElementById("btnRemove" + index).style.display = "none";
-    document.getElementById("btnUpload" + index).style.display = "block";
-    document.getElementById("existingId" + index).value = ""; 
-    document.getElementById("editFoto" + index).value = ""; 
+    document.getElementById("previewFoto" + index).style.display = "none"; document.getElementById("btnRemove" + index).style.display = "none"; document.getElementById("btnUpload" + index).style.display = "block";
+    document.getElementById("existingId" + index).value = ""; document.getElementById("editFoto" + index).value = ""; 
 }
 function previewNewFoto(index) {
     let fileInput = document.getElementById("editFoto" + index);
     if(fileInput.files.length > 0) {
         let reader = new FileReader();
         reader.onload = function(e) {
-            document.getElementById("previewFoto" + index).src = e.target.result;
-            document.getElementById("previewFoto" + index).style.display = "block";
-            document.getElementById("btnRemove" + index).style.display = "block";
-            document.getElementById("btnUpload" + index).style.display = "none";
+            document.getElementById("previewFoto" + index).src = e.target.result; document.getElementById("previewFoto" + index).style.display = "block";
+            document.getElementById("btnRemove" + index).style.display = "block"; document.getElementById("btnUpload" + index).style.display = "none";
             document.getElementById("existingId" + index).value = "NEW_BASE64"; 
         }
         reader.readAsDataURL(fileInput.files[0]);
@@ -318,30 +303,30 @@ function previewNewFoto(index) {
 
 async function submitEditFull(e) {
     e.preventDefault();
-    const btn = document.getElementById("btnSubmitEditFull"); btn.innerText = "MENYIMPAN & UPLOAD..."; btn.disabled = true;
+    const btn = document.getElementById("btnSubmitEditFull"); btn.innerText = "MENYIMPAN..."; btn.disabled = true;
     try {
         let finalFotos = ["", "", ""];
         for(let i=0; i<3; i++) {
             let existVal = document.getElementById("existingId" + i).value;
             let fileInput = document.getElementById("editFoto" + i);
             if (existVal === "NEW_BASE64" && fileInput.files.length > 0) { finalFotos[i] = await compressImage(fileInput.files[0]); } 
-            else if (existVal && existVal.length > 5) { finalFotos[i] = existVal; } 
-            else { finalFotos[i] = ""; }
+            else if (existVal && existVal.length > 5) { finalFotos[i] = existVal; } else { finalFotos[i] = ""; }
         }
         const payload = {
-            action: "full_edit_item", pin: userPin, row_index: document.getElementById("editRowIndex").value, 
-            nama: document.getElementById("editNama").value, kode_barang: document.getElementById("editKode").value, 
-            kode_wadah: document.getElementById("editWadah").value, jumlah: document.getElementById("editJumlah").value, 
+            action: "full_edit_item", pin: userPin, row_index: document.getElementById("editRowIndex").value, nama: document.getElementById("editNama").value, 
+            kode_barang: document.getElementById("editKode").value, kode_wadah: document.getElementById("editWadah").value, jumlah: document.getElementById("editJumlah").value, 
             kondisi: document.getElementById("editKondisi").value, keterangan_ref: document.getElementById("editKet").value, fotos: finalFotos
         };
         const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
         const data = await response.json();
-        
         if (data.status === "success") { showToast("✅ Data Diperbarui!"); closeEditFullModal(); loadData(); } 
-        else { alert("Gagal dari Server:\n" + data.message); } // <--- FIX ERROR MUNCUL
-    } catch (err) { alert("Error Koneksi Internet!"); } finally { btn.innerText = "💾 UPDATE DATA & FOTO"; btn.disabled = false; }
+        else { alert("Gagal:\n" + data.message); }
+    } catch (err) { alert("Error Koneksi!"); } finally { btn.innerText = "💾 UPDATE DATA & FOTO"; btn.disabled = false; }
 }
 
+// ==========================================
+// TAMBAH ALAT (MULTI UPLOAD)
+// ==========================================
 function openAddModal() { if(!isAdminMode) return; document.getElementById("formAdd").reset(); document.getElementById("modalAdd").classList.add("active"); }
 function closeAddModal() { document.getElementById("modalAdd").classList.remove("active"); }
 
@@ -362,7 +347,7 @@ function compressImage(file, maxWidth = 1000) {
 
 async function submitNewItem(e) {
     e.preventDefault();
-    const btn = document.getElementById("btnSubmitAdd"); btn.innerText = "MENGOMPRES & UPLOAD..."; btn.disabled = true;
+    const btn = document.getElementById("btnSubmitAdd"); btn.innerText = "MENYIMPAN..."; btn.disabled = true;
     try {
         let base64Fotos = ["", "", ""]; 
         const fileInput = document.getElementById("addFotosMultiple");
@@ -377,14 +362,13 @@ async function submitNewItem(e) {
         };
         const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
         const data = await response.json();
-        
         if (data.status === "success") { showToast("✅ Alat Tersimpan!"); closeAddModal(); loadData(); } 
-        else { alert("Gagal dari Server:\n" + data.message); } // <--- FIX ERROR MUNCUL
-    } catch (err) { alert("Error Koneksi Internet!"); } finally { btn.innerText = "💾 SIMPAN ALAT"; btn.disabled = false; }
+        else { alert("Gagal:\n" + data.message); }
+    } catch (err) { alert("Error Koneksi!"); } finally { btn.innerText = "💾 SIMPAN ALAT"; btn.disabled = false; }
 }
 
 // ==========================================
-// 6. KERANJANG (BULK) & SCANNER
+// KERANJANG & SCANNER KEYBOARD
 // ==========================================
 function toggleBulkMode() {
     isBulkMode = !isBulkMode; let bar = document.getElementById("bulkBar");
@@ -407,7 +391,6 @@ async function processBulkUpdate(btn) {
         const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "update_status_lokasi", pin: userPin, rows: Array.from(selectedRows), new_status: newStatus }) });
         const data = await response.json();
         if(data.status === "success") { document.getElementById('bulkModal').remove(); toggleBulkMode(); loadData(); showToast("✅ Update massal berhasil!"); }
-        else { alert("Gagal dari Server:\n" + data.message); } // <--- FIX ERROR MUNCUL
     } catch (e) { alert("Error koneksi!"); }
 }
 
@@ -416,11 +399,31 @@ function openScannerModal() {
     modal.innerHTML = `<div class="modal-content" style="max-width:400px; background:white; padding:15px; border-radius:15px; text-align:center; position:relative;"><button onclick="closeScannerModal()" style="position:absolute; top:10px; right:10px; border:none; background:#fef2f2; color:#dc2626; width:35px; height:35px; border-radius:50%; font-weight:bold; cursor:pointer; z-index:9999;">✕</button><h3 style="margin:0 0 10px 0; font-size:16px;">Scan QR / Barcode</h3><div id="qr-reader" style="width:100%; border-radius:10px; overflow:hidden;"></div></div>`;
     document.body.appendChild(modal);
     html5QrcodeScanner = new Html5QrcodeScanner("qr-reader", { fps: 15, qrbox: {width: 250, height: 250} }, false);
+    
     html5QrcodeScanner.render((decodedText) => {
         const now = Date.now(); if (now - lastScanTime < 2000) return; lastScanTime = now;
-        const foundItem = allItems.find(i => i.kode_barang === decodedText || i.kode_wadah === decodedText);
-        if (foundItem) { closeScannerModal(); document.getElementById('searchInput').value = decodedText; applyFilters(); openDetailModal(foundItem); } 
-        else { showToast(`❌ Kode tidak dikenali!`, false); }
+        
+        let scanResult = decodedText.trim();
+        
+        if (isBulkMode) {
+            // MODE KERANJANG (Harus cocok persis dengan kode)
+            const foundItem = allItems.find(i => (i.kode_barang||"").toString().toLowerCase() === scanResult.toLowerCase() || (i.kode_wadah||"").toString().toLowerCase() === scanResult.toLowerCase());
+            if (foundItem) { 
+                if (!selectedRows.has(foundItem.row_index)) {
+                    selectedRows.add(foundItem.row_index); document.getElementById("bulkCount").innerText = `${selectedRows.size} Terpilih`;
+                    applyFilters(); showToast(`✅ ${foundItem.nama_barang} ditambahkan!`);
+                }
+            } else { showToast(`❌ Kode tidak ada di database!`, false); }
+        } else {
+            // MODE CARI BIASA (Berfungsi sbg keyboard otomatis ketik)
+            closeScannerModal(); 
+            document.getElementById('searchInput').value = scanResult; 
+            applyFilters(); 
+            
+            // Kalau kebetulan yang discan adalah kode barang asli, langsung buka Detailnya
+            const foundItem = allItems.find(i => (i.kode_barang||"").toString().toLowerCase() === scanResult.toLowerCase() || (i.kode_wadah||"").toString().toLowerCase() === scanResult.toLowerCase());
+            if (foundItem) openDetailModal(foundItem); 
+        }
     });
 }
 function closeScannerModal() { if (html5QrcodeScanner) { html5QrcodeScanner.clear().catch(e=>console.log(e)); } const m = document.getElementById("tempScannerModal"); if(m) m.remove(); }

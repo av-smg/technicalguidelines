@@ -6,16 +6,11 @@ location: "MASTER"
 <html lang="id">
 <head>
     {% include head.html %}
-    <!-- Mengambil alat Scanner QR -->
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-    <!-- Mengambil CSS Khusus Gudang -->
     <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/custom-gudang.css">
     
     <style>
-        /* MENGUNCI TOMBOL RAHASIA (READ-ONLY MODE) */
         .admin-only { display: none !important; }
-        
-        /* SAAT ADMIN AKTIF, TOMBOL MUNCUL */
         body.admin-mode-active .admin-only { display: inline-flex !important; }
         body.admin-mode-active .admin-only-block { display: flex !important; }
         
@@ -25,6 +20,10 @@ location: "MASTER"
             font-size: 12px; font-weight: 800; transition: 0.3s;
         }
         body.admin-mode-active .btn-lock { background: #f0fdf4; border-color: #22c55e; color: #16a34a; }
+        
+        /* Style Form Tambah Barang */
+        .form-input { width: 100%; padding: 10px; margin-bottom: 12px; border-radius: 8px; border: 1px solid #ccc; font-family: inherit; }
+        .form-label { font-size: 11px; font-weight: bold; color: gray; display: block; text-align: left; margin-bottom: 4px; }
     </style>
 </head>
 <body id="inventoryBody">
@@ -32,7 +31,6 @@ location: "MASTER"
     {% include navbar.html %}
 
     <main style="padding: 0 15px;">
-        <!-- BAGIAN HEADER & GEMBOK -->
         <div style="display:flex; justify-content:space-between; align-items:center; margin:15px 0;">
             <div>
                 <h2 style="font-weight:900; margin:0;">LOGISTIK UTAMA</h2>
@@ -41,12 +39,12 @@ location: "MASTER"
             <button id="btnUnlock" onclick="toggleAdminMode()" class="btn-lock">🔒 Buka Akses</button>
         </div>
 
-        <!-- SEARCH & FILTER -->
         <div class="toolbar-card" style="margin-bottom:15px;">
             <div style="display:flex; gap:8px;">
                 <input type="text" id="searchInput" class="search-input-modern" placeholder="Cari alat, merk, atau kode..." oninput="applyFilters()" style="flex:1; padding:10px; border-radius:8px; border:1px solid #ccc;">
                 
-                <!-- TOMBOL SCANNER (Hanya muncul jika Admin) -->
+                <!-- TOMBOL TAMBAH & SCANNER (Hanya muncul jika Admin) -->
+                <button onclick="openAddModal()" class="admin-only" style="padding:10px 15px; border-radius:8px; background:#16a34a; color:white; border:none; font-weight:bold;"><i class="fa-solid fa-plus"></i></button>
                 <button onclick="openScannerModal()" class="admin-only" style="padding:10px 15px; border-radius:8px; background:#1e293b; color:white; border:none;"><i class="fa-solid fa-qrcode"></i></button>
             </div>
 
@@ -59,10 +57,9 @@ location: "MASTER"
                 <button class="pill-btn admin-only" onclick="setFilterPill('Akan Dibuang', this)">🗑️ Karantina</button>
             </div>
 
-            <!-- KONTROL KERANJANG BONGKAR-MUAT (Hanya muncul jika Admin) -->
+            <!-- KONTROL KERANJANG -->
             <div class="admin-only-block" style="display:none; justify-content:space-between; align-items:center; margin-top:10px; padding-top:10px; border-top:1px dashed #ccc;">
                 <select id="teamSelect" onchange="applyFilters()" style="padding:6px; border-radius:6px; font-size:11px;"><option value="all">Semua Tim</option></select>
-                
                 <div style="display:flex; gap:6px;">
                     <button onclick="selectAllVisible()" style="background:#e2e8f0; font-size:11px; padding:6px 10px; border-radius:6px; border:none; font-weight:bold;">☑️ Pilih Semua</button>
                     <button id="btnBulkMode" onclick="toggleBulkMode()" style="font-size:11px; padding:6px 10px; border-radius:6px; background:#ea580c; color:white; border:none; font-weight:bold;">🛒 Mode Loading</button>
@@ -71,15 +68,54 @@ location: "MASTER"
         </div>
 
         <div id="loading" style="text-align: center; padding: 40px; color: gray; font-weight:bold;">Memuat Data Database...</div>
-        
-        <!-- CONTAINER KARTU BARANG -->
         <div id="dataContainer" class="grid-cards"></div>
     </main>
 
-    <!-- (Modals akan di-handle dari JavaScript agar HTML ini tetap bersih) -->
-    <div id="toastMsg" class="toast-msg">Notifikasi</div>
+    <!-- MODAL TAMBAH BARANG (UPLOAD FOTO) -->
+    <div id="modalAdd" class="modal-overlay">
+        <div class="modal-content" style="max-width:400px; max-height:85vh; overflow-y:auto; background:white; padding:20px; border-radius:15px; position:relative;">
+            <button onclick="closeAddModal()" style="position:absolute; top:15px; right:15px; border:none; background:#f1f5f9; width:30px; height:30px; border-radius:50%; font-weight:bold; cursor:pointer;">✕</button>
+            <h3 style="margin-top:0; color:#ea580c;">+ Tambah Alat Baru</h3>
+            
+            <form id="formAdd" onsubmit="submitNewItem(event)">
+                <label class="form-label">📸 Foto Barang (Bisa langsung jepret)</label>
+                <!-- accept="image/*" dan capture="environment" untuk otomatis buka kamera belakang -->
+                <input type="file" id="addFoto1" class="form-input" accept="image/*" capture="environment" style="background:#f8fafc;">
+                
+                <label class="form-label">Nama Alat *</label>
+                <input type="text" id="addNama" class="form-input" required placeholder="Contoh: Kabel XLR 10m">
+                
+                <div style="display:flex; gap:10px;">
+                    <div style="flex:1;">
+                        <label class="form-label">Kode Stiker (QR)</label>
+                        <input type="text" id="addKode" class="form-input" placeholder="XLR-01">
+                    </div>
+                    <div style="flex:1;">
+                        <label class="form-label">Wadah / Box</label>
+                        <input type="text" id="addWadah" class="form-input" placeholder="BOX-A">
+                    </div>
+                </div>
 
-    <!-- MENGAMBIL MESIN LOGIKA (Akan kita buat nanti) -->
+                <div style="display:flex; gap:10px;">
+                    <div style="flex:1;">
+                        <label class="form-label">Total (Qty)</label>
+                        <input type="number" id="addJumlah" class="form-input" value="1" required>
+                    </div>
+                    <div style="flex:1;">
+                        <label class="form-label">Kondisi</label>
+                        <select id="addKondisi" class="form-input">
+                            <option value="Bagus">Bagus</option>
+                            <option value="Rusak Ringan">Rusak Ringan</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" id="btnSubmitAdd" style="width:100%; padding:12px; background:#16a34a; color:white; border:none; border-radius:8px; font-weight:bold; margin-top:10px;">💾 SIMPAN ALAT</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="toastMsg" class="toast-msg">Notifikasi</div>
     <script src="{{ site.baseurl }}/assets/js/script-gudang.js"></script>
 </body>
 </html>

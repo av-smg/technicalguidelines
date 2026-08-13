@@ -1,5 +1,5 @@
 // ==========================================
-// MESIN LOGIKA GUDANG (V.9.1 - ANTI BLANK & ZOOM HD)
+// MESIN LOGIKA GUDANG (V.10.0 - MULTI UPLOAD & NO CACHE)
 // ==========================================
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyg6ntp8BPWPP8qm9IfpN62Rwd272tAEiTM0Qgl1GQQkUqJGcViG-FnewlFqFTjZ4w-Zg/exec"; 
@@ -66,7 +66,11 @@ async function loadData() {
         document.getElementById("loading").style.display = "block";
         const res = await fetch(SCRIPT_URL + "?action=api&nocache=" + new Date().getTime());
         const data = await res.json();
-        allItems = data.inventory || [];
+        
+        // JARING PENGAMAN: Hancurkan data Hantu "Nama Barang"
+        let rawInventory = data.inventory || [];
+        allItems = rawInventory.filter(item => item.nama_barang && item.nama_barang.toString().trim().toLowerCase() !== 'nama barang');
+        
         optionsData = data.dropdowns || { lokasi: [], tim: [] };
         document.getElementById("loading").style.display = "none";
         applyFilters();
@@ -107,7 +111,7 @@ function getFilteredData() {
 function applyFilters() { render(getFilteredData()); }
 
 // ==========================================
-// MENGGAMBAR KARTU BARANG (UI BERSIH & AMAN)
+// MENGGAMBAR KARTU BARANG
 // ==========================================
 function getStatusClass(status) {
     if(status === 'Akan Dibawa') return 'badge-status status-keranjang';
@@ -127,18 +131,17 @@ function render(data) {
         let stat = item.status_digunakan || "Di Gudang"; if(stat === 'FALSE') stat = "Di Gudang";
         let lok = item.lokasi || "Gudang KC";
 
-        // LOGIKA MENGHILANGKAN REDUNDANSI GUDANG
+        // MENGHILANGKAN REDUNDANSI GUDANG
         let isGudangOnly = (lok.includes("Gudang") && stat === "Di Gudang");
         let badgeLokasiHtml = isGudangOnly 
             ? `<span class="badge-status status-gudang" style="display:inline-block; margin-top:4px; padding:3px 8px;">🏢 ${lok} (Standby)</span>`
             : `<span class="badge-status status-lokasi" style="display:inline-block; margin-top:4px; margin-right:4px; padding:3px 8px;">📍 ${lok}</span>
                <span class="${getStatusClass(stat)}" style="display:inline-block; margin-top:4px; padding:3px 8px;">${stat}</span>`;
 
-        // JARING PENGAMAN: Cek kalau pakai API lama atau API baru
         let safeFileIds = item.file_ids || item.fotos || [];
         let firstFileId = safeFileIds.find(id => id && id.length > 5);
-        
         let imageSrc = 'https://placehold.co/300x300/EEEEEE/999999?text=NO+IMAGE';
+        
         if (firstFileId) {
             imageSrc = firstFileId.includes("http") ? firstFileId : `https://drive.google.com/thumbnail?id=${firstFileId}&sz=w400`;
         }
@@ -203,8 +206,6 @@ function openDetailModal(item) {
 
     let galleryHtml = `<div class="detail-gallery">`;
     let adaFoto = false;
-    
-    // JARING PENGAMAN (Handle versi API lama dan baru)
     let safeFileIds = item.file_ids || item.fotos || [];
     
     safeFileIds.forEach((fileId, i) => {
@@ -228,7 +229,7 @@ function openDetailModal(item) {
     let optionsStatus = `<option value="Di Gudang" ${stat === 'Di Gudang' ? 'selected':''}>📦 Standby / Di Gudang</option><option value="Akan Dibawa" ${stat === 'Akan Dibawa' ? 'selected':''}>🛒 Akan Dibawa (Packing)</option><option value="Sedang Dipakai" ${stat === 'Sedang Dipakai' ? 'selected':''}>🔌 Sedang Dipakai / Aktivasi</option><option value="Sedang Diservis" ${stat === 'Sedang Diservis' ? 'selected':''}>🛠️ Sedang Diservis</option>`;
 
     let actionButtons = isAdminMode ? `
-        <button onclick='openEditFullModal(${JSON.stringify(item).replace(/'/g, "&#39;")})' style="width:100%; padding:10px; background:#f59e0b; color:white; border:none; border-radius:8px; font-weight:bold; margin-bottom:15px;">✏️ EDIT DATA & FOTO LENGKAP</button>
+        <button onclick='openEditFullModal(${JSON.stringify(item).replace(/'/g, "&#39;")})' style="width:100%; padding:10px; background:#f59e0b; color:white; border:none; border-radius:8px; font-weight:bold; margin-bottom:15px;">✏️ EDIT DATA & FOTO</button>
         <div style="text-align:left; border-top:1px dashed #ccc; padding-top:15px;">
             <label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">📍 Update Lokasi Cepat:</label>
             <select id="editLokasi" style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc; margin-bottom:12px;">${optionsLokasi}</select>
@@ -244,9 +245,11 @@ function openDetailModal(item) {
             <button onclick="document.getElementById('detailModal').remove()" style="position:absolute; top:15px; right:15px; border:none; background:#f1f5f9; width:30px; height:30px; border-radius:50%; font-weight:bold; cursor:pointer; z-index:10;">✕</button>
             ${galleryHtml}
             <p style="font-size:10px; color:gray; margin-top:4px; margin-bottom:15px;">*Klik gambar untuk perbesar ukuran HD</p>
+            
             <h3 style="margin:0; font-weight:900; color:#1e293b; font-size:18px;">${item.nama_barang}</h3>
             <div style="font-size:10px; color:gray; margin-bottom:8px;">⏱️ Update: ${item.timestamp || '-'}</div>
             <p style="margin:5px 0 15px 0; font-size:13px; color:#ea580c; font-weight:bold;">#${item.kode_barang || '-'} | 📦 Wadah: ${item.kode_wadah || '-'}</p>
+            
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:12px; text-align:left; background:#f8fafc; padding:10px; border-radius:8px; border:1px solid #e2e8f0;">
                 <div><span style="color:gray;">Total Qty:</span> <br><b>${item.jumlah || 0} Pcs</b></div>
                 <div><span style="color:gray;">Kondisi:</span> <br><b>${item.kondisi || '-'}</b></div>
@@ -265,7 +268,8 @@ function openDetailModal(item) {
 async function saveEditLokasiStatus(rowIndex) {
     const nLok = document.getElementById("editLokasi").value;
     const nStat = document.getElementById("editStatus").value;
-    event.target.innerText = "MEMPROSES..."; event.target.disabled = true;
+    event.target.innerText = "MEMPROSES..."; 
+    event.target.disabled = true;
     try {
         const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "update_status_lokasi", pin: userPin, rows: [rowIndex], new_lokasi: nLok, new_status: nStat }) });
         const data = await response.json();
@@ -274,7 +278,7 @@ async function saveEditLokasiStatus(rowIndex) {
 }
 
 // ==========================================
-// FITUR BARU: FULL EDIT & KELOLA FOTO
+// FITUR: FULL EDIT & KELOLA FOTO
 // ==========================================
 function openEditFullModal(item) {
     document.getElementById('detailModal').remove(); 
@@ -372,8 +376,9 @@ async function submitEditFull(e) {
     } catch (err) { alert("Error Koneksi!"); } finally { btn.innerText = "💾 UPDATE DATA & FOTO"; btn.disabled = false; }
 }
 
+
 // ==========================================
-// TAMBAH ALAT BARU & KOMPRESI
+// TAMBAH ALAT BARU & KOMPRESI (MULTI-UPLOAD)
 // ==========================================
 function openAddModal() { if(!isAdminMode) return; document.getElementById("formAdd").reset(); document.getElementById("modalAdd").classList.add("active"); }
 function closeAddModal() { document.getElementById("modalAdd").classList.remove("active"); }
@@ -398,10 +403,15 @@ async function submitNewItem(e) {
     const btn = document.getElementById("btnSubmitAdd"); btn.innerText = "MENGOMPRES & UPLOAD..."; btn.disabled = true;
     try {
         let base64Fotos = ["", "", ""]; 
-        for (let i = 1; i <= 3; i++) {
-            const fileInput = document.getElementById("addFoto" + i);
-            if (fileInput && fileInput.files.length > 0) { base64Fotos[i-1] = await compressImage(fileInput.files[0]); }
+        const fileInput = document.getElementById("addFotosMultiple");
+        const files = fileInput.files;
+        
+        // Membaca maksimal 3 foto sekaligus dari 1 tombol input
+        let maxFiles = Math.min(files.length, 3);
+        for (let i = 0; i < maxFiles; i++) {
+            base64Fotos[i] = await compressImage(files[i]); 
         }
+
         const payload = {
             action: "add_item", pin: userPin, nama: document.getElementById("addNama").value, kode_barang: document.getElementById("addKode").value,
             kode_wadah: document.getElementById("addWadah").value, jumlah: document.getElementById("addJumlah").value,
@@ -414,7 +424,7 @@ async function submitNewItem(e) {
 }
 
 // ==========================================
-// KERANJANG (BULK) & SCANNER
+// KERANJANG (BULK)
 // ==========================================
 function toggleBulkMode() {
     isBulkMode = !isBulkMode; let bar = document.getElementById("bulkBar");
@@ -440,6 +450,9 @@ async function processBulkUpdate(btn) {
     } catch (e) { alert("Error koneksi!"); }
 }
 
+// ==========================================
+// SCANNER KAMERA
+// ==========================================
 function openScannerModal() {
     let modal = document.createElement("div"); modal.id = "tempScannerModal"; modal.className = "modal-overlay active";
     modal.innerHTML = `<div class="modal-content" style="max-width:400px; background:white; padding:15px; border-radius:15px; text-align:center; position:relative;"><button onclick="closeScannerModal()" style="position:absolute; top:10px; right:10px; border:none; background:#fef2f2; color:#dc2626; width:35px; height:35px; border-radius:50%; font-weight:bold; cursor:pointer; z-index:9999;">✕</button><h3 style="margin:0 0 10px 0; font-size:16px;">Scan QR / Barcode</h3><div id="qr-reader" style="width:100%; border-radius:10px; overflow:hidden;"></div></div>`;

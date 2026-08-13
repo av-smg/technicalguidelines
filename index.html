@@ -8,21 +8,21 @@
     <link rel="stylesheet" href="style.css" />
     
     <style>
-      /* CSS Khusus untuk Banner Event Teratas */
+      /* CSS Khusus untuk Banner Event Teratas - Versi Kalem */
       .event-highlight-card {
-        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        background: linear-gradient(135deg, #1e293b 0%, #162032 100%);
         border-radius: 20px;
         padding: 30px;
-        margin: -10px auto 30px auto; /* Mengangkat posisinya ke arah hero */
+        margin: -10px auto 30px auto; 
         max-width: 900px;
         color: white;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         border: 1px solid #334155;
         text-align: center;
       }
       .event-label {
-        background: rgba(255, 126, 39, 0.15);
-        color: #ff7e27;
+        background: rgba(234, 88, 12, 0.15);
+        color: #ea580c; /* Oranye kalem (Matte) */
         padding: 6px 14px;
         border-radius: 20px;
         font-size: 11px;
@@ -31,7 +31,7 @@
         letter-spacing: 1px;
         display: inline-block;
         margin-bottom: 15px;
-        border: 1px solid rgba(255, 126, 39, 0.3);
+        border: 1px solid rgba(234, 88, 12, 0.2);
       }
       .event-highlight-card h2 {
         font-size: 26px;
@@ -57,22 +57,21 @@
         font-size: 13px;
         font-weight: 800;
         text-decoration: none !important;
-        transition: all 0.3s ease;
+        transition: all 0.2s ease;
         display: inline-flex;
         align-items: center;
         gap: 8px;
       }
       .btn-inv {
-        background: #ff7e27;
+        background: #ea580c; /* Oranye kalem (Matte) */
         color: white;
-        border: 2px solid #ff7e27;
-        box-shadow: 0 4px 15px rgba(255, 126, 39, 0.2);
+        border: 2px solid #ea580c;
+        /* Menghilangkan efek glow shadow yang bikin silau */
       }
       .btn-inv:hover {
-        background: #e66a1e;
-        border-color: #e66a1e;
-        transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(255, 126, 39, 0.3);
+        background: #c2410c; /* Oranye lebih gelap saat di-hover */
+        border-color: #c2410c;
+        transform: translateY(-2px);
         color: white;
       }
       .btn-mc {
@@ -83,7 +82,7 @@
       .btn-mc:hover {
         border-color: white;
         background: rgba(255,255,255,0.05);
-        transform: translateY(-3px);
+        transform: translateY(-2px);
         color: white;
       }
       
@@ -115,14 +114,14 @@
         <div class="event-highlight-card">
           <span class="event-label">🗓️ Event Terdekat</span>
           <h2>Pertemuan Wilayah 2026</h2>
-          <p>📅 3 & 4 Oktober 2026 &nbsp;|&nbsp; 📍 Semarang</p>
+          <p>📅 3 & 4 Oktober 2026 &nbsp;|&nbsp; 📍 UTC Semarang</p>
           
           <div class="event-buttons">
-            <!-- Link menuju folder inventaris (Berdasarkan struktur repo kamu) -->
+            <!-- Link menuju folder inventaris -->
             <a href="inventaris/index.html" class="btn-event btn-inv">
               📦 Buka Logistik & Inventaris
             </a>
-            <!-- Link menuju file misi.html (Berdasarkan struktur repo kamu) -->
+            <!-- Link menuju file misi.html -->
             <a href="misi.html" class="btn-event btn-mc">
               📋 Buka Mission Card
             </a>

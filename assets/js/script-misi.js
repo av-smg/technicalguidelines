@@ -1,5 +1,5 @@
 // ==========================================
-// MESIN LOGIKA MISSION CONTROL (V.5.0)
+// MESIN LOGIKA MISSION CONTROL (V.7.0 - KLIK DETAIL BARANG)
 // ==========================================
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec"; 
@@ -9,8 +9,9 @@ let userPin = localStorage.getItem("AV_MISSION_PIN") || "";
 
 let isAdminMode = false;
 let allMissions = [];
-let allInventory = []; // Menyimpan data gudang untuk dicocokkan dengan Misi
-let activeTeam = ''; // Kosong secara default agar user dipaksa milih
+let allInventory = []; 
+let activeTeam = ''; 
+let isDataLoaded = false; 
 
 window.onload = () => { checkAdminStatus(); loadMissions(); };
 
@@ -27,8 +28,7 @@ function checkAdminStatus() {
         document.getElementById("modeStatusText").innerHTML = "🟢 Read-Only Mode";
         document.getElementById("btnUnlock").innerText = "🔒 Buka Akses";
     }
-    // Paksa kartu dirender ulang agar tombol Gembok langsung berubah tanpa refresh!
-    renderMissions();
+    if (isDataLoaded) renderMissions();
 }
 
 function toggleAdminMode() {
@@ -44,8 +44,8 @@ function toggleAdminMode() {
             let pinAttempt = input.trim().toLowerCase();
             if (VALID_MISSION_PINS.includes(pinAttempt)) {
                 localStorage.setItem("AV_MISSION_PIN", pinAttempt);
-                userPin = pinAttempt; // Pastikan variabel memori langsung terisi
-                checkAdminStatus(); // Panggil fungsi perubah UI
+                userPin = pinAttempt; 
+                checkAdminStatus(); 
                 showToast("Akses Terbuka! Silakan eksekusi misi.");
             } else {
                 alert("⛔ AKSES DITOLAK! PIN tidak dikenali untuk area ini.");
@@ -68,7 +68,8 @@ async function loadMissions() {
         const data = await res.json();
         if(data.status === "success") {
             allMissions = data.missions || [];
-            allInventory = data.inventory || []; // Simpan data gudang untuk foto
+            allInventory = data.inventory || []; 
+            isDataLoaded = true; 
             document.getElementById("loading").style.display = "none";
             renderMissions();
         } else {
@@ -85,14 +86,15 @@ function setTeamFilter(teamName) {
         btn.classList.remove('active');
         if(btn.innerText.includes(teamName)) btn.classList.add('active');
     });
-    renderMissions();
+    if (isDataLoaded) renderMissions();
 }
 
 function renderMissions() {
+    if (!isDataLoaded) return; 
+
     const container = document.getElementById("missionsContainer");
     container.innerHTML = "";
     
-    // Jika belum milih tim, suruh milih
     if (activeTeam === '') {
         container.innerHTML = `<div style="text-align:center; padding:40px 20px; color:#64748b; grid-column: 1 / -1;">
             <h3 style="margin-bottom:5px;">Pilih Divisi Tim 👆</h3>
@@ -115,17 +117,15 @@ function renderMissions() {
         const card = document.createElement("div");
         card.className = `mission-card ${isSelesai ? 'selesai' : ''}`;
         
-        // LOGIKA PENCOCOKAN PAKET BARANG & FOTO
         let packageHtml = '';
         if (misi.kode_barang) {
-            let codes = misi.kode_barang.split(','); // Memisahkan jika ada banyak kode
+            let codes = misi.kode_barang.split(','); 
             packageHtml += `<div class="package-list"><div style="font-size:10px; font-weight:bold; color:gray; margin-bottom:4px;">📦 Target Paket Barang:</div>`;
             
             codes.forEach(c => {
                 let codeClean = c.trim();
                 if(!codeClean) return;
                 
-                // Cari kode ini di database gudang
                 let foundItem = allInventory.find(inv => inv.kode_barang && inv.kode_barang.toLowerCase() === codeClean.toLowerCase());
                 
                 if (foundItem) {
@@ -134,17 +134,18 @@ function renderMissions() {
                     let imgUrl = 'https://placehold.co/100x100/EEEEEE/999999?text=NO+IMG';
                     if(firstFileId) imgUrl = firstFileId.includes("http") ? firstFileId : `https://drive.google.com/thumbnail?id=${firstFileId}&sz=w200`;
                     
-                    packageHtml += `<div class="package-item">
+                    // TAMBAHAN: Efek Hover & Klik untuk Buka Detail
+                    packageHtml += `<div class="package-item" style="cursor:pointer; transition:0.2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='white'" onclick="openItemDetail('${foundItem.kode_barang}')">
                         <img src="${imgUrl}" class="pkg-img" loading="lazy">
                         <div class="pkg-info">
                             <div class="pkg-name">${foundItem.nama_barang}</div>
-                            <div class="pkg-code">#${foundItem.kode_barang}</div>
+                            <div class="pkg-code">#${foundItem.kode_barang} <span style="font-weight:normal; font-size:9px; color:#94a3b8;">(Klik lihat detail)</span></div>
                         </div>
                     </div>`;
                 } else {
                     packageHtml += `<div class="package-item">
                         <div class="pkg-info">
-                            <div class="pkg-code" style="color:gray;">#${codeClean} (Barang tidak ditemukan di gudang)</div>
+                            <div class="pkg-code" style="color:gray;">#${codeClean} (Barang tidak ditemukan)</div>
                         </div>
                     </div>`;
                 }
@@ -176,6 +177,74 @@ function renderMissions() {
         `;
         container.appendChild(card);
     });
+}
+
+// ==========================================
+// POP-UP DETAIL READ-ONLY & ZOOM
+// ==========================================
+function openItemDetail(kodeBarang) {
+    const item = allInventory.find(i => i.kode_barang && i.kode_barang.toLowerCase() === kodeBarang.toLowerCase());
+    if(!item) return;
+
+    const oldModal = document.getElementById("detailModal"); 
+    if(oldModal) oldModal.remove();
+
+    let stat = item.status_digunakan || "Di Gudang"; if(stat === 'FALSE') stat = "Di Gudang"; 
+    let lok = item.lokasi || "Gudang KC (SMG)";
+
+    let galleryHtml = `<div class="detail-gallery">`; 
+    let adaFoto = false; 
+    let safeFileIds = item.file_ids || item.fotos || [];
+    safeFileIds.forEach((fileId, i) => { 
+        if(fileId && fileId.length > 5) { 
+            let thumbUrl = fileId.includes("http") ? fileId : `https://drive.google.com/thumbnail?id=${fileId}&sz=w400`; 
+            let highResUrl = fileId.includes("http") ? fileId.replace('sz=800', 'sz=s2000') : `https://drive.google.com/thumbnail?id=${fileId}&sz=s2000`; 
+            galleryHtml += `<img src="${thumbUrl}" class="gallery-img" onclick="openZoomModal('${highResUrl}')">`; 
+            adaFoto = true; 
+        } 
+    });
+    if(!adaFoto) galleryHtml += `<img src="https://placehold.co/300x200/EEEEEE/999999?text=Tidak+Ada+Foto" class="gallery-img" style="width:100%;">`; 
+    galleryHtml += `</div>`;
+
+    // Modal khusus Read-Only (Tanpa tombol edit sama sekali)
+    const modalHtml = `
+    <div id="detailModal" class="modal-overlay active">
+        <div class="modal-content" style="max-width:400px; background:white; padding:20px; border-radius:15px; text-align:center; position:relative;">
+            <button onclick="document.getElementById('detailModal').remove()" style="position:absolute; top:15px; right:15px; border:none; background:#f1f5f9; width:30px; height:30px; border-radius:50%; font-weight:bold; cursor:pointer; z-index:10;">✕</button>
+            ${galleryHtml}
+            <h3 style="margin:0; font-weight:900; color:#1e293b; font-size:18px;">${item.nama_barang}</h3>
+            <p style="margin:5px 0 10px 0; font-size:12px; color:#ea580c; font-weight:bold;">#${item.kode_barang || '-'}</p>
+            
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:12px; text-align:left; background:#f8fafc; padding:10px; border-radius:8px; border:1px solid #e2e8f0;">
+                <div><span style="color:gray;">Kondisi:</span> <br><b>${item.kondisi || '-'}</b></div>
+                <div><span style="color:gray;">📍 Lokasi:</span> <br><b>${lok}</b></div>
+                <div style="grid-column: 1 / -1;"><span style="color:gray;">🔌 Status Gudang:</span> <br><b>${stat}</b></div>
+            </div>
+            
+            <div style="text-align:left; margin-top:10px; font-size:11px; color:#475569; background:#fff7ed; padding:8px; border-radius:6px; border:1px solid #fed7aa;">
+                <b>📝 Catatan / Referensi:</b> <br>${item.keterangan_ref || 'Tidak ada catatan.'}
+            </div>
+            <div style="margin-top:15px; font-size:10px; color:gray;">Mode Baca (Read-Only)</div>
+        </div>
+    </div>`;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+function openZoomModal(imgUrl) { 
+    let zoomModal = document.getElementById("zoomModal");
+    if (!zoomModal) {
+        document.body.insertAdjacentHTML('beforeend', `<div id="zoomModal" class="zoom-overlay" onclick="closeZoomModal()"><button class="btn-back-zoom" onclick="closeZoomModal()">⬅ Kembali</button><img id="zoomImgSrc" src="" style="max-width:95vw; max-height:90vh; object-fit:contain; border-radius:8px;" onclick="event.stopPropagation()"></div>`);
+        zoomModal = document.getElementById("zoomModal");
+    }
+    document.getElementById("zoomImgSrc").src = imgUrl; 
+    zoomModal.classList.add("active"); 
+}
+function closeZoomModal() { 
+    const zoomModal = document.getElementById("zoomModal");
+    if(zoomModal) {
+        zoomModal.classList.remove("active"); 
+        setTimeout(() => { document.getElementById("zoomImgSrc").src = ""; }, 300); 
+    }
 }
 
 async function confirmMission(event, rowIndex, idMisi, kodeBarang) {

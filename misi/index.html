@@ -6,20 +6,20 @@ location: "MISSION CARD"
 <head>
     {% include head.html %}
     <title>Mission Control A/V</title>
-    <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/custom-misi.css?v=2.0">
+    <!-- Update cache ke V.3.0 -->
+    <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/custom-misi.css?v=3.0">
     <style>
         .admin-only { display: none !important; }
         body.admin-mode-active .admin-only { display: inline-block !important; }
         .btn-lock { background: #f1f5f9; border: 1px solid #cbd5e1; color: #334155; padding: 6px 12px; border-radius: 8px; font-weight: 800; cursor: pointer;}
         body.admin-mode-active .btn-lock { background: #f0fdf4; border-color: #22c55e; color: #16a34a; }
-        .missions-container { display: flex; flex-direction: column; gap: 15px; padding-bottom: 80px; }
     </style>
 </head>
 <body id="missionBody">
     {% include navbar.html %}
     
-    <main style="padding: 0 15px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin:15px 0;">
+    <main>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin:15px 20px;">
             <div>
                 <h2 style="font-weight:900; margin:0;">🎯 MISSION CONTROL</h2>
                 <p style="font-size:11px; color:gray; margin:0;">Status: <span id="modeStatusText">🟢 Read-Only Mode</span></p>
@@ -27,15 +27,14 @@ location: "MISSION CARD"
             <button id="btnUnlock" onclick="toggleAdminMode()" class="btn-lock">🔒 Buka Akses</button>
         </div>
 
-        <!-- Tombol Filter Divisi -->
-        <div class="team-filters" id="teamFilters" style="margin-bottom: 15px; margin-left:-15px; margin-right:-15px;">
-            <button class="btn-team active" onclick="setTeamFilter('Semua')">Semua Misi</button>
+        <!-- Tombol Filter Divisi (Tidak ada yang aktif di awal) -->
+        <div class="team-filters" id="teamFilters">
             <button class="btn-team" onclick="setTeamFilter('Speaker')">🔊 Tim Speaker</button>
             <button class="btn-team" onclick="setTeamFilter('Kabel')">🔌 Tim Kabel</button>
             <button class="btn-team" onclick="setTeamFilter('Booth')">🎛️ Tim Booth</button>
         </div>
 
-        <div id="loading" style="text-align: center; padding: 40px; color: gray; font-weight:bold;">Mengambil Sandi Misi dari Server...</div>
+        <div id="loading" style="text-align: center; padding: 40px; color: gray; font-weight:bold;">Memuat Sandi Sandi Misi...</div>
         
         <!-- Tempat Kartu Misi Muncul -->
         <div class="missions-container" id="missionsContainer"></div>
@@ -43,7 +42,7 @@ location: "MISSION CARD"
 
     <div id="toastMsg" class="toast-msg">Notifikasi</div>
 
-    <!-- UPDATE CACHE V.2.0 -->
-    <script src="{{ site.baseurl }}/assets/js/script-misi.js?v=3.0"></script>
+    <!-- UPDATE CACHE V.5.0 -->
+    <script src="{{ site.baseurl }}/assets/js/script-misi.js?v=5.0"></script>
 </body>
 </html>

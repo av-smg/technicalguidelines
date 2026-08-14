@@ -1,0 +1,42 @@
+---
+location: "MISSION CARD"
+---
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mission Control A/V</title>
+    <!-- Ganti baseurl sesuai struktur web kamu -->
+    <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/custom-misi.css?v=1.0">
+</head>
+<body>
+    <div class="mission-header">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+                <h2 style="margin:0; font-weight:900;">🎯 MISSION CONTROL</h2>
+                <p style="margin:0; font-size:11px; color:#94a3b8;">Dashboard Eksekusi Tim Lapangan</p>
+            </div>
+            <a href="{{ site.baseurl }}/" style="color:white; text-decoration:none; font-size:12px; font-weight:bold; background:#334155; padding:6px 12px; border-radius:8px;">⬅ Home</a>
+        </div>
+    </div>
+
+    <!-- Tombol Filter Divisi -->
+    <div class="team-filters" id="teamFilters">
+        <button class="btn-team active" onclick="setTeamFilter('Semua')">Semua Misi</button>
+        <button class="btn-team" onclick="setTeamFilter('Speaker')">🔊 Tim Speaker</button>
+        <button class="btn-team" onclick="setTeamFilter('Kabel')">🔌 Tim Kabel</button>
+        <button class="btn-team" onclick="setTeamFilter('Booth')">🎛️ Tim Booth</button>
+    </div>
+
+    <div id="loading" style="text-align: center; padding: 40px; color: gray; font-weight:bold;">Mengambil Sandi Misi dari Server...</div>
+    
+    <!-- Tempat Kartu Misi Muncul -->
+    <div class="missions-container" id="missionsContainer"></div>
+
+    <div id="toastMsg" class="toast-msg">Notifikasi</div>
+
+    <!-- File Logic JS Khusus Misi -->
+    <script src="{{ site.baseurl }}/assets/js/script-misi.js?v=1.0"></script>
+</body>
+</html>

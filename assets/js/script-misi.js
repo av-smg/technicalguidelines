@@ -3,7 +3,7 @@
 // ==========================================
 
 // GANTI DENGAN URL DEPLOYMENT BARU (V.26)
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfyc...URL_BARU_V26.../exec"; 
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyYNghkn3XZNfFXRzuWr0BSZf3EC8IZ80KoTO0llMMyouC5ozFfmV8dcAq2zOCTLW0Smg/exec"; 
 
 let allMissions = [];
 let activeTeam = 'Semua';

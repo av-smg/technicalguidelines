@@ -41,8 +41,6 @@ location: "MASTER"
         .list-img { width: 70px; height: 70px; object-fit: cover; border-radius: 8px; border: 1px solid #f1f5f9; flex-shrink: 0; }
         .list-info { flex: 1; overflow: hidden; }
         .list-title { font-weight: 800; font-size: 13px; margin: 0 0 4px 0; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        
-        /* FIX: PAKSA NOTIFIKASI TAMPIL DI DEPAN SCANNER */
         .toast-msg { z-index: 9999999 !important; }
     </style>
 </head>
@@ -98,6 +96,7 @@ location: "MASTER"
                 <div style="background:#f8fafc; padding:10px; border-radius:8px; border:1px solid #e2e8f0; margin-bottom:15px;">
                     <label class="form-label" style="color:#1e293b;">📸 Pilih Foto Alat (Maks 3 Sekaligus)</label>
                     <input type="file" id="addFotosMultiple" class="form-input" accept="image/*" multiple style="margin-bottom:5px;">
+                    <p style="font-size:10px; color:gray; margin:0;">*Tombol di atas otomatis membuka pilihan Kamera atau Galeri di HP Anda.</p>
                 </div>
                 
                 <label class="form-label">Nama Alat Utama *</label>
@@ -168,7 +167,7 @@ location: "MASTER"
     </div>
 
     <div id="toastMsg" class="toast-msg">Notifikasi</div>
-    <!-- UPDATE CACHE V.17.0 -->
-    <script src="{{ site.baseurl }}/assets/js/script-gudang.js?v=17.0"></script>
+    <!-- UPDATE CACHE V.18.0 -->
+    <script src="{{ site.baseurl }}/assets/js/script-gudang.js?v=18.0"></script>
 </body>
 </html>

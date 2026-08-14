@@ -1,8 +1,9 @@
 // ==========================================
-// MESIN LOGIKA GUDANG (V.17.0 - UI TOAST & DUAL LOGIC)
+// MESIN LOGIKA GUDANG (V.18.0 - UI KONDISI, ZOOM HD & CLEAN GUDANG)
 // ==========================================
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyGB8q5JIt8uQME2Sl7qJNgYFw2An6VY-CNNAwTGehxE26A7MkWk8xZFxLUjN2X_nZXDw/exec"; 
+// GANTI LINK DI BAWAH JIKA ADA DEPLOYMENT BARU
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyg6ntp8BPWPP8qm9IfpN62Rwd272tAEiTM0Qgl1GQQkUqJGcViG-FnewlFqFTjZ4w-Zg/exec"; 
 
 const VALID_PINS = ["a1b2c3", "v9t6c2", "123456"];
 
@@ -40,7 +41,6 @@ function toggleAdminMode() {
     }
 }
 
-// FIX: DURASI TOAST DIPERPANJANG JADI 4 DETIK (4000ms) AGAR TERBACA
 function showToast(msg, isSuccess = true) {
     const t = document.getElementById("toastMsg"); if(!t) return;
     t.innerText = msg; t.className = "toast-msg show " + (isSuccess ? "toast-success" : "toast-error");
@@ -83,7 +83,7 @@ function getFilteredData() {
 function applyFilters() { render(getFilteredData()); }
 
 // ==========================================
-// RENDER KARTU
+// RENDER KARTU (DENGAN KONDISI & CLEAN GUDANG)
 // ==========================================
 function getStatusClass(status) {
     if(status === 'Akan Dibawa') return 'badge-status status-keranjang';
@@ -98,10 +98,13 @@ function render(data) {
         const card = document.createElement("div"); const isSelected = selectedRows.has(item.row_index);
         let stat = item.status_digunakan || "Di Gudang"; if(stat === 'FALSE') stat = "Di Gudang"; let lok = item.lokasi || "Gudang KC";
 
-        let isGudangOnly = (lok.includes("Gudang") && stat === "Di Gudang");
-        let badgeLokasiHtml = isGudangOnly 
-            ? `<span class="badge-status status-gudang" style="display:inline-block; margin-top:4px; padding:3px 8px;">🏢 ${lok} (Standby)</span>`
-            : `<span class="badge-status status-lokasi" style="display:inline-block; margin-top:4px; margin-right:4px; padding:3px 8px;">📍 ${lok}</span><span class="${getStatusClass(stat)}" style="display:inline-block; margin-top:4px; padding:3px 8px;">${stat}</span>`;
+        // CLEAN GUDANG: Kalau Lokasi mengandung kata "Gudang" dan Status "Di Gudang", gabung jadi satu saja!
+        let badgeLokasiHtml = "";
+        if (lok.toLowerCase().includes("gudang") && stat === "Di Gudang") {
+            badgeLokasiHtml = `<span class="badge-status status-gudang" style="display:inline-block; margin-top:4px; padding:3px 8px;">🏢 ${lok}</span>`;
+        } else {
+            badgeLokasiHtml = `<span class="badge-status status-lokasi" style="display:inline-block; margin-top:4px; margin-right:4px; padding:3px 8px;">📍 ${lok}</span><span class="${getStatusClass(stat)}" style="display:inline-block; margin-top:4px; padding:3px 8px;">${stat}</span>`;
+        }
 
         let safeFileIds = item.file_ids || item.fotos || []; let firstFileId = safeFileIds.find(id => id && id.length > 5);
         let imageSrc = 'https://placehold.co/300x300/EEEEEE/999999?text=NO+IMAGE';
@@ -109,13 +112,18 @@ function render(data) {
         
         const kodeBadge = item.kode_barang ? `<span style="color:#ea580c; font-weight:900;">#${item.kode_barang}</span>` : "";
         const timeBadge = item.timestamp ? `<div style="font-size:9px; color:gray; margin-bottom:6px;">⏱️ Update: ${item.timestamp}</div>` : "";
+        
+        // BADGE KONDISI BARU
+        let colorKondisi = item.kondisi && item.kondisi.toLowerCase() === 'bagus' ? '#16a34a' : '#dc2626';
+        let bgKondisi = item.kondisi && item.kondisi.toLowerCase() === 'bagus' ? '#f0fdf4' : '#fef2f2';
+        const kondisiBadge = `<span style="font-size:10px; padding:2px 6px; border-radius:4px; border:1px solid ${colorKondisi}; background:${bgKondisi}; color:${colorKondisi}; font-weight:bold; margin-left:6px;">${item.kondisi || 'Bagus'}</span>`;
 
         if (currentViewMode === 'grid') {
             card.className = "mission-card " + (isSelected ? "selected " : "") + (stat === 'Akan Dibawa' ? "card-siap-dibawa " : "");
-            card.innerHTML = `${isSelected ? '<div class="card-check">✓</div>' : ''}<div style="position:relative;"><img src="${imageSrc}" class="card-img" loading="lazy"><div style="position:absolute; bottom:12px; right:4px;"><span class="badge-qty">Qty: ${item.jumlah || 0}</span></div></div><h4 class="card-title">${item.nama_barang}</h4>${timeBadge} <div class="card-codes">${kodeBadge}</div> <div>${badgeLokasiHtml}</div>`;
+            card.innerHTML = `${isSelected ? '<div class="card-check">✓</div>' : ''}<div style="position:relative;"><img src="${imageSrc}" class="card-img" loading="lazy"><div style="position:absolute; bottom:12px; right:4px;"><span class="badge-qty">Qty: ${item.jumlah || 0}</span></div></div><h4 class="card-title">${item.nama_barang}</h4>${timeBadge} <div class="card-codes" style="display:flex; align-items:center;">${kodeBadge} ${kondisiBadge}</div> <div>${badgeLokasiHtml}</div>`;
         } else {
             card.className = "list-item " + (isSelected ? "selected " : "") + (stat === 'Akan Dibawa' ? "card-siap-dibawa " : "");
-            card.innerHTML = `${isSelected ? '<div class="card-check" style="top:50%; transform:translateY(-50%); right:15px;">✓</div>' : ''}<img src="${imageSrc}" class="list-img" loading="lazy"><div class="list-info"><h4 class="list-title">${item.nama_barang}</h4>${timeBadge}<div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center; font-size:10px;">${kodeBadge} ${badgeLokasiHtml} <span class="badge-qty">Qty: ${item.jumlah || 0}</span></div></div>`;
+            card.innerHTML = `${isSelected ? '<div class="card-check" style="top:50%; transform:translateY(-50%); right:15px;">✓</div>' : ''}<img src="${imageSrc}" class="list-img" loading="lazy"><div class="list-info"><h4 class="list-title">${item.nama_barang}</h4>${timeBadge}<div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center; font-size:10px;">${kodeBadge} ${kondisiBadge} ${badgeLokasiHtml} <span class="badge-qty">Qty: ${item.jumlah || 0}</span></div></div>`;
         }
         card.onclick = () => { if (isBulkMode) toggleSelection(item.row_index); else openDetailModal(item); };
         container.appendChild(card);
@@ -126,7 +134,7 @@ function openZoomModal(imgUrl) { document.getElementById("zoomImgSrc").src = img
 function closeZoomModal() { document.getElementById("zoomModal").classList.remove("active"); setTimeout(() => { document.getElementById("zoomImgSrc").src = ""; }, 300); }
 
 // ==========================================
-// POP-UP DETAIL
+// POP-UP DETAIL (ZOOM HD FIX)
 // ==========================================
 function openDetailModal(item) {
     const oldModal = document.getElementById("detailModal"); if(oldModal) oldModal.remove();
@@ -136,7 +144,9 @@ function openDetailModal(item) {
     safeFileIds.forEach((fileId, i) => {
         if(fileId && fileId.length > 5) {
             let thumbUrl = fileId.includes("http") ? fileId : `https://drive.google.com/thumbnail?id=${fileId}&sz=w400`;
-            let highResUrl = fileId.includes("http") ? fileId.replace('sz=800', 'sz=s2000') : `https://drive.google.com/uc?export=view&id=${fileId}`;
+            // FIX ZOOM BLANK: Pakai jalur thumbnail dengan resolusi raksasa (s2000) agar tidak diblokir Google Drive!
+            let highResUrl = fileId.includes("http") ? fileId.replace('sz=800', 'sz=s2000') : `https://drive.google.com/thumbnail?id=${fileId}&sz=s2000`;
+            
             if(i < 3) { galleryHtml += `<img src="${thumbUrl}" class="gallery-img" onclick="openZoomModal('${highResUrl}')">`; } else { galleryHtml += `<div class="gallery-box"><img src="${thumbUrl}" class="gallery-img" style="border:2px solid #ea580c;" onclick="openZoomModal('${highResUrl}')"><span class="badge-wadah">📦 WADAH</span></div>`; }
             adaFoto = true;
         }
@@ -222,38 +232,14 @@ function selectAllVisible() { getFilteredData().forEach(item => selectedRows.add
 
 function openBulkUpdateModal() {
     if (selectedRows.size === 0) { alert("Pilih minimal 1 barang!"); return; }
-    
-    // UI BULK UPDATE YANG DIPERJELAS (Cell O dan Cell R)
     const modalHtml = `
     <div id="bulkModal" class="modal-overlay active">
         <div class="modal-content" style="max-width:350px; padding:20px; background:white; border-radius:15px; position:relative;">
             <button onclick="document.getElementById('bulkModal').remove()" style="position:absolute; top:15px; right:15px; border:none; background:#f1f5f9; width:30px; height:30px; border-radius:50%; font-weight:bold;">✕</button>
             <h3 style="margin-top:0;">Ubah Massal (${selectedRows.size} Alat)</h3>
-            
-            <div style="text-align:left; margin-bottom:15px;">
-                <label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">📍 Ubah Lokasi Saat Ini (Kolom O):</label>
-                <select id="bulkNewLokasi" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; font-weight:bold;">
-                    <option value="TETAP">-- Jangan Ubah Lokasi --</option>
-                    <option value="Gudang KC">🏢 Gudang KC</option>
-                    <option value="Dalam Perjalanan">🚚 Dalam Perjalanan</option>
-                    <option value="Di Lokasi Event">📍 Di Lokasi Event</option>
-                </select>
-            </div>
-
-            <div style="text-align:left; margin-bottom:15px;">
-                <label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">🔌 Ubah Status Alat (Kolom R):</label>
-                <select id="bulkNewStatus" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; font-weight:bold;">
-                    <option value="TETAP">-- Jangan Ubah Status --</option>
-                    <option value="Akan Dibawa">🛒 Akan Dibawa (Packing)</option>
-                    <option value="Sedang Dipakai">🔌 Sedang Dipakai / Aktivasi</option>
-                    <option value="Di Gudang">📦 Standby / Di Gudang</option>
-                </select>
-            </div>
-
-            <div style="font-size:10px; color:gray; text-align:left; margin-bottom:15px;">
-                <i>*Tips: Untuk "Kembalikan ke Gudang", ubah Lokasi jadi "Gudang KC" dan Status jadi "Di Gudang".</i>
-            </div>
-
+            <div style="text-align:left; margin-bottom:15px;"><label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">📍 Ubah Lokasi Saat Ini (Kolom O):</label><select id="bulkNewLokasi" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; font-weight:bold;"><option value="TETAP">-- Jangan Ubah Lokasi --</option><option value="Gudang KC">🏢 Gudang KC</option><option value="Dalam Perjalanan">🚚 Dalam Perjalanan</option><option value="Di Lokasi Event">📍 Di Lokasi Event</option></select></div>
+            <div style="text-align:left; margin-bottom:15px;"><label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">🔌 Ubah Status Alat (Kolom R):</label><select id="bulkNewStatus" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; font-weight:bold;"><option value="TETAP">-- Jangan Ubah Status --</option><option value="Akan Dibawa">🛒 Akan Dibawa (Packing)</option><option value="Sedang Dipakai">🔌 Sedang Dipakai / Aktivasi</option><option value="Di Gudang">📦 Standby / Di Gudang</option></select></div>
+            <div style="font-size:10px; color:gray; text-align:left; margin-bottom:15px;"><i>*Tips: Untuk "Kembalikan ke Gudang", ubah Lokasi jadi "Gudang KC" dan Status jadi "Di Gudang".</i></div>
             <button onclick="processBulkUpdate(this)" style="width:100%; padding:12px; background:#ea580c; color:white; border:none; border-radius:8px; font-weight:bold;">PROSES UPDATE LOKASI & STATUS</button>
         </div>
     </div>`;
@@ -263,7 +249,6 @@ function openBulkUpdateModal() {
 async function processBulkUpdate(btn) {
     const newLokasi = document.getElementById("bulkNewLokasi").value; const newStatus = document.getElementById("bulkNewStatus").value; 
     if (newLokasi === "TETAP" && newStatus === "TETAP") { alert("Pilih minimal satu perubahan (Lokasi atau Status)!"); return; }
-
     btn.disabled = true; btn.innerText = "MEMPROSES... (JANGAN DITUTUP)";
     try {
         const payload = { action: "update_status_lokasi", pin: userPin, rows: Array.from(selectedRows), new_lokasi: newLokasi !== "TETAP" ? newLokasi : null, new_status: newStatus !== "TETAP" ? newStatus : null };
@@ -272,6 +257,9 @@ async function processBulkUpdate(btn) {
     } catch (e) { alert("Error Sistem:\n" + e.message); } finally { btn.disabled = false; btn.innerText = "PROSES UPDATE"; }
 }
 
+// ==========================================
+// SCANNER KAMERA
+// ==========================================
 function openScannerModal() {
     let modal = document.createElement("div"); modal.id = "tempScannerModal"; modal.className = "modal-overlay active";
     modal.innerHTML = `<div class="modal-content" style="max-width:400px; background:white; padding:15px; border-radius:15px; text-align:center; position:relative;"><button onclick="closeScannerModal()" style="position:absolute; top:10px; right:10px; border:none; background:#fef2f2; color:#dc2626; width:35px; height:35px; border-radius:50%; font-weight:bold; cursor:pointer; z-index:9999;">✕</button><h3 style="margin:0 0 10px 0; font-size:16px;">Scan QR / Barcode</h3><div id="qr-reader" style="width:100%; border-radius:10px; overflow:hidden;"></div></div>`;

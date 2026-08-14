@@ -3,7 +3,7 @@
 // ==========================================
 
 // GANTI LINK DI BAWAH JIKA ADA DEPLOYMENT BARU
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyg6ntp8BPWPP8qm9IfpN62Rwd272tAEiTM0Qgl1GQQkUqJGcViG-FnewlFqFTjZ4w-Zg/exec"; 
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyGB8q5JIt8uQME2Sl7qJNgYFw2An6VY-CNNAwTGehxE26A7MkWk8xZFxLUjN2X_nZXDw/exec"; 
 
 const VALID_PINS = ["a1b2c3", "v9t6c2", "123456"];
 let allItems = []; let optionsData = { lokasi: [], tim: [] }; let userPin = localStorage.getItem("AV_INVENTORY_PIN") || ""; let html5QrcodeScanner = null; let isAdminMode = false, isBulkMode = false, selectedRows = new Set(), lastScanTime = 0, activeFilterPill = 'all', currentViewMode = 'grid'; let pendingAddFotos = [];

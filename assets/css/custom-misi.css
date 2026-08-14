@@ -41,3 +41,19 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 
 .toast-msg { visibility: hidden; min-width: 250px; background-color: #333; color: #fff; text-align: center; border-radius: 8px; padding: 12px; position: fixed; z-index: 9999; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 14px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.3); opacity: 0; transition: opacity 0.3s, bottom 0.3s; }
 .toast-msg.show { visibility: visible; opacity: 1; bottom: 50px; }
+/* ========================================= */
+/* POP-UP DETAIL & ZOOM GAMBAR (READ ONLY)   */
+/* ========================================= */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 9999; opacity: 0; pointer-events: none; transition: 0.3s; padding: 15px; box-sizing: border-box;}
+.modal-overlay.active { opacity: 1; pointer-events: auto; }
+.modal-content { width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transform: translateY(20px); transition: 0.3s; }
+.modal-overlay.active .modal-content { transform: translateY(0); }
+
+.detail-gallery { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; scroll-snap-type: x mandatory; }
+.detail-gallery::-webkit-scrollbar { height: 6px; }
+.detail-gallery::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+.gallery-img { height: 160px; min-width: 160px; object-fit: cover; border-radius: 10px; scroll-snap-align: center; border: 1px solid #e2e8f0; cursor: zoom-in; }
+
+.zoom-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 999999; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: 0.3s; }
+.zoom-overlay.active { opacity: 1; pointer-events: auto; }
+.btn-back-zoom { position: absolute; top: 20px; left: 20px; background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.5); padding: 8px 15px; border-radius: 20px; font-weight: bold; font-size: 14px; backdrop-filter: blur(5px); cursor: pointer; }

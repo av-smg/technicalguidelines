@@ -1,14 +1,56 @@
 // ==========================================
-// MESIN LOGIKA MISSION CONTROL (V.1.0)
+// MESIN LOGIKA MISSION CONTROL (V.2.0 - PIN AUTH)
 // ==========================================
 
-// GANTI DENGAN URL DEPLOYMENT BARU (V.26)
+// ⚠️ GANTI DENGAN URL DEPLOYMENT BARUMU!
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyYNghkn3XZNfFXRzuWr0BSZf3EC8IZ80KoTO0llMMyouC5ozFfmV8dcAq2zOCTLW0Smg/exec"; 
 
+const VALID_PINS = ["a1b2c3", "v9t6c2", "123456"];
+let userPin = localStorage.getItem("AV_INVENTORY_PIN") || "";
+let isAdminMode = false;
 let allMissions = [];
 let activeTeam = 'Semua';
 
-window.onload = () => { loadMissions(); };
+window.onload = () => { checkAdminStatus(); loadMissions(); };
+
+function checkAdminStatus() {
+    if (userPin && VALID_PINS.includes(userPin)) {
+        isAdminMode = true;
+        document.body.classList.add("admin-mode-active");
+        document.getElementById("modeStatusText").innerHTML = "🔴 Akses Eksekutor";
+        document.getElementById("btnUnlock").innerText = "🔓 Tutup Akses";
+    } else {
+        isAdminMode = false;
+        userPin = "";
+        document.body.classList.remove("admin-mode-active");
+        document.getElementById("modeStatusText").innerHTML = "🟢 Read-Only Mode";
+        document.getElementById("btnUnlock").innerText = "🔒 Buka Akses";
+    }
+    // Jika data sudah terload, render ulang agar tombol gembok berubah
+    if (allMissions.length > 0) renderMissions();
+}
+
+function toggleAdminMode() {
+    if (isAdminMode) {
+        if(confirm("Tutup akses? Memori PIN akan dihapus.")) {
+            localStorage.removeItem("AV_INVENTORY_PIN");
+            checkAdminStatus();
+            showToast("Mode Read-Only aktif.");
+        }
+    } else {
+        let input = prompt("Masukkan PIN Kapten Lapangan:");
+        if (input) {
+            let pinAttempt = input.trim().toLowerCase();
+            if (VALID_PINS.includes(pinAttempt)) {
+                localStorage.setItem("AV_INVENTORY_PIN", pinAttempt);
+                checkAdminStatus();
+                showToast("Akses Terbuka! Silakan eksekusi misi.");
+            } else {
+                alert("⛔ AKSES DITOLAK! PIN salah.");
+            }
+        }
+    }
+}
 
 function showToast(msg) {
     const t = document.getElementById("toastMsg");
@@ -52,7 +94,7 @@ function renderMissions() {
     });
 
     if(filtered.length === 0) {
-        container.innerHTML = `<div style="text-align:center; padding:20px; color:gray;">Tidak ada misi untuk tim ini.</div>`;
+        container.innerHTML = `<div style="text-align:center; padding:20px; color:gray;">Belum ada data misi. Pastikan nama Sheet di Google adalah "Database_Misi".</div>`;
         return;
     }
 
@@ -62,9 +104,18 @@ function renderMissions() {
         card.className = `mission-card ${isSelesai ? 'selesai' : ''}`;
         
         let kaitanHtml = misi.kode_barang ? `<span class="badge-kaitan">📦 Link: ${misi.kode_barang}</span>` : '';
-        let buttonHtml = isSelesai 
-            ? `<button class="btn-complete done">✅ SELESAI (${misi.waktu_selesai})</button>`
-            : `<button class="btn-complete" onclick="confirmMission('${misi.row_index}', '${misi.id_misi}', '${misi.kode_barang}')">☑️ TANDAI SELESAI</button>`;
+        
+        // Logika Tombol Gembok
+        let buttonHtml = '';
+        if (isSelesai) {
+            buttonHtml = `<button class="btn-complete done">✅ SELESAI (${misi.waktu_selesai})</button>`;
+        } else {
+            if (isAdminMode) {
+                buttonHtml = `<button class="btn-complete" onclick="confirmMission(event, '${misi.row_index}', '${misi.id_misi}', '${misi.kode_barang}')">☑️ TANDAI SELESAI</button>`;
+            } else {
+                buttonHtml = `<button class="btn-complete" style="background:#94a3b8;" onclick="toggleAdminMode()">🔒 KUNCI (LOGIN)</button>`;
+            }
+        }
 
         card.innerHTML = `
             <div class="mission-top">
@@ -81,19 +132,18 @@ function renderMissions() {
     });
 }
 
-async function confirmMission(rowIndex, idMisi, kodeBarang) {
-    // Meminta PIN validasi agar tidak sembarang orang bisa centang
-    let pinAttempt = prompt(`VALIDASI MISI ${idMisi}\nMasukkan PIN Kapten Lapangan untuk menyelesaikan:`);
-    if (!pinAttempt) return;
+async function confirmMission(event, rowIndex, idMisi, kodeBarang) {
+    if (!confirm(`Konfirmasi:\nApakah tugas ${idMisi} sudah terpasang dengan benar di lapangan?`)) return;
 
     // Ubah tombol jadi loading
-    event.target.innerText = "⏳ MEMPROSES...";
-    event.target.disabled = true;
+    const btn = event.target;
+    btn.innerText = "⏳ MEMPROSES...";
+    btn.disabled = true;
 
     try {
         const payload = {
             action: "complete_mission",
-            pin: pinAttempt,
+            pin: userPin,  // Otomatis menembak PIN dari memori login
             row_index: rowIndex,
             id_misi: idMisi,
             kode_barang: kodeBarang
@@ -103,16 +153,16 @@ async function confirmMission(rowIndex, idMisi, kodeBarang) {
         const data = await response.json();
 
         if (data.status === "success") {
-            showToast(`✅ Misi ${idMisi} Selesai! Gudang Diupdate.`);
-            loadMissions(); // Refresh data untuk mengubah warna kartu
+            showToast(`✅ Misi Selesai! Gudang Diupdate.`);
+            loadMissions(); // Refresh data untuk merubah kartu jadi hijau
         } else {
             alert("Gagal:\n" + data.message);
-            event.target.innerText = "☑️ TANDAI SELESAI";
-            event.target.disabled = false;
+            btn.innerText = "☑️ TANDAI SELESAI";
+            btn.disabled = false;
         }
     } catch (e) {
         alert("Error Jaringan:\n" + e.message);
-        event.target.innerText = "☑️ TANDAI SELESAI";
-        event.target.disabled = false;
+        btn.innerText = "☑️ TANDAI SELESAI";
+        btn.disabled = false;
     }
 }

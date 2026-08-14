@@ -1,16 +1,16 @@
 // ==========================================
-// MESIN LOGIKA MISSION CONTROL (V.4.0 - URL BARU & PIN TERPISAH)
+// MESIN LOGIKA MISSION CONTROL (V.5.0)
 // ==========================================
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec"; 
 
-// HANYA KAPTEN TIM (123456) DAN MASTER DEV (v9t6c2) YANG BISA AKSES
 const VALID_MISSION_PINS = ["123456", "v9t6c2"]; 
 let userPin = localStorage.getItem("AV_MISSION_PIN") || ""; 
 
 let isAdminMode = false;
 let allMissions = [];
-let activeTeam = 'Semua';
+let allInventory = []; // Menyimpan data gudang untuk dicocokkan dengan Misi
+let activeTeam = ''; // Kosong secara default agar user dipaksa milih
 
 window.onload = () => { checkAdminStatus(); loadMissions(); };
 
@@ -27,14 +27,15 @@ function checkAdminStatus() {
         document.getElementById("modeStatusText").innerHTML = "🟢 Read-Only Mode";
         document.getElementById("btnUnlock").innerText = "🔒 Buka Akses";
     }
-    if (allMissions.length > 0) renderMissions();
+    // Paksa kartu dirender ulang agar tombol Gembok langsung berubah tanpa refresh!
+    renderMissions();
 }
 
 function toggleAdminMode() {
     if (isAdminMode) {
         if(confirm("Tutup akses Eksekutor? Memori PIN akan dihapus.")) {
             localStorage.removeItem("AV_MISSION_PIN");
-            checkAdminStatus();
+            checkAdminStatus(); 
             showToast("Mode Read-Only aktif.");
         }
     } else {
@@ -43,7 +44,8 @@ function toggleAdminMode() {
             let pinAttempt = input.trim().toLowerCase();
             if (VALID_MISSION_PINS.includes(pinAttempt)) {
                 localStorage.setItem("AV_MISSION_PIN", pinAttempt);
-                checkAdminStatus();
+                userPin = pinAttempt; // Pastikan variabel memori langsung terisi
+                checkAdminStatus(); // Panggil fungsi perubah UI
                 showToast("Akses Terbuka! Silakan eksekusi misi.");
             } else {
                 alert("⛔ AKSES DITOLAK! PIN tidak dikenali untuk area ini.");
@@ -66,6 +68,7 @@ async function loadMissions() {
         const data = await res.json();
         if(data.status === "success") {
             allMissions = data.missions || [];
+            allInventory = data.inventory || []; // Simpan data gudang untuk foto
             document.getElementById("loading").style.display = "none";
             renderMissions();
         } else {
@@ -89,13 +92,21 @@ function renderMissions() {
     const container = document.getElementById("missionsContainer");
     container.innerHTML = "";
     
-    let filtered = allMissions.filter(m => {
-        if(activeTeam === 'Semua') return true;
-        return m.tim.toLowerCase().includes(activeTeam.toLowerCase());
-    });
+    // Jika belum milih tim, suruh milih
+    if (activeTeam === '') {
+        container.innerHTML = `<div style="text-align:center; padding:40px 20px; color:#64748b; grid-column: 1 / -1;">
+            <h3 style="margin-bottom:5px;">Pilih Divisi Tim 👆</h3>
+            <p style="font-size:12px; margin-top:0;">Silakan pilih salah satu tombol tim di atas untuk melihat daftar tugas yang harus diselesaikan.</p>
+        </div>`;
+        return;
+    }
+
+    let filtered = allMissions.filter(m => m.tim.toLowerCase().includes(activeTeam.toLowerCase()));
 
     if(filtered.length === 0) {
-        container.innerHTML = `<div style="text-align:center; padding:20px; color:gray;">Belum ada data misi untuk tim ini.</div>`;
+        container.innerHTML = `<div style="text-align:center; padding:40px 20px; color:#64748b; grid-column: 1 / -1;">
+            ✅ Belum ada tugas / semua tugas telah selesai untuk tim ini.
+        </div>`;
         return;
     }
 
@@ -104,7 +115,42 @@ function renderMissions() {
         const card = document.createElement("div");
         card.className = `mission-card ${isSelesai ? 'selesai' : ''}`;
         
-        let kaitanHtml = misi.kode_barang ? `<span class="badge-kaitan">📦 Link: ${misi.kode_barang}</span>` : '';
+        // LOGIKA PENCOCOKAN PAKET BARANG & FOTO
+        let packageHtml = '';
+        if (misi.kode_barang) {
+            let codes = misi.kode_barang.split(','); // Memisahkan jika ada banyak kode
+            packageHtml += `<div class="package-list"><div style="font-size:10px; font-weight:bold; color:gray; margin-bottom:4px;">📦 Target Paket Barang:</div>`;
+            
+            codes.forEach(c => {
+                let codeClean = c.trim();
+                if(!codeClean) return;
+                
+                // Cari kode ini di database gudang
+                let foundItem = allInventory.find(inv => inv.kode_barang && inv.kode_barang.toLowerCase() === codeClean.toLowerCase());
+                
+                if (foundItem) {
+                    let safeFileIds = foundItem.file_ids || []; 
+                    let firstFileId = safeFileIds.find(id => id && id.length > 5); 
+                    let imgUrl = 'https://placehold.co/100x100/EEEEEE/999999?text=NO+IMG';
+                    if(firstFileId) imgUrl = firstFileId.includes("http") ? firstFileId : `https://drive.google.com/thumbnail?id=${firstFileId}&sz=w200`;
+                    
+                    packageHtml += `<div class="package-item">
+                        <img src="${imgUrl}" class="pkg-img" loading="lazy">
+                        <div class="pkg-info">
+                            <div class="pkg-name">${foundItem.nama_barang}</div>
+                            <div class="pkg-code">#${foundItem.kode_barang}</div>
+                        </div>
+                    </div>`;
+                } else {
+                    packageHtml += `<div class="package-item">
+                        <div class="pkg-info">
+                            <div class="pkg-code" style="color:gray;">#${codeClean} (Barang tidak ditemukan di gudang)</div>
+                        </div>
+                    </div>`;
+                }
+            });
+            packageHtml += `</div>`;
+        }
         
         let buttonHtml = '';
         if (isSelesai) {
@@ -123,7 +169,7 @@ function renderMissions() {
                 <span class="badge-zona">📍 ${misi.zona || '-'}</span>
             </div>
             <h3 class="mission-title">${misi.tugas}</h3>
-            <div>${kaitanHtml}</div>
+            ${packageHtml}
             <div class="mission-action">
                 ${buttonHtml}
             </div>

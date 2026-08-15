@@ -1,5 +1,5 @@
 // ==========================================
-// MESIN LOGIKA MISSION CONTROL (V.11.2 - ULTIMATE + APD & NUMBERING)
+// MESIN LOGIKA MISSION CONTROL (V.11.4 - BOOTH BYPASS + SENTER + BOX)
 // ==========================================
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec"; 
@@ -47,7 +47,6 @@ function showToast(msg, isSuccess = true) {
     setTimeout(() => { t.classList.remove("show"); }, 3000); 
 }
 
-// 🔊 HAPTIC & AUDIO ENGINE
 function triggerFeedback(type) {
     try {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -95,41 +94,29 @@ function renderMissions() {
     let filtered = allMissions.filter(m => m.tim.toLowerCase().includes(activeTeam.toLowerCase()));
     if(filtered.length === 0) { container.innerHTML = `<div style="text-align:center; padding:40px 20px; color:#64748b; grid-column: 1 / -1;">✅ Belum ada tugas untuk tim ini.</div>`; return; }
 
-    // Hitung Progress
     let totalMisi = filtered.length;
     let selesaiMisi = filtered.filter(m => m.status_misi.toLowerCase() === 'selesai').length;
     let persentase = Math.round((selesaiMisi / totalMisi) * 100);
 
-    // Banner APD Berdasarkan Tim Aktif
     let apdText = "";
     let teamLower = activeTeam.toLowerCase();
-    if (teamLower.includes("speaker")) {
-        apdText = "🪖 Helm Wajib | 🥾 Sepatu Safety | 🧤 Sarung Tangan";
-    } else if (teamLower.includes("kabel")) {
-        apdText = "🥾 Sepatu Safety | 🧤 Sarung Tangan";
-    } else if (teamLower.includes("booth")) {
-        apdText = "🥾 Sepatu Safety | 🧤 Sarung Tangan";
-    }
+    if (teamLower.includes("speaker")) { apdText = "🪖 Helm Wajib | 🥾 Sepatu Safety | 🧤 Sarung Tangan"; } 
+    else if (teamLower.includes("kabel")) { apdText = "🥾 Sepatu Safety | 🧤 Sarung Tangan"; } 
+    else if (teamLower.includes("booth")) { apdText = "🥾 Sepatu Safety | 🧤 Sarung Tangan"; }
 
-    let apdHtml = apdText ? `
-    <div style="background:#fffbeb; border:1px solid #fde68a; color:#b45309; padding:12px 15px; border-radius:12px; margin-bottom:15px; font-size:12px; font-weight:bold; display:flex; align-items:center; gap:8px; grid-column: 1 / -1; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-        <span style="font-size:16px;">⚠️</span> <span><b>PENGINGAT APD:</b> ${apdText}</span>
-    </div>` : '';
+    let apdHtml = apdText ? `<div style="background:#fffbeb; border:1px solid #fde68a; color:#b45309; padding:12px 15px; border-radius:12px; margin-bottom:15px; font-size:12px; font-weight:bold; display:flex; align-items:center; gap:8px; grid-column: 1 / -1; box-shadow: 0 2px 4px rgba(0,0,0,0.05);"><span style="font-size:16px;">⚠️</span> <span><b>PENGINGAT APD:</b> ${apdText}</span></div>` : '';
 
     let progressHtml = `
     <div class="mission-progress-container" style="grid-column: 1 / -1;">
         <div style="display:flex; justify-content:space-between; align-items:center;">
             <div style="font-size:14px; font-weight:bold; color:#1e293b;">📊 Progress: ${selesaiMisi}/${totalMisi} (${persentase}%)</div>
-            <button class="filter-toggle ${isHideCompleted ? 'active' : ''}" onclick="toggleHideCompleted()">
-                ${isHideCompleted ? '👁️ Tampilkan Semua' : '🙈 Sembunyikan Selesai'}
-            </button>
+            <button class="filter-toggle ${isHideCompleted ? 'active' : ''}" onclick="toggleHideCompleted()">${isHideCompleted ? '👁️ Tampilkan Semua' : '🙈 Sembunyikan Selesai'}</button>
         </div>
         <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${persentase}%;"></div></div>
     </div>`;
     
     container.innerHTML = apdHtml + progressHtml;
 
-    // SORTING: Yang Pending di atas, Selesai di bawah
     filtered.sort((a, b) => {
         let statA = a.status_misi.toLowerCase() === 'selesai' ? 1 : -1;
         let statB = b.status_misi.toLowerCase() === 'selesai' ? 1 : -1;
@@ -143,20 +130,39 @@ function renderMissions() {
         const card = document.createElement("div"); card.className = `mission-card ${isSelesai ? 'selesai' : ''}`;
         const isOverride = misi.tugas.includes("⚠️");
         
-        let packageHtml = `<div class="package-list"><div style="font-size:10px; font-weight:bold; color:gray; margin-bottom:4px;">📦 Target Instalasi:</div>`;
+        let packageHtml = `<div class="package-list"><div style="font-size:10px; font-weight:bold; color:gray; margin-bottom:6px;">📦 Target Instalasi:</div>`;
+        
         if (misi.kode_barang) {
             let codes = misi.kode_barang.split(',').map(c => c.trim()).filter(c => c);
+            let groupedItems = {}; let notFoundCodes = [];
+            
             codes.forEach(code => {
                 let foundItem = allInventory.find(inv => inv.kode_barang && inv.kode_barang.toLowerCase() === code.toLowerCase());
                 if (foundItem) {
-                    packageHtml += `<div class="package-item" style="cursor:pointer;" onclick="openItemDetail('${foundItem.kode_barang}')">
-                        <img src="${getThumbUrl(foundItem)}" class="pkg-img" loading="lazy">
-                        <div class="pkg-info"><div class="pkg-name">${foundItem.nama_barang}</div><div class="pkg-code">#${foundItem.kode_barang}</div></div>
-                    </div>`;
-                } else {
-                    packageHtml += `<div class="package-item"><div class="pkg-info"><div class="pkg-code" style="color:#ef4444;">#${code} (Tidak Ada)</div></div></div>`;
-                }
+                    let wadah = (foundItem.kode_wadah && foundItem.kode_wadah.trim() !== "") ? foundItem.kode_wadah.toUpperCase() : "NON_BOX";
+                    if (!groupedItems[wadah]) groupedItems[wadah] = [];
+                    groupedItems[wadah].push(foundItem);
+                } else { notFoundCodes.push(code); }
             });
+
+            for (const [wadah, items] of Object.entries(groupedItems)) {
+                if (wadah !== "NON_BOX") {
+                    let boxItem = allInventory.find(inv => inv.kode_barang && inv.kode_barang.toUpperCase() === wadah);
+                    let boxName = boxItem ? boxItem.nama_barang : `WADAH #${wadah}`;
+                    packageHtml += `<div class="box-group" style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; margin-bottom:10px; overflow:hidden;"><div style="background:#e2e8f0; padding:8px 10px; font-size:11px; font-weight:bold; color:#0f172a; border-bottom:1px solid #cbd5e1; display:flex; align-items:center;">🧰 ${boxName}</div><div style="padding:6px;">`;
+                    items.forEach(foundItem => {
+                        packageHtml += `<div class="package-item" style="cursor:pointer; border:none; background:transparent; margin-bottom:2px; padding:6px; border-bottom:1px dashed #e2e8f0;" onclick="openItemDetail('${foundItem.kode_barang}')"><img src="${getThumbUrl(foundItem)}" class="pkg-img" loading="lazy"><div class="pkg-info"><div class="pkg-name">${foundItem.nama_barang}</div><div class="pkg-code">#${foundItem.kode_barang}</div></div></div>`;
+                    });
+                    packageHtml += `</div></div>`;
+                }
+            }
+
+            if (groupedItems["NON_BOX"]) {
+                groupedItems["NON_BOX"].forEach(foundItem => {
+                    packageHtml += `<div class="package-item" style="cursor:pointer;" onclick="openItemDetail('${foundItem.kode_barang}')"><img src="${getThumbUrl(foundItem)}" class="pkg-img" loading="lazy"><div class="pkg-info"><div class="pkg-name">${foundItem.nama_barang}</div><div class="pkg-code">#${foundItem.kode_barang}</div></div></div>`;
+                });
+            }
+            notFoundCodes.forEach(code => { packageHtml += `<div class="package-item"><div class="pkg-info"><div class="pkg-code" style="color:#ef4444;">#${code} (Tidak Ada)</div></div></div>`; });
         }
         packageHtml += `</div>`;
         
@@ -165,11 +171,22 @@ function renderMissions() {
             if (isAdminMode) buttonHtml = `<div style="display:flex; gap:10px;"><div class="btn-complete done" style="flex:1; margin:0;">✅ Selesai: ${misi.waktu_selesai}</div><button class="btn-complete" style="background:#ef4444; flex:0 0 auto; padding:10px; margin:0;" onclick="undoMission(event, '${misi.row_index}', '${misi.id_misi}', '${misi.kode_barang}')">❌ BATALKAN</button></div>`;
             else buttonHtml = `<button class="btn-complete done">✅ SELESAI (${misi.waktu_selesai})</button>`;
         } else {
-            if (isAdminMode) buttonHtml = `<button class="btn-complete" style="background:#2563eb;" onclick="openMissionScanner('${misi.row_index}', '${misi.id_misi}', '${misi.kode_barang}')">📷 SCAN BARANG</button>`;
+            if (isAdminMode) {
+                // LOGIKA TOMBOL PAKSA SELESAI UNTUK TIM BOOTH
+                let scanBtn = `<button class="btn-complete" style="background:#2563eb; flex:1; margin:0;" onclick="openMissionScanner('${misi.row_index}', '${misi.id_misi}', '${misi.kode_barang}')">📷 SCAN BARANG</button>`;
+                
+                if (teamLower.includes("booth")) {
+                    buttonHtml = `<div style="display:flex; gap:10px; align-items:stretch;">
+                        ${scanBtn}
+                        <button class="btn-complete" style="background:#10b981; flex:1; margin:0; padding:10px 5px;" onclick="executeCompleteMission('${misi.row_index}', '${misi.id_misi}', '${misi.kode_barang}')">✅ PAKSA SELESAI</button>
+                    </div>`;
+                } else {
+                    buttonHtml = scanBtn;
+                }
+            }
             else buttonHtml = `<button class="btn-complete" style="background:#94a3b8;" onclick="toggleAdminMode()">🔒 KUNCI (LOGIN)</button>`;
         }
 
-        // Card dengan Nomor Urut (#1, #2, dst)
         card.innerHTML = `
             <div class="mission-header-click" onclick="toggleMissionContent(this)">
                 <div class="mission-top">
@@ -190,7 +207,7 @@ function renderMissions() {
 }
 
 // ==========================================
-// SCANNER V.11
+// SCANNER V.11 (DENGAN SENTER)
 // ==========================================
 function openMissionScanner(rowIndex, idMisi, targetKodeBarangString) {
     let modal = document.createElement("div"); modal.id = "missionScannerModal"; modal.className = "modal-overlay active";
@@ -200,12 +217,16 @@ function openMissionScanner(rowIndex, idMisi, targetKodeBarangString) {
             <h3 style="margin:0 0 5px 0; font-size:16px;">Misi: ${idMisi}</h3>
             <p style="font-size:11px; color:#64748b; margin-bottom:10px;">Scan target atau alat pengganti</p>
             <div id="qr-reader-mission" style="width:100%; border-radius:10px; overflow:hidden; background:black;"></div>
-            <div class="scanner-controls">
-                <button class="btn-scanner-action" onclick="toggleCameraFacing()">🔄 Tukar Kamera</button>
+            
+            <div class="scanner-controls" style="display:flex; gap:10px; justify-content:center; margin-top:15px;">
+                <button class="btn-scanner-action" style="padding:10px 15px; border-radius:8px; border:none; background:#e2e8f0; font-weight:bold; cursor:pointer; flex:1;" onclick="toggleCameraFacing()">🔄 Kamera</button>
+                <button class="btn-scanner-action" id="btnFlashlight" style="padding:10px 15px; border-radius:8px; border:none; background:#e2e8f0; font-weight:bold; cursor:pointer; flex:1;" onclick="toggleFlashlight()">🔦 Senter</button>
             </div>
+            
             <div id="overrideForm" style="display:none; text-align:left; margin-top:15px; background:#fef2f2; border:1px solid #fca5a5; padding:15px; border-radius:10px;"></div>
         </div>`; 
     document.body.appendChild(modal);
+    isFlashlightOn = false; // Reset status senter
     startScanner(rowIndex, idMisi, targetKodeBarangString);
 }
 
@@ -223,6 +244,20 @@ function toggleCameraFacing() {
     currentCameraFacing = currentCameraFacing === "environment" ? "user" : "environment";
     showToast("Mengganti kamera...", true);
     setTimeout(() => { closeMissionScanner(); showToast("Silakan klik SCAN lagi", true); }, 500);
+}
+
+function toggleFlashlight() {
+    if (!html5QrCode) return;
+    isFlashlightOn = !isFlashlightOn;
+    html5QrCode.applyVideoConstraints({
+        advanced: [{ torch: isFlashlightOn }]
+    }).then(() => {
+        document.getElementById("btnFlashlight").style.background = isFlashlightOn ? "#fef08a" : "#e2e8f0"; // Warna kuning jika nyala
+    }).catch(err => {
+        showToast("Senter tidak didukung/kamera depan aktif.", false);
+        isFlashlightOn = false;
+        document.getElementById("btnFlashlight").style.background = "#e2e8f0";
+    });
 }
 
 function processScanResult(decodedText, rowIndex, idMisi, targetKodeBarangString) {

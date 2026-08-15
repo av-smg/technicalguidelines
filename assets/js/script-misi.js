@@ -1,5 +1,5 @@
 // ==========================================
-// MESIN LOGIKA MISSION CONTROL (V.11.4 - BOOTH BYPASS + SENTER + BOX)
+// MESIN LOGIKA MISSION CONTROL (V.11.5 - TEAM ROSTER + INVENTARIS + SENTER + BOOTH BYPASS)
 // ==========================================
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec"; 
@@ -11,6 +11,14 @@ let html5QrCode = null;
 let isHideCompleted = false; 
 let currentCameraFacing = "environment"; 
 let isFlashlightOn = false;
+
+// 📋 DATABASE KAPTEN & ASISTEN TIM
+const teamRoster = {
+    "speaker": { kapten: "Malkhiel", asisten: "Yoka" },
+    "kabel": { kapten: "Vina", asisten: "Anggid" },
+    "booth": { kapten: "Truna", asisten: "xx" },
+    "inventaris": { kapten: "Emma", asisten: "Peni" }
+};
 
 window.onload = () => { checkAdminStatus(); loadMissions(); };
 
@@ -97,17 +105,36 @@ function renderMissions() {
     let totalMisi = filtered.length;
     let selesaiMisi = filtered.filter(m => m.status_misi.toLowerCase() === 'selesai').length;
     let persentase = Math.round((selesaiMisi / totalMisi) * 100);
-
-    let apdText = "";
     let teamLower = activeTeam.toLowerCase();
+
+    // 🌟 1. BANNER CONTACT PERSON (KAPTEN & ASISTEN)
+    let rosterHtml = "";
+    let foundTeamKey = Object.keys(teamRoster).find(k => teamLower.includes(k));
+    if (foundTeamKey) {
+        let cp = teamRoster[foundTeamKey];
+        rosterHtml = `
+        <div style="background:#eff6ff; border:1px solid #bfdbfe; color:#1e3a8a; padding:12px 15px; border-radius:12px; margin-bottom:10px; font-size:13px; display:flex; justify-content:space-between; align-items:center; grid-column: 1 / -1; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+            <div>
+                <div style="font-size:10px; font-weight:bold; color:#3b82f6; margin-bottom:4px; letter-spacing:0.5px;">📞 CONTACT PERSON TIM</div>
+                <div><b>👑 Kapten:</b> ${cp.kapten}</div>
+                <div style="margin-top:2px;"><b>🛠️ Asisten:</b> ${cp.asisten}</div>
+            </div>
+            <div style="font-size:28px; opacity:0.8;">📱</div>
+        </div>`;
+    }
+
+    // 🌟 2. BANNER PENGINGAT APD
+    let apdText = "";
     if (teamLower.includes("speaker")) { apdText = "🪖 Helm Wajib | 🥾 Sepatu Safety | 🧤 Sarung Tangan"; } 
     else if (teamLower.includes("kabel")) { apdText = "🥾 Sepatu Safety | 🧤 Sarung Tangan"; } 
     else if (teamLower.includes("booth")) { apdText = "🥾 Sepatu Safety | 🧤 Sarung Tangan"; }
+    // Tim inventaris biasanya tidak butuh APD berat, jadi dikosongkan/di-skip otomatis.
 
     let apdHtml = apdText ? `<div style="background:#fffbeb; border:1px solid #fde68a; color:#b45309; padding:12px 15px; border-radius:12px; margin-bottom:15px; font-size:12px; font-weight:bold; display:flex; align-items:center; gap:8px; grid-column: 1 / -1; box-shadow: 0 2px 4px rgba(0,0,0,0.05);"><span style="font-size:16px;">⚠️</span> <span><b>PENGINGAT APD:</b> ${apdText}</span></div>` : '';
 
+    // 🌟 3. PROGRESS BAR
     let progressHtml = `
-    <div class="mission-progress-container" style="grid-column: 1 / -1;">
+    <div class="mission-progress-container" style="grid-column: 1 / -1; margin-bottom:10px;">
         <div style="display:flex; justify-content:space-between; align-items:center;">
             <div style="font-size:14px; font-weight:bold; color:#1e293b;">📊 Progress: ${selesaiMisi}/${totalMisi} (${persentase}%)</div>
             <button class="filter-toggle ${isHideCompleted ? 'active' : ''}" onclick="toggleHideCompleted()">${isHideCompleted ? '👁️ Tampilkan Semua' : '🙈 Sembunyikan Selesai'}</button>
@@ -115,7 +142,7 @@ function renderMissions() {
         <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${persentase}%;"></div></div>
     </div>`;
     
-    container.innerHTML = apdHtml + progressHtml;
+    container.innerHTML = rosterHtml + apdHtml + progressHtml;
 
     filtered.sort((a, b) => {
         let statA = a.status_misi.toLowerCase() === 'selesai' ? 1 : -1;

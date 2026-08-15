@@ -158,29 +158,19 @@ function renderMissions() {
 
     filtered.forEach((misi, index) => {
         const isSelesai = (misi.status_misi.toLowerCase() === 'selesai');
-        if (isSelesai && isHideCompleted) return;
-
-        const card = document.createElement("div"); card.className = `mission-card ${isSelesai ? 'selesai' : ''}`;
         const isOverride = misi.tugas.includes("⚠️ [");
         
-        // ========================================
-        // 🔥 LOGIKA PEMISAHAN JUDUL DAN DETAIL TUGAS
-        // ========================================
-        let rawTugas = (misi.tugas || "").replace(/⚠️ \[.*?\] /g, ''); // Hapus embel-embel Override jika ada
+        let rawTugas = (misi.tugas || "").replace(/⚠️ \[.*?\] /g, ''); 
         let judulTugas = rawTugas;
-        
-        // Deteksi jika Komandan menambah kolom "Detail Tugas" (misi.detail_tugas)
         let detailTugas = misi.detail_tugas || misi.detail || ""; 
 
-        // Deteksi jika menggunakan fitur Alt+Enter (baris baru / \n)
         if (!detailTugas && rawTugas.includes("\n")) {
             let parts = rawTugas.split("\n");
-            judulTugas = parts[0]; // Baris pertama jadi Judul
-            parts.shift(); // Hapus baris pertama dari array
-            detailTugas = parts.join("<br>"); // Sisanya gabungkan dengan efek baris baru (HTML)
+            judulTugas = parts[0]; 
+            parts.shift(); 
+            detailTugas = parts.join("<br>"); 
         }
 
-        // Template HTML untuk Detail Instruksi
         let detailHtml = detailTugas ? `
             <div style="background:#f8fafc; border-left:4px solid #3b82f6; padding:10px 12px; font-size:12px; color:#334155; margin-bottom:12px; border-radius:4px; line-height:1.5;">
                 <b style="color:#1d4ed8; font-size:11px;">📝 RINCIAN INSTRUKSI:</b><br>${detailTugas}
@@ -207,10 +197,17 @@ function renderMissions() {
                     let boxItem = allInventory.find(inv => inv.kode_barang && inv.kode_barang.toUpperCase() === wadah);
                     let boxName = boxItem ? boxItem.nama_barang : `WADAH #${wadah}`;
                     
+                    // 🔥 THUMBNAIL DITEMPELKAN KE HEADER BOX ABU-ABU DI SINI 🔥
+                    let boxThumbUrl = boxItem ? getThumbUrl(boxItem) : 'https://placehold.co/100x100/EEEEEE/999999?text=BOX';
+                    
                     packageHtml += `
                     <div class="box-group" style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; margin-bottom:10px; overflow:hidden;">
-                        <div onclick="openItemDetail('${wadah}')" style="cursor:pointer; background:#e2e8f0; padding:8px 10px; font-size:11px; font-weight:bold; color:#0f172a; border-bottom:1px solid #cbd5e1; display:flex; justify-content:space-between; align-items:center;">
-                            <span>🧰 ${boxName}</span> <span style="font-size:14px;">🔍</span>
+                        <div onclick="openItemDetail('${wadah}')" style="cursor:pointer; background:#e2e8f0; padding:6px 10px; font-size:11px; font-weight:bold; color:#0f172a; border-bottom:1px solid #cbd5e1; display:flex; justify-content:space-between; align-items:center;">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <img src="${boxThumbUrl}" style="width:28px; height:28px; object-fit:cover; border-radius:4px; border:1px solid #cbd5e1; background:white;">
+                                <span>🧰 ${boxName}</span>
+                            </div>
+                            <span style="font-size:14px;">🔍</span>
                         </div>
                         <div style="padding:6px;">`;
                         
@@ -238,7 +235,6 @@ function renderMissions() {
             if (isAdminMode) {
                 let scanBtn = `<button class="btn-complete" style="background:#2563eb; flex:1; margin:0;" onclick="openMissionScanner('${misi.row_index}', '${misi.id_misi}', '${misi.kode_barang}')">📷 SCAN BARANG</button>`;
                 
-                // 🔥 LOGIKA BYPASS DITAMBAHKAN UNTUK TIM KABEL & TIM BOOTH
                 if (teamLower.includes("booth") || teamLower.includes("kabel")) {
                     buttonHtml = `<div style="display:flex; gap:10px; align-items:stretch;">
                         ${scanBtn}
@@ -263,7 +259,7 @@ function renderMissions() {
                 </h3>
             </div>
             <div class="mission-content">
-                ${detailHtml} <!-- MEMASUKKAN RINCIAN DETAIL TUGAS DI SINI -->
+                ${detailHtml}
                 ${packageHtml}
                 <div class="mission-action">${buttonHtml}</div>
             </div>`;

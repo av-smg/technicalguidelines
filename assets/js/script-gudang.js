@@ -105,8 +105,8 @@ function render(data) {
 function openZoomModal(imgUrl) { document.getElementById("zoomImgSrc").src = imgUrl; document.getElementById("zoomModal").classList.add("active"); }
 function closeZoomModal() { document.getElementById("zoomModal").classList.remove("active"); setTimeout(() => { document.getElementById("zoomImgSrc").src = ""; }, 300); }
 
-// ==========================================
-// POP-UP DETAIL (DENGAN AUTO-TRACK STOK SEJENIS)
+/// ==========================================
+// POP-UP DETAIL (THUMBNAIL WADAH + AUTO-TRACK)
 // ==========================================
 function openDetailModal(item) {
     const oldModal = document.getElementById("detailModal"); if(oldModal) oldModal.remove();
@@ -117,13 +117,31 @@ function openDetailModal(item) {
     
     let badgeWadahHtml = item.kode_wadah ? `<span onclick="document.getElementById('detailModal').remove(); document.getElementById('searchInput').value='${item.kode_wadah}'; applyFilters();" style="cursor:pointer; display:inline-block; margin-left:5px; background:#fef3c7; color:#d97706; padding:2px 8px; border-radius:4px; border:1px solid #fde68a;">🧰 Lihat Wadah: ${item.kode_wadah} 🔍</span>` : `<span style="color:gray; margin-left:5px;">📦 Wadah: -</span>`;
     
-    let isiWadahHtml = ""; if (item.kode_barang) { let isiWadah = allItems.filter(i => i.kode_wadah && i.kode_wadah.toLowerCase() === item.kode_barang.toLowerCase()); if (isiWadah.length > 0) { isiWadahHtml = `<div style="text-align:left; margin-top:10px; background:#f0fdf4; padding:10px; border-radius:8px; border:1px solid #bbf7d0;"><div style="font-size:11px; font-weight:bold; color:#16a34a; margin-bottom:4px;">🧰 Isi di dalam wadah ini (${isiWadah.length} jenis):</div><ul style="margin:0; padding-left:15px; font-size:11px; color:#334155;">${isiWadah.map(w => `<li style="margin-bottom:3px; cursor:pointer;" onclick="document.getElementById('searchInput').value='${w.kode_barang}'; applyFilters(); document.getElementById('detailModal').remove();"><b>${w.nama_barang}</b> (Qty: ${w.jumlah})</li>`).join('')}</ul></div>`; } }
+    // 💡 PERBAIKAN: SUB-WADAH MENGGUNAKAN THUMBNAIL
+    let isiWadahHtml = ""; 
+    if (item.kode_barang) { 
+        let isiWadah = allItems.filter(i => i.kode_wadah && i.kode_wadah.toLowerCase() === item.kode_barang.toLowerCase()); 
+        if (isiWadah.length > 0) { 
+            let listHtml = isiWadah.map(w => {
+                let safeFileIdsW = w.file_ids || w.fotos || []; 
+                let firstFileIdW = safeFileIdsW.find(id => id && id.length > 5); 
+                let thumbW = firstFileIdW ? (firstFileIdW.includes("http") ? firstFileIdW : `https://drive.google.com/thumbnail?id=${firstFileIdW}&sz=w100`) : 'https://placehold.co/100x100/EEEEEE/999999?text=NO+IMG';
+                return `
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px; padding:6px; background:#fff; border:1px solid #dcfce7; border-radius:6px; cursor:pointer; box-shadow:0 1px 2px rgba(0,0,0,0.05);" onclick="document.getElementById('searchInput').value='${w.kode_barang}'; applyFilters(); document.getElementById('detailModal').remove();">
+                    <img src="${thumbW}" style="width:45px; height:45px; object-fit:cover; border-radius:6px; border:1px solid #e2e8f0;">
+                    <div style="flex:1; line-height:1.2;">
+                        <div style="font-size:11px; font-weight:bold; color:#1e293b;">${w.nama_barang}</div>
+                        <div style="font-size:10px; color:#ea580c; font-weight:bold; margin-top:2px;">#${w.kode_barang || '-'} <span style="color:#64748b; font-weight:normal;">• Qty: ${w.jumlah||0}</span></div>
+                    </div>
+                </div>`;
+            }).join('');
+            isiWadahHtml = `<div style="text-align:left; margin-top:10px; background:#f0fdf4; padding:10px; border-radius:8px; border:1px solid #bbf7d0;"><div style="font-size:11px; font-weight:bold; color:#16a34a; margin-bottom:8px;">🧰 Isi di dalam wadah ini (${isiWadah.length} jenis):</div>${listHtml}</div>`; 
+        } 
+    }
     
-    // 💡 FITUR BARU: AUTO-TRACK STOK BARANG SEJENIS (Berdasarkan Nama)
+    // 💡 FITUR BARU: AUTO-TRACK STOK BARANG SEJENIS
     let similarItems = allItems.filter(i => i.nama_barang.toLowerCase() === item.nama_barang.toLowerCase());
     let totalSimilarQty = similarItems.reduce((sum, curr) => sum + (parseInt(curr.jumlah) || 1), 0);
-    
-    // Hitung Sebaran Status Barang Sejenis
     let statusCounts = {};
     similarItems.forEach(i => {
         let s = (i.status_digunakan && i.status_digunakan !== 'FALSE') ? i.status_digunakan : "Di Gudang";

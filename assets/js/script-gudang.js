@@ -106,7 +106,7 @@ function openZoomModal(imgUrl) { document.getElementById("zoomImgSrc").src = img
 function closeZoomModal() { document.getElementById("zoomModal").classList.remove("active"); setTimeout(() => { document.getElementById("zoomImgSrc").src = ""; }, 300); }
 
 // ==========================================
-// POP-UP DETAIL
+// POP-UP DETAIL (DENGAN AUTO-TRACK STOK SEJENIS)
 // ==========================================
 function openDetailModal(item) {
     const oldModal = document.getElementById("detailModal"); if(oldModal) oldModal.remove();
@@ -116,17 +116,46 @@ function openDetailModal(item) {
     if(!adaFoto) galleryHtml += `<img src="https://placehold.co/300x200/EEEEEE/999999?text=Tidak+Ada+Foto" class="gallery-img" style="width:100%;">`; galleryHtml += `</div>`;
     
     let badgeWadahHtml = item.kode_wadah ? `<span onclick="document.getElementById('detailModal').remove(); document.getElementById('searchInput').value='${item.kode_wadah}'; applyFilters();" style="cursor:pointer; display:inline-block; margin-left:5px; background:#fef3c7; color:#d97706; padding:2px 8px; border-radius:4px; border:1px solid #fde68a;">🧰 Lihat Wadah: ${item.kode_wadah} 🔍</span>` : `<span style="color:gray; margin-left:5px;">📦 Wadah: -</span>`;
+    
     let isiWadahHtml = ""; if (item.kode_barang) { let isiWadah = allItems.filter(i => i.kode_wadah && i.kode_wadah.toLowerCase() === item.kode_barang.toLowerCase()); if (isiWadah.length > 0) { isiWadahHtml = `<div style="text-align:left; margin-top:10px; background:#f0fdf4; padding:10px; border-radius:8px; border:1px solid #bbf7d0;"><div style="font-size:11px; font-weight:bold; color:#16a34a; margin-bottom:4px;">🧰 Isi di dalam wadah ini (${isiWadah.length} jenis):</div><ul style="margin:0; padding-left:15px; font-size:11px; color:#334155;">${isiWadah.map(w => `<li style="margin-bottom:3px; cursor:pointer;" onclick="document.getElementById('searchInput').value='${w.kode_barang}'; applyFilters(); document.getElementById('detailModal').remove();"><b>${w.nama_barang}</b> (Qty: ${w.jumlah})</li>`).join('')}</ul></div>`; } }
+    
+    // 💡 FITUR BARU: AUTO-TRACK STOK BARANG SEJENIS (Berdasarkan Nama)
+    let similarItems = allItems.filter(i => i.nama_barang.toLowerCase() === item.nama_barang.toLowerCase());
+    let totalSimilarQty = similarItems.reduce((sum, curr) => sum + (parseInt(curr.jumlah) || 1), 0);
+    
+    // Hitung Sebaran Status Barang Sejenis
+    let statusCounts = {};
+    similarItems.forEach(i => {
+        let s = (i.status_digunakan && i.status_digunakan !== 'FALSE') ? i.status_digunakan : "Di Gudang";
+        statusCounts[s] = (statusCounts[s] || 0) + (parseInt(i.jumlah) || 1);
+    });
+    
+    let similarHtml = "";
+    if (similarItems.length > 1 || totalSimilarQty > 1) {
+        let badgeHtml = Object.keys(statusCounts).map(status => {
+            let bgCol = status.includes('Gudang') ? '#dcfce7' : (status.includes('Dipakai') || status.includes('Event') ? '#fef08a' : '#e2e8f0');
+            let txtCol = status.includes('Gudang') ? '#166534' : (status.includes('Dipakai') || status.includes('Event') ? '#854d0e' : '#334155');
+            return `<span style="display:inline-block; margin-right:4px; margin-bottom:4px; padding:4px 8px; border-radius:6px; font-size:10px; background:${bgCol}; color:${txtCol}; font-weight:bold; border:1px solid #cbd5e1;">${status}: ${statusCounts[status]}</span>`;
+        }).join('');
+        
+        similarHtml = `
+        <div style="text-align:left; margin-top:10px; background:#eff6ff; padding:12px; border-radius:8px; border:1px solid #bfdbfe;">
+            <div style="font-size:12px; font-weight:900; color:#1d4ed8; margin-bottom:4px;">📊 Cek Silang Stok '${item.nama_barang}':</div>
+            <div style="font-size:11px; color:#1e293b; margin-bottom:8px;">Sistem mendeteksi ada total <b>${totalSimilarQty} Pcs</b> alat ini di database. Berikut sebarannya:</div>
+            <div style="display:flex; flex-wrap:wrap;">${badgeHtml}</div>
+        </div>`;
+    }
+
     let logHtml = `<div style="text-align:left; margin-top:10px; background:#f1f5f9; padding:8px; border-radius:6px; font-size:10px; color:#475569; max-height:80px; overflow-y:auto; white-space:pre-wrap; border:1px solid #cbd5e1;"><b>📜 Histori Log:</b><br>${item.log || 'Belum ada histori.'}</div>`;
 
     let optionsLokasi = `<option value="Gudang KC (SMG)" ${lok.includes('Gudang') ? 'selected':''}>🏢 Gudang KC (SMG)</option><option value="Gudang KC (JKT)" ${lok === 'Gudang KC (JKT)' ? 'selected':''}>🏢 Gudang KC (JKT)</option><option value="Gedung UTC" ${lok === 'Gedung UTC' ? 'selected':''}>🏢 Gedung UTC</option><option value="Dalam Perjalanan" ${lok === 'Dalam Perjalanan' ? 'selected':''}>🚚 Dalam Perjalanan</option><option value="Di Lokasi Event" ${lok === 'Di Lokasi Event' ? 'selected':''}>📍 Di Lokasi Event</option>`; 
     let optionsStatus = `<option value="Di Gudang" ${stat === 'Di Gudang' ? 'selected':''}>📦 Standby / Di Gudang</option><option value="Akan Dibawa" ${stat === 'Akan Dibawa' ? 'selected':''}>🛒 Akan Dibawa (Packing)</option><option value="Sedang Dipakai" ${stat === 'Sedang Dipakai' ? 'selected':''}>🔌 Sedang Dipakai / Aktivasi</option><option value="Sedang Diservis" ${stat === 'Sedang Diservis' ? 'selected':''}>🛠️ Sedang Diservis</option>`;
     
     let actionButtons = isAdminMode ? `<button onclick='openEditFullModal(${JSON.stringify(item).replace(/'/g, "&#39;")})' style="width:100%; padding:10px; background:#f59e0b; color:white; border:none; border-radius:8px; font-weight:bold; margin-bottom:15px;">✏️ EDIT DATA & FOTO LENGKAP</button><div style="text-align:left; border-top:1px dashed #ccc; padding-top:15px;"><label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">📍 Update Lokasi (Cell O):</label><select id="editLokasi" style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc; margin-bottom:12px;">${optionsLokasi}</select><label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">🔌 Update Status (Cell R):</label><select id="editStatus" style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc; margin-bottom:12px; font-weight:bold;">${optionsStatus}</select><button onclick="saveEditLokasiStatus(${item.row_index})" style="width:100%; padding:12px; background:#ea580c; color:white; border:none; border-radius:8px; font-weight:bold;">💾 SIMPAN STATUS</button></div>` : `<div style="margin-top:15px; padding:10px; background:#f1f5f9; border-radius:8px; font-size:12px; color:#64748b;">🔒 Login Akses untuk mengubah status/lokasi.</div>`;
-    const modalHtml = `<div id="detailModal" class="modal-overlay active"><div class="modal-content" style="max-width:400px; background:white; padding:20px; border-radius:15px; text-align:center; position:relative;"><button onclick="document.getElementById('detailModal').remove()" style="position:absolute; top:15px; right:15px; border:none; background:#f1f5f9; width:30px; height:30px; border-radius:50%; font-weight:bold; cursor:pointer; z-index:10;">✕</button>${galleryHtml}<h3 style="margin:0; font-weight:900; color:#1e293b; font-size:18px;">${item.nama_barang}</h3><div style="font-size:10px; color:gray; margin-bottom:8px;">⏱️ Update: ${item.timestamp || '-'}</div><p style="margin:5px 0 10px 0; font-size:12px; color:#ea580c; font-weight:bold;">#${item.kode_barang || '-'} ${badgeWadahHtml}</p><div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:12px; text-align:left; background:#f8fafc; padding:10px; border-radius:8px; border:1px solid #e2e8f0;"><div><span style="color:gray;">Total Qty:</span> <br><b>${item.jumlah || 0} Pcs</b></div><div><span style="color:gray;">Kondisi:</span> <br><b>${item.kondisi || '-'}</b></div><div><span style="color:gray;">📍 Lokasi:</span> <br><b>${lok}</b></div><div><span style="color:gray;">🔌 Status:</span> <br><b>${stat}</b></div></div>${isiWadahHtml}<div style="text-align:left; margin-top:10px; font-size:11px; color:#475569; background:#fff7ed; padding:8px; border-radius:6px; border:1px solid #fed7aa; margin-bottom:5px;"><b>📝 Ket:</b> ${item.keterangan_ref || 'Tidak ada catatan.'}</div><div style="text-align:left; font-size:11px; margin-bottom:15px; color:#3b82f6;"><b>🎯 Tujuan (Event):</b> ${item.tujuan || '-'}</div>${logHtml}${actionButtons}</div></div>`; document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    const modalHtml = `<div id="detailModal" class="modal-overlay active"><div class="modal-content" style="max-width:400px; background:white; padding:20px; border-radius:15px; text-align:center; position:relative;"><button onclick="document.getElementById('detailModal').remove()" style="position:absolute; top:15px; right:15px; border:none; background:#f1f5f9; width:30px; height:30px; border-radius:50%; font-weight:bold; cursor:pointer; z-index:10;">✕</button>${galleryHtml}<h3 style="margin:0; font-weight:900; color:#1e293b; font-size:18px;">${item.nama_barang}</h3><div style="font-size:10px; color:gray; margin-bottom:8px;">⏱️ Update: ${item.timestamp || '-'}</div><p style="margin:5px 0 10px 0; font-size:12px; color:#ea580c; font-weight:bold;">#${item.kode_barang || '-'} ${badgeWadahHtml}</p><div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:12px; text-align:left; background:#f8fafc; padding:10px; border-radius:8px; border:1px solid #e2e8f0;"><div><span style="color:gray;">Item Ini:</span> <br><b>${item.jumlah || 0} Pcs</b></div><div><span style="color:gray;">Kondisi:</span> <br><b>${item.kondisi || '-'}</b></div><div><span style="color:gray;">📍 Lokasi:</span> <br><b>${lok}</b></div><div><span style="color:gray;">🔌 Status:</span> <br><b>${stat}</b></div></div>${similarHtml}${isiWadahHtml}<div style="text-align:left; margin-top:10px; font-size:11px; color:#475569; background:#fff7ed; padding:8px; border-radius:6px; border:1px solid #fed7aa; margin-bottom:5px;"><b>📝 Ket:</b> ${item.keterangan_ref || 'Tidak ada catatan.'}</div><div style="text-align:left; font-size:11px; margin-bottom:15px; color:#3b82f6;"><b>🎯 Tujuan (Event):</b> ${item.tujuan || '-'}</div>${logHtml}${actionButtons}</div></div>`; 
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
 }
-async function saveEditLokasiStatus(rowIndex) { const nLok = document.getElementById("editLokasi").value; const nStat = document.getElementById("editStatus").value; event.target.innerText = "MEMPROSES..."; event.target.disabled = true; try { const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "update_status_lokasi", pin: userPin, rows: [rowIndex], new_lokasi: nLok, new_status: nStat }) }); const data = await response.json(); if(data.status === "success") { showToast("Lokasi & Status diperbarui!"); document.getElementById('detailModal').remove(); loadData(); } else { alert("Gagal:\n" + data.message); } } catch(e) { alert("Error Sistem:\n" + e.message); } }
-
 // ==========================================
 // PRINT SURAT JALAN / MANIFEST (CHECKLIST WADAH)
 // ==========================================

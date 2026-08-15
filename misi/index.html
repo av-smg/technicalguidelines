@@ -6,8 +6,8 @@ location: "MISSION CARD"
 <head>
     {% include head.html %}
     <title>Mission Control A/V</title>
-    <!-- Update cache ke V.3.0 -->
-    <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/custom-misi.css?v=3.0">
+    <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/custom-misi.css?v=8.0">
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <style>
         .admin-only { display: none !important; }
         body.admin-mode-active .admin-only { display: inline-block !important; }
@@ -27,22 +27,21 @@ location: "MISSION CARD"
             <button id="btnUnlock" onclick="toggleAdminMode()" class="btn-lock">🔒 Buka Akses</button>
         </div>
 
-        <!-- Tombol Filter Divisi (Tidak ada yang aktif di awal) -->
         <div class="team-filters" id="teamFilters">
             <button class="btn-team" onclick="setTeamFilter('Speaker')">🔊 Tim Speaker</button>
             <button class="btn-team" onclick="setTeamFilter('Kabel')">🔌 Tim Kabel</button>
             <button class="btn-team" onclick="setTeamFilter('Booth')">🎛️ Tim Booth</button>
         </div>
 
-        <div id="loading" style="text-align: center; padding: 40px; color: gray; font-weight:bold;">Memuat Sandi Sandi Misi...</div>
+        <!-- Teks loading santai sesuai permintaan -->
+        <div id="loading" style="text-align: center; padding: 40px; color: gray; font-weight:bold;">Tunggu sebentar yaa. . .</div>
         
-        <!-- Tempat Kartu Misi Muncul -->
         <div class="missions-container" id="missionsContainer"></div>
     </main>
 
     <div id="toastMsg" class="toast-msg">Notifikasi</div>
 
-    <!-- UPDATE CACHE V.5.0 -->
-    <script src="{{ site.baseurl }}/assets/js/script-misi.js?v=7.0"></script>
+    <!-- UPDATE CACHE V.10.0 -->
+    <script src="{{ site.baseurl }}/assets/js/script-misi.js?v=10.0"></script>
 </body>
 </html>

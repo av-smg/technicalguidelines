@@ -128,10 +128,126 @@ function openDetailModal(item) {
 async function saveEditLokasiStatus(rowIndex) { const nLok = document.getElementById("editLokasi").value; const nStat = document.getElementById("editStatus").value; event.target.innerText = "MEMPROSES..."; event.target.disabled = true; try { const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "update_status_lokasi", pin: userPin, rows: [rowIndex], new_lokasi: nLok, new_status: nStat }) }); const data = await response.json(); if(data.status === "success") { showToast("Lokasi & Status diperbarui!"); document.getElementById('detailModal').remove(); loadData(); } else { alert("Gagal:\n" + data.message); } } catch(e) { alert("Error Sistem:\n" + e.message); } }
 
 // ==========================================
-// PRINT SURAT JALAN / MANIFEST
+// PRINT SURAT JALAN / MANIFEST (CHECKLIST WADAH)
 // ==========================================
-function printSuratJalan() { let bawaData = allItems.filter(i => i.status_digunakan === 'Akan Dibawa'); if(bawaData.length === 0) return alert("Belum ada barang dengan status '🛒 Akan Dibawa' (Packing)."); let eventName = bawaData[0].tujuan || "___________"; let printWin = window.open('', '', 'width=800,height=600'); let html = `<html><head><title>Surat Jalan Logistik / Manifest</title><style>body{font-family:Arial,sans-serif;} table{width:100%; border-collapse:collapse; margin-top:20px; font-size:14px;} th,td{border:1px solid black; padding:8px; text-align:left;} th{background:#eee;}</style></head><body onload="window.print()"><h2 style="text-align:center; margin-bottom:5px;">SURAT JALAN LOGISTIK / MANIFEST</h2><p style="text-align:center; margin-top:0;"><b>Event / Tujuan:</b> ${eventName} <br><b>Tanggal Cetak:</b> ${new Date().toLocaleString('id-ID')}</p><table><tr><th>No</th><th>Kode / Wadah</th><th>Nama Alat</th><th>Qty</th><th>Kondisi</th><th>Cek Fisik</th></tr>`; bawaData.forEach((item, idx) => { let kodeOrWadah = item.kode_barang ? item.kode_barang : (item.kode_wadah ? "Wadah: "+item.kode_wadah : "-"); html += `<tr><td>${idx+1}</td><td>${kodeOrWadah}</td><td><b>${item.nama_barang}</b></td><td>${item.jumlah} Pcs</td><td>${item.kondisi||'Bagus'}</td><td style="width:50px;"></td></tr>`; }); html += `</table><br><br><div style="display:flex; justify-content:space-between; margin-top:50px; padding:0 30px;"><div><b>Disiapkan Oleh (Gudang):</b><br><br><br><br>____________________</div><div><b>Diterima Oleh (PIC Event):</b><br><br><br><br>____________________</div></div></body></html>`; printWin.document.write(html); printWin.document.close(); }
+function printSuratJalan() { 
+    let bawaData = allItems.filter(i => i.status_digunakan === 'Akan Dibawa'); 
+    if(bawaData.length === 0) return alert("Belum ada barang dengan status '🛒 Akan Dibawa' (Packing)."); 
+    
+    let eventName = bawaData[0].tujuan || "____________________"; 
+    
+    // 🧠 LOGIKA PENGELOMPOKKAN WADAH
+    let grouped = {};
+    let lepasan = [];
+    
+    bawaData.forEach(item => {
+        let wadah = (item.kode_wadah || "").toUpperCase().trim();
+        if (wadah) {
+            if (!grouped[wadah]) grouped[wadah] = [];
+            grouped[wadah].push(item);
+        } else {
+            lepasan.push(item);
+        }
+    });
 
+    let printWin = window.open('', '', 'width=800,height=800'); 
+    
+    // 🎨 TEMPLATE HTML SURAT JALAN (Gaya Checklist Loading)
+    let html = `
+    <html><head><title>Manifest - ${eventName}</title>
+    <style>
+        body { font-family: 'Arial', sans-serif; padding: 20px; color: #000; }
+        .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
+        .event-info { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 20px; }
+        
+        .box-group { border: 2px solid #000; border-radius: 6px; margin-bottom: 15px; page-break-inside: avoid; }
+        .box-header { background: #f0f0f0; padding: 10px 15px; font-weight: bold; font-size: 14px; display: flex; align-items: center; border-bottom: 2px solid #000; }
+        
+        .checkbox { display: inline-block; width: 18px; height: 18px; border: 2px solid #000; border-radius: 4px; margin-right: 12px; }
+        .item-list { list-style: none; padding: 0; margin: 0; }
+        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 15px; border-bottom: 1px dashed #aaa; font-size: 13px; margin-left: 20px;}
+        .item-row:last-child { border-bottom: none; }
+        
+        .qty { font-weight: bold; font-size: 14px; }
+        .signatures { display: flex; justify-content: space-between; margin-top: 50px; padding: 0 40px; text-align: center; font-size: 14px; page-break-inside: avoid; }
+        .sign-box { margin-top: 70px; border-top: 1px solid black; padding-top: 5px; width: 220px; }
+        
+        @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+    </style>
+    </head><body onload="window.print()">
+    
+    <div class="header">
+        <h2 style="margin:0;">MANIFEST LOGISTIK / SURAT JALAN</h2>
+        <p style="margin:5px 0 0 0; color:#444; font-size:14px;">Checklist Pengeluaran Gudang (Load-In)</p>
+    </div>
+    
+    <div class="event-info">
+        <div><b>Tujuan / Event:</b> <span style="font-size:16px;">${eventName.toUpperCase()}</span></div>
+        <div><b>Tanggal Cetak:</b> ${new Date().toLocaleString('id-ID')}</div>
+    </div>`;
+
+    // 1. RENDER WADAH / HARDCASE
+    if (Object.keys(grouped).length > 0) {
+        html += `<h4 style="margin-bottom:10px; border-bottom:2px solid #000; display:inline-block;">📦 PAKET HARDCASE / BOX</h4>`;
+        for (let wadah in grouped) {
+            let boxItem = allItems.find(i => i.kode_barang && i.kode_barang.toUpperCase() === wadah);
+            let boxName = boxItem ? boxItem.nama_barang.toUpperCase() : `WADAH #${wadah}`;
+            
+            html += `
+            <div class="box-group">
+                <div class="box-header">
+                    <div class="checkbox"></div> 🧰 ${boxName} 
+                    <span style="margin-left:auto; font-weight:normal; font-size:12px; color:#333;">#${wadah}</span>
+                </div>
+                <ul class="item-list">`;
+            
+            // Isi detail di dalam wadah
+            grouped[wadah].forEach(item => {
+                html += `
+                    <li class="item-row">
+                        <span>- ${item.nama_barang} ${item.kode_barang ? ` <i style="color:#555; font-size:11px;">(#${item.kode_barang})</i>` : ''}</span>
+                        <span class="qty">${item.jumlah} Pcs</span>
+                    </li>`;
+            });
+            
+            html += `</ul></div>`;
+        }
+    }
+
+    // 2. RENDER BARANG LEPASAN (TIDAK ADA WADAH)
+    if (lepasan.length > 0) {
+        html += `<h4 style="margin-top:20px; margin-bottom:10px; border-bottom:2px solid #000; display:inline-block;">📌 BARANG LEPASAN (TANPA BOX)</h4>`;
+        html += `<div class="box-group"><ul class="item-list">`;
+        lepasan.forEach(item => {
+            html += `
+                <li class="item-row" style="padding:10px 15px; margin-left:0;">
+                    <div style="display:flex; align-items:center;">
+                        <div class="checkbox"></div> 
+                        <span><b>${item.nama_barang.toUpperCase()}</b> ${item.kode_barang ? ` <i style="color:#555; font-size:11px;">(#${item.kode_barang})</i>` : ''}</span>
+                    </div>
+                    <span class="qty">${item.jumlah} Pcs</span>
+                </li>`;
+        });
+        html += `</ul></div>`;
+    }
+
+    html += `
+    <div class="signatures">
+        <div>
+            <b>Disiapkan Oleh (Gudang):</b>
+            <div class="sign-box">( Nama & Tanda Tangan )</div>
+        </div>
+        <div>
+            <b>Dicek & Dimuat Oleh (Loader):</b>
+            <div class="sign-box">( Nama & Tanda Tangan )</div>
+        </div>
+    </div>
+    
+    </body></html>`;
+
+    printWin.document.write(html); 
+    printWin.document.close(); 
+}
 // ==========================================
 // KERANJANG & BULK UPDATE 
 // ==========================================

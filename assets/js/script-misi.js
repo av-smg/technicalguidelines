@@ -1,5 +1,5 @@
 // ==========================================
-// MESIN LOGIKA MISSION CONTROL (V.11.7 - WORDING FIX + CLICKABLE BOX)
+// MESIN LOGIKA MISSION CONTROL (V.11.8 - RINCIAN TUGAS + MANUAL KABEL + FREEZE FRAME)
 // ==========================================
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec"; 
@@ -25,22 +25,22 @@ window.onload = () => { checkAdminStatus(); loadMissions(); };
 function checkAdminStatus() {
     if (userPin && VALID_MISSION_PINS.includes(userPin)) {
         isAdminMode = true; document.body.classList.add("admin-mode-active");
-        document.getElementById("modeStatusText").innerHTML = "🔴 Akses Eksekutor Aktif"; document.getElementById("btnUnlock").innerText = "🔓 Tutup Akses";
+        document.getElementById("modeStatusText").innerHTML = "🔓 Akses Kru Lapangan Terbuka"; document.getElementById("btnUnlock").innerText = "🔒 Tutup Akses";
     } else {
         isAdminMode = false; userPin = ""; document.body.classList.remove("admin-mode-active");
-        document.getElementById("modeStatusText").innerHTML = "🟢 Read-Only Mode"; document.getElementById("btnUnlock").innerText = "🔒 Buka Akses";
+        document.getElementById("modeStatusText").innerHTML = "🟢 Read-Only Mode"; document.getElementById("btnUnlock").innerText = "🔓 Buka Akses";
     }
     if (isDataLoaded) renderMissions();
 }
 
 function toggleAdminMode() {
     if (isAdminMode) {
-        if(confirm("Tutup akses Eksekutor? Memori PIN akan dihapus.")) { 
+        if(confirm("Tutup akses Kru Lapangan? Memori PIN akan dihapus.")) { 
             localStorage.removeItem("AV_MISSION_PIN"); showToast("Sistem dikunci. Memuat ulang..."); 
             setTimeout(() => { window.location.reload(); }, 800); 
         }
     } else {
-        let input = prompt("Masukkan PIN Kapten Lapangan / Master:");
+        let input = prompt("Masukkan PIN Tim Lapangan / Master:");
         if (input && VALID_MISSION_PINS.includes(input.trim().toLowerCase())) {
             localStorage.setItem("AV_MISSION_PIN", input.trim().toLowerCase()); showToast("Akses Terbuka! Memuat ulang..."); 
             setTimeout(() => { window.location.reload(); }, 800); 
@@ -163,7 +163,30 @@ function renderMissions() {
         const card = document.createElement("div"); card.className = `mission-card ${isSelesai ? 'selesai' : ''}`;
         const isOverride = misi.tugas.includes("⚠️");
         
-        // WORDING DIPERBAIKI DI SINI
+        // ========================================
+        // 🔥 LOGIKA PEMISAHAN JUDUL DAN DETAIL TUGAS
+        // ========================================
+        let rawTugas = (misi.tugas || "").replace(/⚠️ \[.*?\] /g, ''); // Hapus embel-embel Override jika ada
+        let judulTugas = rawTugas;
+        
+        // Deteksi jika Komandan menambah kolom "Detail Tugas" (misi.detail_tugas)
+        let detailTugas = misi.detail_tugas || misi.detail || ""; 
+
+        // Deteksi jika menggunakan fitur Alt+Enter (baris baru / \n)
+        if (!detailTugas && rawTugas.includes("\n")) {
+            let parts = rawTugas.split("\n");
+            judulTugas = parts[0]; // Baris pertama jadi Judul
+            parts.shift(); // Hapus baris pertama dari array
+            detailTugas = parts.join("<br>"); // Sisanya gabungkan dengan efek baris baru (HTML)
+        }
+
+        // Template HTML untuk Detail Instruksi
+        let detailHtml = detailTugas ? `
+            <div style="background:#f8fafc; border-left:4px solid #3b82f6; padding:10px 12px; font-size:12px; color:#334155; margin-bottom:12px; border-radius:4px; line-height:1.5;">
+                <b style="color:#1d4ed8; font-size:11px;">📝 RINCIAN INSTRUKSI:</b><br>${detailTugas}
+            </div>` : '';
+
+
         let packageHtml = `<div class="package-list"><div style="font-size:10px; font-weight:bold; color:gray; margin-bottom:6px;">📦 Daftar Alat / Barang:</div>`;
         
         if (misi.kode_barang) {
@@ -184,7 +207,6 @@ function renderMissions() {
                     let boxItem = allInventory.find(inv => inv.kode_barang && inv.kode_barang.toUpperCase() === wadah);
                     let boxName = boxItem ? boxItem.nama_barang : `WADAH #${wadah}`;
                     
-                    // HEADER BOX BISA DIKLIK SEKARANG
                     packageHtml += `
                     <div class="box-group" style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; margin-bottom:10px; overflow:hidden;">
                         <div onclick="openItemDetail('${wadah}')" style="cursor:pointer; background:#e2e8f0; padding:8px 10px; font-size:11px; font-weight:bold; color:#0f172a; border-bottom:1px solid #cbd5e1; display:flex; justify-content:space-between; align-items:center;">
@@ -215,8 +237,9 @@ function renderMissions() {
         } else {
             if (isAdminMode) {
                 let scanBtn = `<button class="btn-complete" style="background:#2563eb; flex:1; margin:0;" onclick="openMissionScanner('${misi.row_index}', '${misi.id_misi}', '${misi.kode_barang}')">📷 SCAN BARANG</button>`;
-                if (teamLower.includes("booth")) {
-                    // WORDING TOMBOL BOOTH DIPERBAIKI
+                
+                // 🔥 LOGIKA BYPASS DITAMBAHKAN UNTUK TIM KABEL & TIM BOOTH
+                if (teamLower.includes("booth") || teamLower.includes("kabel")) {
                     buttonHtml = `<div style="display:flex; gap:10px; align-items:stretch;">
                         ${scanBtn}
                         <button class="btn-complete" style="background:#10b981; flex:1; margin:0; padding:10px 5px;" onclick="executeCompleteMission('${misi.row_index}', '${misi.id_misi}', '${misi.kode_barang}')">✅ SELESAI (MANUAL)</button>
@@ -236,10 +259,11 @@ function renderMissions() {
                 </div>
                 ${isOverride ? '<span class="badge-diganti">⚠️ ALAT DIGANTI</span>' : ''}
                 <h3 class="mission-title" style="margin:5px 0 0 0; display:flex; justify-content:space-between; align-items:center;">
-                    ${misi.tugas.replace(/⚠️ \[.*?\] /g, '')} <span class="toggle-icon">▼</span>
+                    ${judulTugas} <span class="toggle-icon">▼</span>
                 </h3>
             </div>
             <div class="mission-content">
+                ${detailHtml} <!-- MEMASUKKAN RINCIAN DETAIL TUGAS DI SINI -->
                 ${packageHtml}
                 <div class="mission-action">${buttonHtml}</div>
             </div>`;

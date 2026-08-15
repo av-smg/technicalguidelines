@@ -16,7 +16,7 @@ let isFlashlightOn = false;
 const teamRoster = {
     "speaker": { kapten: "Malkhiel", asisten: "Yoka" },
     "kabel": { kapten: "Vina", asisten: "Anggid" },
-    "booth": { kapten: "Truna", asisten: "xx" },
+    "booth": { kapten: "Evan", asisten: "Truna" },
     "inventaris": { kapten: "Emma", asisten: "Peni" }
 };
 

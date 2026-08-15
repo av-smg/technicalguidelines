@@ -412,20 +412,93 @@ async function undoMission(event, rowIndex, idMisi, kodeBarang) {
     } catch (e) { alert("Error:\n" + e.message); btn.innerText = "❌ BATALKAN"; btn.disabled = false; }
 }
 
+// ==========================================
+// POP-UP DETAIL (VERSI MISSION CONTROL - DENGAN THUMBNAIL WADAH & AUTO-TRACK)
+// ==========================================
 function openItemDetail(kodeBarang) {
-    const item = allInventory.find(i => i.kode_barang && i.kode_barang.toLowerCase() === kodeBarang.toLowerCase()); if(!item) return;
+    const item = allInventory.find(i => i.kode_barang && i.kode_barang.toLowerCase() === kodeBarang.toLowerCase()); 
+    if(!item) return;
+
     const oldModal = document.getElementById("detailModal"); if(oldModal) oldModal.remove();
     let stat = item.status_digunakan || "Di Gudang"; if(stat === 'FALSE') stat = "Di Gudang"; let lok = item.lokasi || "Gudang KC (SMG)";
     let galleryHtml = `<div class="detail-gallery">`; let adaFoto = false; let safeFileIds = item.file_ids || item.fotos || [];
-    safeFileIds.forEach((fileId) => { 
+    
+    safeFileIds.forEach((fileId, i) => { 
         if(fileId && fileId.length > 5) { 
             let thumbUrl = fileId.includes("http") ? fileId : `https://drive.google.com/thumbnail?id=${fileId}&sz=w400`; 
             let highResUrl = fileId.includes("http") ? fileId.replace('sz=800', 'sz=s2000') : `https://drive.google.com/thumbnail?id=${fileId}&sz=s2000`; 
-            galleryHtml += `<img src="${thumbUrl}" class="gallery-img" onclick="openZoomModal('${highResUrl}')">`; adaFoto = true; 
+            if(i < 3) { galleryHtml += `<img src="${thumbUrl}" class="gallery-img" onclick="openZoomModal('${highResUrl}')">`; } 
+            else { galleryHtml += `<div class="gallery-box"><img src="${thumbUrl}" class="gallery-img" style="border:2px solid #ea580c;" onclick="openZoomModal('${highResUrl}')"><span class="badge-wadah">📦 WADAH</span></div>`; } 
+            adaFoto = true; 
         } 
     });
-    if(!adaFoto) galleryHtml += `<img src="https://placehold.co/300x200/EEEEEE/999999?text=Tidak+Ada+Foto" class="gallery-img" style="width:100%;">`; galleryHtml += `</div>`;
-    const modalHtml = `<div id="detailModal" class="modal-overlay active"><div class="modal-content" style="max-width:400px; background:white; padding:20px; border-radius:15px; text-align:center; position:relative;"><button onclick="document.getElementById('detailModal').remove()" style="position:absolute; top:15px; right:15px; border:none; background:#f1f5f9; width:30px; height:30px; border-radius:50%; font-weight:bold; cursor:pointer; z-index:10;">✕</button>${galleryHtml}<h3 style="margin:0; font-weight:900; color:#1e293b; font-size:18px;">${item.nama_barang}</h3><p style="margin:5px 0 10px 0; font-size:12px; color:#ea580c; font-weight:bold;">#${item.kode_barang || '-'}</p><div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:12px; text-align:left; background:#f8fafc; padding:10px; border-radius:8px; border:1px solid #e2e8f0;"><div><span style="color:gray;">Kondisi:</span> <br><b>${item.kondisi || '-'}</b></div><div><span style="color:gray;">📍 Lokasi:</span> <br><b>${lok}</b></div><div style="grid-column: 1 / -1;"><span style="color:gray;">🔌 Status Gudang:</span> <br><b>${stat}</b></div></div></div></div>`;
+    if(!adaFoto) galleryHtml += `<img src="https://placehold.co/300x200/EEEEEE/999999?text=Tidak+Ada+Foto" class="gallery-img" style="width:100%;">`; 
+    galleryHtml += `</div>`;
+    
+    let badgeWadahHtml = item.kode_wadah ? `<span style="display:inline-block; margin-left:5px; background:#fef3c7; color:#d97706; padding:2px 8px; border-radius:4px; border:1px solid #fde68a;">🧰 Wadah: ${item.kode_wadah}</span>` : `<span style="color:gray; margin-left:5px;">📦 Wadah: -</span>`;
+    
+    // 💡 THUMBNAIL SUB-WADAH
+    let isiWadahHtml = ""; 
+    if (item.kode_barang) { 
+        let isiWadah = allInventory.filter(i => i.kode_wadah && i.kode_wadah.toLowerCase() === item.kode_barang.toLowerCase()); 
+        if (isiWadah.length > 0) { 
+            let listHtml = isiWadah.map(w => {
+                let safeFileIdsW = w.file_ids || w.fotos || []; 
+                let firstFileIdW = safeFileIdsW.find(id => id && id.length > 5); 
+                let thumbW = firstFileIdW ? (firstFileIdW.includes("http") ? firstFileIdW : `https://drive.google.com/thumbnail?id=${firstFileIdW}&sz=w100`) : 'https://placehold.co/100x100/EEEEEE/999999?text=NO+IMG';
+                return `
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px; padding:6px; background:#fff; border:1px solid #dcfce7; border-radius:6px; box-shadow:0 1px 2px rgba(0,0,0,0.05);">
+                    <img src="${thumbW}" style="width:45px; height:45px; object-fit:cover; border-radius:6px; border:1px solid #e2e8f0;">
+                    <div style="flex:1; line-height:1.2; text-align:left;">
+                        <div style="font-size:11px; font-weight:bold; color:#1e293b;">${w.nama_barang}</div>
+                        <div style="font-size:10px; color:#ea580c; font-weight:bold; margin-top:2px;">#${w.kode_barang || '-'} <span style="color:#64748b; font-weight:normal;">• Qty: ${w.jumlah||0}</span></div>
+                    </div>
+                </div>`;
+            }).join('');
+            isiWadahHtml = `<div style="text-align:left; margin-top:10px; background:#f0fdf4; padding:10px; border-radius:8px; border:1px solid #bbf7d0;"><div style="font-size:11px; font-weight:bold; color:#16a34a; margin-bottom:8px;">🧰 Isi di dalam wadah ini (${isiWadah.length} jenis):</div>${listHtml}</div>`; 
+        } 
+    }
+
+    // 💡 CEK SILANG STOK
+    let similarItems = allInventory.filter(i => i.nama_barang.toLowerCase() === item.nama_barang.toLowerCase());
+    let totalSimilarQty = similarItems.reduce((sum, curr) => sum + (parseInt(curr.jumlah) || 1), 0);
+    let statusCounts = {};
+    similarItems.forEach(i => {
+        let s = (i.status_digunakan && i.status_digunakan !== 'FALSE') ? i.status_digunakan : "Di Gudang";
+        statusCounts[s] = (statusCounts[s] || 0) + (parseInt(i.jumlah) || 1);
+    });
+    
+    let similarHtml = "";
+    if (similarItems.length > 1 || totalSimilarQty > 1) {
+        let badgeHtml = Object.keys(statusCounts).map(status => {
+            let bgCol = status.includes('Gudang') ? '#dcfce7' : (status.includes('Dipakai') || status.includes('Event') ? '#fef08a' : '#e2e8f0');
+            let txtCol = status.includes('Gudang') ? '#166534' : (status.includes('Dipakai') || status.includes('Event') ? '#854d0e' : '#334155');
+            return `<span style="display:inline-block; margin-right:4px; margin-bottom:4px; padding:4px 8px; border-radius:6px; font-size:10px; background:${bgCol}; color:${txtCol}; font-weight:bold; border:1px solid #cbd5e1;">${status}: ${statusCounts[status]}</span>`;
+        }).join('');
+        
+        similarHtml = `
+        <div style="text-align:left; margin-top:10px; background:#eff6ff; padding:12px; border-radius:8px; border:1px solid #bfdbfe;">
+            <div style="font-size:12px; font-weight:900; color:#1d4ed8; margin-bottom:4px;">📊 Cek Silang Stok:</div>
+            <div style="display:flex; flex-wrap:wrap;">${badgeHtml}</div>
+        </div>`;
+    }
+
+    const modalHtml = `
+    <div id="detailModal" class="modal-overlay active">
+        <div class="modal-content" style="max-width:400px; background:white; padding:20px; border-radius:15px; text-align:center; position:relative;">
+            <button onclick="document.getElementById('detailModal').remove()" style="position:absolute; top:15px; right:15px; border:none; background:#f1f5f9; width:30px; height:30px; border-radius:50%; font-weight:bold; cursor:pointer; z-index:10;">✕</button>
+            ${galleryHtml}
+            <h3 style="margin:0; font-weight:900; color:#1e293b; font-size:18px;">${item.nama_barang}</h3>
+            <p style="margin:5px 0 10px 0; font-size:12px; color:#ea580c; font-weight:bold;">#${item.kode_barang || '-'} ${badgeWadahHtml}</p>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:12px; text-align:left; background:#f8fafc; padding:10px; border-radius:8px; border:1px solid #e2e8f0;">
+                <div><span style="color:gray;">Kondisi:</span> <br><b>${item.kondisi || '-'}</b></div>
+                <div><span style="color:gray;">📍 Lokasi:</span> <br><b>${lok}</b></div>
+                <div style="grid-column: 1 / -1;"><span style="color:gray;">🔌 Status Gudang:</span> <br><b>${stat}</b></div>
+            </div>
+            ${similarHtml}
+            ${isiWadahHtml}
+        </div>
+    </div>`;
     document.body.insertAdjacentHTML('beforeend', modalHtml);
 }
 function openZoomModal(imgUrl) { let zoomModal = document.getElementById("zoomModal"); if (!zoomModal) { document.body.insertAdjacentHTML('beforeend', `<div id="zoomModal" class="zoom-overlay" onclick="closeZoomModal()"><button class="btn-back-zoom" onclick="closeZoomModal()">⬅ Kembali</button><img id="zoomImgSrc" src="" style="max-width:95vw; max-height:90vh; object-fit:contain; border-radius:8px;" onclick="event.stopPropagation()"></div>`); zoomModal = document.getElementById("zoomModal"); } document.getElementById("zoomImgSrc").src = imgUrl; zoomModal.classList.add("active"); }

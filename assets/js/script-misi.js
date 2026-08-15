@@ -1,5 +1,5 @@
 // ==========================================
-// MESIN LOGIKA MISSION CONTROL (V.11.6 - FREEZE FRAME + TEAM ROSTER + BOX GROUPING)
+// MESIN LOGIKA MISSION CONTROL (V.11.7 - WORDING FIX + CLICKABLE BOX)
 // ==========================================
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec"; 
@@ -107,7 +107,7 @@ function renderMissions() {
     let persentase = Math.round((selesaiMisi / totalMisi) * 100);
     let teamLower = activeTeam.toLowerCase();
 
-    // 🌟 1. BANNER CONTACT PERSON (Normal, ikut ter-scroll)
+    // 🌟 1. BANNER CONTACT PERSON
     let rosterHtml = "";
     let foundTeamKey = Object.keys(teamRoster).find(k => teamLower.includes(k));
     if (foundTeamKey) {
@@ -123,7 +123,7 @@ function renderMissions() {
         </div>`;
     }
 
-    // 🌟 2. BANNER PENGINGAT APD (Persiapan untuk lengket)
+    // 🌟 2. BANNER PENGINGAT APD 
     let apdText = "";
     if (teamLower.includes("speaker")) { apdText = "🪖 Helm Wajib | 🥾 Sepatu Safety | 🧤 Sarung Tangan"; } 
     else if (teamLower.includes("kabel")) { apdText = "🥾 Sepatu Safety | 🧤 Sarung Tangan"; } 
@@ -131,7 +131,7 @@ function renderMissions() {
 
     let apdHtml = apdText ? `<div style="background:#fffbeb; border:1px solid #fde68a; color:#b45309; padding:10px 15px; border-radius:12px; margin-bottom:10px; font-size:12px; font-weight:bold; display:flex; align-items:center; gap:8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);"><span style="font-size:16px;">⚠️</span> <span><b>PENGINGAT APD:</b> ${apdText}</span></div>` : '';
 
-    // 🌟 3. PROGRESS BAR (Persiapan untuk lengket)
+    // 🌟 3. PROGRESS BAR
     let progressHtml = `
     <div class="mission-progress-container" style="margin-bottom:0;">
         <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -141,7 +141,7 @@ function renderMissions() {
         <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${persentase}%;"></div></div>
     </div>`;
     
-    // 🌟 4. STICKY FREEZE FRAME WRAPPER (Pembungkus Lengket)
+    // 🌟 4. STICKY FREEZE FRAME WRAPPER
     let stickyHeaderHtml = `
     <div style="position: sticky; top: 70px; z-index: 90; background: rgba(248, 250, 252, 0.95); backdrop-filter: blur(8px); padding: 5px 0 15px 0; margin-bottom: 10px; grid-column: 1 / -1; border-bottom: 2px dashed #cbd5e1;">
         ${apdHtml}
@@ -163,7 +163,8 @@ function renderMissions() {
         const card = document.createElement("div"); card.className = `mission-card ${isSelesai ? 'selesai' : ''}`;
         const isOverride = misi.tugas.includes("⚠️");
         
-        let packageHtml = `<div class="package-list"><div style="font-size:10px; font-weight:bold; color:gray; margin-bottom:6px;">📦 Target Instalasi:</div>`;
+        // WORDING DIPERBAIKI DI SINI
+        let packageHtml = `<div class="package-list"><div style="font-size:10px; font-weight:bold; color:gray; margin-bottom:6px;">📦 Daftar Alat / Barang:</div>`;
         
         if (misi.kode_barang) {
             let codes = misi.kode_barang.split(',').map(c => c.trim()).filter(c => c);
@@ -182,7 +183,15 @@ function renderMissions() {
                 if (wadah !== "NON_BOX") {
                     let boxItem = allInventory.find(inv => inv.kode_barang && inv.kode_barang.toUpperCase() === wadah);
                     let boxName = boxItem ? boxItem.nama_barang : `WADAH #${wadah}`;
-                    packageHtml += `<div class="box-group" style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; margin-bottom:10px; overflow:hidden;"><div style="background:#e2e8f0; padding:8px 10px; font-size:11px; font-weight:bold; color:#0f172a; border-bottom:1px solid #cbd5e1; display:flex; align-items:center;">🧰 ${boxName}</div><div style="padding:6px;">`;
+                    
+                    // HEADER BOX BISA DIKLIK SEKARANG
+                    packageHtml += `
+                    <div class="box-group" style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; margin-bottom:10px; overflow:hidden;">
+                        <div onclick="openItemDetail('${wadah}')" style="cursor:pointer; background:#e2e8f0; padding:8px 10px; font-size:11px; font-weight:bold; color:#0f172a; border-bottom:1px solid #cbd5e1; display:flex; justify-content:space-between; align-items:center;">
+                            <span>🧰 ${boxName}</span> <span style="font-size:14px;">🔍</span>
+                        </div>
+                        <div style="padding:6px;">`;
+                        
                     items.forEach(foundItem => {
                         packageHtml += `<div class="package-item" style="cursor:pointer; border:none; background:transparent; margin-bottom:2px; padding:6px; border-bottom:1px dashed #e2e8f0;" onclick="openItemDetail('${foundItem.kode_barang}')"><img src="${getThumbUrl(foundItem)}" class="pkg-img" loading="lazy"><div class="pkg-info"><div class="pkg-name">${foundItem.nama_barang}</div><div class="pkg-code">#${foundItem.kode_barang}</div></div></div>`;
                     });
@@ -207,9 +216,10 @@ function renderMissions() {
             if (isAdminMode) {
                 let scanBtn = `<button class="btn-complete" style="background:#2563eb; flex:1; margin:0;" onclick="openMissionScanner('${misi.row_index}', '${misi.id_misi}', '${misi.kode_barang}')">📷 SCAN BARANG</button>`;
                 if (teamLower.includes("booth")) {
+                    // WORDING TOMBOL BOOTH DIPERBAIKI
                     buttonHtml = `<div style="display:flex; gap:10px; align-items:stretch;">
                         ${scanBtn}
-                        <button class="btn-complete" style="background:#10b981; flex:1; margin:0; padding:10px 5px;" onclick="executeCompleteMission('${misi.row_index}', '${misi.id_misi}', '${misi.kode_barang}')">✅ PAKSA SELESAI</button>
+                        <button class="btn-complete" style="background:#10b981; flex:1; margin:0; padding:10px 5px;" onclick="executeCompleteMission('${misi.row_index}', '${misi.id_misi}', '${misi.kode_barang}')">✅ SELESAI (MANUAL)</button>
                     </div>`;
                 } else {
                     buttonHtml = scanBtn;

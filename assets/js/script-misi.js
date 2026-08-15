@@ -4,7 +4,7 @@
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec"; 
 
-const VALID_MISSION_PINS = ["123456", "v9t6c2"]; 
+const VALID_MISSION_PINS = ["123456", "v9t6c2", "spk001", "kbl002", "bth003"];
 let userPin = localStorage.getItem("AV_MISSION_PIN") || ""; 
 
 let isAdminMode = false, allMissions = [], allInventory = [], activeTeam = '', isDataLoaded = false, html5QrcodeScanner = null;

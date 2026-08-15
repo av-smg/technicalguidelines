@@ -1,5 +1,5 @@
 // ==========================================
-// MESIN LOGIKA MISSION CONTROL (V.10.0 - PRO LOGISTICS)
+// MESIN LOGIKA MISSION CONTROL (V.10.1 - PRO LOGISTICS)
 // ==========================================
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec"; 
@@ -24,12 +24,20 @@ function checkAdminStatus() {
 
 function toggleAdminMode() {
     if (isAdminMode) {
-        if(confirm("Tutup akses Eksekutor? Memori PIN akan dihapus.")) { localStorage.removeItem("AV_MISSION_PIN"); checkAdminStatus(); showToast("Mode Read-Only aktif."); }
+        if(confirm("Tutup akses Eksekutor? Memori PIN akan dihapus.")) { 
+            localStorage.removeItem("AV_MISSION_PIN"); 
+            showToast("Sistem dikunci. Memuat ulang halaman..."); 
+            setTimeout(() => { window.location.reload(); }, 800); // Otomatis Refresh saat Tutup Akses
+        }
     } else {
         let input = prompt("Masukkan PIN Kapten Lapangan / Master:");
         if (input) {
             let pinAttempt = input.trim().toLowerCase();
-            if (VALID_MISSION_PINS.includes(pinAttempt)) { localStorage.setItem("AV_MISSION_PIN", pinAttempt); userPin = pinAttempt; checkAdminStatus(); showToast("Akses Terbuka! Silakan scan & eksekusi misi."); } 
+            if (VALID_MISSION_PINS.includes(pinAttempt)) { 
+                localStorage.setItem("AV_MISSION_PIN", pinAttempt); 
+                showToast("Akses Terbuka! Memuat ulang halaman..."); 
+                setTimeout(() => { window.location.reload(); }, 800); // Otomatis Refresh saat Buka Akses
+            } 
             else { alert("⛔ AKSES DITOLAK! PIN tidak dikenali untuk area ini."); }
         }
     }
@@ -116,10 +124,21 @@ function renderMissions() {
             packageHtml += `</div>`;
         }
         
+        // ====================================
+        // TOMBOL AKSI & TIMESTAMP FIX
+        // ====================================
         let buttonHtml = '';
         if (isSelesai) {
-            if (isAdminMode) buttonHtml = `<button class="btn-complete" style="background:#ef4444;" onclick="undoMission(event, '${misi.row_index}', '${misi.id_misi}', '${misi.kode_barang}')">❌ BATALKAN</button>`;
-            else buttonHtml = `<button class="btn-complete done">✅ SELESAI (${misi.waktu_selesai})</button>`;
+            if (isAdminMode) {
+                // UI FIX: Tombol Timestamp & Batal bersebelahan rapi
+                buttonHtml = `
+                <div style="display:flex; gap:10px; width:100%;">
+                    <div class="btn-complete done" style="flex:1; display:flex; justify-content:center; align-items:center; background:#f0fdf4; border:1px solid #10b981; color:#10b981; font-size:12px; margin:0;">✅ Selesai: ${misi.waktu_selesai}</div>
+                    <button class="btn-complete" style="background:#ef4444; flex:0 0 auto; padding:10px 15px; margin:0;" onclick="undoMission(event, '${misi.row_index}', '${misi.id_misi}', '${misi.kode_barang}')">❌ BATALKAN</button>
+                </div>`;
+            } else {
+                buttonHtml = `<button class="btn-complete done">✅ SELESAI (${misi.waktu_selesai})</button>`;
+            }
         } else {
             if (isAdminMode) buttonHtml = `<button class="btn-complete" style="background:#2563eb;" onclick="openMissionScanner('${misi.row_index}', '${misi.id_misi}', '${misi.kode_barang}')">📷 SCAN & SELESAI</button>`;
             else buttonHtml = `<button class="btn-complete" style="background:#94a3b8;" onclick="toggleAdminMode()">🔒 KUNCI (LOGIN)</button>`;

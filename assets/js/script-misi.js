@@ -161,7 +161,7 @@ function renderMissions() {
         if (isSelesai && isHideCompleted) return;
 
         const card = document.createElement("div"); card.className = `mission-card ${isSelesai ? 'selesai' : ''}`;
-        const isOverride = misi.tugas.includes("⚠️");
+        const isOverride = misi.tugas.includes("⚠️ [");
         
         // ========================================
         // 🔥 LOGIKA PEMISAHAN JUDUL DAN DETAIL TUGAS

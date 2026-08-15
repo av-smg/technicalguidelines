@@ -1,5 +1,5 @@
 // ==========================================
-// MESIN LOGIKA MISSION CONTROL (V.11.5 - TEAM ROSTER + INVENTARIS + SENTER + BOOTH BYPASS)
+// MESIN LOGIKA MISSION CONTROL (V.11.6 - FREEZE FRAME + TEAM ROSTER + BOX GROUPING)
 // ==========================================
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec"; 
@@ -107,13 +107,13 @@ function renderMissions() {
     let persentase = Math.round((selesaiMisi / totalMisi) * 100);
     let teamLower = activeTeam.toLowerCase();
 
-    // 🌟 1. BANNER CONTACT PERSON (KAPTEN & ASISTEN)
+    // 🌟 1. BANNER CONTACT PERSON (Normal, ikut ter-scroll)
     let rosterHtml = "";
     let foundTeamKey = Object.keys(teamRoster).find(k => teamLower.includes(k));
     if (foundTeamKey) {
         let cp = teamRoster[foundTeamKey];
         rosterHtml = `
-        <div style="background:#eff6ff; border:1px solid #bfdbfe; color:#1e3a8a; padding:12px 15px; border-radius:12px; margin-bottom:10px; font-size:13px; display:flex; justify-content:space-between; align-items:center; grid-column: 1 / -1; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+        <div style="background:#eff6ff; border:1px solid #bfdbfe; color:#1e3a8a; padding:12px 15px; border-radius:12px; margin-bottom:15px; font-size:13px; display:flex; justify-content:space-between; align-items:center; grid-column: 1 / -1; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
             <div>
                 <div style="font-size:10px; font-weight:bold; color:#3b82f6; margin-bottom:4px; letter-spacing:0.5px;">📞 CONTACT PERSON TIM</div>
                 <div><b>👑 Kapten:</b> ${cp.kapten}</div>
@@ -123,18 +123,17 @@ function renderMissions() {
         </div>`;
     }
 
-    // 🌟 2. BANNER PENGINGAT APD
+    // 🌟 2. BANNER PENGINGAT APD (Persiapan untuk lengket)
     let apdText = "";
     if (teamLower.includes("speaker")) { apdText = "🪖 Helm Wajib | 🥾 Sepatu Safety | 🧤 Sarung Tangan"; } 
     else if (teamLower.includes("kabel")) { apdText = "🥾 Sepatu Safety | 🧤 Sarung Tangan"; } 
     else if (teamLower.includes("booth")) { apdText = "🥾 Sepatu Safety | 🧤 Sarung Tangan"; }
-    // Tim inventaris biasanya tidak butuh APD berat, jadi dikosongkan/di-skip otomatis.
 
-    let apdHtml = apdText ? `<div style="background:#fffbeb; border:1px solid #fde68a; color:#b45309; padding:12px 15px; border-radius:12px; margin-bottom:15px; font-size:12px; font-weight:bold; display:flex; align-items:center; gap:8px; grid-column: 1 / -1; box-shadow: 0 2px 4px rgba(0,0,0,0.05);"><span style="font-size:16px;">⚠️</span> <span><b>PENGINGAT APD:</b> ${apdText}</span></div>` : '';
+    let apdHtml = apdText ? `<div style="background:#fffbeb; border:1px solid #fde68a; color:#b45309; padding:10px 15px; border-radius:12px; margin-bottom:10px; font-size:12px; font-weight:bold; display:flex; align-items:center; gap:8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);"><span style="font-size:16px;">⚠️</span> <span><b>PENGINGAT APD:</b> ${apdText}</span></div>` : '';
 
-    // 🌟 3. PROGRESS BAR
+    // 🌟 3. PROGRESS BAR (Persiapan untuk lengket)
     let progressHtml = `
-    <div class="mission-progress-container" style="grid-column: 1 / -1; margin-bottom:10px;">
+    <div class="mission-progress-container" style="margin-bottom:0;">
         <div style="display:flex; justify-content:space-between; align-items:center;">
             <div style="font-size:14px; font-weight:bold; color:#1e293b;">📊 Progress: ${selesaiMisi}/${totalMisi} (${persentase}%)</div>
             <button class="filter-toggle ${isHideCompleted ? 'active' : ''}" onclick="toggleHideCompleted()">${isHideCompleted ? '👁️ Tampilkan Semua' : '🙈 Sembunyikan Selesai'}</button>
@@ -142,7 +141,14 @@ function renderMissions() {
         <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${persentase}%;"></div></div>
     </div>`;
     
-    container.innerHTML = rosterHtml + apdHtml + progressHtml;
+    // 🌟 4. STICKY FREEZE FRAME WRAPPER (Pembungkus Lengket)
+    let stickyHeaderHtml = `
+    <div style="position: sticky; top: 70px; z-index: 90; background: rgba(248, 250, 252, 0.95); backdrop-filter: blur(8px); padding: 5px 0 15px 0; margin-bottom: 10px; grid-column: 1 / -1; border-bottom: 2px dashed #cbd5e1;">
+        ${apdHtml}
+        ${progressHtml}
+    </div>`;
+
+    container.innerHTML = rosterHtml + stickyHeaderHtml;
 
     filtered.sort((a, b) => {
         let statA = a.status_misi.toLowerCase() === 'selesai' ? 1 : -1;
@@ -199,9 +205,7 @@ function renderMissions() {
             else buttonHtml = `<button class="btn-complete done">✅ SELESAI (${misi.waktu_selesai})</button>`;
         } else {
             if (isAdminMode) {
-                // LOGIKA TOMBOL PAKSA SELESAI UNTUK TIM BOOTH
                 let scanBtn = `<button class="btn-complete" style="background:#2563eb; flex:1; margin:0;" onclick="openMissionScanner('${misi.row_index}', '${misi.id_misi}', '${misi.kode_barang}')">📷 SCAN BARANG</button>`;
-                
                 if (teamLower.includes("booth")) {
                     buttonHtml = `<div style="display:flex; gap:10px; align-items:stretch;">
                         ${scanBtn}
@@ -391,4 +395,4 @@ function openItemDetail(kodeBarang) {
     document.body.insertAdjacentHTML('beforeend', modalHtml);
 }
 function openZoomModal(imgUrl) { let zoomModal = document.getElementById("zoomModal"); if (!zoomModal) { document.body.insertAdjacentHTML('beforeend', `<div id="zoomModal" class="zoom-overlay" onclick="closeZoomModal()"><button class="btn-back-zoom" onclick="closeZoomModal()">⬅ Kembali</button><img id="zoomImgSrc" src="" style="max-width:95vw; max-height:90vh; object-fit:contain; border-radius:8px;" onclick="event.stopPropagation()"></div>`); zoomModal = document.getElementById("zoomModal"); } document.getElementById("zoomImgSrc").src = imgUrl; zoomModal.classList.add("active"); }
-function closeZoomModal() { const zoomModal = document.getElementById("zoomModal"); if(zoomModal) { zoomModal.classList.remove("active"); setTimeout(() => { document.getElementById("zoomImgSrc", "").src = ""; }, 300); } }
+function closeZoomModal() { const zoomModal = document.getElementById("zoomModal"); if(zoomModal) { zoomModal.classList.remove("active"); setTimeout(() => { document.getElementById("zoomImgSrc").src = ""; }, 300); } }

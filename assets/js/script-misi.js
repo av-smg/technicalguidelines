@@ -1,5 +1,5 @@
 // ==========================================
-// MESIN LOGIKA MISSION CONTROL (V.11.1 - THE ULTIMATE + COLLAPSIBLE)
+// MESIN LOGIKA MISSION CONTROL (V.11.2 - ULTIMATE + APD & NUMBERING)
 // ==========================================
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec"; 
@@ -8,8 +8,8 @@ let userPin = localStorage.getItem("AV_MISSION_PIN") || "";
 
 let isAdminMode = false, allMissions = [], allInventory = [], activeTeam = '', isDataLoaded = false;
 let html5QrCode = null; 
-let isHideCompleted = false; // Mode sembunyikan selesai
-let currentCameraFacing = "environment"; // Belakang
+let isHideCompleted = false; 
+let currentCameraFacing = "environment"; 
 let isFlashlightOn = false;
 
 window.onload = () => { checkAdminStatus(); loadMissions(); };
@@ -47,7 +47,7 @@ function showToast(msg, isSuccess = true) {
     setTimeout(() => { t.classList.remove("show"); }, 3000); 
 }
 
-// 🔊 HAPTIC & AUDIO ENGINE V.11
+// 🔊 HAPTIC & AUDIO ENGINE
 function triggerFeedback(type) {
     try {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -80,18 +80,12 @@ async function loadMissions() {
 function setTeamFilter(teamName) { activeTeam = teamName; document.querySelectorAll('.btn-team').forEach(btn => { btn.classList.remove('active'); if(btn.innerText.includes(teamName)) btn.classList.add('active'); }); if (isDataLoaded) renderMissions(); }
 function toggleHideCompleted() { isHideCompleted = !isHideCompleted; renderMissions(); }
 
-// 🌟 PERBAIKAN 1: Logika Panah Akordeon Dinamis
 function toggleMissionContent(element) { 
     const content = element.nextElementSibling; 
     const icon = element.querySelector('.toggle-icon');
-    
     content.classList.toggle('open'); 
-    
-    if (content.classList.contains('open')) {
-        if (icon) icon.innerText = '▲'; 
-    } else {
-        if (icon) icon.innerText = '▼'; 
-    }
+    if (content.classList.contains('open')) { if (icon) icon.innerText = '▲'; } 
+    else { if (icon) icon.innerText = '▼'; }
 }
 
 function renderMissions() {
@@ -106,6 +100,22 @@ function renderMissions() {
     let selesaiMisi = filtered.filter(m => m.status_misi.toLowerCase() === 'selesai').length;
     let persentase = Math.round((selesaiMisi / totalMisi) * 100);
 
+    // Banner APD Berdasarkan Tim Aktif
+    let apdText = "";
+    let teamLower = activeTeam.toLowerCase();
+    if (teamLower.includes("speaker")) {
+        apdText = "🪖 Helm Wajib | 🥾 Sepatu Safety | 🧤 Sarung Tangan";
+    } else if (teamLower.includes("kabel")) {
+        apdText = "🥾 Sepatu Safety | 🧤 Sarung Tangan";
+    } else if (teamLower.includes("booth")) {
+        apdText = "🥾 Sepatu Safety | 🧤 Sarung Tangan";
+    }
+
+    let apdHtml = apdText ? `
+    <div style="background:#fffbeb; border:1px solid #fde68a; color:#b45309; padding:12px 15px; border-radius:12px; margin-bottom:15px; font-size:12px; font-weight:bold; display:flex; align-items:center; gap:8px; grid-column: 1 / -1; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+        <span style="font-size:16px;">⚠️</span> <span><b>PENGINGAT APD:</b> ${apdText}</span>
+    </div>` : '';
+
     let progressHtml = `
     <div class="mission-progress-container" style="grid-column: 1 / -1;">
         <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -116,7 +126,8 @@ function renderMissions() {
         </div>
         <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${persentase}%;"></div></div>
     </div>`;
-    container.innerHTML = progressHtml;
+    
+    container.innerHTML = apdHtml + progressHtml;
 
     // SORTING: Yang Pending di atas, Selesai di bawah
     filtered.sort((a, b) => {
@@ -125,9 +136,9 @@ function renderMissions() {
         return statA - statB;
     });
 
-    filtered.forEach(misi => {
+    filtered.forEach((misi, index) => {
         const isSelesai = (misi.status_misi.toLowerCase() === 'selesai');
-        if (isSelesai && isHideCompleted) return; // Filter sembunyikan
+        if (isSelesai && isHideCompleted) return;
 
         const card = document.createElement("div"); card.className = `mission-card ${isSelesai ? 'selesai' : ''}`;
         const isOverride = misi.tugas.includes("⚠️");
@@ -158,10 +169,13 @@ function renderMissions() {
             else buttonHtml = `<button class="btn-complete" style="background:#94a3b8;" onclick="toggleAdminMode()">🔒 KUNCI (LOGIN)</button>`;
         }
 
-        // 🌟 PERBAIKAN 2: Hilangkan class 'open' & Tambahkan class 'toggle-icon'
+        // Card dengan Nomor Urut (#1, #2, dst)
         card.innerHTML = `
             <div class="mission-header-click" onclick="toggleMissionContent(this)">
-                <div class="mission-top"><span class="mission-id">${misi.id_misi}</span><span class="badge-zona">📍 ${misi.zona || '-'}</span></div>
+                <div class="mission-top">
+                    <span class="mission-id"><span style="background:#e2e8f0; color:#1e293b; padding:2px 6px; border-radius:4px; margin-right:5px; font-weight:bold;">#${index + 1}</span> ${misi.id_misi}</span>
+                    <span class="badge-zona">📍 ${misi.zona || '-'}</span>
+                </div>
                 ${isOverride ? '<span class="badge-diganti">⚠️ ALAT DIGANTI</span>' : ''}
                 <h3 class="mission-title" style="margin:5px 0 0 0; display:flex; justify-content:space-between; align-items:center;">
                     ${misi.tugas.replace(/⚠️ \[.*?\] /g, '')} <span class="toggle-icon">▼</span>
@@ -176,7 +190,7 @@ function renderMissions() {
 }
 
 // ==========================================
-// SCANNER V.11 (SMART OVERRIDE, KAMERA DEPAN, SENTER)
+// SCANNER V.11
 // ==========================================
 function openMissionScanner(rowIndex, idMisi, targetKodeBarangString) {
     let modal = document.createElement("div"); modal.id = "missionScannerModal"; modal.className = "modal-overlay active";
@@ -192,14 +206,12 @@ function openMissionScanner(rowIndex, idMisi, targetKodeBarangString) {
             <div id="overrideForm" style="display:none; text-align:left; margin-top:15px; background:#fef2f2; border:1px solid #fca5a5; padding:15px; border-radius:10px;"></div>
         </div>`; 
     document.body.appendChild(modal);
-
     startScanner(rowIndex, idMisi, targetKodeBarangString);
 }
 
 function startScanner(rowIndex, idMisi, targetKodeBarangString) {
     if(html5QrCode) { html5QrCode.stop().catch(e=>console.log(e)); html5QrCode = null; }
     html5QrCode = new Html5Qrcode("qr-reader-mission");
-    
     let config = { fps: 10, qrbox: { width: 230, height: 230 } };
     html5QrCode.start({ facingMode: currentCameraFacing }, config, 
         (decodedText) => { processScanResult(decodedText, rowIndex, idMisi, targetKodeBarangString); }, 
@@ -317,4 +329,4 @@ function openItemDetail(kodeBarang) {
     document.body.insertAdjacentHTML('beforeend', modalHtml);
 }
 function openZoomModal(imgUrl) { let zoomModal = document.getElementById("zoomModal"); if (!zoomModal) { document.body.insertAdjacentHTML('beforeend', `<div id="zoomModal" class="zoom-overlay" onclick="closeZoomModal()"><button class="btn-back-zoom" onclick="closeZoomModal()">⬅ Kembali</button><img id="zoomImgSrc" src="" style="max-width:95vw; max-height:90vh; object-fit:contain; border-radius:8px;" onclick="event.stopPropagation()"></div>`); zoomModal = document.getElementById("zoomModal"); } document.getElementById("zoomImgSrc").src = imgUrl; zoomModal.classList.add("active"); }
-function closeZoomModal() { const zoomModal = document.getElementById("zoomModal"); if(zoomModal) { zoomModal.classList.remove("active"); setTimeout(() => { document.getElementById("zoomImgSrc").src = ""; }, 300); } }
+function closeZoomModal() { const zoomModal = document.getElementById("zoomModal"); if(zoomModal) { zoomModal.classList.remove("active"); setTimeout(() => { document.getElementById("zoomImgSrc", "").src = ""; }, 300); } }

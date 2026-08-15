@@ -57,3 +57,17 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 .zoom-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 999999; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: 0.3s; }
 .zoom-overlay.active { opacity: 1; pointer-events: auto; }
 .btn-back-zoom { position: absolute; top: 20px; left: 20px; background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.5); padding: 8px 15px; border-radius: 20px; font-weight: bold; font-size: 14px; backdrop-filter: blur(5px); cursor: pointer; }
+/* ========================================= */
+/* SMART GROUPING & TOAST ERROR              */
+/* ========================================= */
+.toast-msg.error { background-color: #dc2626 !important; }
+
+.container-group { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; margin-bottom: 6px; }
+.container-header { display: flex; align-items: center; gap: 10px; background: #e0f2fe; padding: 8px; border-bottom: 1px dashed #bae6fd; cursor: pointer; transition: 0.2s; }
+.container-header:hover { background: #bae6fd; }
+.container-children { padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+
+.item-child { display: flex; align-items: center; gap: 10px; background: white; padding: 6px; border-radius: 6px; border: 1px solid #e2e8f0; margin-left: 15px; position: relative; cursor: pointer; transition: 0.2s; }
+.item-child:hover { background: #f1f5f9; border-color: #cbd5e1; }
+.item-child::before { content: "↳"; position: absolute; left: -12px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-weight: bold; }
+.pkg-img-small { width: 28px; height: 28px; object-fit: cover; border-radius: 4px; border: 1px solid #e2e8f0; flex-shrink: 0; }

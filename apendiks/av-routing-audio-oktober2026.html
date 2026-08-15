@@ -1,0 +1,664 @@
+---
+layout: default
+location: "JA-01"
+---
+
+<style>
+    /* ====================================================
+       SISTEM WARNA SCHEMATIC - AUDIO (AUTO DARK MODE)
+       ==================================================== */
+    :root {
+        --c-mic: #10b981;
+        --c-media: #0ea5e9;
+        --c-mix: #d946ef;
+        --c-tx: #f59e0b;
+        --c-split: #ef4444;
+        --c-dlms: #3b82f6;
+    }
+
+    /* 1. CSS VARIABLES (Mode Terang - Default) */
+    .diagram-wrapper {
+        --c-spk: #64748b; 
+        
+        --dw-bg: #f8fafc;
+        --dw-dot: #cbd5e1;
+        --dw-node-bg: #ffffff;
+        --dw-border: #cbd5e1;
+        --dw-text: #0f172a;
+        --dw-text-muted: #475569;
+        --dw-label-bg: rgba(255, 255, 255, 0.95);
+        --dw-rack-bg: #1e293b;
+        --dw-rack-border: #0f172a;
+        --dw-rack-text: #f8fafc;
+        --dw-zone-bg: rgba(100,116,139,0.03);
+        --dw-zone-border: #94a3b8;
+        --dw-spk-bg: #1e293b;
+        --dw-spk-border: #475569;
+        --dw-watt-bg: #f1f5f9;
+        --dw-shadow: rgba(0,0,0,0.05);
+
+        position: relative; 
+        width: 100%; 
+        height: calc(100vh - 100px); 
+        min-height: 600px;
+        max-height: 900px;
+        background-color: var(--dw-bg);
+        background-image: radial-gradient(var(--dw-dot) 1.5px, transparent 1.5px);
+        background-size: 30px 30px; 
+        overflow: auto; 
+        cursor: grab;
+        border-radius: 12px; 
+        border: 1px solid var(--dw-border);
+        margin: 20px auto; 
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        box-shadow: inset 0 0 20px rgba(0,0,0,0.03);
+        transition: background-color 0.4s ease, border-color 0.4s ease;
+    }
+
+    /* 2. TRIGGER DARK MODE (Terdeteksi Otomatis) */
+    html.dark .diagram-wrapper,
+    html.dark-mode .diagram-wrapper,
+    html[data-theme="dark"] .diagram-wrapper,
+    html[data-bs-theme="dark"] .diagram-wrapper,
+    body.dark .diagram-wrapper,
+    body.dark-mode .diagram-wrapper,
+    .dark-mode .diagram-wrapper,
+    .dark-theme .diagram-wrapper {
+        --c-spk: #cbd5e1; 
+        
+        --dw-bg: #020617;
+        --dw-dot: #1e293b;
+        --dw-node-bg: #0f172a;
+        --dw-border: #334155;
+        --dw-text: #f8fafc;
+        --dw-text-muted: #94a3b8;
+        --dw-label-bg: rgba(15, 23, 42, 0.95);
+        --dw-rack-bg: #000000;
+        --dw-rack-border: #1e293b;
+        --dw-rack-text: #f8fafc;
+        --dw-zone-bg: rgba(15, 23, 42, 0.4);
+        --dw-zone-border: #475569;
+        --dw-spk-bg: #000000;
+        --dw-spk-border: #334155;
+        --dw-watt-bg: #1e293b;
+        --dw-shadow: rgba(0,0,0,0.4);
+    }
+
+    .diagram-wrapper:active { cursor: grabbing; }
+    .diagram-wrapper #svg-canvas { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 10; }
+    
+    .diagram-wrapper .cable-flow { stroke-dasharray: 10, 10; animation: flowAnim 1s linear infinite; }
+    @keyframes flowAnim { from { stroke-dashoffset: 20; } to { stroke-dashoffset: 0; } }
+    
+    .diagram-wrapper .cable-label-bg { fill: var(--dw-label-bg); stroke-width: 2.5; transition: fill 0.4s ease, stroke 0.4s ease; }
+    .diagram-wrapper .cable-label-text { 
+        fill: var(--dw-text); stroke: none !important; 
+        font-size: 12px; font-weight: 800; text-anchor: middle; 
+        transition: fill 0.4s ease;
+    }
+
+    /* ANIMASI KOTAK DELAY */
+    @keyframes flashDelayBorder {
+        0%, 100% { border-color: #ef4444; box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); }
+        50% { border-color: rgba(239, 68, 68, 0.2); box-shadow: 0 0 2px rgba(239, 68, 68, 0.1); }
+    }
+    .diagram-wrapper .node.is-delayed { animation: flashDelayBorder 1.2s infinite ease-in-out; }
+    @keyframes flashDelayTag {
+        0%, 100% { background-color: #ef4444; color: #ffffff; }
+        50% { background-color: #7f1d1d; color: #fca5a5; }
+    }
+    .diagram-wrapper .tag-delay {
+        position: absolute; top: -12px; right: 15px;
+        padding: 3px 10px; border-radius: 6px;
+        font-size: 10px; font-weight: 900; letter-spacing: 1px;
+        border: 1px solid #ef4444;
+        animation: flashDelayTag 1.2s infinite ease-in-out; z-index: 40;
+    }
+
+    /* MATRIX GRID */
+    .diagram-wrapper .diagram-grid {
+        display: grid;
+        grid-template-columns: 240px 200px 240px 240px 240px 260px 280px max-content;
+        grid-auto-rows: minmax(70px, auto);
+        gap: 40px 380px;
+        padding: 100px 100px 160px 100px;
+        position: relative; z-index: 20; width: max-content; align-items: center; margin: auto; 
+    }
+
+    /* NODE KARTU */
+    .diagram-wrapper .node {
+        position: relative; border-radius: 8px; box-shadow: 0 4px 15px var(--dw-shadow);
+        display: flex; align-items: center; padding: 12px 16px; gap: 15px;
+        background: var(--dw-node-bg); border: 2px solid var(--dw-border); color: var(--dw-text);
+        transition: transform 0.2s, background 0.4s ease, border-color 0.4s ease, color 0.4s ease;
+    }
+    .diagram-wrapper .node:hover { transform: translateY(-3px); box-shadow: 0 8px 25px var(--dw-shadow); z-index: 30; }
+
+    .diagram-wrapper .style-input { border-left: 6px solid var(--c-mic); }
+    .diagram-wrapper .style-media { border-left: 6px solid var(--c-media); }
+    .diagram-wrapper .style-rack {
+        background: var(--dw-rack-bg) !important; 
+        color: var(--dw-rack-text) !important; 
+        border: 2px solid var(--dw-rack-border) !important;
+        border-left: 14px solid #334155 !important; 
+        border-right: 14px solid #334155 !important;
+        transition: background 0.4s ease, border-color 0.4s ease, color 0.4s ease !important;
+    }
+
+    .diagram-wrapper .node-icon { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; background: rgba(100,116,139,0.1); border-radius: 8px; flex-shrink: 0; }
+    .diagram-wrapper .node-info { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+    .diagram-wrapper .node-info h4 { margin: 0; font-size: 13px; font-weight: 700; }
+    .diagram-wrapper .node-info p { margin: 0; font-size: 11px; opacity: 0.85; font-family: monospace; }
+    .style-rack .node-info p { color: #94a3b8; }
+
+    /* SISTEM TERMINAL PORT */
+    .diagram-wrapper .tp {
+        width: 12px; height: 12px; background: var(--dw-node-bg); border: 3px solid var(--dw-text);
+        border-radius: 50%; position: absolute; z-index: 15; transition: all 0.3s ease;
+    }
+    .diagram-wrapper .tp:hover { background: #ef4444; transform: scale(1.3); }
+    
+    .diagram-wrapper .tp::after {
+        content: attr(data-label); position: absolute; font-size: 10px; font-weight: 800;
+        font-family: monospace; color: var(--dw-text-muted); white-space: nowrap; pointer-events: none;
+        transition: color 0.4s ease;
+    }
+    .style-rack .tp::after { color: #94a3b8; }
+
+    .diagram-wrapper .tp-in { left: -22px; }
+    .diagram-wrapper .tp-in::after { left: 16px; top: -2px; }
+    .diagram-wrapper .tp-out { right: -22px; }
+    .diagram-wrapper .tp-out::after { right: 16px; top: -2px; text-align: right; }
+    .style-input .tp-out, .style-media .tp-out { right: -8px; }
+
+    /* ZONA SPEAKER LAPANGAN */
+    .diagram-wrapper .zone-group {
+        display: flex; flex-direction: column; gap: 15px; 
+        background: var(--dw-zone-bg);
+        padding: 15px 25px 25px 25px; border-radius: 12px; 
+        border: 1px dashed var(--dw-zone-border); position: relative;
+        transition: background 0.4s ease, border-color 0.4s ease;
+    }
+    .diagram-wrapper .zone-title { font-size: 12px; font-weight: 800; border-bottom: 2px solid var(--c-spk); padding-bottom: 5px; display: inline-block; color: var(--dw-text); transition: color 0.4s ease;}
+    .diagram-wrapper .speaker-row { display: flex; flex-direction: row; gap: 40px; align-items: center; }
+
+    .diagram-wrapper .spk-unit {
+        width: 36px; height: 54px; background: var(--dw-spk-bg); border-radius: 5px; position: relative; border: 2px solid var(--dw-spk-border); z-index: 20;
+        transition: background 0.4s ease, border-color 0.4s ease;
+    }
+    
+    .diagram-wrapper .watt-label {
+        position: absolute; bottom: -22px; left: 50%; transform: translateX(-50%);
+        font-size: 10px; font-weight: 800; color: var(--dw-text);
+        background: var(--dw-watt-bg); padding: 2px 6px; border-radius: 4px;
+        border: 1px solid var(--dw-border); white-space: nowrap;
+        transition: background 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+    }
+
+    .diagram-wrapper .foh-array-stack {
+        display: flex; flex-direction: column; gap: 2px; align-items: center; background: var(--dw-spk-bg); padding: 5px; border-radius: 6px; border: 2px solid #be123c; z-index: 20;
+        transition: background 0.4s ease;
+    }
+    .diagram-wrapper .array-module { width: 50px; height: 16px; background: #000000; border-radius: 3px; }
+
+    .diagram-wrapper .node-icon svg { width: 24px; height: 24px; stroke: currentColor; stroke-width: 2; fill: none; }
+    
+    .diagram-wrapper .mobile-hint { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: #0f172a; color: #ffffff; padding: 10px 20px; border-radius: 20px; font-size: 13px; font-weight: bold; z-index: 9999; pointer-events: none; opacity: 0; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+    @media (max-width: 768px) { 
+        .diagram-wrapper .diagram-grid { gap: 40px 250px; padding: 80px 60px 160px 60px; }
+        .diagram-wrapper .mobile-hint { opacity: 1; animation: fadeOut 6s forwards 1s; } 
+    }
+    @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
+</style>
+
+<div class="diagram-wrapper" id="diagram-container">
+    <div class="mobile-hint">👆 Geser area diagram untuk menelusuri jalur kabel</div>
+    <svg id="svg-canvas"></svg>
+
+    <div class="diagram-grid">
+        
+        <div class="node style-input" id="in-mic1" style="grid-area: 1 / 1;">
+            <div class="node-icon"><svg><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg></div>
+            <div class="node-info"><h4>Mic 1 - Ketua</h4><p>Shure SM58 • CH 01</p></div>
+            <div class="tp tp-out" id="t-m1-out" style="top:50%;" data-label="OUT"></div>
+        </div>
+        <div class="node style-input" id="in-mic2" style="grid-area: 2 / 1;">
+            <div class="node-icon"><svg><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg></div>
+            <div class="node-info"><h4>Mic 2 - Mimbar</h4><p>Sennheiser e835• CH 02</p></div>
+            <div class="tp tp-out" id="t-m2-out" style="top:50%;" data-label="OUT"></div>
+        </div>
+        <div class="node style-input" id="in-mic3" style="grid-area: 3 / 1;">
+            <div class="node-icon"><svg><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg></div>
+            <div class="node-info"><h4>Mic 3 - Peserta 1</h4><p>Shure SM58 • CH 03</p></div>
+            <div class="tp tp-out" id="t-m3-out" style="top:50%;" data-label="OUT"></div>
+        </div>
+        <div class="node style-input" id="in-mic4" style="grid-area: 4 / 1;">
+            <div class="node-icon"><svg><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg></div>
+            <div class="node-info"><h4>Mic 4 - Peserta 2</h4><p>Shure SM58 • CH 04</p></div>
+            <div class="tp tp-out" id="t-m4-out" style="top:50%;" data-label="OUT"></div>
+        </div>
+
+        <div class="node style-media" id="in-med-utama" style="grid-area: 6 / 1;">
+            <div class="node-icon"><svg><rect x="2" y="3" width="20" height="14" rx="2"/></svg></div>
+            <div class="node-info"><h4>Media Utama</h4><p>Laptop (Stereo)</p></div>
+            <div class="tp tp-out" id="t-mu-L" style="top:35%;" data-label="OUT L"></div>
+            <div class="tp tp-out" id="t-mu-R" style="top:65%;" data-label="OUT R"></div>
+        </div>
+        
+        <div class="node style-media" id="in-med-backup" style="grid-area: 7 / 1;">
+            <div class="node-icon"><svg><rect x="2" y="3" width="20" height="14" rx="2"/></svg></div>
+            <div class="node-info"><h4>Media Backup</h4><p>Laptop (Stereo)</p></div>
+            <div class="tp tp-out" id="t-mb-L" style="top:35%;" data-label="OUT L"></div>
+            <div class="tp tp-out" id="t-mb-R" style="top:65%;" data-label="OUT R"></div>
+        </div>
+
+        <div class="node style-rack" id="snake-box" style="grid-area: 1 / 2 / span 5 / 3; align-self: center; height: 350px; width: 300px;">
+            <div class="node-icon" style="color:#10b981; align-self:flex-start; margin-top:5px;"><svg><rect x="4" y="4" width="16" height="16" rx="2"/></svg></div>
+            <div class="node-info" style="align-self:flex-start; margin-top:5px;"><h4>PROEL Stagebox</h4><p>Snake Cable 8/4</p></div>
+            
+            <div class="tp tp-in" id="t-sb-m1" style="top:15%;" data-label="CH 1"></div>
+            <div class="tp tp-in" id="t-sb-m2" style="top:35%;" data-label="CH 2"></div>
+            <div class="tp tp-in" id="t-sb-m3" style="top:55%;" data-label="CH 3"></div>
+            <div class="tp tp-in" id="t-sb-m4" style="top:75%;" data-label="CH 4"></div>
+            
+            <div class="tp tp-out" id="t-sb-o1" style="top:15%;" data-label="OUT CH 1"></div>
+            <div class="tp tp-out" id="t-sb-o2" style="top:25%;" data-label="OUT CH 2"></div>
+            <div class="tp tp-out" id="t-sb-o3" style="top:35%;" data-label="OUT CH 3"></div>
+            <div class="tp tp-out" id="t-sb-o4" style="top:45%;" data-label="OUT CH 4"></div>
+            
+            <div class="tp tp-out" id="t-sb-retL" style="top:60%; border-color:#ef4444;" data-label="RET L IN"></div>
+            <div class="tp tp-out" id="t-sb-retR" style="top:70%; border-color:#ef4444;" data-label="RET R IN"></div>
+            <div class="tp tp-out" id="t-sb-protL" style="top:85%; border-color:#ef4444;" data-label="TO PROTEA L"></div>
+            <div class="tp tp-out" id="t-sb-protR" style="top:95%; border-color:#ef4444;" data-label="TO PROTEA R"></div>
+        </div>
+
+        <div class="node style-rack" id="mix-main" style="grid-area: 3 / 3 / span 4 / 4; align-self: end; height: 350px; width: 300px;">
+            <div class="node-icon" style="color:#d946ef; align-self:flex-start; margin-top:5px;"><svg><line x1="4" y1="21" x2="4" y2="14"/><line x1="12" y1="21" x2="12" y2="3"/></svg></div>
+            <div class="node-info" style="align-self:flex-start; margin-top:5px;">
+                <h4>Yamaha MG16XU</h4>
+                <p>Audio Console</p>
+                <p style="font-size: 10px; color: #d946ef; font-weight: bold;">» CH 1-4, 9-12 ➔ Stereo Out</p>
+                <p style="font-size: 10px; color: #f59e0b; margin-top: 6px; font-weight: bold;">» Group 1-2 ➔ Broadcast/FM</p>
+            </div>
+            
+            <div class="tp tp-in" id="t-mix-i1" style="top:12%;" data-label="CH 1 IN"></div>
+            <div class="tp tp-in" id="t-mix-i2" style="top:22%;" data-label="CH 2 IN"></div>
+            <div class="tp tp-in" id="t-mix-i3" style="top:32%;" data-label="CH 3 IN"></div>
+            <div class="tp tp-in" id="t-mix-i4" style="top:42%;" data-label="CH 4 IN"></div>
+            
+            <div class="tp tp-in" id="t-mix-i9" style="top:57%; border-color:var(--c-media);" data-label="CH 9 L"></div>
+            <div class="tp tp-in" id="t-mix-i10" style="top:67%; border-color:var(--c-media);" data-label="CH 10 R"></div>
+            <div class="tp tp-in" id="t-mix-i11" style="top:77%; border-color:var(--c-media);" data-label="CH 11 L"></div>
+            <div class="tp tp-in" id="t-mix-i12" style="top:87%; border-color:var(--c-media);" data-label="CH 12 R"></div>
+            
+            <div class="tp tp-out" id="t-mix-mainL" style="top:25%;" data-label="STEREO L"></div>
+            <div class="tp tp-out" id="t-mix-mainR" style="top:35%;" data-label="STEREO R"></div>
+            <div class="tp tp-out" id="t-mix-grp1" style="top:75%; border-color:var(--c-tx);" data-label="GRP 1"></div>
+            <div class="tp tp-out" id="t-mix-grp2" style="top:85%; border-color:var(--c-tx);" data-label="GRP 2"></div>
+        </div>
+
+        <div class="node style-rack" id="tx-fm" style="grid-area: 3 / 4; height: 100px;">
+            <div class="node-icon" style="color:#f59e0b;"><svg><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49"/></svg></div>
+            <div class="node-info"><h4>FM Transmitter</h4><p>Broadcast Radio</p></div>
+            <div class="tp tp-in" id="t-tx-in" style="top:50%;" data-label="IN"></div>
+        </div>
+        
+        <div class="node style-rack" id="proc-geq" style="grid-area: 5 / 4; height: 100px; width: 230px;">
+            <div class="node-icon" style="color:#10b981; align-self:flex-start; margin-top:5px;"><svg><rect x="2" y="4" width="20" height="16" rx="2"/></svg></div>
+            <div class="node-info" style="align-self:flex-start; margin-top:5px;"><h4>GEQ DBX 231</h4><p>Graphic EQ 2 Channel</p></div>
+            <div class="tp tp-in" id="t-geq-inL" style="top:35%;" data-label="IN L"></div>
+            <div class="tp tp-in" id="t-geq-inR" style="top:65%;" data-label="IN R"></div>
+            <div class="tp tp-out" id="t-geq-outL" style="top:35%;" data-label="OUT L"></div>
+            <div class="tp tp-out" id="t-geq-outR" style="top:65%;" data-label="OUT R"></div>
+        </div>
+
+        <div class="node style-rack" id="proc-dlms" style="grid-area: 5 / 5; height: 160px; width: 300px;">
+            <div class="node-icon" style="color:#3b82f6; align-self:flex-start; margin-top:5px;"><svg><rect x="2" y="4" width="20" height="16" rx="2"/></svg></div>
+            <div class="node-info" style="align-self:flex-start; margin-top:5px;"><h4>DLMS Behringer DCX2496</h4><p>Manajemen Delay</p></div>
+            
+            <div class="tp tp-in" id="t-dlms-inL" style="top:35%;" data-label="IN L"></div>
+            <div class="tp tp-in" id="t-dlms-inR" style="top:65%;" data-label="IN R"></div>
+            
+            <div class="tp tp-out" id="t-dlms-o1" style="top:15%;" data-label="OUT 1"></div>
+            <div class="tp tp-out" id="t-dlms-o2" style="top:30%; border-color:#ef4444;" data-label="OUT 2 (DLY)"></div>
+            <div class="tp tp-out" id="t-dlms-o3" style="top:45%; border-color:#ef4444;" data-label="OUT 3 (DLY)"></div>
+            <div class="tp tp-out" id="t-dlms-o4" style="top:60%;" data-label="OUT 4 (Backup)"></div>
+            <div class="tp tp-out" id="t-dlms-o5" style="top:75%;" data-label="OUT 5"></div>
+            <div class="tp tp-out" id="t-dlms-o6" style="top:90%;" data-label="OUT 6"></div>
+        </div>
+
+        <div class="node style-rack" id="proc-split" style="grid-area: 4 / 6; height: 160px; width: 300px;">
+            <div class="node-icon" style="color:#ef4444; align-self:flex-start; margin-top:5px;"><svg><circle cx="8" cy="12" r="1"/><circle cx="12" cy="12" r="1"/></svg></div>
+            <div class="node-info" style="align-self:flex-start; margin-top:5px;"><h4>MX882 Splitter</h4><p>Distribusi Zona</p></div>
+            
+            <div class="tp tp-in" id="t-split-inL" style="top:35%;" data-label="IN L"></div>
+            <div class="tp tp-in" id="t-split-inR" style="top:65%;" data-label="IN R"></div>
+            
+            <div class="tp tp-out" id="t-split-retL" style="top:12%; border-color:#ef4444;" data-label="MAIN OUT L"></div>
+            <div class="tp tp-out" id="t-split-retR" style="top:26%; border-color:#ef4444;" data-label="MAIN OUT R"></div>
+            <div class="tp tp-out" id="t-split-o1" style="top:41%;" data-label="OUT 1"></div>
+            <div class="tp tp-out" id="t-split-o2" style="top:56%;" data-label="OUT 2"></div>
+            <div class="tp tp-out" id="t-split-o3" style="top:71%;" data-label="OUT 3"></div>
+            <div class="tp tp-out" id="t-split-o4" style="top:86%;" data-label="OUT 4 (Unused)"></div>
+        </div>
+
+        <div class="node style-rack" id="amp-protea1" style="grid-area: 1 / 7;">
+            <div class="node-info"><h4>Ampli PROTEA 1</h4><p>FOH L (Link 1-2)</p></div>
+            <div class="tp tp-in" id="t-ap1-in" style="top:50%;" data-label="IN"></div>
+            <div class="tp tp-out" id="t-ap1-out" style="top:50%;" data-label="OUT"></div>
+        </div>
+        <div class="node style-rack" id="amp-protea2" style="grid-area: 2 / 7;">
+            <div class="node-info"><h4>Ampli PROTEA 2</h4><p>FOH R (Link 1-2)</p></div>
+            <div class="tp tp-in" id="t-ap2-in" style="top:50%;" data-label="IN"></div>
+            <div class="tp tp-out" id="t-ap2-out" style="top:50%;" data-label="OUT"></div>
+        </div>
+        
+        <div class="node style-rack" id="amp-za1" style="grid-area: 3 / 7;">
+            <div class="node-info"><h4>TOA ZA 2240</h4><p>Belakang Panggung</p></div>
+            <div class="tp tp-in" id="t-az1-in" style="top:50%;" data-label="IN"></div>
+            <div class="tp tp-out" id="t-az1-out" style="top:50%;" data-label="OUT"></div>
+        </div>
+        <div class="node style-rack" id="amp-za2" style="grid-area: 4 / 7;">
+            <div class="node-info"><h4>TOA ZA 2240</h4><p>Samping Panggung</p></div>
+            <div class="tp tp-in" id="t-az2-in" style="top:50%;" data-label="IN"></div>
+            <div class="tp tp-out" id="t-az2-out" style="top:50%;" data-label="OUT"></div>
+        </div>
+        <div class="node style-rack" id="amp-za3" style="grid-area: 5 / 7;">
+            <div class="node-info"><h4>TOA ZA 2120</h4><p>Panggung Monitor</p></div>
+            <div class="tp tp-in" id="t-az3-in" style="top:50%;" data-label="IN"></div>
+            <div class="tp tp-out" id="t-az3-out" style="top:50%;" data-label="OUT"></div>
+        </div>
+        
+        <div class="node style-rack is-delayed" id="amp-za4" style="grid-area: 6 / 7;">
+            <div class="tag-delay">DELAY</div>
+            <div class="node-info"><h4>TOA ZA 2240</h4><p>Tower Delay 1</p></div>
+            <div class="tp tp-in" id="t-az4-in" style="top:50%; border-color:#ef4444;" data-label="IN"></div>
+            <div class="tp tp-out" id="t-az4-out" style="top:50%;" data-label="OUT"></div>
+        </div>
+        <div class="node style-rack is-delayed" id="amp-za5" style="grid-area: 7 / 7;">
+            <div class="tag-delay">DELAY</div>
+            <div class="node-info"><h4>TOA ZA 2240</h4><p>Tower Delay 2</p></div>
+            <div class="tp tp-in" id="t-az5-in" style="top:50%; border-color:#ef4444;" data-label="IN"></div>
+            <div class="tp tp-out" id="t-az5-out" style="top:50%;" data-label="OUT"></div>
+        </div>
+        
+        <div class="node style-rack" id="amp-za6" style="grid-area: 8 / 7;">
+            <div class="node-info"><h4>TOA ZA 2240</h4><p>Ruang P3K</p></div>
+            <div class="tp tp-in" id="t-az6-in" style="top:50%;" data-label="IN"></div>
+            <div class="tp tp-out" id="t-az6-out" style="top:50%;" data-label="OUT"></div>
+        </div>
+
+        <div class="zone-group" style="grid-area: 1 / 8; border-color: #be123c;">
+            <div class="zone-title" style="border-color: #be123c;">FOH Kiri (TOA HX-5) - ZONA D1</div>
+            <div class="speaker-row">
+                <div class="foh-array-stack" id="foh-L1"><div class="tp tp-in" id="t-spk-fl" style="top:50%;" data-label="IN"></div><div class="array-module"></div><div class="array-module"></div></div>
+                <div class="foh-array-stack"><div class="array-module"></div><div class="array-module"></div></div>
+            </div>
+        </div>
+        <div class="zone-group" style="grid-area: 2 / 8; border-color: #be123c;">
+            <div class="zone-title" style="border-color: #be123c;">FOH Kanan (TOA HX-5) - ZONA D2</div>
+            <div class="speaker-row">
+                <div class="foh-array-stack" id="foh-R1"><div class="tp tp-in" id="t-spk-fr" style="top:50%;" data-label="IN"></div><div class="array-module"></div><div class="array-module"></div></div>
+                <div class="foh-array-stack"><div class="array-module"></div><div class="array-module"></div></div>
+            </div>
+        </div>
+        
+        <div class="zone-group" style="grid-area: 3 / 8;">
+            <div class="zone-title">Belakang Panggung (TOA F-2000BM) - ZONA A</div>
+            <div class="speaker-row">
+                <div class="spk-unit" id="z1-1"><div class="tp tp-in" id="t-spk-1" style="top:50%;"></div><span class="watt-label">60W</span></div>
+                <div class="spk-unit" id="z1-2"><span class="watt-label">60W</span></div>
+                <div class="spk-unit" id="z1-3"><span class="watt-label">60W</span></div>
+            </div>
+        </div>
+        
+        <div class="zone-group" style="grid-area: 4 / 8;">
+            <div class="zone-title">Samping Panggung (TOA F-2000BM) - ZONA B</div>
+            <div class="speaker-row">
+                <div class="spk-unit" id="z2-1"><div class="tp tp-in" id="t-spk-2" style="top:50%;"></div><span class="watt-label">30W</span></div>
+                <div class="spk-unit" id="z2-2"><span class="watt-label">30W</span></div>
+                <div class="spk-unit" id="z2-3"><span class="watt-label">30W</span></div>
+            </div>
+        </div>
+        
+        <div class="zone-group" style="grid-area: 5 / 8;">
+            <div class="zone-title">Panggung Monitor (TOA ZA-1030 W) - ZONA C</div>
+            <div class="speaker-row">
+                <div class="spk-unit" id="z3-1"><div class="tp tp-in" id="t-spk-3" style="top:50%;"></div><span class="watt-label">30W</span></div>
+                <div class="spk-unit" id="z3-2"><span class="watt-label">30W</span></div>
+                <div class="spk-unit" id="z3-3"><span class="watt-label">30W</span></div>
+            </div>
+        </div>
+        
+        <div class="zone-group" style="grid-area: 6 / 8;">
+            <div class="zone-title">Tower Delay 1 (TOA F-2000BM) - ZONA E</div>
+            <div class="speaker-row">
+                <div class="spk-unit" id="z4-1"><div class="tp tp-in" id="t-spk-4" style="top:50%;"></div><span class="watt-label">30W</span></div>
+                <div class="spk-unit" id="z4-2"><span class="watt-label">30W</span></div>
+                <div class="spk-unit" id="z4-3"><span class="watt-label">30W</span></div>
+                <div class="spk-unit" id="z4-4"><span class="watt-label">30W</span></div>
+                <div class="spk-unit" id="z4-5"><span class="watt-label">30W</span></div>
+            </div>
+        </div>
+        
+        <div class="zone-group" style="grid-area: 7 / 8;">
+            <div class="zone-title">Tower Delay 2 (TOA F-2000BM) - ZONA F</div>
+            <div class="speaker-row">
+                <div class="spk-unit" id="z5-1"><div class="tp tp-in" id="t-spk-5" style="top:50%;"></div><span class="watt-label">30W</span></div>
+                <div class="spk-unit" id="z5-2"><span class="watt-label">30W</span></div>
+                <div class="spk-unit" id="z5-3"><span class="watt-label">30W</span></div>
+            </div>
+        </div>
+        
+        <div class="zone-group" style="grid-area: 8 / 8;">
+            <div class="zone-title">Ruang P3K (TOA F-2000BM) - ZONA G</div>
+            <div class="speaker-row">
+                <div class="spk-unit" id="z6-1"><div class="tp tp-in" id="t-spk-6" style="top:50%;"></div><span class="watt-label">60W</span></div>
+                <div class="spk-unit" id="z6-2"><span class="watt-label">60W</span></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const cables = [
+        { from: 't-m1-out', to: 't-sb-m1', label: 'XLR', color: 'var(--c-mic)' },
+        { from: 't-m2-out', to: 't-sb-m2', label: 'XLR', color: 'var(--c-mic)' },
+        { from: 't-m3-out', to: 't-sb-m3', label: 'XLR', color: 'var(--c-mic)' },
+        { from: 't-m4-out', to: 't-sb-m4', label: 'XLR', color: 'var(--c-mic)' },
+        
+        { from: 't-sb-o1', to: 't-mix-i1', label: 'CH 1', color: 'var(--c-mic)' },
+        { from: 't-sb-o2', to: 't-mix-i2', label: 'CH 2', color: 'var(--c-mic)' },
+        { from: 't-sb-o3', to: 't-mix-i3', label: 'CH 3', color: 'var(--c-mic)' },
+        { from: 't-sb-o4', to: 't-mix-i4', label: 'CH 4', color: 'var(--c-mic)' },
+        
+        { from: 't-mu-L', to: 't-mix-i9', label: 'CH 9 L', color: 'var(--c-media)' },
+        { from: 't-mu-R', to: 't-mix-i10', label: 'CH 10 R', color: 'var(--c-media)' },
+        { from: 't-mb-L', to: 't-mix-i11', label: 'CH 11 L', color: 'var(--c-media)' },
+        { from: 't-mb-R', to: 't-mix-i12', label: 'CH 12 R', color: 'var(--c-media)' },
+        
+        // --- Perubahan Rute Group Mixer Langsung ke Transmitter ---
+        { from: 't-mix-grp1', to: 't-tx-in', label: 'Dual TRS 6,5mm to 3,5mm', color: 'var(--c-tx)', route: 'elbow', xOffset: 60, labelOffsetY: -15 },
+        { from: 't-mix-grp2', to: 't-tx-in', color: 'var(--c-tx)', route: 'elbow', xOffset: 80 },
+
+        { from: 't-mix-mainL', to: 't-geq-inL', label: 'Stereo Out L/R', color: 'var(--c-mix)' },
+        { from: 't-mix-mainR', to: 't-geq-inR', color: 'var(--c-mix)' },
+        
+        { from: 't-geq-outL', to: 't-dlms-inL', label: 'XLR L/R', color: 'var(--c-mix)' },
+        { from: 't-geq-outR', to: 't-dlms-inR', color: 'var(--c-mix)' },
+        
+        { from: 't-dlms-o5', to: 't-split-inL', label: 'Out 5/6: XLR', color: 'var(--c-dlms)', route: 'elbow', xOffset: 35 },
+        { from: 't-dlms-o6', to: 't-split-inR', color: 'var(--c-dlms)', route: 'elbow', xOffset: 45 },
+        
+        { from: 't-dlms-o1', to: 't-az3-in', label: 'Out 1: XLR to RCA', color: 'var(--c-dlms)' },
+        { from: 't-dlms-o2', to: 't-az4-in', label: 'Out 2: XLR to RCA', color: 'var(--c-dlms)', route: 'elbow', xOffset: 65 },
+        { from: 't-dlms-o3', to: 't-az5-in', label: 'Out 3: XLR to RCA', color: 'var(--c-dlms)', route: 'elbow', xOffset: 95 },
+
+        { from: 't-split-retL', to: 't-sb-retL', label: 'Main Out L (Snake)', color: 'var(--c-split)', route: 'return-top', yOffset: 45 },
+        { from: 't-split-retR', to: 't-sb-retR', label: 'Main Out R (Snake)', color: 'var(--c-split)', route: 'return-top', yOffset: 25 },
+        
+        { from: 't-sb-protL', to: 't-ap1-in', label: 'XLR L', color: 'var(--c-split)', route: 'under', underOffset: 120 },
+        { from: 't-sb-protR', to: 't-ap2-in', label: 'XLR R', color: 'var(--c-split)', route: 'under', underOffset: 95 },
+
+        { from: 't-split-o1', to: 't-az1-in', label: 'Out 1: XLR to RCA', color: 'var(--c-split)', route: 'elbow', xOffset: 50 },
+        { from: 't-split-o2', to: 't-az2-in', label: 'Out 2: XLR to RCA', color: 'var(--c-split)' }, 
+        { from: 't-split-o3', to: 't-az6-in', label: 'Out 3: XLR to RCA', color: 'var(--c-split)', route: 'elbow', xOffset: 80 },
+        
+        // --- Out 4 XLR ke Video Switcher dihapus ---
+        
+        { from: 't-ap1-out', to: 't-spk-fl', label: 'SpeakON', color: 'var(--c-spk)', route: 'elbow', xOffset: 40, dual: true },
+        { from: 't-ap2-out', to: 't-spk-fr', label: 'SpeakON', color: 'var(--c-spk)', route: 'elbow', xOffset: 80, dual: true },
+        { from: 't-az1-out', to: 't-spk-1', label: '100V Line', color: 'var(--c-spk)', dual: true },
+        { from: 't-az2-out', to: 't-spk-2', label: '100V Line', color: 'var(--c-spk)', dual: true },
+        { from: 't-az3-out', to: 't-spk-3', label: '100V Line', color: 'var(--c-spk)', dual: true },
+        { from: 't-az4-out', to: 't-spk-4', label: '100V Line', color: 'var(--c-spk)', dual: true },
+        { from: 't-az5-out', to: 't-spk-5', label: '100V Line', color: 'var(--c-spk)', dual: true },
+        { from: 't-az6-out', to: 't-spk-6', label: '100V Line', color: 'var(--c-spk)', dual: true },
+
+        { from: 'z1-1', to: 'z1-2', color: 'var(--c-spk)', dual: true, route: 'jumper' },
+        { from: 'z1-2', to: 'z1-3', color: 'var(--c-spk)', dual: true, route: 'jumper' },
+        
+        { from: 'z2-1', to: 'z2-2', color: 'var(--c-spk)', dual: true, route: 'jumper' },
+        { from: 'z2-2', to: 'z2-3', color: 'var(--c-spk)', dual: true, route: 'jumper' },
+        
+        { from: 'z3-1', to: 'z3-2', color: 'var(--c-spk)', dual: true, route: 'jumper' },
+        { from: 'z3-2', to: 'z3-3', color: 'var(--c-spk)', dual: true, route: 'jumper' },
+        { from: 'z4-1', to: 'z4-2', color: 'var(--c-spk)', dual: true, route: 'jumper' },
+        { from: 'z4-2', to: 'z4-3', color: 'var(--c-spk)', dual: true, route: 'jumper' },
+        { from: 'z4-3', to: 'z4-4', color: 'var(--c-spk)', dual: true, route: 'jumper' },
+        { from: 'z4-4', to: 'z4-5', color: 'var(--c-spk)', dual: true, route: 'jumper' },
+        
+        { from: 'z5-1', to: 'z5-2', color: 'var(--c-spk)', dual: true, route: 'jumper' },
+        { from: 'z5-2', to: 'z5-3', color: 'var(--c-spk)', dual: true, route: 'jumper' },
+        
+        { from: 'z6-1', to: 'z6-2', color: 'var(--c-spk)', dual: true, route: 'jumper' }
+    ];
+
+    function createPathD(x1, y1, x2, y2, link, gridH) {
+        let pathD = ""; let labelX, labelY;
+
+        if (link.route === 'jumper') {
+            pathD = `M ${x1} ${y1} L ${x2} ${y2}`;
+            labelX = (x1 + x2) / 2; labelY = y2 - 10;
+        } else if (link.route === 'elbow') {
+            const dropX = x1 + (link.xOffset || 40);
+            let r = 15; 
+            const dirY = y2 > y1 ? 1 : -1; 
+            
+            const dirX1 = dropX > x1 ? 1 : -1;
+            const dirX2 = x2 > dropX ? 1 : -1;
+
+            if (Math.abs(y2 - y1) < 10) {
+                pathD = `M ${x1} ${y1} L ${x2} ${y2}`;
+                labelX = (x1 + x2) / 2; labelY = y2;
+            } else {
+                if (Math.abs(y2 - y1) < r * 2) r = Math.abs(y2 - y1) / 2;
+                
+                pathD = `M ${x1} ${y1} 
+                         L ${dropX - (r * dirX1)} ${y1} 
+                         Q ${dropX} ${y1} ${dropX} ${y1 + (r * dirY)} 
+                         L ${dropX} ${y2 - (r * dirY)} 
+                         Q ${dropX} ${y2} ${dropX + (r * dirX2)} ${y2} 
+                         L ${x2} ${y2}`;
+                         
+                labelX = dropX + ((x2 - dropX) / 2); labelY = y2;
+            }
+        } else if (link.route === 'return-top') {
+            const dropX1 = x1 + 30; const dropX2 = x2 + 80;
+            const routeY = link.yOffset || 40; const r = 15;
+            pathD = `M ${x1} ${y1} L ${dropX1 - r} ${y1} Q ${dropX1} ${y1} ${dropX1} ${y1 - r} L ${dropX1} ${routeY + r} Q ${dropX1} ${routeY} ${dropX1 - r} ${routeY} L ${dropX2 + r} ${routeY} Q ${dropX2} ${routeY} ${dropX2} ${routeY + r} L ${dropX2} ${y2 - r} Q ${dropX2} ${y2} ${dropX2 - r} ${y2} L ${x2} ${y2}`;
+            labelX = (dropX1 + dropX2) / 2; labelY = routeY;
+        } else if (link.route === 'under') {
+            const dropX1 = x1 + 40; const dropX2 = x2 - 50; 
+            const routeY = gridH - (link.underOffset || 60); const r = 15;
+            pathD = `M ${x1} ${y1} L ${dropX1 - r} ${y1} Q ${dropX1} ${y1} ${dropX1} ${y1 + r} L ${dropX1} ${routeY - r} Q ${dropX1} ${routeY} ${dropX1 + r} ${routeY} L ${dropX2 - r} ${routeY} Q ${dropX2} ${routeY} ${dropX2} ${routeY - r} L ${dropX2} ${y2 + r} Q ${dropX2} ${y2} ${dropX2 + r} ${y2} L ${x2} ${y2}`;
+            labelX = (dropX1 + dropX2) / 2; labelY = routeY;
+        } else {
+            const curveFactor = Math.max(Math.abs(x2 - x1) * 0.45, 40); 
+            const cp1x = x1 < x2 ? x1 + curveFactor : x1 - curveFactor;
+            const cp2x = x1 < x2 ? x2 - curveFactor : x2 + curveFactor;
+            pathD = `M ${x1} ${y1} C ${cp1x} ${y1}, ${cp2x} ${y2}, ${x2} ${y2}`;
+            labelX = (x1 + x2) / 2; labelY = (y1 + y2) / 2;
+        }
+        return { pathD, labelX, labelY };
+    }
+
+    function drawConnections() {
+        const svg = document.getElementById('svg-canvas');
+        const container = document.getElementById('diagram-container');
+        const grid = document.querySelector('.diagram-grid');
+        
+        svg.style.width = Math.max(container.scrollWidth, grid.scrollWidth) + 'px';
+        svg.style.height = Math.max(container.scrollHeight, grid.scrollHeight) + 'px';
+        
+        const cRect = container.getBoundingClientRect();
+        const gridH = grid.scrollHeight;
+        let svgContent = '';
+
+        cables.forEach(link => {
+            const elFrom = document.getElementById(link.from);
+            const elTo = document.getElementById(link.to);
+            if(!elFrom || !elTo) return;
+
+            const rectFrom = elFrom.getBoundingClientRect();
+            const rectTo = elTo.getBoundingClientRect();
+            
+            const x1 = rectFrom.left + rectFrom.width/2 - cRect.left + container.scrollLeft;
+            const y1 = rectFrom.top + rectFrom.height/2 - cRect.top + container.scrollTop;
+            const x2 = rectTo.left + rectTo.width/2 - cRect.left + container.scrollLeft;
+            const y2 = rectTo.top + rectTo.height/2 - cRect.top + container.scrollTop;
+            
+            let paths = []; let finalLabelX, finalLabelY;
+
+            if (link.dual) {
+                const gap = 12; 
+                const l1 = { ...link, xOffset: link.xOffset ? link.xOffset - gap/2 : undefined };
+                const l2 = { ...link, xOffset: link.xOffset ? link.xOffset + gap/2 : undefined };
+                const p1 = createPathD(x1, y1 - gap/2, x2, y2 - gap/2, l1, gridH);
+                const p2 = createPathD(x1, y1 + gap/2, x2, y2 + gap/2, l2, gridH);
+                paths.push(p1.pathD, p2.pathD);
+                finalLabelX = (p1.labelX + p2.labelX) / 2; finalLabelY = (p1.labelY + p2.labelY) / 2;
+            } else {
+                const p = createPathD(x1, y1, x2, y2, link, gridH);
+                paths.push(p.pathD); finalLabelX = p.labelX; finalLabelY = p.labelY;
+            }
+            
+            paths.forEach(d => {
+                const zClass = link.route === 'jumper' ? 'z-index: 1;' : '';
+                svgContent += `<path d="${d}" fill="none" stroke="${link.color}" stroke-width="6" stroke-linecap="round" opacity="0.4" style="transition: stroke 0.4s ease; ${zClass}" />`;
+                svgContent += `<path d="${d}" fill="none" stroke="${link.color}" stroke-width="3" stroke-linecap="round" class="cable-flow" style="transition: stroke 0.4s ease; ${zClass}" />`;
+            });
+                        
+            if (link.label) {
+                const labelWidth = link.label.length * 7.5 + 20; 
+                const offsetY = link.labelOffsetY || 0; 
+
+                svgContent += `
+                    <rect class="cable-label-bg" x="${finalLabelX - labelWidth/2}" y="${finalLabelY - 14 + offsetY}" width="${labelWidth}" height="28" rx="14" stroke="${link.color}" style="transition: fill 0.4s ease, stroke 0.4s ease;" />
+                    <text class="cable-label-text" x="${finalLabelX}" y="${finalLabelY + offsetY}" dominant-baseline="central" alignment-baseline="central" style="transition: fill 0.4s ease;">${link.label}</text>
+                `;
+            }
+        });
+        svg.innerHTML = svgContent;
+    }
+
+    const slider = document.getElementById('diagram-container');
+    let isDown = false, startX, startY, scrollLeft, scrollTop;
+
+    slider.addEventListener('mousedown', (e) => {
+        isDown = true; startX = e.pageX - slider.offsetLeft; startY = e.pageY - slider.offsetTop; scrollLeft = slider.scrollLeft; scrollTop = slider.scrollTop;
+    });
+    slider.addEventListener('mouseleave', () => { isDown = false; });
+    slider.addEventListener('mouseup', () => { isDown = false; });
+    slider.addEventListener('mousemove', (e) => {
+        if (!isDown) return; e.preventDefault(); slider.scrollLeft = scrollLeft - (e.pageX - slider.offsetLeft - startX) * 1.5; slider.scrollTop = scrollTop - (e.pageY - slider.offsetTop - startY) * 1.5;
+    });
+
+    const observer = new MutationObserver(() => drawConnections());
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class', 'data-theme', 'data-bs-theme'] });
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+
+    window.onload = () => { setTimeout(drawConnections, 300); };
+    window.onresize = drawConnections;
+</script>

@@ -1,5 +1,5 @@
 // ==========================================
-// MESIN LOGIKA MISSION CONTROL (V.11.8 - RINCIAN TUGAS + MANUAL KABEL + FREEZE FRAME)
+// MESIN LOGIKA MISSION CONTROL (V.11.9 - ANTI-CRASH & THUMBNAIL BOX)
 // ==========================================
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec"; 
@@ -99,11 +99,12 @@ function renderMissions() {
     if (!isDataLoaded) return; const container = document.getElementById("missionsContainer"); container.innerHTML = "";
     if (activeTeam === '') { container.innerHTML = `<div style="text-align:center; padding:40px 20px; color:#64748b; grid-column: 1 / -1;"><h3 style="margin-bottom:5px;">Pilih Divisi Tim 👆</h3></div>`; return; }
     
-    let filtered = allMissions.filter(m => m.tim.toLowerCase().includes(activeTeam.toLowerCase()));
+    // 🔥 Proteksi Anti-Crash: Memastikan m.tim tidak undefined
+    let filtered = allMissions.filter(m => (m.tim || "").toLowerCase().includes(activeTeam.toLowerCase()));
     if(filtered.length === 0) { container.innerHTML = `<div style="text-align:center; padding:40px 20px; color:#64748b; grid-column: 1 / -1;">✅ Belum ada tugas untuk tim ini.</div>`; return; }
 
     let totalMisi = filtered.length;
-    let selesaiMisi = filtered.filter(m => m.status_misi.toLowerCase() === 'selesai').length;
+    let selesaiMisi = filtered.filter(m => (m.status_misi || "").toLowerCase() === 'selesai').length;
     let persentase = Math.round((selesaiMisi / totalMisi) * 100);
     let teamLower = activeTeam.toLowerCase();
 
@@ -151,16 +152,18 @@ function renderMissions() {
     container.innerHTML = rosterHtml + stickyHeaderHtml;
 
     filtered.sort((a, b) => {
-        let statA = a.status_misi.toLowerCase() === 'selesai' ? 1 : -1;
-        let statB = b.status_misi.toLowerCase() === 'selesai' ? 1 : -1;
+        let statA = (a.status_misi || "").toLowerCase() === 'selesai' ? 1 : -1;
+        let statB = (b.status_misi || "").toLowerCase() === 'selesai' ? 1 : -1;
         return statA - statB;
     });
 
     filtered.forEach((misi, index) => {
-        const isSelesai = (misi.status_misi.toLowerCase() === 'selesai');
-        const isOverride = misi.tugas.includes("⚠️ [");
+        const isSelesai = ((misi.status_misi || "").toLowerCase() === 'selesai');
         
+        // 🔥 Proteksi Anti-Crash: Memastikan misi.tugas tidak undefined saat membaca symbol
+        const isOverride = (misi.tugas || "").includes("⚠️ [");
         let rawTugas = (misi.tugas || "").replace(/⚠️ \[.*?\] /g, ''); 
+        
         let judulTugas = rawTugas;
         let detailTugas = misi.detail_tugas || misi.detail || ""; 
 
@@ -180,13 +183,14 @@ function renderMissions() {
         let packageHtml = `<div class="package-list"><div style="font-size:10px; font-weight:bold; color:gray; margin-bottom:6px;">📦 Daftar Alat / Barang:</div>`;
         
         if (misi.kode_barang) {
-            let codes = misi.kode_barang.split(',').map(c => c.trim()).filter(c => c);
+            // 🔥 Proteksi Anti-Crash: Jadikan string dulu sebelum di-split (Jaga-jaga kalau kodenya cuma angka)
+            let codes = String(misi.kode_barang).split(',').map(c => c.trim()).filter(c => c);
             let groupedItems = {}; let notFoundCodes = [];
             
             codes.forEach(code => {
-                let foundItem = allInventory.find(inv => inv.kode_barang && inv.kode_barang.toLowerCase() === code.toLowerCase());
+                let foundItem = allInventory.find(inv => inv.kode_barang && String(inv.kode_barang).toLowerCase() === String(code).toLowerCase());
                 if (foundItem) {
-                    let wadah = (foundItem.kode_wadah && foundItem.kode_wadah.trim() !== "") ? foundItem.kode_wadah.toUpperCase() : "NON_BOX";
+                    let wadah = (foundItem.kode_wadah && String(foundItem.kode_wadah).trim() !== "") ? String(foundItem.kode_wadah).toUpperCase() : "NON_BOX";
                     if (!groupedItems[wadah]) groupedItems[wadah] = [];
                     groupedItems[wadah].push(foundItem);
                 } else { notFoundCodes.push(code); }
@@ -194,7 +198,7 @@ function renderMissions() {
 
             for (const [wadah, items] of Object.entries(groupedItems)) {
                 if (wadah !== "NON_BOX") {
-                    let boxItem = allInventory.find(inv => inv.kode_barang && inv.kode_barang.toUpperCase() === wadah);
+                    let boxItem = allInventory.find(inv => inv.kode_barang && String(inv.kode_barang).toUpperCase() === wadah);
                     let boxName = boxItem ? boxItem.nama_barang : `WADAH #${wadah}`;
                     
                     // 🔥 THUMBNAIL DITEMPELKAN KE HEADER BOX ABU-ABU DI SINI 🔥
@@ -247,6 +251,8 @@ function renderMissions() {
             else buttonHtml = `<button class="btn-complete" style="background:#94a3b8;" onclick="toggleAdminMode()">🔒 KUNCI (LOGIN)</button>`;
         }
 
+        const card = document.createElement("div"); 
+        card.className = `mission-card ${isSelesai ? 'selesai' : ''}`;
         card.innerHTML = `
             <div class="mission-header-click" onclick="toggleMissionContent(this)">
                 <div class="mission-top">
@@ -327,14 +333,14 @@ function processScanResult(decodedText, rowIndex, idMisi, targetKodeBarangString
     
     let allowedCodes = new Set(targetCodes);
     targetCodes.forEach(code => {
-        let foundItem = allInventory.find(inv => inv.kode_barang && inv.kode_barang.toLowerCase() === code);
-        if (foundItem && foundItem.kode_wadah) allowedCodes.add(foundItem.kode_wadah.toLowerCase());
+        let foundItem = allInventory.find(inv => inv.kode_barang && String(inv.kode_barang).toLowerCase() === code);
+        if (foundItem && foundItem.kode_wadah) allowedCodes.add(String(foundItem.kode_wadah).toLowerCase());
     });
 
     let isMatch = Array.from(allowedCodes).some(allowed => scannedText.includes(allowed));
     
     if (!isMatch) {
-        let validNewItem = allInventory.find(inv => inv.kode_barang && inv.kode_barang.toLowerCase() === scannedText);
+        let validNewItem = allInventory.find(inv => inv.kode_barang && String(inv.kode_barang).toLowerCase() === scannedText);
         if (!validNewItem) { triggerFeedback('error'); showToast(`❌ Barcode ${scannedText} tidak terdaftar!`, false); return; }
 
         triggerFeedback('error'); 
@@ -343,7 +349,7 @@ function processScanResult(decodedText, rowIndex, idMisi, targetKodeBarangString
             document.querySelector(".scanner-controls").style.display = "none";
             
             let optionsHtml = targetCodes.map(c => {
-                let itm = allInventory.find(inv => inv.kode_barang && inv.kode_barang.toLowerCase() === c);
+                let itm = allInventory.find(inv => inv.kode_barang && String(inv.kode_barang).toLowerCase() === c);
                 return `<option value="${c}">${itm ? itm.nama_barang : c} (#${c.toUpperCase()})</option>`;
             }).join('');
 
@@ -412,7 +418,7 @@ async function undoMission(event, rowIndex, idMisi, kodeBarang) {
 // POP-UP DETAIL (VERSI MISSION CONTROL - DENGAN THUMBNAIL WADAH & AUTO-TRACK)
 // ==========================================
 function openItemDetail(kodeBarang) {
-    const item = allInventory.find(i => i.kode_barang && i.kode_barang.toLowerCase() === kodeBarang.toLowerCase()); 
+    const item = allInventory.find(i => i.kode_barang && String(i.kode_barang).toLowerCase() === String(kodeBarang).toLowerCase()); 
     if(!item) return;
 
     const oldModal = document.getElementById("detailModal"); if(oldModal) oldModal.remove();
@@ -436,7 +442,7 @@ function openItemDetail(kodeBarang) {
     // 💡 THUMBNAIL SUB-WADAH
     let isiWadahHtml = ""; 
     if (item.kode_barang) { 
-        let isiWadah = allInventory.filter(i => i.kode_wadah && i.kode_wadah.toLowerCase() === item.kode_barang.toLowerCase()); 
+        let isiWadah = allInventory.filter(i => i.kode_wadah && String(i.kode_wadah).toLowerCase() === String(item.kode_barang).toLowerCase()); 
         if (isiWadah.length > 0) { 
             let listHtml = isiWadah.map(w => {
                 let safeFileIdsW = w.file_ids || w.fotos || []; 
@@ -456,7 +462,7 @@ function openItemDetail(kodeBarang) {
     }
 
     // 💡 CEK SILANG STOK
-    let similarItems = allInventory.filter(i => i.nama_barang.toLowerCase() === item.nama_barang.toLowerCase());
+    let similarItems = allInventory.filter(i => i.nama_barang && String(i.nama_barang).toLowerCase() === String(item.nama_barang).toLowerCase());
     let totalSimilarQty = similarItems.reduce((sum, curr) => sum + (parseInt(curr.jumlah) || 1), 0);
     let statusCounts = {};
     similarItems.forEach(i => {

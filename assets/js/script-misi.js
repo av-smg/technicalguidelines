@@ -1,5 +1,5 @@
 // ==========================================
-// MESIN LOGIKA MISSION CONTROL (V.10.1 - PRO LOGISTICS)
+// MESIN LOGIKA MISSION CONTROL (V.10.2 - SMART OVERRIDE)
 // ==========================================
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec"; 
@@ -25,25 +25,29 @@ function checkAdminStatus() {
 function toggleAdminMode() {
     if (isAdminMode) {
         if(confirm("Tutup akses Eksekutor? Memori PIN akan dihapus.")) { 
-            localStorage.removeItem("AV_MISSION_PIN"); 
-            showToast("Sistem dikunci. Memuat ulang halaman..."); 
-            setTimeout(() => { window.location.reload(); }, 800); // Otomatis Refresh saat Tutup Akses
+            localStorage.removeItem("AV_MISSION_PIN"); showToast("Sistem dikunci. Memuat ulang..."); 
+            setTimeout(() => { window.location.reload(); }, 800); 
         }
     } else {
         let input = prompt("Masukkan PIN Kapten Lapangan / Master:");
         if (input) {
             let pinAttempt = input.trim().toLowerCase();
             if (VALID_MISSION_PINS.includes(pinAttempt)) { 
-                localStorage.setItem("AV_MISSION_PIN", pinAttempt); 
-                showToast("Akses Terbuka! Memuat ulang halaman..."); 
-                setTimeout(() => { window.location.reload(); }, 800); // Otomatis Refresh saat Buka Akses
+                localStorage.setItem("AV_MISSION_PIN", pinAttempt); showToast("Akses Terbuka! Memuat ulang..."); 
+                setTimeout(() => { window.location.reload(); }, 800); 
             } 
             else { alert("⛔ AKSES DITOLAK! PIN tidak dikenali untuk area ini."); }
         }
     }
 }
 
-function showToast(msg, isSuccess = true) { const t = document.getElementById("toastMsg"); if(!t) return; t.innerText = msg; t.className = "toast-msg show " + (isSuccess ? "" : "error"); setTimeout(() => { t.classList.remove("show"); }, 3000); }
+// FIX: zIndex 99999 agar notifikasi tidak tenggelam di belakang scanner
+function showToast(msg, isSuccess = true) { 
+    const t = document.getElementById("toastMsg"); if(!t) return; 
+    t.innerText = msg; t.className = "toast-msg show " + (isSuccess ? "" : "error"); 
+    t.style.zIndex = "999999"; 
+    setTimeout(() => { t.classList.remove("show"); }, 3000); 
+}
 function getThumbUrl(item) { let fileIds = item.file_ids || item.fotos || []; let firstFileId = fileIds.find(id => id && id.length > 5); if(!firstFileId) return 'https://placehold.co/100x100/EEEEEE/999999?text=NO+IMG'; return firstFileId.includes("http") ? firstFileId : `https://drive.google.com/thumbnail?id=${firstFileId}&sz=w200`; }
 
 async function loadMissions() {
@@ -66,13 +70,10 @@ function renderMissions() {
         const isSelesai = (misi.status_misi.toLowerCase() === 'selesai');
         const card = document.createElement("div"); card.className = `mission-card ${isSelesai ? 'selesai' : ''}`;
         
-        // ====================================
-        // LOGIKA SMART GROUPING (CONTAINER)
-        // ====================================
         let packageHtml = '';
         if (misi.kode_barang) {
             let codes = misi.kode_barang.split(',').map(c => c.trim()).filter(c => c);
-            let groups = {}; // Tempat mengelompokkan barang berdasarkan Wadah
+            let groups = {}; 
 
             codes.forEach(code => {
                 let foundItem = allInventory.find(inv => inv.kode_barang && inv.kode_barang.toLowerCase() === code.toLowerCase());
@@ -92,15 +93,13 @@ function renderMissions() {
                 if (wadahKey === "NOT_FOUND") {
                     itemsArr.forEach(item => { packageHtml += `<div class="package-item"><div class="pkg-info"><div class="pkg-code" style="color:#ef4444;">#${item.kode_barang} (Tidak Ada)</div></div></div>`; });
                 } else if (wadahKey === "TANPA_WADAH") {
-                    // Barang Mandiri (Speaker, Mixer dll)
                     itemsArr.forEach(item => {
                         packageHtml += `<div class="package-item" style="cursor:pointer;" onclick="openItemDetail('${item.kode_barang}')">
                             <img src="${getThumbUrl(item)}" class="pkg-img" loading="lazy">
-                            <div class="pkg-info"><div class="pkg-name">${item.nama_barang}</div><div class="pkg-code">#${item.kode_barang} <span style="font-weight:normal; font-size:9px; color:#94a3b8;">(Klik detail)</span></div></div>
+                            <div class="pkg-info"><div class="pkg-name">${item.nama_barang}</div><div class="pkg-code">#${item.kode_barang}</div></div>
                         </div>`;
                     });
                 } else {
-                    // Barang di dalam Wadah (Smart Grouping)
                     let containerItem = allInventory.find(inv => inv.kode_barang && inv.kode_barang.toLowerCase() === wadahKey.toLowerCase());
                     let cImgUrl = containerItem ? getThumbUrl(containerItem) : 'https://placehold.co/100x100/EEEEEE/999999?text=BOX';
                     let cName = containerItem ? containerItem.nama_barang : `Wadah: ${wadahKey}`;
@@ -118,19 +117,15 @@ function renderMissions() {
                             <div class="pkg-info"><div class="pkg-name">${item.nama_barang}</div><div class="pkg-code">#${item.kode_barang}</div></div>
                         </div>`;
                     });
-                    packageHtml += `</div></div>`; // Tutup Group
+                    packageHtml += `</div></div>`; 
                 }
             }
             packageHtml += `</div>`;
         }
         
-        // ====================================
-        // TOMBOL AKSI & TIMESTAMP FIX
-        // ====================================
         let buttonHtml = '';
         if (isSelesai) {
             if (isAdminMode) {
-                // UI FIX: Tombol Timestamp & Batal bersebelahan rapi
                 buttonHtml = `
                 <div style="display:flex; gap:10px; width:100%;">
                     <div class="btn-complete done" style="flex:1; display:flex; justify-content:center; align-items:center; background:#f0fdf4; border:1px solid #10b981; color:#10b981; font-size:12px; margin:0;">✅ Selesai: ${misi.waktu_selesai}</div>
@@ -150,11 +145,11 @@ function renderMissions() {
 }
 
 // ==========================================
-// SCANNER JALUR TIKUS (WADAH ATAU BARANG)
+// SCANNER JALUR TIKUS & SMART OVERRIDE
 // ==========================================
 function openMissionScanner(rowIndex, idMisi, targetKodeBarangString) {
     let modal = document.createElement("div"); modal.id = "missionScannerModal"; modal.className = "modal-overlay active";
-    modal.innerHTML = `<div class="modal-content" style="max-width:400px; background:white; padding:20px; border-radius:15px; text-align:center; position:relative;"><button onclick="closeMissionScanner()" style="position:absolute; top:15px; right:15px; border:none; background:#fef2f2; color:#dc2626; width:35px; height:35px; border-radius:50%; font-weight:bold; cursor:pointer; z-index:9999;">✕</button><h3 style="margin:0 0 5px 0; font-size:16px; font-weight:900;">Scan QR Code</h3><p style="font-size:11px; color:#64748b; margin-top:0;">Scan Barcode Barang atau Wadahnya</p><div id="qr-reader-mission" style="width:100%; border-radius:10px; overflow:hidden;"></div></div>`; document.body.appendChild(modal);
+    modal.innerHTML = `<div class="modal-content" style="max-width:400px; background:white; padding:20px; border-radius:15px; text-align:center; position:relative;"><button onclick="closeMissionScanner()" style="position:absolute; top:15px; right:15px; border:none; background:#fef2f2; color:#dc2626; width:35px; height:35px; border-radius:50%; font-weight:bold; cursor:pointer; z-index:9999;">✕</button><h3 style="margin:0 0 5px 0; font-size:16px; font-weight:900;">Scan QR Code</h3><p style="font-size:11px; color:#64748b; margin-top:0;">Scan Barcode Target / Wadah / Pengganti</p><div id="qr-reader-mission" style="width:100%; border-radius:10px; overflow:hidden;"></div></div>`; document.body.appendChild(modal);
 
     html5QrcodeScanner = new Html5QrcodeScanner("qr-reader-mission", { fps: 15, qrbox: {width: 230, height: 230} }, false);
     
@@ -163,19 +158,52 @@ function openMissionScanner(rowIndex, idMisi, targetKodeBarangString) {
         
         if (targetKodeBarangString) {
             let targetCodes = targetKodeBarangString.split(',').map(c => c.trim().toLowerCase()).filter(c => c);
-            
-            // Mencari daftar sandi yang diizinkan (Target Barang ASLI + Wadahnya)
             let allowedCodes = new Set(targetCodes);
+            
             targetCodes.forEach(code => {
                 let foundItem = allInventory.find(inv => inv.kode_barang && inv.kode_barang.toLowerCase() === code);
                 if (foundItem && foundItem.kode_wadah) allowedCodes.add(foundItem.kode_wadah.toLowerCase());
             });
 
-            // Cek apakah hasil scan ada di daftar sandi yang diizinkan
+            // LOGIKA 1: Apakah scan cocok dengan target atau wadahnya?
             let isMatch = Array.from(allowedCodes).some(allowed => scannedText.includes(allowed));
             
             if (!isMatch) {
-                showToast(`❌ SALAH BARANG! Terbaca: ${scannedText}`, false); return;
+                // LOGIKA 2: Cek apakah barcode ini valid terdaftar di gudang?
+                let validNewItem = allInventory.find(inv => inv.kode_barang && inv.kode_barang.toLowerCase() === scannedText);
+                
+                if (!validNewItem) {
+                    showToast(`❌ Barcode tidak terdaftar di Gudang!`, false);
+                    return; // Tetap biarkan kamera hidup
+                }
+
+                // LOGIKA 3: SMART OVERRIDE (Barang valid, tapi bukan target misi)
+                html5QrcodeScanner.clear().catch(e => console.log(e)); // Matikan kamera
+                
+                let optionsHtml = targetCodes.map(c => {
+                    let itm = allInventory.find(inv => inv.kode_barang && inv.kode_barang.toLowerCase() === c);
+                    let nama = itm ? itm.nama_barang : c;
+                    return `<option value="${c}">${nama} (#${c.toUpperCase()})</option>`;
+                }).join('');
+
+                // Ubah tampilan modal menjadi pop-up konfirmasi ganti alat
+                document.querySelector("#missionScannerModal .modal-content").innerHTML = `
+                    <button onclick="closeMissionScanner()" style="position:absolute; top:15px; right:15px; border:none; background:#fef2f2; color:#dc2626; width:35px; height:35px; border-radius:50%; font-weight:bold; cursor:pointer; z-index:9999;">✕</button>
+                    <div style="background:#fef2f2; border:1px solid #fca5a5; padding:15px; border-radius:10px; margin-top:20px;">
+                        <h3 style="margin:0 0 5px 0; font-size:18px; color:#dc2626;">⚠️ ALAT BERBEDA!</h3>
+                        <p style="font-size:12px; color:#475569; margin:0 0 15px 0;">Target misi tidak cocok. Anda men-scan:<br><b style="font-size:14px; color:black;">${validNewItem.nama_barang}</b><br><span style="color:#dc2626; font-weight:bold;">#${scannedText.toUpperCase()}</span></p>
+                        
+                        <div style="background:white; padding:10px; border-radius:8px; text-align:left;">
+                            <label style="font-size:11px; font-weight:bold; color:#c2410c;">Ganti alat target dengan alat ini?</label>
+                            <p style="font-size:10px; color:gray; margin:2px 0 8px 0;">Pilih alat awal yang ingin digantikan:</p>
+                            <select id="overrideSelect" style="width:100%; padding:8px; border-radius:5px; border:1px solid #cbd5e1; margin-bottom:15px; font-size:12px;">
+                                ${optionsHtml}
+                            </select>
+                            <button onclick="executeOverrideMission('${rowIndex}', '${idMisi}', '${targetKodeBarangString}', '${scannedText}')" style="width:100%; padding:10px; background:#f97316; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">🔄 Ya, Ganti & Selesai</button>
+                        </div>
+                    </div>
+                `;
+                return;
             }
         }
         closeMissionScanner(); executeCompleteMission(rowIndex, idMisi, targetKodeBarangString);
@@ -189,6 +217,35 @@ async function executeCompleteMission(rowIndex, idMisi, kodeBarang) {
         const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "complete_mission", pin: userPin, row_index: rowIndex, id_misi: idMisi, kode_barang: kodeBarang }) });
         const data = await response.json();
         if (data.status === "success") { showToast(`✅ Scan Berhasil! Misi Selesai.`); loadMissions(); } 
+        else { alert("Gagal:\n" + data.message); }
+    } catch (e) { alert("Error Jaringan:\n" + e.message); }
+}
+
+async function executeOverrideMission(rowIndex, idMisi, oldTargetString, newScannedCode) {
+    let replacedCode = document.getElementById("overrideSelect").value; 
+    
+    // Buat daftar target baru (ganti kode lama dengan kode baru)
+    let oldTargetArray = oldTargetString.split(',').map(c => c.trim().toLowerCase());
+    let newTargetArray = oldTargetArray.map(c => c === replacedCode ? newScannedCode : c);
+    let finalKodeString = newTargetArray.join(', '); 
+
+    showToast(`⏳ Memproses pergantian alat & menyelesaikan misi...`);
+    closeMissionScanner(); 
+    
+    try {
+        const response = await fetch(SCRIPT_URL, { 
+            method: "POST", 
+            body: JSON.stringify({ 
+                action: "complete_mission", 
+                pin: userPin, 
+                row_index: rowIndex, 
+                id_misi: idMisi, 
+                kode_barang: finalKodeString, // Deploy barang pengganti!
+                update_kode: finalKodeString // Update teks target di Excel
+            }) 
+        });
+        const data = await response.json();
+        if (data.status === "success") { showToast(`✅ Alat diganti & Misi Selesai!`); loadMissions(); } 
         else { alert("Gagal:\n" + data.message); }
     } catch (e) { alert("Error Jaringan:\n" + e.message); }
 }

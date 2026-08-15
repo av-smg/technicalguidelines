@@ -1,5 +1,5 @@
 // ==========================================
-// MESIN LOGIKA MISSION CONTROL (V.11 - THE ULTIMATE)
+// MESIN LOGIKA MISSION CONTROL (V.11.1 - THE ULTIMATE + COLLAPSIBLE)
 // ==========================================
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec"; 
@@ -79,7 +79,20 @@ async function loadMissions() {
 
 function setTeamFilter(teamName) { activeTeam = teamName; document.querySelectorAll('.btn-team').forEach(btn => { btn.classList.remove('active'); if(btn.innerText.includes(teamName)) btn.classList.add('active'); }); if (isDataLoaded) renderMissions(); }
 function toggleHideCompleted() { isHideCompleted = !isHideCompleted; renderMissions(); }
-function toggleMissionContent(element) { const content = element.nextElementSibling; content.classList.toggle('open'); }
+
+// 🌟 PERBAIKAN 1: Logika Panah Akordeon Dinamis
+function toggleMissionContent(element) { 
+    const content = element.nextElementSibling; 
+    const icon = element.querySelector('.toggle-icon');
+    
+    content.classList.toggle('open'); 
+    
+    if (content.classList.contains('open')) {
+        if (icon) icon.innerText = '▲'; 
+    } else {
+        if (icon) icon.innerText = '▼'; 
+    }
+}
 
 function renderMissions() {
     if (!isDataLoaded) return; const container = document.getElementById("missionsContainer"); container.innerHTML = "";
@@ -145,16 +158,16 @@ function renderMissions() {
             else buttonHtml = `<button class="btn-complete" style="background:#94a3b8;" onclick="toggleAdminMode()">🔒 KUNCI (LOGIN)</button>`;
         }
 
-        // HTML Card dengan Collapsible Logic
+        // 🌟 PERBAIKAN 2: Hilangkan class 'open' & Tambahkan class 'toggle-icon'
         card.innerHTML = `
             <div class="mission-header-click" onclick="toggleMissionContent(this)">
                 <div class="mission-top"><span class="mission-id">${misi.id_misi}</span><span class="badge-zona">📍 ${misi.zona || '-'}</span></div>
                 ${isOverride ? '<span class="badge-diganti">⚠️ ALAT DIGANTI</span>' : ''}
                 <h3 class="mission-title" style="margin:5px 0 0 0; display:flex; justify-content:space-between; align-items:center;">
-                    ${misi.tugas.replace(/⚠️ \[.*?\] /g, '')} <span>${isSelesai ? '▼' : '▲'}</span>
+                    ${misi.tugas.replace(/⚠️ \[.*?\] /g, '')} <span class="toggle-icon">▼</span>
                 </h3>
             </div>
-            <div class="mission-content ${isSelesai ? '' : 'open'}">
+            <div class="mission-content">
                 ${packageHtml}
                 <div class="mission-action">${buttonHtml}</div>
             </div>`;
@@ -196,10 +209,6 @@ function startScanner(rowIndex, idMisi, targetKodeBarangString) {
 
 function toggleCameraFacing() {
     currentCameraFacing = currentCameraFacing === "environment" ? "user" : "environment";
-    // Restart Scanner with new facing
-    const rowIndex = document.getElementById("qr-reader-mission").getAttribute('data-row'); // hacky way to pass args, we rely on closure usually but here we just restart
-    // Simpler: Just close and ask them to reopen if we can't pass args easily, but let's grab from the DOM or just rely on state. 
-    // Wait, let's close and reopen cleanly.
     showToast("Mengganti kamera...", true);
     setTimeout(() => { closeMissionScanner(); showToast("Silakan klik SCAN lagi", true); }, 500);
 }
@@ -208,7 +217,6 @@ function processScanResult(decodedText, rowIndex, idMisi, targetKodeBarangString
     let scannedText = decodedText.trim().toLowerCase();
     let targetCodes = targetKodeBarangString.split(',').map(c => c.trim().toLowerCase()).filter(c => c);
     
-    // Logika Validasi Sama Seperti Sebelumnya
     let allowedCodes = new Set(targetCodes);
     targetCodes.forEach(code => {
         let foundItem = allInventory.find(inv => inv.kode_barang && inv.kode_barang.toLowerCase() === code);
@@ -221,8 +229,7 @@ function processScanResult(decodedText, rowIndex, idMisi, targetKodeBarangString
         let validNewItem = allInventory.find(inv => inv.kode_barang && inv.kode_barang.toLowerCase() === scannedText);
         if (!validNewItem) { triggerFeedback('error'); showToast(`❌ Barcode ${scannedText} tidak terdaftar!`, false); return; }
 
-        // SMART OVERRIDE TERPICU
-        triggerFeedback('error'); // Buzz sebagai peringatan
+        triggerFeedback('error'); 
         html5QrCode.stop().then(() => {
             document.getElementById("qr-reader-mission").style.display = "none";
             document.querySelector(".scanner-controls").style.display = "none";
@@ -247,7 +254,6 @@ function processScanResult(decodedText, rowIndex, idMisi, targetKodeBarangString
         return;
     }
 
-    // MATCH SUKSES
     triggerFeedback('success'); closeMissionScanner(); executeCompleteMission(rowIndex, idMisi, targetKodeBarangString);
 }
 
@@ -294,7 +300,6 @@ async function undoMission(event, rowIndex, idMisi, kodeBarang) {
     } catch (e) { alert("Error:\n" + e.message); btn.innerText = "❌ BATALKAN"; btn.disabled = false; }
 }
 
-// Fitur Detail (Sama dengan V.10)
 function openItemDetail(kodeBarang) {
     const item = allInventory.find(i => i.kode_barang && i.kode_barang.toLowerCase() === kodeBarang.toLowerCase()); if(!item) return;
     const oldModal = document.getElementById("detailModal"); if(oldModal) oldModal.remove();

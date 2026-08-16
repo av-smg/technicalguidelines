@@ -1,5 +1,5 @@
 // ==========================================
-// MESIN LOGIKA GUDANG (V.31.0 - DUAL BULK MODAL SEPARATED)
+// MESIN LOGIKA GUDANG (V.31.1 - FIX MODAL OVERLAP & PLACEHOLDER)
 // ==========================================
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec"; 
@@ -203,6 +203,7 @@ function openDetailModal(item) {
     const modalHtml = `<div id="detailModal" class="modal-overlay active"><div class="modal-content" style="max-width:400px; background:white; padding:20px; border-radius:15px; text-align:center; position:relative;"><button onclick="document.getElementById('detailModal').remove()" style="position:absolute; top:15px; right:15px; border:none; background:#f1f5f9; width:30px; height:30px; border-radius:50%; font-weight:bold; cursor:pointer; z-index:10;">✕</button>${galleryHtml}<h3 style="margin:0; font-weight:900; color:#1e293b; font-size:18px;">${item.nama_barang}</h3><div style="font-size:10px; color:gray; margin-bottom:8px;">⏱️ Update: ${item.timestamp || '-'}</div><p style="margin:5px 0 10px 0; font-size:12px; color:#ea580c; font-weight:bold;">#${item.kode_barang || '-'} ${badgeWadahHtml}</p><div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:12px; text-align:left; background:#f8fafc; padding:10px; border-radius:8px; border:1px solid #e2e8f0;"><div><span style="color:gray;">Item Ini:</span> <br><b>${item.jumlah || 0} Pcs</b></div><div><span style="color:gray;">Kondisi:</span> <br><b>${item.kondisi || '-'}</b></div><div><span style="color:gray;">📍 Lokasi:</span> <br><b>${lok}</b></div><div><span style="color:gray;">🔌 Status:</span> <br><b>${stat}</b></div></div>${similarHtml}${isiWadahHtml}<div style="text-align:left; margin-top:10px; font-size:11px; color:#475569; background:#fff7ed; padding:8px; border-radius:6px; border:1px solid #fed7aa; margin-bottom:5px;"><b>📝 Ket:</b> ${item.keterangan_ref || 'Tidak ada catatan.'}</div><div style="text-align:left; font-size:11px; margin-bottom:15px; color:#3b82f6;"><b>🎯 Tujuan (Event):</b> ${item.tujuan || '-'}</div>${logHtml}${actionButtons}</div></div>`; 
     document.body.insertAdjacentHTML('beforeend', modalHtml);
 }
+
 function printSuratJalan() { 
     let bawaData = allItems.filter(i => i.status_digunakan === 'Akan Dibawa'); 
     if(bawaData.length === 0) return alert("Belum ada barang dengan status '🛒 Akan Dibawa' (Packing)."); 
@@ -274,8 +275,9 @@ function openBulkUpdateModal() {
     <div id="bulkModal" class="modal-overlay active">
         <div class="modal-content" style="max-width:350px; padding:20px; background:white; border-radius:15px; position:relative;">
             <button onclick="document.getElementById('bulkModal').remove()" style="position:absolute; top:15px; right:15px; border:none; background:#f1f5f9; width:30px; height:30px; border-radius:50%; font-weight:bold; cursor:pointer;">✕</button>
-            <h3 style="margin-top:0; color:#ea580c;">⚙️ Update Status & Lokasi</h3>
-            <p style="font-size:11px; color:gray; margin-top:-10px;">${selectedRows.size} Alat Terpilih</p>
+            
+            <h3 style="margin:0; color:#ea580c; font-size:18px;">⚙️ Update Status & Lokasi</h3>
+            <div style="font-size:12px; color:#64748b; margin-top:5px; margin-bottom:15px; font-weight:bold;">${selectedRows.size} Alat Terpilih</div>
             
             <div style="text-align:left; margin-bottom:12px;">
                 <label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">📍 Ubah Lokasi (Kolom O):</label>
@@ -325,12 +327,13 @@ function openAssignMissionModal() {
     <div id="assignModal" class="modal-overlay active">
         <div class="modal-content" style="max-width:350px; padding:20px; background:white; border-radius:15px; position:relative;">
             <button onclick="document.getElementById('assignModal').remove()" style="position:absolute; top:15px; right:15px; border:none; background:#f1f5f9; width:30px; height:30px; border-radius:50%; font-weight:bold; cursor:pointer;">✕</button>
-            <h3 style="margin-top:0; color:#2563eb;">🎯 Tugas Misi & Event</h3>
-            <p style="font-size:11px; color:gray; margin-top:-10px;">${selectedRows.size} Alat Terpilih</p>
+            
+            <h3 style="margin:0; color:#2563eb; font-size:18px;">🎯 Tugas Misi & Event</h3>
+            <div style="font-size:12px; color:#64748b; margin-top:5px; margin-bottom:15px; font-weight:bold;">${selectedRows.size} Alat Terpilih</div>
             
             <div style="text-align:left; margin-bottom:12px;">
                 <label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">🎪 Nama Event / Tujuan (Kolom P):</label>
-                <input type="text" id="assignNewTujuan" placeholder="Contoh: HUT Kemerdekaan RI..." style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; font-weight:bold; box-sizing:border-box;">
+                <input type="text" id="assignNewTujuan" placeholder="Pertemuan Wilayah Oktober 2026 - Semarang" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; font-weight:bold; box-sizing:border-box;">
             </div>
 
             <div style="background:#eff6ff; border:1px solid #bfdbfe; padding:15px; border-radius:10px; margin-bottom:15px;">

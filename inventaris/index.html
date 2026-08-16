@@ -70,27 +70,20 @@ location: "MASTER"
                 <button class="pill-btn" data-filter="Rusak" onclick="setFilterPill('Rusak', this)" style="border-color:#ef4444; color:#ef4444; background:#fef2f2;">🚨 Perbaikan</button>
             </div>
 
-            <!-- FILTER LANJUTAN (DIPINDAH KE SINI) -->
+            <!-- FILTER LANJUTAN MURNI UNTUK TIM -->
             <div style="margin-bottom: 5px;">
                 <button id="btnBukaFilter" style="background:#334155; color:white; border:none; padding:8px 15px; border-radius:8px; font-size:11px; font-weight:bold; cursor:pointer;">
                     ⚙️ FILTER LANJUTAN
                 </button>
             </div>
 
-            <!-- Laci Checkbox -->
+            <!-- Laci Checkbox (Hanya Tim) -->
             <div id="panelFilterLanjutan" style="display:none; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:15px; margin-top: 10px;">
                 <div style="margin-bottom:10px; font-size:12px;"><strong>🛠️ Pilih Tim:</strong></div>
-                <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:15px; font-size:11px;">
+                <div style="display:flex; flex-wrap:wrap; gap:10px; font-size:11px;">
                     <label><input type="checkbox" class="cek-tim" value="Speaker"> Speaker</label>
                     <label><input type="checkbox" class="cek-tim" value="Kabel"> Kabel</label>
                     <label><input type="checkbox" class="cek-tim" value="Booth"> Booth</label>
-                </div>
-
-                <div style="margin-bottom:10px; font-size:12px;"><strong>📍 Pilih Status:</strong></div>
-                <div style="display:flex; flex-wrap:wrap; gap:10px; font-size:11px;">
-                    <label><input type="checkbox" class="cek-status" value="Gudang"> Di Gudang</label>
-                    <label><input type="checkbox" class="cek-status" value="Akan Dibawa"> Akan Dibawa</label>
-                    <label><input type="checkbox" class="cek-status" value="Lokasi Event"> Lokasi Event</label>
                 </div>
             </div>
         </div>
@@ -105,6 +98,6 @@ location: "MASTER"
     
     <div id="zoomModal" class="zoom-overlay" onclick="closeZoomModal()"><button class="btn-back-zoom" onclick="closeZoomModal()">⬅ Kembali</button><img id="zoomImgSrc" src="" onclick="event.stopPropagation()"></div>
     <div id="toastMsg" class="toast-msg">Notifikasi</div>
-    <script src="{{ site.baseurl }}/assets/js/script-gudang.js?v=25.0"></script>
+    <script src="{{ site.baseurl }}/assets/js/script-gudang.js?v=26.0"></script>
 </body>
 </html>

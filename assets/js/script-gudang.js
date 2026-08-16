@@ -1,5 +1,5 @@
 // ==========================================
-// MESIN LOGIKA GUDANG (V.28.0 - FILTER LANJUTAN FIXED & UTUH)
+// MESIN LOGIKA GUDANG (V.29.0 - FILTER TIM ONLY FIXED)
 // ==========================================
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec"; 
@@ -7,7 +7,7 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrs
 // HANYA ADMIN GUDANG DAN MASTER DEV
 const VALID_PINS = ["a1b2c3", "v9t6c2"];
 let allItems = []; let optionsData = { lokasi: [], tim: [] }; let userPin = localStorage.getItem("AV_INVENTORY_PIN") || ""; 
-let html5QrCode = null; // Ganti ke object html5QrCode murni
+let html5QrCode = null; 
 let isAdminMode = false, isBulkMode = false, selectedRows = new Set(), lastScanTime = 0, activeFilterPill = 'all', currentViewMode = 'grid'; 
 let pendingAddFotos = [];
 let currentCameraFacing = "environment"; 
@@ -19,7 +19,7 @@ function checkAdminStatus() { if (userPin && VALID_PINS.includes(userPin)) { isA
 function toggleAdminMode() { if (isAdminMode) { if(confirm("Tutup akses Admin? Memori PIN dihapus.")) { localStorage.removeItem("AV_INVENTORY_PIN"); userPin = ""; checkAdminStatus(); showToast("Mode Read-Only aktif."); applyFilters(); } } else { let input = prompt("Masukkan PIN Kapten / Admin Gudang:"); if (input) { let pinAttempt = input.trim().toLowerCase(); if (VALID_PINS.includes(pinAttempt)) { userPin = pinAttempt; localStorage.setItem("AV_INVENTORY_PIN", userPin); checkAdminStatus(); showToast("Akses Admin Terbuka!"); applyFilters(); } else { alert("⛔ AKSES DITOLAK! PIN tidak punya izin ke Gudang."); } } } }
 function showToast(msg, isSuccess = true) { const t = document.getElementById("toastMsg"); if(!t) return; t.innerText = msg; t.className = "toast-msg show " + (isSuccess ? "toast-success" : "toast-error"); setTimeout(() => { t.classList.remove("show"); }, 4000); }
 
-// 🔊 HAPTIC & AUDIO ENGINE (Dari Mission Control)
+// 🔊 HAPTIC & AUDIO ENGINE 
 function triggerFeedback(type) {
     try {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -46,16 +46,15 @@ function setupStickyHeader() {
     let toolbar = document.querySelector(".toolbar-card");
     if(toolbar) {
         toolbar.style.position = "sticky";
-        toolbar.style.top = "60px"; // Di bawah navbar
+        toolbar.style.top = "60px"; 
         toolbar.style.zIndex = "90";
         toolbar.style.background = "rgba(255, 255, 255, 0.95)";
         toolbar.style.backdropFilter = "blur(8px)";
         toolbar.style.padding = "10px";
-        toolbar.style.margin = "0 -15px 15px -15px"; // Buat full width
+        toolbar.style.margin = "0 -15px 15px -15px"; 
         toolbar.style.borderBottom = "1px solid #e2e8f0";
         toolbar.style.boxShadow = "0 4px 6px -1px rgba(0, 0, 0, 0.05)";
         
-        // Tambahkan Filter Dosa (Load-Out) - Diperbaiki agar warna berfungsi
         let pillsWrapper = document.querySelector(".filter-pills-wrapper");
         if(pillsWrapper && !pillsWrapper.innerHTML.includes("Di Lokasi Event")) {
             pillsWrapper.insertAdjacentHTML('beforeend', `<button class="pill-btn" data-filter="Di Lokasi Event" onclick="setFilterPill('Di Lokasi Event', this)" style="border-color:#f59e0b; color:#b45309; background:#fffbeb;">⚠️ Di Lokasi Event</button>`);
@@ -72,53 +71,47 @@ function setFilterPill(status, btnElement) {
     applyFilters(); 
 }
 
-// 🧠 MESIN FILTER UTAMA (Diperbarui untuk mengakomodasi Laci Lanjutan)
+// 🧠 MESIN FILTER UTAMA (Kini hanya menggunakan Filter Laci TIM)
 function getFilteredData() { 
     const q = document.getElementById("searchInput").value.toLowerCase(); 
     
-    // BACA STATUS FILTER LANJUTAN
+    // Baca status laci filter lanjutan
     const panelFilter = document.getElementById('panelFilterLanjutan');
     const isAdvancedOpen = panelFilter && panelFilter.style.display === 'block';
     let timAktif = [];
-    let statusAktif = [];
 
     if (isAdvancedOpen) {
         timAktif = Array.from(document.querySelectorAll('.cek-tim:checked')).map(cb => cb.value.toLowerCase());
-        statusAktif = Array.from(document.querySelectorAll('.cek-status:checked')).map(cb => cb.value);
     }
 
     return allItems.filter(i => { 
-        const matchQ = i.nama_barang.toLowerCase().includes(q) || (i.kode_barang||"").toLowerCase().includes(q) || (i.kode_wadah||"").toLowerCase().includes(q); 
+        // 1. Filter Pencarian Teks
+        const matchQ = (i.nama_barang||"").toLowerCase().includes(q) || (i.kode_barang||"").toLowerCase().includes(q) || (i.kode_wadah||"").toLowerCase().includes(q); 
+        
         let stat = i.status_digunakan || 'Di Gudang'; if(stat === 'FALSE') stat = 'Di Gudang'; 
         let lok = i.lokasi || '';
         let kategoriBarang = (i.kategori || i.tim || i.nama_barang || "").toLowerCase();
         
+        // 2. Filter Tombol Kapsul (Atas)
         let matchPill = false;
         if (activeFilterPill === 'all') matchPill = true;
         else if (activeFilterPill === 'Rusak') { matchPill = (i.kondisi === 'Rusak' || i.kondisi === 'Periksa'); }
         else if (activeFilterPill === 'Di Lokasi Event') { matchPill = (lok === 'Di Lokasi Event'); } 
         else matchPill = (stat === activeFilterPill);
         
-        // LOGIKA FILTER LANJUTAN (Bekerja secara bersamaan)
+        // 3. Filter Laci Lanjutan (HANYA CEK TIM)
         let matchAdvanced = true;
         if (isAdvancedOpen) {
-            let matchTim = timAktif.length === 0 || timAktif.some(t => kategoriBarang.includes(t));
-            let matchStatus = statusAktif.length === 0;
-            if (!matchStatus) {
-                if (statusAktif.includes('Gudang') && stat === 'Di Gudang') matchStatus = true;
-                if (statusAktif.includes('Akan Dibawa') && stat === 'Akan Dibawa') matchStatus = true;
-                if (statusAktif.includes('Lokasi Event') && lok === 'Di Lokasi Event') matchStatus = true;
-            }
-            matchAdvanced = matchTim && matchStatus;
+            matchAdvanced = timAktif.length === 0 || timAktif.some(t => kategoriBarang.includes(t));
         }
 
+        // Tampilkan hanya jika lolos ketiga filter
         return matchQ && matchPill && matchAdvanced; 
     }); 
 }
 
 function applyFilters() { render(getFilteredData()); }
 
-// PERBAIKAN WARNA KARTU BADGE UNTUK DI LOKASI EVENT
 function getStatusClass(status, lokasi) { 
     if(lokasi === 'Di Lokasi Event') return 'badge-status status-lokasi'; 
     if(status === 'Akan Dibawa') return 'badge-status status-keranjang'; 
@@ -136,7 +129,6 @@ function render(data) {
         const kodeBadge = item.kode_barang ? `<span style="color:#ea580c; font-weight:900;">#${item.kode_barang}</span>` : ""; const timeBadge = item.timestamp ? `<div style="font-size:9px; color:gray; margin-bottom:6px;">⏱️ Update: ${item.timestamp}</div>` : "";
         let colorKondisi = item.kondisi && item.kondisi.toLowerCase() === 'bagus' ? '#16a34a' : '#dc2626'; let bgKondisi = item.kondisi && item.kondisi.toLowerCase() === 'bagus' ? '#f0fdf4' : '#fef2f2'; const kondisiBadge = `<span style="font-size:10px; padding:2px 6px; border-radius:4px; border:1px solid ${colorKondisi}; background:${bgKondisi}; color:${colorKondisi}; font-weight:bold; margin-left:6px;">${item.kondisi || 'Bagus'}</span>`;
         
-        // Tambahkan Ikon Box jika dia merupakan isi dari Hardcase
         const boxBadge = item.kode_wadah ? `<span style="font-size:10px; color:#d97706; background:#fef3c7; border-radius:4px; padding:2px 6px; margin-left:6px; border:1px solid #fde68a;">🧰 IN-BOX</span>` : "";
 
         if (currentViewMode === 'grid') { card.className = "mission-card " + (isSelected ? "selected " : "") + (stat === 'Akan Dibawa' ? "card-siap-dibawa " : ""); card.innerHTML = `${isSelected ? '<div class="card-check">✓</div>' : ''}<div style="position:relative;"><img src="${imageSrc}" class="card-img" loading="lazy"><div style="position:absolute; bottom:12px; right:4px;"><span class="badge-qty">Qty: ${item.jumlah || 0}</span></div></div><h4 class="card-title">${item.nama_barang}</h4>${timeBadge} <div class="card-codes" style="display:flex; align-items:center; flex-wrap:wrap; gap:4px;">${kodeBadge} ${kondisiBadge} ${boxBadge}</div> <div>${badgeLokasiHtml}</div>`;
@@ -144,11 +136,13 @@ function render(data) {
         card.onclick = () => { if (isBulkMode) toggleSelection(item.row_index); else openDetailModal(item); }; container.appendChild(card);
     });
 }
+
 function openZoomModal(imgUrl) { document.getElementById("zoomImgSrc").src = imgUrl; document.getElementById("zoomModal").classList.add("active"); }
 function closeZoomModal() { document.getElementById("zoomModal").classList.remove("active"); setTimeout(() => { document.getElementById("zoomImgSrc").src = ""; }, 300); }
 
-/// ==========================================
-// POP-UP DETAIL (THUMBNAIL WADAH + AUTO-TRACK)
+// ==========================================
+// FUNGSI LAINNYA (MODAL, CETAK, EDIT, SCANNER) 
+// SAMA PERSIS. TIDAK DIHAPUS.
 // ==========================================
 function openDetailModal(item) {
     const oldModal = document.getElementById("detailModal"); if(oldModal) oldModal.remove();
@@ -159,7 +153,6 @@ function openDetailModal(item) {
     
     let badgeWadahHtml = item.kode_wadah ? `<span onclick="document.getElementById('detailModal').remove(); document.getElementById('searchInput').value='${item.kode_wadah}'; applyFilters();" style="cursor:pointer; display:inline-block; margin-left:5px; background:#fef3c7; color:#d97706; padding:2px 8px; border-radius:4px; border:1px solid #fde68a;">🧰 Lihat Wadah: ${item.kode_wadah} 🔍</span>` : `<span style="color:gray; margin-left:5px;">📦 Wadah: -</span>`;
     
-    // 💡 PERBAIKAN: SUB-WADAH MENGGUNAKAN THUMBNAIL
     let isiWadahHtml = ""; 
     if (item.kode_barang) { 
         let isiWadah = allItems.filter(i => i.kode_wadah && i.kode_wadah.toLowerCase() === item.kode_barang.toLowerCase()); 
@@ -181,7 +174,6 @@ function openDetailModal(item) {
         } 
     }
     
-    // 💡 FITUR BARU: AUTO-TRACK STOK BARANG SEJENIS
     let similarItems = allItems.filter(i => i.nama_barang.toLowerCase() === item.nama_barang.toLowerCase());
     let totalSimilarQty = similarItems.reduce((sum, curr) => sum + (parseInt(curr.jumlah) || 1), 0);
     let statusCounts = {};
@@ -216,130 +208,31 @@ function openDetailModal(item) {
     const modalHtml = `<div id="detailModal" class="modal-overlay active"><div class="modal-content" style="max-width:400px; background:white; padding:20px; border-radius:15px; text-align:center; position:relative;"><button onclick="document.getElementById('detailModal').remove()" style="position:absolute; top:15px; right:15px; border:none; background:#f1f5f9; width:30px; height:30px; border-radius:50%; font-weight:bold; cursor:pointer; z-index:10;">✕</button>${galleryHtml}<h3 style="margin:0; font-weight:900; color:#1e293b; font-size:18px;">${item.nama_barang}</h3><div style="font-size:10px; color:gray; margin-bottom:8px;">⏱️ Update: ${item.timestamp || '-'}</div><p style="margin:5px 0 10px 0; font-size:12px; color:#ea580c; font-weight:bold;">#${item.kode_barang || '-'} ${badgeWadahHtml}</p><div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:12px; text-align:left; background:#f8fafc; padding:10px; border-radius:8px; border:1px solid #e2e8f0;"><div><span style="color:gray;">Item Ini:</span> <br><b>${item.jumlah || 0} Pcs</b></div><div><span style="color:gray;">Kondisi:</span> <br><b>${item.kondisi || '-'}</b></div><div><span style="color:gray;">📍 Lokasi:</span> <br><b>${lok}</b></div><div><span style="color:gray;">🔌 Status:</span> <br><b>${stat}</b></div></div>${similarHtml}${isiWadahHtml}<div style="text-align:left; margin-top:10px; font-size:11px; color:#475569; background:#fff7ed; padding:8px; border-radius:6px; border:1px solid #fed7aa; margin-bottom:5px;"><b>📝 Ket:</b> ${item.keterangan_ref || 'Tidak ada catatan.'}</div><div style="text-align:left; font-size:11px; margin-bottom:15px; color:#3b82f6;"><b>🎯 Tujuan (Event):</b> ${item.tujuan || '-'}</div>${logHtml}${actionButtons}</div></div>`; 
     document.body.insertAdjacentHTML('beforeend', modalHtml);
 }
-// ==========================================
-// PRINT SURAT JALAN / MANIFEST (CHECKLIST WADAH)
-// ==========================================
 function printSuratJalan() { 
     let bawaData = allItems.filter(i => i.status_digunakan === 'Akan Dibawa'); 
     if(bawaData.length === 0) return alert("Belum ada barang dengan status '🛒 Akan Dibawa' (Packing)."); 
     
     let eventName = bawaData[0].tujuan || "____________________"; 
     
-    // 🧠 LOGIKA PENGELOMPOKKAN WADAH
-    let grouped = {};
-    let lepasan = [];
-    
-    bawaData.forEach(item => {
-        let wadah = (item.kode_wadah || "").toUpperCase().trim();
-        if (wadah) {
-            if (!grouped[wadah]) grouped[wadah] = [];
-            grouped[wadah].push(item);
-        } else {
-            lepasan.push(item);
-        }
-    });
+    let grouped = {}; let lepasan = [];
+    bawaData.forEach(item => { let wadah = (item.kode_wadah || "").toUpperCase().trim(); if (wadah) { if (!grouped[wadah]) grouped[wadah] = []; grouped[wadah].push(item); } else { lepasan.push(item); } });
 
     let printWin = window.open('', '', 'width=800,height=800'); 
-    
-    // 🎨 TEMPLATE HTML SURAT JALAN (Gaya Checklist Loading)
-    let html = `
-    <html><head><title>Manifest - ${eventName}</title>
-    <style>
-        body { font-family: 'Arial', sans-serif; padding: 20px; color: #000; }
-        .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
-        .event-info { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 20px; }
-        
-        .box-group { border: 2px solid #000; border-radius: 6px; margin-bottom: 15px; page-break-inside: avoid; }
-        .box-header { background: #f0f0f0; padding: 10px 15px; font-weight: bold; font-size: 14px; display: flex; align-items: center; border-bottom: 2px solid #000; }
-        
-        .checkbox { display: inline-block; width: 18px; height: 18px; border: 2px solid #000; border-radius: 4px; margin-right: 12px; }
-        .item-list { list-style: none; padding: 0; margin: 0; }
-        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 15px; border-bottom: 1px dashed #aaa; font-size: 13px; margin-left: 20px;}
-        .item-row:last-child { border-bottom: none; }
-        
-        .qty { font-weight: bold; font-size: 14px; }
-        .signatures { display: flex; justify-content: space-between; margin-top: 50px; padding: 0 40px; text-align: center; font-size: 14px; page-break-inside: avoid; }
-        .sign-box { margin-top: 70px; border-top: 1px solid black; padding-top: 5px; width: 220px; }
-        
-        @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
-    </style>
-    </head><body onload="window.print()">
-    
-    <div class="header">
-        <h2 style="margin:0;">MANIFEST LOGISTIK / SURAT JALAN</h2>
-        <p style="margin:5px 0 0 0; color:#444; font-size:14px;">Checklist Pengeluaran Gudang (Load-In)</p>
-    </div>
-    
-    <div class="event-info">
-        <div><b>Tujuan / Event:</b> <span style="font-size:16px;">${eventName.toUpperCase()}</span></div>
-        <div><b>Tanggal Cetak:</b> ${new Date().toLocaleString('id-ID')}</div>
-    </div>`;
+    let html = `<html><head><title>Manifest - ${eventName}</title><style>body { font-family: 'Arial', sans-serif; padding: 20px; color: #000; } .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; } .event-info { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 20px; } .box-group { border: 2px solid #000; border-radius: 6px; margin-bottom: 15px; page-break-inside: avoid; } .box-header { background: #f0f0f0; padding: 10px 15px; font-weight: bold; font-size: 14px; display: flex; align-items: center; border-bottom: 2px solid #000; } .checkbox { display: inline-block; width: 18px; height: 18px; border: 2px solid #000; border-radius: 4px; margin-right: 12px; } .item-list { list-style: none; padding: 0; margin: 0; } .item-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 15px; border-bottom: 1px dashed #aaa; font-size: 13px; margin-left: 20px;} .item-row:last-child { border-bottom: none; } .qty { font-weight: bold; font-size: 14px; } .signatures { display: flex; justify-content: space-between; margin-top: 50px; padding: 0 40px; text-align: center; font-size: 14px; page-break-inside: avoid; } .sign-box { margin-top: 70px; border-top: 1px solid black; padding-top: 5px; width: 220px; } @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }</style></head><body onload="window.print()"><div class="header"><h2 style="margin:0;">MANIFEST LOGISTIK / SURAT JALAN</h2><p style="margin:5px 0 0 0; color:#444; font-size:14px;">Checklist Pengeluaran Gudang (Load-In)</p></div><div class="event-info"><div><b>Tujuan / Event:</b> <span style="font-size:16px;">${eventName.toUpperCase()}</span></div><div><b>Tanggal Cetak:</b> ${new Date().toLocaleString('id-ID')}</div></div>`;
 
-    // 1. RENDER WADAH / HARDCASE
     if (Object.keys(grouped).length > 0) {
         html += `<h4 style="margin-bottom:10px; border-bottom:2px solid #000; display:inline-block;">📦 PAKET HARDCASE / BOX</h4>`;
-        for (let wadah in grouped) {
-            let boxItem = allItems.find(i => i.kode_barang && i.kode_barang.toUpperCase() === wadah);
-            let boxName = boxItem ? boxItem.nama_barang.toUpperCase() : `WADAH #${wadah}`;
-            
-            html += `
-            <div class="box-group">
-                <div class="box-header">
-                    <div class="checkbox"></div> 🧰 ${boxName} 
-                    <span style="margin-left:auto; font-weight:normal; font-size:12px; color:#333;">#${wadah}</span>
-                </div>
-                <ul class="item-list">`;
-            
-            // Isi detail di dalam wadah
-            grouped[wadah].forEach(item => {
-                html += `
-                    <li class="item-row">
-                        <span>- ${item.nama_barang} ${item.kode_barang ? ` <i style="color:#555; font-size:11px;">(#${item.kode_barang})</i>` : ''}</span>
-                        <span class="qty">${item.jumlah} Pcs</span>
-                    </li>`;
-            });
-            
-            html += `</ul></div>`;
-        }
+        for (let wadah in grouped) { let boxItem = allItems.find(i => i.kode_barang && i.kode_barang.toUpperCase() === wadah); let boxName = boxItem ? boxItem.nama_barang.toUpperCase() : `WADAH #${wadah}`; html += `<div class="box-group"><div class="box-header"><div class="checkbox"></div> 🧰 ${boxName}  <span style="margin-left:auto; font-weight:normal; font-size:12px; color:#333;">#${wadah}</span></div><ul class="item-list">`; grouped[wadah].forEach(item => { html += `<li class="item-row"><span>- ${item.nama_barang} ${item.kode_barang ? ` <i style="color:#555; font-size:11px;">(#${item.kode_barang})</i>` : ''}</span><span class="qty">${item.jumlah} Pcs</span></li>`; }); html += `</ul></div>`; }
     }
 
-    // 2. RENDER BARANG LEPASAN (TIDAK ADA WADAH)
     if (lepasan.length > 0) {
-        html += `<h4 style="margin-top:20px; margin-bottom:10px; border-bottom:2px solid #000; display:inline-block;">📌 BARANG LEPASAN (TANPA BOX)</h4>`;
-        html += `<div class="box-group"><ul class="item-list">`;
-        lepasan.forEach(item => {
-            html += `
-                <li class="item-row" style="padding:10px 15px; margin-left:0;">
-                    <div style="display:flex; align-items:center;">
-                        <div class="checkbox"></div> 
-                        <span><b>${item.nama_barang.toUpperCase()}</b> ${item.kode_barang ? ` <i style="color:#555; font-size:11px;">(#${item.kode_barang})</i>` : ''}</span>
-                    </div>
-                    <span class="qty">${item.jumlah} Pcs</span>
-                </li>`;
-        });
-        html += `</ul></div>`;
+        html += `<h4 style="margin-top:20px; margin-bottom:10px; border-bottom:2px solid #000; display:inline-block;">📌 BARANG LEPASAN (TANPA BOX)</h4><div class="box-group"><ul class="item-list">`;
+        lepasan.forEach(item => { html += `<li class="item-row" style="padding:10px 15px; margin-left:0;"><div style="display:flex; align-items:center;"><div class="checkbox"></div> <span><b>${item.nama_barang.toUpperCase()}</b> ${item.kode_barang ? ` <i style="color:#555; font-size:11px;">(#${item.kode_barang})</i>` : ''}</span></div><span class="qty">${item.jumlah} Pcs</span></li>`; }); html += `</ul></div>`;
     }
 
-    html += `
-    <div class="signatures">
-        <div>
-            <b>Disiapkan Oleh (Gudang):</b>
-            <div class="sign-box">( Nama & Tanda Tangan )</div>
-        </div>
-        <div>
-            <b>Dicek & Dimuat Oleh (Loader):</b>
-            <div class="sign-box">( Nama & Tanda Tangan )</div>
-        </div>
-    </div>
-    
-    </body></html>`;
-
-    printWin.document.write(html); 
-    printWin.document.close(); 
+    html += `<div class="signatures"><div><b>Disiapkan Oleh (Gudang):</b><div class="sign-box">( Nama & Tanda Tangan )</div></div><div><b>Dicek & Dimuat Oleh (Loader):</b><div class="sign-box">( Nama & Tanda Tangan )</div></div></div></body></html>`;
+    printWin.document.write(html); printWin.document.close(); 
 }
-// ==========================================
-// KERANJANG & BULK UPDATE 
-// ==========================================
 function toggleBulkMode() { isBulkMode = !isBulkMode; let bar = document.getElementById("bulkBar"); if(!bar) { document.body.insertAdjacentHTML('beforeend', `<div id="bulkBar" class="bulk-bar" style="position:fixed; bottom:0; left:0; width:100%; background:#1e293b; color:white; padding:15px; z-index:99; display:none; justify-content:space-between; align-items:center;"><span id="bulkCount" class="bulk-info" style="font-weight:bold;">0 Terpilih</span><div style="display:flex; gap:8px;"><button onclick="selectAllVisible()" style="background:#e2e8f0; color:#334155; border:none; padding:8px 12px; border-radius:8px; font-weight:bold; font-size:12px;">☑️ Semua</button><button onclick="openBulkUpdateModal()" class="btn-bulk-process" style="padding:8px 12px; font-size:12px; background:#ea580c; color:white; border:none; border-radius:8px; font-weight:bold;">Ubah Massal</button></div></div>`); bar = document.getElementById("bulkBar"); } const btnMode = document.getElementById("btnBulkMode"); if (isBulkMode) { btnMode.innerHTML = `❌ Batal Massal`; btnMode.style.background = "#ef4444"; bar.style.display = "flex"; } else { btnMode.innerHTML = `🛒 Mode Massal`; btnMode.style.background = "#ea580c"; bar.style.display = "none"; selectedRows.clear(); document.getElementById("bulkCount").innerText = `0 Terpilih`; } applyFilters(); }
 function toggleSelection(rowIndex) { if (selectedRows.has(rowIndex)) selectedRows.delete(rowIndex); else selectedRows.add(rowIndex); document.getElementById("bulkCount").innerText = `${selectedRows.size} Terpilih`; applyFilters(); }
 function selectAllVisible() { getFilteredData().forEach(item => selectedRows.add(item.row_index)); document.getElementById("bulkCount").innerText = `${selectedRows.size} Terpilih`; applyFilters(); }
@@ -355,9 +248,6 @@ function openBulkUpdateModal() {
 
 async function processBulkUpdate(btn) { const newLokasi = document.getElementById("bulkNewLokasi").value; const newStatus = document.getElementById("bulkNewStatus").value; const newTujuan = document.getElementById("bulkNewTujuan").value; if (newLokasi === "TETAP" && newStatus === "TETAP" && newTujuan === "") { alert("Isi atau pilih minimal satu perubahan!"); return; } btn.disabled = true; btn.innerText = "MEMPROSES... (JANGAN DITUTUP)"; try { const payload = { action: "update_status_lokasi", pin: userPin, rows: Array.from(selectedRows), new_lokasi: newLokasi !== "TETAP" ? newLokasi : null, new_status: newStatus !== "TETAP" ? newStatus : null, new_tujuan: newTujuan || "TETAP" }; const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) }); const data = await response.json(); if(data.status === "success") { document.getElementById('bulkModal').remove(); toggleBulkMode(); loadData(); showToast("✅ Update massal berhasil!"); } else { alert("Gagal:\n" + data.message); } } catch (e) { alert("Error Sistem:\n" + e.message); } finally { btn.disabled = false; btn.innerText = "PROSES UPDATE MASSAL"; } }
 
-// ==========================================
-// FORM TAMBAH / EDIT
-// ==========================================
 function openAddModal() { if(!isAdminMode) return; document.getElementById("formAdd").reset(); pendingAddFotos = []; renderPreviewAddFotos(); document.getElementById("modalAdd").classList.add("active"); }
 function closeAddModal() { document.getElementById("modalAdd").classList.remove("active"); }
 function handleNewFotos(input) { if (!input.files || input.files.length === 0) return; for (let i = 0; i < input.files.length; i++) { if (pendingAddFotos.length < 3) pendingAddFotos.push(input.files[i]); } input.value = ""; renderPreviewAddFotos(); }
@@ -372,9 +262,6 @@ function removeFotoEdit(index) { document.getElementById("previewFoto" + index).
 function previewNewFoto(index) { let fileInput = document.getElementById("editFoto" + index); if(fileInput.files.length > 0) { let reader = new FileReader(); reader.onload = function(e) { document.getElementById("previewFoto" + index).src = e.target.result; document.getElementById("previewFoto" + index).style.display = "block"; document.getElementById("btnRemove" + index).style.display = "block"; document.getElementById("btnUpload" + index).style.display = "none"; document.getElementById("existingId" + index).value = "NEW_BASE64"; }; reader.readAsDataURL(fileInput.files[0]); } }
 async function submitEditFull(e) { e.preventDefault(); const btn = document.getElementById("btnSubmitEditFull"); btn.innerText = "MENYIMPAN..."; btn.disabled = true; try { let finalFotos = ["", "", ""]; for(let i=0; i<3; i++) { let existVal = document.getElementById("existingId" + i).value; let fileInput = document.getElementById("editFoto" + i); if (existVal === "NEW_BASE64" && fileInput.files.length > 0) { finalFotos[i] = await compressImage(fileInput.files[0]); } else if (existVal && existVal.length > 5) { finalFotos[i] = existVal; } else { finalFotos[i] = ""; } } const payload = { action: "full_edit_item", pin: userPin, row_index: document.getElementById("editRowIndex").value, nama: document.getElementById("editNama").value, kode_barang: document.getElementById("editKode").value, kode_wadah: document.getElementById("editWadah").value, jumlah: document.getElementById("editJumlah").value, kondisi: document.getElementById("editKondisi").value, keterangan_ref: document.getElementById("editKet").value, fotos: finalFotos }; const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) }); const data = await response.json(); if (data.status === "success") { showToast("✅ Data Diperbarui!"); closeEditFullModal(); loadData(); } else { alert("Gagal:\n" + data.message); } } catch (err) { alert("Error Sistem:\n" + err.message); } finally { btn.innerText = "💾 UPDATE DATA & FOTO"; btn.disabled = false; } }
 
-// ==========================================
-// THE ULTIMATE SCANNER V.11 (GUDANG EDITION)
-// ==========================================
 function openScannerModal() { 
     let modal = document.createElement("div"); modal.id = "tempScannerModal"; modal.className = "modal-overlay active"; 
     modal.innerHTML = `
@@ -459,13 +346,12 @@ function closeScannerModal() {
 }
 
 /* ==========================================
-   TAMBAHAN JS: LOGIKA FILTER LANJUTAN (ANTI-BLANK)
+   TAMBAHAN JS: LOGIKA FILTER LANJUTAN (HANYA TIM)
    ========================================== */
 const btnBukaFilter = document.getElementById('btnBukaFilter');
 const panelFilter = document.getElementById('panelFilterLanjutan');
-const semuaCekbox = document.querySelectorAll('.cek-tim, .cek-status');
+const semuaCekbox = document.querySelectorAll('.cek-tim'); // Hapus cek-status
 
-// Fungsi buka/tutup laci filter
 btnBukaFilter.addEventListener('click', () => {
     if (panelFilter.style.display === 'none') {
         panelFilter.style.display = 'block';
@@ -482,7 +368,6 @@ btnBukaFilter.addEventListener('click', () => {
     }
 });
 
-// Panggil ulang render otomatis saat checkbox dicentang!
 semuaCekbox.forEach(cek => {
     cek.addEventListener('change', () => {
         applyFilters();

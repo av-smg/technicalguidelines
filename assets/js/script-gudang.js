@@ -1,5 +1,5 @@
 // ==========================================
-// MESIN LOGIKA GUDANG (V.29.0 - FILTER TIM ONLY FIXED)
+// MESIN LOGIKA GUDANG (V.29.1 - FULL CLEAN INLINE STYLES)
 // ==========================================
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec"; 
@@ -55,9 +55,10 @@ function setupStickyHeader() {
         toolbar.style.borderBottom = "1px solid #e2e8f0";
         toolbar.style.boxShadow = "0 4px 6px -1px rgba(0, 0, 0, 0.05)";
         
+        // BEBAS INLINE STYLES! Sepenuhnya diatur oleh CSS
         let pillsWrapper = document.querySelector(".filter-pills-wrapper");
         if(pillsWrapper && !pillsWrapper.innerHTML.includes("Di Lokasi Event")) {
-            pillsWrapper.insertAdjacentHTML('beforeend', `<button class="pill-btn" data-filter="Di Lokasi Event" onclick="setFilterPill('Di Lokasi Event', this)" style="border-color:#f59e0b; color:#b45309; background:#fffbeb;">⚠️ Di Lokasi Event</button>`);
+            pillsWrapper.insertAdjacentHTML('beforeend', `<button class="pill-btn" data-filter="Di Lokasi Event" onclick="setFilterPill('Di Lokasi Event', this)">⚠️ Di Lokasi Event</button>`);
         }
     }
 }
@@ -140,10 +141,6 @@ function render(data) {
 function openZoomModal(imgUrl) { document.getElementById("zoomImgSrc").src = imgUrl; document.getElementById("zoomModal").classList.add("active"); }
 function closeZoomModal() { document.getElementById("zoomModal").classList.remove("active"); setTimeout(() => { document.getElementById("zoomImgSrc").src = ""; }, 300); }
 
-// ==========================================
-// FUNGSI LAINNYA (MODAL, CETAK, EDIT, SCANNER) 
-// SAMA PERSIS. TIDAK DIHAPUS.
-// ==========================================
 function openDetailModal(item) {
     const oldModal = document.getElementById("detailModal"); if(oldModal) oldModal.remove();
     let stat = item.status_digunakan || "Di Gudang"; if(stat === 'FALSE') stat = "Di Gudang"; let lok = item.lokasi || "Gudang KC (SMG)";
@@ -350,7 +347,7 @@ function closeScannerModal() {
    ========================================== */
 const btnBukaFilter = document.getElementById('btnBukaFilter');
 const panelFilter = document.getElementById('panelFilterLanjutan');
-const semuaCekbox = document.querySelectorAll('.cek-tim'); // Hapus cek-status
+const semuaCekbox = document.querySelectorAll('.cek-tim');
 
 btnBukaFilter.addEventListener('click', () => {
     if (panelFilter.style.display === 'none') {

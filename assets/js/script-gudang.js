@@ -1,5 +1,5 @@
 // ==========================================
-// MESIN LOGIKA GUDANG (V.27.0 - MISSION CONTROL ENGINE + SENTER + STICKY)
+// MESIN LOGIKA GUDANG (V.28.0 - FILTER LANJUTAN FIXED & UTUH)
 // ==========================================
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec"; 
@@ -55,89 +55,83 @@ function setupStickyHeader() {
         toolbar.style.borderBottom = "1px solid #e2e8f0";
         toolbar.style.boxShadow = "0 4px 6px -1px rgba(0, 0, 0, 0.05)";
         
-        // Tambahkan Filter Dosa (Load-Out)
+        // Tambahkan Filter Dosa (Load-Out) - Diperbaiki agar warna berfungsi
         let pillsWrapper = document.querySelector(".filter-pills-wrapper");
         if(pillsWrapper && !pillsWrapper.innerHTML.includes("Di Lokasi Event")) {
-            pillsWrapper.innerHTML += `<button class="pill-btn" onclick="setFilterPill('Di Lokasi Event', this)" style="border-color:#f59e0b; color:#b45309; background:#fffbeb;">⚠️ Di Lokasi Event</button>`;
+            pillsWrapper.insertAdjacentHTML('beforeend', `<button class="pill-btn" data-filter="Di Lokasi Event" onclick="setFilterPill('Di Lokasi Event', this)" style="border-color:#f59e0b; color:#b45309; background:#fffbeb;">⚠️ Di Lokasi Event</button>`);
         }
     }
 }
 
 function toggleViewMode() { const btn = document.getElementById("btnViewToggle"); if (currentViewMode === 'grid') { currentViewMode = 'list'; btn.innerHTML = '🖼️ Grid View'; document.getElementById("dataContainer").className = "list-view-container"; } else { currentViewMode = 'grid'; btn.innerHTML = '📄 List View'; document.getElementById("dataContainer").className = "grid-cards"; } applyFilters(); }
-function setFilterPill(status, btnElement) { activeFilterPill = status; document.querySelectorAll('.pill-btn').forEach(btn => btn.classList.remove('active')); btnElement.classList.add('active'); applyFilters(); }
 
-function getFilteredData() { 
-    const q = document.getElementById("searchInput").value.toLowerCase(); 
-    return allItems.filter(i => { 
-        const matchQ = i.nama_barang.toLowerCase().includes(q) || (i.kode_barang||"").toLowerCase().includes(q) || (i.kode_wadah||"").toLowerCase().includes(q); 
-        let stat = i.status_digunakan || 'Di Gudang'; if(stat === 'FALSE') stat = 'Di Gudang'; 
-        let lok = i.lokasi || '';
-        
-        let matchPill = false;
-        if (activeFilterPill === 'all') matchPill = true;
-        else if (activeFilterPill === 'Rusak') { matchPill = (i.kondisi === 'Rusak' || i.kondisi === 'Periksa'); }
-        else if (activeFilterPill === 'Di Lokasi Event') { matchPill = (lok === 'Di Lokasi Event'); } // Logika Load-Out Dosa
-        else matchPill = (stat === activeFilterPill);
-        
-        return matchQ && matchPill; 
-    }); 
+function setFilterPill(status, btnElement) { 
+    activeFilterPill = status; 
+    document.querySelectorAll('.pill-btn').forEach(btn => btn.classList.remove('active')); 
+    btnElement.classList.add('active'); 
+    applyFilters(); 
 }
+
+// 🧠 MESIN FILTER UTAMA (Diperbarui untuk mengakomodasi Laci Lanjutan)
 function getFilteredData() { 
     const q = document.getElementById("searchInput").value.toLowerCase(); 
     
-    // 🔍 1. BACA STATUS FILTER LANJUTAN
+    // BACA STATUS FILTER LANJUTAN
     const panelFilter = document.getElementById('panelFilterLanjutan');
     const isAdvancedOpen = panelFilter && panelFilter.style.display === 'block';
     let timAktif = [];
     let statusAktif = [];
 
     if (isAdvancedOpen) {
-        // Ambil kata kunci tim (menghilangkan kata 'Tim ' agar lebih akurat)
-        timAktif = Array.from(document.querySelectorAll('.cek-tim:checked')).map(cb => cb.value.toLowerCase().replace('tim ', ''));
+        timAktif = Array.from(document.querySelectorAll('.cek-tim:checked')).map(cb => cb.value.toLowerCase());
         statusAktif = Array.from(document.querySelectorAll('.cek-status:checked')).map(cb => cb.value);
     }
 
     return allItems.filter(i => { 
-        // Pencarian Teks
         const matchQ = i.nama_barang.toLowerCase().includes(q) || (i.kode_barang||"").toLowerCase().includes(q) || (i.kode_wadah||"").toLowerCase().includes(q); 
-        
         let stat = i.status_digunakan || 'Di Gudang'; if(stat === 'FALSE') stat = 'Di Gudang'; 
         let lok = i.lokasi || '';
         let kategoriBarang = (i.kategori || i.tim || i.nama_barang || "").toLowerCase();
         
-        // 🔍 2. LOGIKA TOMBOL FILTER ATAS (PILLS)
         let matchPill = false;
         if (activeFilterPill === 'all') matchPill = true;
         else if (activeFilterPill === 'Rusak') { matchPill = (i.kondisi === 'Rusak' || i.kondisi === 'Periksa'); }
         else if (activeFilterPill === 'Di Lokasi Event') { matchPill = (lok === 'Di Lokasi Event'); } 
         else matchPill = (stat === activeFilterPill);
         
-        // 🔍 3. LOGIKA FILTER LANJUTAN (CHECKBOX)
+        // LOGIKA FILTER LANJUTAN (Bekerja secara bersamaan)
         let matchAdvanced = true;
         if (isAdvancedOpen) {
-            // Cek kecocokan Tim
             let matchTim = timAktif.length === 0 || timAktif.some(t => kategoriBarang.includes(t));
-            
-            // Cek kecocokan Status
             let matchStatus = statusAktif.length === 0;
             if (!matchStatus) {
                 if (statusAktif.includes('Gudang') && stat === 'Di Gudang') matchStatus = true;
                 if (statusAktif.includes('Akan Dibawa') && stat === 'Akan Dibawa') matchStatus = true;
                 if (statusAktif.includes('Lokasi Event') && lok === 'Di Lokasi Event') matchStatus = true;
             }
-            
             matchAdvanced = matchTim && matchStatus;
         }
 
-        // Tampilkan hanya jika lolos semua tes
         return matchQ && matchPill && matchAdvanced; 
     }); 
 }
+
+function applyFilters() { render(getFilteredData()); }
+
+// PERBAIKAN WARNA KARTU BADGE UNTUK DI LOKASI EVENT
+function getStatusClass(status, lokasi) { 
+    if(lokasi === 'Di Lokasi Event') return 'badge-status status-lokasi'; 
+    if(status === 'Akan Dibawa') return 'badge-status status-keranjang'; 
+    if(status === 'Sedang Dipakai') return 'badge-status status-dipakai'; 
+    if(status.includes('Perjalanan')) return 'badge-status status-perjalanan'; 
+    return 'badge-status status-gudang'; 
+}
+
 function render(data) {
     const container = document.getElementById("dataContainer"); container.innerHTML = "";
     data.forEach(item => {
         const card = document.createElement("div"); const isSelected = selectedRows.has(item.row_index); let stat = item.status_digunakan || "Di Gudang"; if(stat === 'FALSE') stat = "Di Gudang"; let lok = item.lokasi || "Gudang KC (SMG)";
-        let badgeLokasiHtml = (lok.toLowerCase().includes("gudang") && stat === "Di Gudang") ? `<span class="badge-status status-gudang" style="display:inline-block; margin-top:4px; padding:3px 8px;">🏢 ${lok}</span>` : `<span class="badge-status status-lokasi" style="display:inline-block; margin-top:4px; margin-right:4px; padding:3px 8px;">📍 ${lok}</span><span class="${getStatusClass(stat)}" style="display:inline-block; margin-top:4px; padding:3px 8px;">${stat}</span>`;
+        let badgeLokasiHtml = (lok.toLowerCase().includes("gudang") && stat === "Di Gudang") ? `<span class="badge-status status-gudang" style="display:inline-block; margin-top:4px; padding:3px 8px;">🏢 ${lok}</span>` : `<span class="badge-status status-lokasi" style="display:inline-block; margin-top:4px; margin-right:4px; padding:3px 8px;">📍 ${lok}</span><span class="${getStatusClass(stat, lok)}" style="display:inline-block; margin-top:4px; padding:3px 8px;">${stat}</span>`;
         let safeFileIds = item.file_ids || item.fotos || []; let firstFileId = safeFileIds.find(id => id && id.length > 5); let imageSrc = 'https://placehold.co/300x300/EEEEEE/999999?text=NO+IMAGE'; if (firstFileId) { imageSrc = firstFileId.includes("http") ? firstFileId : `https://drive.google.com/thumbnail?id=${firstFileId}&sz=w400`; }
         const kodeBadge = item.kode_barang ? `<span style="color:#ea580c; font-weight:900;">#${item.kode_barang}</span>` : ""; const timeBadge = item.timestamp ? `<div style="font-size:9px; color:gray; margin-bottom:6px;">⏱️ Update: ${item.timestamp}</div>` : "";
         let colorKondisi = item.kondisi && item.kondisi.toLowerCase() === 'bagus' ? '#16a34a' : '#dc2626'; let bgKondisi = item.kondisi && item.kondisi.toLowerCase() === 'bagus' ? '#f0fdf4' : '#fef2f2'; const kondisiBadge = `<span style="font-size:10px; padding:2px 6px; border-radius:4px; border:1px solid ${colorKondisi}; background:${bgKondisi}; color:${colorKondisi}; font-weight:bold; margin-left:6px;">${item.kondisi || 'Bagus'}</span>`;
@@ -463,33 +457,15 @@ function closeScannerModal() {
     if (html5QrCode) { html5QrCode.stop().catch(e=>console.log(e)); html5QrCode = null; } 
     const m = document.getElementById("tempScannerModal"); if(m) m.remove(); 
 }
+
 /* ==========================================
-   TAMBAHAN JS: LOGIKA FILTER LANJUTAN
+   TAMBAHAN JS: LOGIKA FILTER LANJUTAN (ANTI-BLANK)
    ========================================== */
 const btnBukaFilter = document.getElementById('btnBukaFilter');
 const panelFilter = document.getElementById('panelFilterLanjutan');
 const semuaCekbox = document.querySelectorAll('.cek-tim, .cek-status');
 
 // Fungsi buka/tutup laci filter
-btnBukaFilter.addEventListener('click', () => {
-    if (panelFilter.style.display === 'none') {
-        panelFilter.style.display = 'block';
-        btnBukaFilter.innerHTML = '❌ TUTUP FILTER';
-        btnBukaFilter.style.background = '#ef4444';
-    } else {
-        panelFilter.style.display = 'none';
-        btnBukaFilter.innerHTML = '⚙️ FILTER LANJUTAN';
-        btnBukaFilter.style.background = '#334155';
-    }
-});
-
-/* ==========================================
-   PERBAIKAN JS: LOGIKA FILTER LANJUTAN
-   ========================================== */
-const btnBukaFilter = document.getElementById('btnBukaFilter');
-const panelFilter = document.getElementById('panelFilterLanjutan');
-const semuaCekbox = document.querySelectorAll('.cek-tim, .cek-status');
-
 btnBukaFilter.addEventListener('click', () => {
     if (panelFilter.style.display === 'none') {
         panelFilter.style.display = 'block';

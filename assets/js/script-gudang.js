@@ -1,5 +1,5 @@
 // ==========================================
-// MESIN LOGIKA GUDANG (V.30.0 - ASSIGN TO MISSION READY & CLEAN STYLES)
+// MESIN LOGIKA GUDANG (V.30.0 - LIST VIEW MINIMALIS & ASSIGN MISSION)
 // ==========================================
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec"; 
@@ -19,7 +19,6 @@ function checkAdminStatus() { if (userPin && VALID_PINS.includes(userPin)) { isA
 function toggleAdminMode() { if (isAdminMode) { if(confirm("Tutup akses Admin? Memori PIN dihapus.")) { localStorage.removeItem("AV_INVENTORY_PIN"); userPin = ""; checkAdminStatus(); showToast("Mode Read-Only aktif."); applyFilters(); } } else { let input = prompt("Masukkan PIN Kapten / Admin Gudang:"); if (input) { let pinAttempt = input.trim().toLowerCase(); if (VALID_PINS.includes(pinAttempt)) { userPin = pinAttempt; localStorage.setItem("AV_INVENTORY_PIN", userPin); checkAdminStatus(); showToast("Akses Admin Terbuka!"); applyFilters(); } else { alert("⛔ AKSES DITOLAK! PIN tidak punya izin ke Gudang."); } } } }
 function showToast(msg, isSuccess = true) { const t = document.getElementById("toastMsg"); if(!t) return; t.innerText = msg; t.className = "toast-msg show " + (isSuccess ? "toast-success" : "toast-error"); setTimeout(() => { t.classList.remove("show"); }, 4000); }
 
-// 🔊 HAPTIC & AUDIO ENGINE 
 function triggerFeedback(type) {
     try {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -41,18 +40,11 @@ function triggerFeedback(type) {
 
 async function loadData() { try { document.getElementById("loading").style.display = "block"; const res = await fetch(SCRIPT_URL + "?action=api&nocache=" + new Date().getTime()); const data = await res.json(); allItems = (data.inventory || []).filter(item => item.nama_barang && item.nama_barang.toString().trim().toLowerCase() !== 'nama barang'); optionsData = data.dropdowns || { lokasi: [], tim: [] }; document.getElementById("loading").style.display = "none"; setupStickyHeader(); applyFilters(); } catch (e) { document.getElementById("loading").innerHTML = `<span style="color:red;">Gagal memuat data. Periksa koneksi internet.</span>`; } }
 
-// 🌟 STICKY HEADER GUDANG
 function setupStickyHeader() {
     let toolbar = document.querySelector(".toolbar-card");
     if(toolbar) {
-        toolbar.style.position = "sticky";
-        toolbar.style.top = "60px"; 
-        toolbar.style.zIndex = "90";
-        toolbar.style.background = "rgba(255, 255, 255, 0.95)";
-        toolbar.style.backdropFilter = "blur(8px)";
-        toolbar.style.padding = "10px";
-        toolbar.style.margin = "0 -15px 15px -15px"; 
-        toolbar.style.borderBottom = "1px solid #e2e8f0";
+        toolbar.style.position = "sticky"; toolbar.style.top = "60px"; toolbar.style.zIndex = "90";
+        toolbar.style.background = "rgba(255, 255, 255, 0.95)"; toolbar.style.backdropFilter = "blur(8px)";
         toolbar.style.boxShadow = "0 4px 6px -1px rgba(0, 0, 0, 0.05)";
         
         let pillsWrapper = document.querySelector(".filter-pills-wrapper");
@@ -63,29 +55,17 @@ function setupStickyHeader() {
 }
 
 function toggleViewMode() { const btn = document.getElementById("btnViewToggle"); if (currentViewMode === 'grid') { currentViewMode = 'list'; btn.innerHTML = '🖼️ Grid View'; document.getElementById("dataContainer").className = "list-view-container"; } else { currentViewMode = 'grid'; btn.innerHTML = '📄 List View'; document.getElementById("dataContainer").className = "grid-cards"; } applyFilters(); }
+function setFilterPill(status, btnElement) { activeFilterPill = status; document.querySelectorAll('.pill-btn').forEach(btn => btn.classList.remove('active')); btnElement.classList.add('active'); applyFilters(); }
 
-function setFilterPill(status, btnElement) { 
-    activeFilterPill = status; 
-    document.querySelectorAll('.pill-btn').forEach(btn => btn.classList.remove('active')); 
-    btnElement.classList.add('active'); 
-    applyFilters(); 
-}
-
-// 🧠 MESIN FILTER UTAMA (Kini hanya menggunakan Filter Laci TIM)
 function getFilteredData() { 
     const q = document.getElementById("searchInput").value.toLowerCase(); 
-    
     const panelFilter = document.getElementById('panelFilterLanjutan');
     const isAdvancedOpen = panelFilter && panelFilter.style.display === 'block';
     let timAktif = [];
-
-    if (isAdvancedOpen) {
-        timAktif = Array.from(document.querySelectorAll('.cek-tim:checked')).map(cb => cb.value.toLowerCase());
-    }
+    if (isAdvancedOpen) { timAktif = Array.from(document.querySelectorAll('.cek-tim:checked')).map(cb => cb.value.toLowerCase()); }
 
     return allItems.filter(i => { 
         const matchQ = (i.nama_barang||"").toLowerCase().includes(q) || (i.kode_barang||"").toLowerCase().includes(q) || (i.kode_wadah||"").toLowerCase().includes(q); 
-        
         let stat = i.status_digunakan || 'Di Gudang'; if(stat === 'FALSE') stat = 'Di Gudang'; 
         let lok = i.lokasi || '';
         let kategoriBarang = (i.kategori || i.tim || i.nama_barang || "").toLowerCase();
@@ -97,10 +77,7 @@ function getFilteredData() {
         else matchPill = (stat === activeFilterPill);
         
         let matchAdvanced = true;
-        if (isAdvancedOpen) {
-            matchAdvanced = timAktif.length === 0 || timAktif.some(t => kategoriBarang.includes(t));
-        }
-
+        if (isAdvancedOpen) { matchAdvanced = timAktif.length === 0 || timAktif.some(t => kategoriBarang.includes(t)); }
         return matchQ && matchPill && matchAdvanced; 
     }); 
 }
@@ -115,19 +92,50 @@ function getStatusClass(status, lokasi) {
     return 'badge-status status-gudang'; 
 }
 
+// =====================================
+// RENDER HTML YANG SUDAH DIBIKIN TIPIS/MINIMALIS
+// =====================================
 function render(data) {
     const container = document.getElementById("dataContainer"); container.innerHTML = "";
     data.forEach(item => {
         const card = document.createElement("div"); const isSelected = selectedRows.has(item.row_index); let stat = item.status_digunakan || "Di Gudang"; if(stat === 'FALSE') stat = "Di Gudang"; let lok = item.lokasi || "Gudang KC (SMG)";
-        let badgeLokasiHtml = (lok.toLowerCase().includes("gudang") && stat === "Di Gudang") ? `<span class="badge-status status-gudang" style="display:inline-block; margin-top:4px; padding:3px 8px;">🏢 ${lok}</span>` : `<span class="badge-status status-lokasi" style="display:inline-block; margin-top:4px; margin-right:4px; padding:3px 8px;">📍 ${lok}</span><span class="${getStatusClass(stat, lok)}" style="display:inline-block; margin-top:4px; padding:3px 8px;">${stat}</span>`;
-        let safeFileIds = item.file_ids || item.fotos || []; let firstFileId = safeFileIds.find(id => id && id.length > 5); let imageSrc = 'https://placehold.co/300x300/EEEEEE/999999?text=NO+IMAGE'; if (firstFileId) { imageSrc = firstFileId.includes("http") ? firstFileId : `https://drive.google.com/thumbnail?id=${firstFileId}&sz=w400`; }
-        const kodeBadge = item.kode_barang ? `<span style="color:#ea580c; font-weight:900;">#${item.kode_barang}</span>` : ""; const timeBadge = item.timestamp ? `<div style="font-size:9px; color:gray; margin-bottom:6px;">⏱️ Update: ${item.timestamp}</div>` : "";
-        let colorKondisi = item.kondisi && item.kondisi.toLowerCase() === 'bagus' ? '#16a34a' : '#dc2626'; let bgKondisi = item.kondisi && item.kondisi.toLowerCase() === 'bagus' ? '#f0fdf4' : '#fef2f2'; const kondisiBadge = `<span style="font-size:10px; padding:2px 6px; border-radius:4px; border:1px solid ${colorKondisi}; background:${bgKondisi}; color:${colorKondisi}; font-weight:bold; margin-left:6px;">${item.kondisi || 'Bagus'}</span>`;
         
-        const boxBadge = item.kode_wadah ? `<span style="font-size:10px; color:#d97706; background:#fef3c7; border-radius:4px; padding:2px 6px; margin-left:6px; border:1px solid #fde68a;">🧰 IN-BOX</span>` : "";
+        let badgeLokasiHtml = (lok.toLowerCase().includes("gudang") && stat === "Di Gudang") ? `<span class="badge-status status-gudang">🏢 ${lok}</span>` : `<span class="badge-status status-lokasi">📍 ${lok}</span><span class="${getStatusClass(stat, lok)}">${stat}</span>`;
+        let safeFileIds = item.file_ids || item.fotos || []; let firstFileId = safeFileIds.find(id => id && id.length > 5); let imageSrc = 'https://placehold.co/300x300/EEEEEE/999999?text=NO+IMAGE'; if (firstFileId) { imageSrc = firstFileId.includes("http") ? firstFileId : `https://drive.google.com/thumbnail?id=${firstFileId}&sz=w400`; }
+        const kodeBadge = item.kode_barang ? `<span style="color:#ea580c; font-weight:900; font-size:9px;">#${item.kode_barang}</span>` : ""; 
+        const timeBadge = item.timestamp ? `<div style="font-size:8px; color:#94a3b8;">⏱️ ${item.timestamp}</div>` : "";
+        let colorKondisi = item.kondisi && item.kondisi.toLowerCase() === 'bagus' ? '#16a34a' : '#dc2626'; let bgKondisi = item.kondisi && item.kondisi.toLowerCase() === 'bagus' ? '#f0fdf4' : '#fef2f2'; 
+        const kondisiBadge = `<span style="font-size:9px; padding:2px 4px; border-radius:4px; border:1px solid ${colorKondisi}; background:${bgKondisi}; color:${colorKondisi}; font-weight:bold;">${item.kondisi || 'Bagus'}</span>`;
+        const boxBadge = item.kode_wadah ? `<span style="font-size:9px; color:#d97706; background:#fef3c7; border-radius:4px; padding:2px 4px; border:1px solid #fde68a;">🧰 IN-BOX</span>` : "";
 
-        if (currentViewMode === 'grid') { card.className = "mission-card " + (isSelected ? "selected " : "") + (stat === 'Akan Dibawa' ? "card-siap-dibawa " : ""); card.innerHTML = `${isSelected ? '<div class="card-check">✓</div>' : ''}<div style="position:relative;"><img src="${imageSrc}" class="card-img" loading="lazy"><div style="position:absolute; bottom:12px; right:4px;"><span class="badge-qty">Qty: ${item.jumlah || 0}</span></div></div><h4 class="card-title">${item.nama_barang}</h4>${timeBadge} <div class="card-codes" style="display:flex; align-items:center; flex-wrap:wrap; gap:4px;">${kodeBadge} ${kondisiBadge} ${boxBadge}</div> <div>${badgeLokasiHtml}</div>`;
-        } else { card.className = "list-item " + (isSelected ? "selected " : "") + (stat === 'Akan Dibawa' ? "card-siap-dibawa " : ""); card.innerHTML = `${isSelected ? '<div class="card-check" style="top:50%; transform:translateY(-50%); right:15px;">✓</div>' : ''}<img src="${imageSrc}" class="list-img" loading="lazy"><div class="list-info"><h4 class="list-title">${item.nama_barang}</h4>${timeBadge}<div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center; font-size:10px;">${kodeBadge} ${kondisiBadge} ${boxBadge} ${badgeLokasiHtml} <span class="badge-qty">Qty: ${item.jumlah || 0}</span></div></div>`; }
+        if (currentViewMode === 'grid') { 
+            card.className = "mission-card " + (isSelected ? "selected " : "") + (stat === 'Akan Dibawa' ? "card-siap-dibawa " : ""); 
+            card.innerHTML = `${isSelected ? '<div class="card-check">✓</div>' : ''}
+            <div style="position:relative;">
+                <img src="${imageSrc}" class="card-img" loading="lazy">
+                <div style="position:absolute; bottom:12px; right:4px;"><span class="badge-qty">Qty: ${item.jumlah || 0}</span></div>
+            </div>
+            <h4 class="card-title">${item.nama_barang}</h4>
+            <div style="display:flex; align-items:center; flex-wrap:wrap; gap:4px; margin-bottom:4px;">${kodeBadge} ${kondisiBadge} ${boxBadge}</div> 
+            <div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:auto;">${badgeLokasiHtml}</div>`;
+        } else { 
+            card.className = "list-item " + (isSelected ? "selected " : "") + (stat === 'Akan Dibawa' ? "card-siap-dibawa " : ""); 
+            card.innerHTML = `${isSelected ? '<div class="card-check" style="top:50%; transform:translateY(-50%); right:10px;">✓</div>' : ''}
+            <img src="${imageSrc}" class="list-img" loading="lazy">
+            <div class="list-info">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <h4 class="list-title" style="flex:1;">${item.nama_barang}</h4>
+                    <span class="badge-qty" style="margin-left:4px;">Qty: ${item.jumlah || 0}</span>
+                </div>
+                ${timeBadge}
+                <div style="display:flex; gap:4px; flex-wrap:wrap; align-items:center; margin-top:3px;">
+                    ${kodeBadge} ${kondisiBadge} ${boxBadge}
+                </div>
+                <div style="display:flex; gap:4px; flex-wrap:wrap; align-items:center; margin-top:3px;">
+                    ${badgeLokasiHtml}
+                </div>
+            </div>`; 
+        }
         card.onclick = () => { if (isBulkMode) toggleSelection(item.row_index); else openDetailModal(item); }; container.appendChild(card);
     });
 }
@@ -284,11 +292,9 @@ async function processAssignMission(btn) {
     const missionId = document.getElementById("bulkAssignMission").value.trim().toUpperCase();
     if (!missionId) { alert("Masukkan ID Misi terlebih dahulu!"); return; }
     
-    // Kumpulkan kode barang dari baris yang dipilih
     let selectedCodes = [];
     Array.from(selectedRows).forEach(rowIndex => {
         let item = allItems.find(i => i.row_index === rowIndex);
-        // Prioritaskan mengambil kode_wadah jika ada, agar seluruh box terkirim
         if (item) {
             let codeToPush = item.kode_wadah ? item.kode_wadah : item.kode_barang;
             if (codeToPush && codeToPush.trim() !== "") {
@@ -297,7 +303,6 @@ async function processAssignMission(btn) {
         }
     });
 
-    // Hilangkan duplikat (kalau 2 barang dari box yang sama dipilih)
     selectedCodes = [...new Set(selectedCodes)];
 
     if (selectedCodes.length === 0) { alert("Alat yang dipilih tidak memiliki Kode Barang/Wadah!"); return; }
@@ -318,8 +323,8 @@ async function processAssignMission(btn) {
         
         if(data.status === "success") { 
             document.getElementById('bulkModal').remove(); 
-            toggleBulkMode(); // Matikan mode massal & bersihkan seleksi
-            showToast(`✅ ${selectedCodes.length} Barang berhasil ditugaskan ke ${missionId}!`); 
+            toggleBulkMode(); 
+            showToast(`✅ ${selectedCodes.length} Barang ditugaskan ke ${missionId}!`); 
         } else { 
             alert("Gagal:\n" + data.message); 
         } 
@@ -429,9 +434,6 @@ function closeScannerModal() {
     const m = document.getElementById("tempScannerModal"); if(m) m.remove(); 
 }
 
-/* ==========================================
-   TAMBAHAN JS: LOGIKA FILTER LANJUTAN (HANYA TIM)
-   ========================================== */
 const btnBukaFilter = document.getElementById('btnBukaFilter');
 const panelFilter = document.getElementById('panelFilterLanjutan');
 const semuaCekbox = document.querySelectorAll('.cek-tim');
@@ -443,17 +445,13 @@ btnBukaFilter.addEventListener('click', () => {
         btnBukaFilter.style.background = '#ef4444';
     } else {
         panelFilter.style.display = 'none';
-        btnBukaFilter.innerHTML = '⚙️ FILTER LANJUTAN';
+        btnBukaFilter.innerHTML = '⚙️ FILTER TIM';
         btnBukaFilter.style.background = '#334155';
-        
-        // Reset centang saat ditutup agar kembali ke "Semua Alat"
         semuaCekbox.forEach(cek => cek.checked = false);
         applyFilters(); 
     }
 });
 
 semuaCekbox.forEach(cek => {
-    cek.addEventListener('change', () => {
-        applyFilters();
-    });
+    cek.addEventListener('change', () => { applyFilters(); });
 });

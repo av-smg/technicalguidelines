@@ -1,176 +1,153 @@
 ---
+location: "HOME"
 ---
-
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
-  <head>
+<head>
     {% include head.html %}
-    <link rel="stylesheet" href="style.css" />
-    
+    <title>A/V Command Center</title>
     <style>
-      /* CSS Khusus untuk Banner Event Teratas - Versi Kalem */
-      .event-highlight-card {
-        background: linear-gradient(135deg, #1e293b 0%, #162032 100%);
-        border-radius: 20px;
-        padding: 30px;
-        margin: -10px auto 30px auto; 
-        max-width: 900px;
-        color: white;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        border: 1px solid #334155;
-        text-align: center;
-      }
-      .event-label {
-        background: rgba(234, 88, 12, 0.15);
-        color: #ea580c; /* Oranye kalem (Matte) */
-        padding: 6px 14px;
-        border-radius: 20px;
-        font-size: 11px;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        display: inline-block;
-        margin-bottom: 15px;
-        border: 1px solid rgba(234, 88, 12, 0.2);
-      }
-      .event-highlight-card h2 {
-        font-size: 26px;
-        font-weight: 900;
-        margin: 0 0 10px 0;
-        color: white;
-      }
-      .event-highlight-card p {
-        color: #94a3b8;
-        font-size: 14px;
-        margin-bottom: 25px;
-        font-weight: 600;
-      }
-      .event-buttons {
-        display: flex;
-        gap: 15px;
-        justify-content: center;
-        flex-wrap: wrap;
-      }
-      .btn-event {
-        padding: 12px 24px;
-        border-radius: 12px;
-        font-size: 13px;
-        font-weight: 800;
-        text-decoration: none !important;
-        transition: all 0.2s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-      }
-      .btn-inv {
-        background: #ea580c; /* Oranye kalem (Matte) */
-        color: white;
-        border: 2px solid #ea580c;
-        /* Menghilangkan efek glow shadow yang bikin silau */
-      }
-      .btn-inv:hover {
-        background: #c2410c; /* Oranye lebih gelap saat di-hover */
-        border-color: #c2410c;
-        transform: translateY(-2px);
-        color: white;
-      }
-      .btn-mc {
-        background: transparent;
-        color: white;
-        border: 2px solid #475569;
-      }
-      .btn-mc:hover {
-        border-color: white;
-        background: rgba(255,255,255,0.05);
-        transform: translateY(-2px);
-        color: white;
-      }
-      
-      /* Penyesuaian jarak hero section */
-      .hero { padding-bottom: 20px; }
-      
-      /* Responsif untuk layar HP */
-      @media (max-width: 600px) {
-        .event-buttons { flex-direction: column; }
-        .btn-event { width: 100%; justify-content: center; }
-      }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f8fafc; transition: 0.3s; margin: 0; padding: 0; }
+        
+        .hero-section { background: linear-gradient(135deg, #1e293b, #0f172a); color: white; padding: 40px 20px; text-align: center; border-radius: 0 0 20px 20px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .hero-title { margin: 0 0 10px 0; font-size: 24px; font-weight: 900; }
+        .hero-subtitle { margin: 0; font-size: 13px; color: #cbd5e1; }
+
+        .dashboard-container { max-width: 1000px; margin: 0 auto; padding: 0 20px 40px 20px; }
+        .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        
+        .stat-card { background: white; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; flex-direction: column; align-items: center; text-align: center; transition: 0.3s; }
+        .stat-card.blue { border-bottom: 4px solid #3b82f6; }
+        .stat-card.orange { border-bottom: 4px solid #f59e0b; }
+        .stat-card.green { border-bottom: 4px solid #10b981; }
+        .stat-card.red { border-bottom: 4px solid #ef4444; }
+        
+        .stat-icon { font-size: 28px; margin-bottom: 10px; }
+        .stat-value { font-size: 28px; font-weight: 900; color: #1e293b; line-height: 1; margin-bottom: 5px; }
+        .stat-label { font-size: 11px; font-weight: bold; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .progress-box { background: white; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.02); margin-bottom: 20px; transition: 0.3s;}
+        .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .progress-title { font-weight: 900; font-size: 14px; color: #1e293b; margin: 0; }
+        .progress-bar-bg { width: 100%; height: 12px; background: #e2e8f0; border-radius: 20px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #3b82f6, #10b981); width: 0%; transition: width 1s ease-in-out; }
+
+        .btn-action { display: block; width: 100%; padding: 15px; background: #1e293b; color: white; text-align: center; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 14px; margin-bottom: 10px; transition: 0.2s; }
+        .btn-action:hover { background: #334155; }
+        .btn-action.secondary { background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; }
+        .btn-action.secondary:hover { background: #e2e8f0; }
+
+        #loadingDash { text-align: center; padding: 50px; font-weight: bold; color: #64748b; font-size: 12px; }
+        .hidden { display: none !important; }
+
+        /* 🌙 SUNTIKAN DARK MODE */
+        body.dark-mode, [data-theme="dark"] { background-color: #0f172a; color: #e2e8f0; }
+        body.dark-mode .hero-section { background: linear-gradient(135deg, #020617, #0f172a); border-bottom: 1px solid #1e293b; }
+        body.dark-mode .stat-card, body.dark-mode .progress-box { background: #1e293b; border-color: #334155; }
+        body.dark-mode .stat-value, body.dark-mode .progress-title { color: #f8fafc; }
+        body.dark-mode .stat-label { color: #94a3b8; }
+        body.dark-mode .progress-bar-bg { background: #334155; }
+        body.dark-mode .btn-action.secondary { background: #334155; color: #e2e8f0; border-color: #475569; }
+        body.dark-mode .btn-action.secondary:hover { background: #475569; }
     </style>
-  </head>
-  
-  <body>
+</head>
+<body>
     {% include navbar.html %}
 
-    <main>
-      <section class="hero">
-        <h1>Dashboard Teknis: <br /><span>Departemen Audio Video</span> 🌍</h1>
-        <p>Pilih lokasi penugasan kamu untuk mengakses panduan dan alur kerja tim  A/V.</p>
-      </section>
+    <div class="hero-section">
+        <h1 class="hero-title">A/V COMMAND CENTER</h1>
+        <p class="hero-subtitle">Sistem Pemantauan Logistik & Misi Lapangan</p>
+    </div>
 
-      <div class="content-container">
-          
-        <!-- ========================================== -->
-        <!-- BANNER EVENT UTAMA (HIGHLIGHT)             -->
-        <!-- ========================================== -->
-        <div class="event-highlight-card">
-          <span class="event-label">🗓️ Event Terdekat</span>
-          <h2>Pertemuan Wilayah 2026</h2>
-          <p>📅 3 & 4 Oktober 2026 &nbsp;|&nbsp; 📍 UTC Semarang</p>
-          
-          <div class="event-buttons">
-            <!-- Link menuju folder inventaris -->
-            <a href="inventaris/index.html" class="btn-event btn-inv">
-              📦 Buka Logistik & Inventaris
-            </a>
-            <!-- Link menuju file misi.html -->
-            <a href="misi/index.html" class="btn-event btn-mc">
-              📋 Buka Mission Card
-            </a>
-          </div>
+    <div id="loadingDash">Membaca Data Satelit... 🛰️</div>
+
+    <div class="dashboard-container hidden" id="dashContent">
+        
+        <div class="progress-box">
+            <div class="progress-header">
+                <h3 class="progress-title">🎯 PROGRESS MISI LAPANGAN</h3>
+                <span id="dash-misi-text" style="font-weight:bold; font-size:14px; color:#3b82f6;">0/0</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="dash-misi-bar"></div>
+            </div>
         </div>
 
-        <!-- ========================================== -->
-        <!-- KARTU REGIONAL (TETAP SEPERTI ASLINYA)     -->
-        <!-- ========================================== -->
-        <a href="jw-08/index.html" class="location-main-card-link">
-          <div class="location-main-card jw-card">
-            <div class="card-content">
-              <span class="location-label badge-jw">Regional Semarang IN</span>
-              <h2>JW-08 Indonesia</h2>
-              <p>Dashboard informasi tim A/V</p>
-              <span class="btn-enter">Buka Region &rarr;</span>
+        <div class="grid-stats">
+            <div class="stat-card blue">
+                <div class="stat-icon">📦</div>
+                <div class="stat-value" id="dash-total">0</div>
+                <div class="stat-label">Total Alat Terdata</div>
             </div>
-            <div class="card-illustration">🇮🇩</div>
-          </div>
-        </a>
-
-        <a href="ja-01/index.html" class="location-main-card-link">
-          <div class="location-main-card ja-card">
-            <div class="card-content">
-              <span class="location-label badge-ja">Regional Semarang JA</span>
-              <h2>JA-01 Jawa</h2>
-              <p>Dashboard informasi tim A/V.</p>
-              <span class="btn-enter">Buka Region &rarr;</span>
+            
+            <div class="stat-card orange">
+                <div class="stat-icon">🛒</div>
+                <div class="stat-value" id="dash-packing">0</div>
+                <div class="stat-label">Akan Dibawa (Packing)</div>
             </div>
-            <div class="card-illustration">🗺️</div>
-          </div>
-        </a>
 
-        <a href="apendiks/index.html" class="location-main-card-link">
-          <div class="location-main-card apendiks-card">
-            <div class="card-content">
-              <span class="location-label badge-apendiks">Resources</span>
-              <h2>Apendiks</h2>
-              <p>Glossary, dokumentasi alat, dan referensi tambahan.</p>
-              <span class="btn-enter">Buka Resource &rarr;</span>
+            <div class="stat-card green">
+                <div class="stat-icon">📍</div>
+                <div class="stat-value" id="dash-event">0</div>
+                <div class="stat-label">Sedang di Lokasi</div>
             </div>
-            <div class="card-illustration">📚</div>
-          </div>
-        </a>
-      </div>
-    </main>
 
-    <footer class="simple-footer">
-      <p>&copy; 2026 Tim Teknis A/V. All rights reserved.</p>
-    </footer>
-  </body>
+            <div class="stat-card red">
+                <div class="stat-icon">🛠️</div>
+                <div class="stat-value" id="dash-rusak">0</div>
+                <div class="stat-label">Rusak / Perbaikan</div>
+            </div>
+        </div>
+
+        <h3 style="font-size:14px; color:#64748b; margin-bottom:10px; border-bottom:1px solid #cbd5e1; padding-bottom:5px;">Akses Cepat:</h3>
+        <a href="{{ site.baseurl }}/inventaris/" class="btn-action">🏢 Buka Gudang Inventaris</a>
+        <a href="{{ site.baseurl }}/misi/" class="btn-action secondary">🎯 Buka Mission Control</a>
+        
+    </div>
+
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec";
+
+        window.onload = async () => {
+            try {
+                const res = await fetch(API_URL + "?action=api&nocache=" + new Date().getTime());
+                const data = await res.json();
+                
+                let inventory = data.inventory || [];
+                let missions = data.missions || [];
+
+                // KALKULASI GUDANG
+                let totalAlat = inventory.length;
+                let diEvent = inventory.filter(i => i.lokasi === 'Di Lokasi Event' || i.status_digunakan === 'Sedang Dipakai').length;
+                let rusak = inventory.filter(i => (i.kondisi || "").toLowerCase() === 'rusak' || (i.kondisi || "").toLowerCase() === 'periksa' || (i.status_digunakan || "").toLowerCase().includes('servis')).length;
+                let packing = inventory.filter(i => i.status_digunakan === 'Akan Dibawa').length;
+
+                // KALKULASI MISI
+                let totalMisi = missions.length;
+                let misiSelesai = missions.filter(m => (m.status_misi || "").toLowerCase() === 'selesai').length;
+                let progress = totalMisi === 0 ? 0 : Math.round((misiSelesai / totalMisi) * 100);
+
+                // INJEKSI KE HTML
+                document.getElementById('dash-total').innerText = totalAlat;
+                document.getElementById('dash-event').innerText = diEvent;
+                document.getElementById('dash-rusak').innerText = rusak;
+                document.getElementById('dash-packing').innerText = packing;
+                
+                document.getElementById('dash-misi-text').innerText = `${misiSelesai} dari ${totalMisi} Selesai (${progress}%)`;
+                
+                // Animasi Loading selesai
+                document.getElementById('loadingDash').classList.add('hidden');
+                document.getElementById('dashContent').classList.remove('hidden');
+                
+                // Delay sedikit untuk animasi Bar
+                setTimeout(() => {
+                    document.getElementById('dash-misi-bar').style.width = `${progress}%`;
+                }, 100);
+
+            } catch(e) {
+                document.getElementById('loadingDash').innerHTML = `<span style="color:red;">Koneksi Satelit Terputus. Gagal memuat data.</span>`;
+            }
+        };
+    </script>
+</body>
 </html>

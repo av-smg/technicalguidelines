@@ -11,9 +11,9 @@ location: "HOME"
 
         body { font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif; background: #f8fafc; transition: background 0.3s, color 0.3s; margin: 0; padding: 0; color: #0f172a; }
         
-        /* 🚀 HERO SECTION (A/V PALETTE: NAVY & ORANGE) */
+        /* 🚀 HERO SECTION (A/V PALETTE) */
         .hero-section {
-            background: #0f172a; /* Navy Blue AV */
+            background: #0f172a; 
             background-image: radial-gradient(circle at 100% 0%, #1e293b 0%, transparent 50%), radial-gradient(circle at 0% 100%, #f97316 0%, transparent 40%);
             color: white; 
             padding: 40px 20px 70px 20px; 
@@ -24,7 +24,7 @@ location: "HOME"
         }
         
         .hero-title { margin: 0 0 5px 0; font-size: 32px; font-weight: 900; letter-spacing: -1px; color: #f8fafc; }
-        .hero-title span { color: #f97316; /* Orange AV */ }
+        .hero-title span { color: #f97316; }
         .hero-subtitle { margin: 0; font-size: 14px; opacity: 0.9; font-weight: 700; color: #cbd5e1; }
 
         .dashboard-container { max-width: 1000px; margin: 0 auto; padding: 0 20px 40px 20px; }
@@ -34,9 +34,9 @@ location: "HOME"
         .greeting-box h2 { font-size: 22px; font-weight: 900; color: #f97316; margin: 0 0 5px 0; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         .greeting-box p { font-size: 13px; font-weight: 700; color: #f8fafc; margin: 0; background: #1e293b; display: inline-block; padding: 6px 15px; border-radius: 20px; border: 2px solid #334155; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         
-        /* ⚡ AKSES CEPAT (4 TOMBOL CHUNKY & BOUNCY) */
-        .quick-access-wrapper { position: relative; z-index: 10; margin-bottom: 35px; }
-        .quick-access-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; }
+        /* ⚡ AKSES CEPAT (4 TOMBOL CHUNKY) */
+        .quick-access-wrapper { position: relative; z-index: 10; margin-bottom: 25px; }
+        .quick-access-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; }
         
         .btn-quick { 
             display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
@@ -44,7 +44,7 @@ location: "HOME"
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
             background: white; color: #0f172a;
             border: 3px solid #e2e8f0;
-            box-shadow: 0 8px 0 #cbd5e1; /* Efek tombol 3D */
+            box-shadow: 0 8px 0 #cbd5e1; 
         }
         
         .btn-quick:hover { transform: translateY(-3px); box-shadow: 0 11px 0 #cbd5e1; border-color: #cbd5e1; }
@@ -53,18 +53,38 @@ location: "HOME"
         .btn-quick .icon { font-size: 38px; margin-bottom: 10px; transition: 0.3s; }
         .btn-quick:hover .icon { transform: scale(1.15) rotate(5deg); }
 
-        /* Highlight khusus untuk tombol Misi (Warna Orange AV) */
         .btn-quick.misi-btn { background: #f97316; color: white; border-color: #ea580c; box-shadow: 0 8px 0 #c2410c; }
         .btn-quick.misi-btn:hover { border-color: #c2410c; box-shadow: 0 11px 0 #c2410c; background: #f97316; }
         .btn-quick.misi-btn:active { box-shadow: 0 3px 0 #c2410c; }
 
+        /* 📑 APENDIKS MEMANJANG (WIDE CARDS) */
+        .apendiks-section { margin-bottom: 40px; }
+        .section-title { font-size: 18px; font-weight: 900; color: #0f172a; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px;}
+        
+        .apendiks-list { display: flex; flex-direction: column; gap: 12px; }
+        .apendiks-card { 
+            display: flex; align-items: center; justify-content: space-between; 
+            background: white; padding: 15px 20px; border-radius: 20px; 
+            border: 2px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            text-decoration: none; transition: 0.2s;
+        }
+        .apendiks-card:hover { transform: translateX(5px); border-color: #cbd5e1; box-shadow: 0 6px 12px rgba(0,0,0,0.05); }
+        .apendiks-card:active { transform: translateX(2px); }
+        
+        .apendiks-info { display: flex; align-items: center; gap: 15px; }
+        .apendiks-icon { font-size: 28px; background: #f1f5f9; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 14px; }
+        .apendiks-text h3 { margin: 0; font-size: 14px; font-weight: 900; color: #0f172a; }
+        .apendiks-text p { margin: 2px 0 0 0; font-size: 11px; font-weight: 700; color: #64748b; }
+        
+        .apendiks-arrow { font-size: 18px; color: #94a3b8; font-weight: bold; transition: 0.2s; }
+        .apendiks-card:hover .apendiks-arrow { color: #f97316; transform: translateX(3px); }
+
         /* 📡 LOADING STATE */
-        #loadingDash { text-align: center; padding: 40px; font-weight: 800; color: #64748b; font-size: 14px; animation: bounce 1.5s infinite; }
+        #loadingDash { text-align: center; padding: 30px; font-weight: 800; color: #64748b; font-size: 14px; animation: bounce 1.5s infinite; }
         @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
         .hidden { display: none !important; }
 
         /* 📊 STATISTIK GUDANG (PILL SHAPE) */
-        .section-title { font-size: 18px; font-weight: 900; color: #0f172a; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px;}
         .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; margin-bottom: 40px; }
         
         .stat-card { 
@@ -121,13 +141,12 @@ location: "HOME"
         .team-inventaris .dash-txt { background: #fff7ed; color: #ea580c; border: 1px solid #fed7aa; }
         .team-inventaris .progress-bar-fill { background: linear-gradient(90deg, #fbbf24, #f97316); }
 
-        /* 🌙 DARK MODE SAKTI (NAVY & ORANGE NEON) */
+        /* 🌙 DARK MODE SAKTI */
         body.dark-mode, [data-theme="dark"] { background-color: #020617; color: #e2e8f0; }
         
         body.dark-mode .hero-section { background: #0f172a; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         body.dark-mode .greeting-box p { background: #020617; border-color: #1e293b; color: #cbd5e1; }
         
-        /* Dark Mode: Tombol Chunky */
         body.dark-mode .btn-quick { background: #1e293b; color: #f8fafc; border-color: #334155; box-shadow: 0 8px 0 #0f172a; }
         body.dark-mode .btn-quick:hover { border-color: #475569; background: #273549; box-shadow: 0 11px 0 #0f172a; }
         body.dark-mode .btn-quick:active { box-shadow: 0 3px 0 #0f172a; }
@@ -137,6 +156,12 @@ location: "HOME"
         body.dark-mode .btn-quick.misi-btn:active { box-shadow: 0 3px 0 #7c2d12; }
         
         body.dark-mode .section-title { color: #f8fafc; }
+        
+        body.dark-mode .apendiks-card { background: #0f172a; border-color: #1e293b; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        body.dark-mode .apendiks-card:hover { border-color: #334155; background: #151e2e; }
+        body.dark-mode .apendiks-icon { background: #1e293b; }
+        body.dark-mode .apendiks-text h3 { color: #f8fafc; }
+        body.dark-mode .apendiks-text p { color: #94a3b8; }
         
         body.dark-mode .stat-card, body.dark-mode .progress-box { background: #0f172a; border-color: #1e293b; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         body.dark-mode .stat-card:hover, body.dark-mode .progress-box:hover { border-color: #334155; background: #1e293b; }
@@ -171,10 +196,10 @@ location: "HOME"
         <!-- 👋 GREETING FUN -->
         <div class="greeting-box">
             <h2>Haii Tim A/V! 👋</h2>
-            <p>Pusat komando siap. Klik button yang kamu mau yaaa~ 🚀</p>
+            <p>Pusat komando siap. Klik menu yang kamu butuhkan yaaa~ 🚀</p>
         </div>
 
-        <!-- ⚡ AKSES CEPAT (4 TOMBOL CHUNKY) -->
+        <!-- ⚡ AKSES CEPAT (4 TOMBOL SHORTCUT) -->
         <div class="quick-access-wrapper">
             <div class="quick-access-grid">
                 <a href="{{ site.baseurl }}/inventaris/" class="btn-quick">
@@ -185,14 +210,44 @@ location: "HOME"
                     <span class="icon">🎯</span>
                     <span class="text">Mission Control</span>
                 </a>
-                <a href="{{ site.baseurl }}/apendiks/" class="btn-quick">
-                    <span class="icon">🗺️</span>
-                    <span class="text">Apendiks & Denah</span>
-                </a>
-                <a href="{{ site.baseurl }}/ja-01/" class="btn-quick">
+                <a href="{{ site.baseurl }}/apendiks/struktur-personil.html" class="btn-quick">
                     <span class="icon">👥</span>
                     <span class="text">Struktur Personil</span>
                 </a>
+                <a href="{{ site.baseurl }}/apendiks/layout.html" class="btn-quick">
+                    <span class="icon">🗺️</span>
+                    <span class="text">Layout Area</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 📑 APENDIKS MEMANJANG (DI BAWAH TOMBOL) -->
+        <div class="apendiks-section">
+            <h2 class="section-title">📑 Apendiks & Dokumen Tambahan</h2>
+            <div class="apendiks-list">
+                
+                <a href="{{ site.baseurl }}/apendiks/routing-audio.html" class="apendiks-card">
+                    <div class="apendiks-info">
+                        <div class="apendiks-icon">🎛️</div>
+                        <div class="apendiks-text">
+                            <h3>Routing Audio A/V</h3>
+                            <p>Skema jalur instalasi dan routing mixer audio Regional.</p>
+                        </div>
+                    </div>
+                    <div class="apendiks-arrow">➔</div>
+                </a>
+
+                <a href="{{ site.baseurl }}/apendiks/pedoman-teknis.html" class="apendiks-card">
+                    <div class="apendiks-info">
+                        <div class="apendiks-icon">📘</div>
+                        <div class="apendiks-text">
+                            <h3>Pedoman Teknis (SOP)</h3>
+                            <p>Standar operasional prosedur pemasangan & pembongkaran.</p>
+                        </div>
+                    </div>
+                    <div class="apendiks-arrow">➔</div>
+                </a>
+
             </div>
         </div>
 
@@ -232,7 +287,6 @@ location: "HOME"
             <h2 class="section-title" style="margin-top: 40px;">🎯 Progress Misi Lapangan</h2>
             <div class="team-progress-grid">
                 
-                <!-- TIM SPEAKER -->
                 <div class="progress-box team-speaker">
                     <div class="progress-header">
                         <h3 class="progress-title">🔊 Tim Speaker</h3>
@@ -241,7 +295,6 @@ location: "HOME"
                     <div class="progress-bar-bg"><div class="progress-bar-fill" id="dash-bar-speaker"></div></div>
                 </div>
 
-                <!-- TIM KABEL -->
                 <div class="progress-box team-kabel">
                     <div class="progress-header">
                         <h3 class="progress-title">🔌 Tim Kabel</h3>
@@ -250,7 +303,6 @@ location: "HOME"
                     <div class="progress-bar-bg"><div class="progress-bar-fill" id="dash-bar-kabel"></div></div>
                 </div>
 
-                <!-- TIM BOOTH -->
                 <div class="progress-box team-booth">
                     <div class="progress-header">
                         <h3 class="progress-title">🎛️ Tim Booth</h3>
@@ -259,7 +311,6 @@ location: "HOME"
                     <div class="progress-bar-bg"><div class="progress-bar-fill" id="dash-bar-booth"></div></div>
                 </div>
 
-                <!-- TIM INVENTARIS -->
                 <div class="progress-box team-inventaris">
                     <div class="progress-header">
                         <h3 class="progress-title">🗂️ Tim Inventaris</h3>
@@ -284,19 +335,16 @@ location: "HOME"
                 let inventory = data.inventory || [];
                 let missions = data.missions || [];
 
-                // KALKULASI GUDANG
                 let totalAlat = inventory.length;
                 let diEvent = inventory.filter(i => i.lokasi === 'Di Lokasi Event' || i.status_digunakan === 'Sedang Dipakai').length;
                 let rusak = inventory.filter(i => (i.kondisi || "").toLowerCase() === 'rusak' || (i.kondisi || "").toLowerCase() === 'periksa' || (i.status_digunakan || "").toLowerCase().includes('servis')).length;
                 let packing = inventory.filter(i => i.status_digunakan === 'Akan Dibawa').length;
 
-                // UPDATE UI GUDANG
                 document.getElementById('dash-total').innerText = totalAlat;
                 document.getElementById('dash-event').innerText = diEvent;
                 document.getElementById('dash-rusak').innerText = rusak;
                 document.getElementById('dash-packing').innerText = packing;
                 
-                // KALKULASI & UPDATE UI MISI PER TIM
                 const teams = ['speaker', 'kabel', 'booth', 'inventaris'];
                 
                 teams.forEach(team => {
@@ -307,13 +355,11 @@ location: "HOME"
 
                     document.getElementById(`dash-txt-${team}`).innerText = `${selesai}/${total} (${prog}%)`;
                     
-                    // Delay render bar for smooth animation
                     setTimeout(() => {
                         document.getElementById(`dash-bar-${team}`).style.width = `${prog}%`;
                     }, 150);
                 });
 
-                // Tampilkan Data & Sembunyikan Loading
                 document.getElementById('loadingDash').classList.add('hidden');
                 document.getElementById('dashContent').classList.remove('hidden');
 

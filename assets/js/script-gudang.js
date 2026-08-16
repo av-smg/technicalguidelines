@@ -236,15 +236,51 @@ function selectAllVisible() { getFilteredData().forEach(item => selectedRows.add
 
 function openBulkUpdateModal() { 
     if (selectedRows.size === 0) { alert("Pilih minimal 1 barang!"); return; } 
-    const modalHtml = `<div id="bulkModal" class="modal-overlay active"><div class="modal-content" style="max-width:350px; padding:20px; background:white; border-radius:15px; position:relative;"><button onclick="document.getElementById('bulkModal').remove()" style="position:absolute; top:15px; right:15px; border:none; background:#f1f5f9; width:30px; height:30px; border-radius:50%; font-weight:bold;">✕</button><h3 style="margin-top:0;">Ubah Massal (${selectedRows.size} Alat)</h3>
-    <div style="text-align:left; margin-bottom:12px;"><label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">🎯 Nama Event / Tujuan (Kolom P):</label><input type="text" id="bulkNewTujuan" placeholder="Biarkan kosong jika tidak diubah..." style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; font-weight:bold;"></div>
-    <div style="text-align:left; margin-bottom:12px;"><label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">📍 Ubah Lokasi (Kolom O):</label><select id="bulkNewLokasi" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; font-weight:bold;"><option value="TETAP">-- Jangan Ubah Lokasi --</option><option value="Gudang KC (SMG)">🏢 Gudang KC (SMG)</option><option value="Gudang KC (JKT)">🏢 Gudang KC (JKT)</option><option value="Gedung UTC">🏢 Gedung UTC</option><option value="Dalam Perjalanan">🚚 Dalam Perjalanan</option><option value="Di Lokasi Event">📍 Di Lokasi Event</option></select></div>
-    <div style="text-align:left; margin-bottom:15px;"><label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">🔌 Ubah Status (Kolom R):</label><select id="bulkNewStatus" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; font-weight:bold;"><option value="TETAP">-- Jangan Ubah Status --</option><option value="Akan Dibawa">🛒 Akan Dibawa (Packing)</option><option value="Sedang Dipakai">🔌 Sedang Dipakai / Aktivasi</option><option value="Di Gudang">📦 Standby / Di Gudang</option></select></div>
-    <button onclick="processBulkUpdate(this)" style="width:100%; padding:12px; background:#ea580c; color:white; border:none; border-radius:8px; font-weight:bold;">PROSES UPDATE MASSAL</button></div></div>`; document.body.insertAdjacentHTML('beforeend', modalHtml); 
+    const modalHtml = `
+    <div id="bulkModal" class="modal-overlay active">
+        <div class="modal-content" style="max-width:350px; padding:20px; background:white; border-radius:15px; position:relative; max-height:85vh; overflow-y:auto;">
+            <button onclick="document.getElementById('bulkModal').remove()" style="position:absolute; top:15px; right:15px; border:none; background:#f1f5f9; width:30px; height:30px; border-radius:50%; font-weight:bold; cursor:pointer;">✕</button>
+            <h3 style="margin-top:0; color:#1e293b;">Ubah Massal (${selectedRows.size} Alat)</h3>
+            
+            <!-- FITUR BARU: ASSIGN TO MISSION -->
+            <div style="background:#eff6ff; border:1px solid #bfdbfe; padding:15px; border-radius:10px; margin-bottom:15px;">
+                <label style="font-size:11px; font-weight:bold; color:#1d4ed8; display:block; margin-bottom:6px;">🎯 TUGASKAN KE MISI LAPANGAN:</label>
+                <input type="text" id="bulkAssignMission" placeholder="Ketik ID Misi (Contoh: M-001)" style="width:100%; padding:10px; border-radius:8px; border:1px solid #93c5fd; font-weight:bold; text-transform:uppercase; margin-bottom:8px; box-sizing:border-box;">
+                <button onclick="processAssignMission(this)" style="width:100%; padding:10px; background:#2563eb; color:white; border:none; border-radius:8px; font-weight:bold; font-size:12px; cursor:pointer;">KIRIM KE MISSION CARD 🚀</button>
+            </div>
+
+            <div style="text-align:center; color:gray; font-size:10px; font-weight:bold; margin-bottom:15px;">ATAU UPDATE STATUS BIASA ⬇️</div>
+
+            <!-- UPDATE STATUS LAMA -->
+            <div style="text-align:left; margin-bottom:12px;">
+                <label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">🎯 Nama Event / Tujuan:</label>
+                <input type="text" id="bulkNewTujuan" placeholder="Kosongkan jika tidak diubah..." style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; font-weight:bold; box-sizing:border-box;">
+            </div>
+            <div style="text-align:left; margin-bottom:12px;">
+                <label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">📍 Ubah Lokasi:</label>
+                <select id="bulkNewLokasi" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; font-weight:bold;">
+                    <option value="TETAP">-- Jangan Ubah Lokasi --</option>
+                    <option value="Gudang KC (SMG)">🏢 Gudang KC (SMG)</option>
+                    <option value="Gudang KC (JKT)">🏢 Gudang KC (JKT)</option>
+                    <option value="Gedung UTC">🏢 Gedung UTC</option>
+                    <option value="Dalam Perjalanan">🚚 Dalam Perjalanan</option>
+                    <option value="Di Lokasi Event">📍 Di Lokasi Event</option>
+                </select>
+            </div>
+            <div style="text-align:left; margin-bottom:15px;">
+                <label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">🔌 Ubah Status:</label>
+                <select id="bulkNewStatus" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; font-weight:bold;">
+                    <option value="TETAP">-- Jangan Ubah Status --</option>
+                    <option value="Akan Dibawa">🛒 Akan Dibawa (Packing)</option>
+                    <option value="Sedang Dipakai">🔌 Sedang Dipakai / Aktivasi</option>
+                    <option value="Di Gudang">📦 Standby / Di Gudang</option>
+                </select>
+            </div>
+            <button onclick="processBulkUpdate(this)" style="width:100%; padding:12px; background:#ea580c; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">PROSES UPDATE MASSAL</button>
+        </div>
+    </div>`; 
+    document.body.insertAdjacentHTML('beforeend', modalHtml); 
 }
-
-async function processBulkUpdate(btn) { const newLokasi = document.getElementById("bulkNewLokasi").value; const newStatus = document.getElementById("bulkNewStatus").value; const newTujuan = document.getElementById("bulkNewTujuan").value; if (newLokasi === "TETAP" && newStatus === "TETAP" && newTujuan === "") { alert("Isi atau pilih minimal satu perubahan!"); return; } btn.disabled = true; btn.innerText = "MEMPROSES... (JANGAN DITUTUP)"; try { const payload = { action: "update_status_lokasi", pin: userPin, rows: Array.from(selectedRows), new_lokasi: newLokasi !== "TETAP" ? newLokasi : null, new_status: newStatus !== "TETAP" ? newStatus : null, new_tujuan: newTujuan || "TETAP" }; const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) }); const data = await response.json(); if(data.status === "success") { document.getElementById('bulkModal').remove(); toggleBulkMode(); loadData(); showToast("✅ Update massal berhasil!"); } else { alert("Gagal:\n" + data.message); } } catch (e) { alert("Error Sistem:\n" + e.message); } finally { btn.disabled = false; btn.innerText = "PROSES UPDATE MASSAL"; } }
-
 function openAddModal() { if(!isAdminMode) return; document.getElementById("formAdd").reset(); pendingAddFotos = []; renderPreviewAddFotos(); document.getElementById("modalAdd").classList.add("active"); }
 function closeAddModal() { document.getElementById("modalAdd").classList.remove("active"); }
 function handleNewFotos(input) { if (!input.files || input.files.length === 0) return; for (let i = 0; i < input.files.length; i++) { if (pendingAddFotos.length < 3) pendingAddFotos.push(input.files[i]); } input.value = ""; renderPreviewAddFotos(); }

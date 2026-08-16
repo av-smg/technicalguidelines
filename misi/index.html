@@ -6,12 +6,13 @@ location: "MISSION CARD"
 <head>
     {% include head.html %}
     <title>Mission Control A/V</title>
-    <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/custom-misi.css?v=8.0">
+    <!-- V.15.0: Memaksa browser muat UI Compact baru -->
+    <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/custom-misi.css?v=15.0">
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <style>
         .admin-only { display: none !important; }
         body.admin-mode-active .admin-only { display: inline-block !important; }
-        .btn-lock { background: #f1f5f9; border: 1px solid #cbd5e1; color: #334155; padding: 6px 12px; border-radius: 8px; font-weight: 800; cursor: pointer;}
+        .btn-lock { background: #f1f5f9; border: 1px solid #cbd5e1; color: #334155; padding: 4px 10px; border-radius: 6px; font-weight: 800; cursor: pointer; font-size:11px;}
         body.admin-mode-active .btn-lock { background: #f0fdf4; border-color: #22c55e; color: #16a34a; }
     </style>
 </head>
@@ -21,8 +22,8 @@ location: "MISSION CARD"
     <main>
         <div style="display:flex; justify-content:space-between; align-items:center; margin:15px 20px;">
             <div>
-                <h2 style="font-weight:900; margin:0;">🎯 MISSION CONTROL</h2>
-                <p style="font-size:11px; color:gray; margin:0;">Status: <span id="modeStatusText">🟢 Read-Only Mode</span></p>
+                <h2 style="font-weight:900; margin:0; font-size:18px;">🎯 MISSION CONTROL</h2>
+                <p style="font-size:10px; color:gray; margin:0;">Status: <span id="modeStatusText">🟢 Read-Only Mode</span></p>
             </div>
             <button id="btnUnlock" onclick="toggleAdminMode()" class="btn-lock">🔒 Buka Akses</button>
         </div>
@@ -34,15 +35,13 @@ location: "MISSION CARD"
             <button class="btn-team" onclick="setTeamFilter('Booth')">🎛️ Tim Booth</button>
         </div>
 
-        <!-- Teks loading santai sesuai permintaan -->
-        <div id="loading" style="text-align: center; padding: 40px; color: gray; font-weight:bold;">Tunggu sebentar yaa. . .</div>
+        <div id="loading" style="text-align: center; padding: 40px; color: gray; font-weight:bold; font-size:12px;">Tunggu sebentar yaa. . .</div>
         
         <div class="missions-container" id="missionsContainer"></div>
     </main>
 
     <div id="toastMsg" class="toast-msg">Notifikasi</div>
 
-    <!-- UPDATE CACHE V.10.0 -->
-    <script src="{{ site.baseurl }}/assets/js/script-misi.js?v=14.0"></script>
+    <script src="{{ site.baseurl }}/assets/js/script-misi.js?v=15.0"></script>
 </body>
 </html>

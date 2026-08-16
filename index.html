@@ -7,98 +7,177 @@ location: "HOME"
     {% include head.html %}
     <title>A/V Command Center</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f8fafc; transition: 0.3s; margin: 0; padding: 0; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800;900&display=swap');
+
+        body { font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif; background: #f8fafc; transition: background 0.3s, color 0.3s; margin: 0; padding: 0; color: #0f172a; }
         
-        /* 🚀 HERO SECTION (FUN & MODERN) */
-        .hero-section { background: linear-gradient(135deg, #1e293b, #0f172a); color: white; padding: 40px 20px 60px 20px; text-align: center; border-radius: 0 0 30px 30px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); position: relative; }
-        .hero-title { margin: 0 0 5px 0; font-size: 28px; font-weight: 900; letter-spacing: -0.5px; background: linear-gradient(90deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .hero-subtitle { margin: 0; font-size: 13px; color: #cbd5e1; font-weight: 500; }
+        /* 🚀 HERO SECTION (A/V PALETTE: NAVY & ORANGE) */
+        .hero-section {
+            background: #0f172a; /* Navy Blue AV */
+            background-image: radial-gradient(circle at 100% 0%, #1e293b 0%, transparent 50%), radial-gradient(circle at 0% 100%, #f97316 0%, transparent 40%);
+            color: white; 
+            padding: 40px 20px 70px 20px; 
+            text-align: center; 
+            border-radius: 0 0 40px 40px; 
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.3); 
+            position: relative;
+        }
+        
+        .hero-title { margin: 0 0 5px 0; font-size: 32px; font-weight: 900; letter-spacing: -1px; color: #f8fafc; }
+        .hero-title span { color: #f97316; /* Orange AV */ }
+        .hero-subtitle { margin: 0; font-size: 14px; opacity: 0.9; font-weight: 700; color: #cbd5e1; }
 
         .dashboard-container { max-width: 1000px; margin: 0 auto; padding: 0 20px 40px 20px; }
+
+        /* 👋 FUN GREETING */
+        .greeting-box { text-align: center; margin-top: -30px; margin-bottom: 20px; position: relative; z-index: 10; }
+        .greeting-box h2 { font-size: 22px; font-weight: 900; color: #f97316; margin: 0 0 5px 0; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .greeting-box p { font-size: 13px; font-weight: 700; color: #f8fafc; margin: 0; background: #1e293b; display: inline-block; padding: 6px 15px; border-radius: 20px; border: 2px solid #334155; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         
-        /* ⚡ AKSES CEPAT (MUNCUL DULUAN, CHUNKY BUTTONS) */
-        .quick-access-wrapper { margin-top: -35px; position: relative; z-index: 10; margin-bottom: 30px; }
+        /* ⚡ AKSES CEPAT (4 TOMBOL CHUNKY & BOUNCY) */
+        .quick-access-wrapper { position: relative; z-index: 10; margin-bottom: 35px; }
         .quick-access-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; }
-        .btn-quick { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px 15px; border-radius: 20px; text-decoration: none; font-weight: 800; font-size: 13px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .btn-quick:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
-        .btn-quick:active { transform: translateY(2px); }
-        .btn-quick .icon { font-size: 32px; margin-bottom: 8px; }
         
-        .gudang-btn { background: linear-gradient(135deg, #ffffff, #f1f5f9); color: #1e293b; border: 2px solid #e2e8f0; }
-        .misi-btn { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; border: 2px solid #1d4ed8; }
+        .btn-quick { 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+            padding: 20px 10px; border-radius: 24px; text-decoration: none; font-weight: 800; font-size: 13px; 
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+            background: white; color: #0f172a;
+            border: 3px solid #e2e8f0;
+            box-shadow: 0 8px 0 #cbd5e1; /* Efek tombol 3D */
+        }
+        
+        .btn-quick:hover { transform: translateY(-3px); box-shadow: 0 11px 0 #cbd5e1; border-color: #cbd5e1; }
+        .btn-quick:active { transform: translateY(5px); box-shadow: 0 3px 0 #cbd5e1; }
+        
+        .btn-quick .icon { font-size: 38px; margin-bottom: 10px; transition: 0.3s; }
+        .btn-quick:hover .icon { transform: scale(1.15) rotate(5deg); }
+
+        /* Highlight khusus untuk tombol Misi (Warna Orange AV) */
+        .btn-quick.misi-btn { background: #f97316; color: white; border-color: #ea580c; box-shadow: 0 8px 0 #c2410c; }
+        .btn-quick.misi-btn:hover { border-color: #c2410c; box-shadow: 0 11px 0 #c2410c; background: #f97316; }
+        .btn-quick.misi-btn:active { box-shadow: 0 3px 0 #c2410c; }
 
         /* 📡 LOADING STATE */
-        #loadingDash { text-align: center; padding: 30px; font-weight: bold; color: #64748b; font-size: 13px; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; transform: scale(1.05); } 100% { opacity: 0.5; } }
+        #loadingDash { text-align: center; padding: 40px; font-weight: 800; color: #64748b; font-size: 14px; animation: bounce 1.5s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
         .hidden { display: none !important; }
 
-        /* 📊 STATISTIK GUDANG (GRID) */
-        .section-title { font-size: 16px; font-weight: 900; color: #1e293b; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
-        .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; margin-bottom: 30px; }
-        .stat-card { background: white; padding: 20px 15px; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; flex-direction: column; align-items: center; text-align: center; transition: 0.3s; }
-        .stat-icon { font-size: 26px; margin-bottom: 8px; }
-        .stat-value { font-size: 26px; font-weight: 900; color: #1e293b; line-height: 1; margin-bottom: 5px; }
-        .stat-label { font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+        /* 📊 STATISTIK GUDANG (PILL SHAPE) */
+        .section-title { font-size: 18px; font-weight: 900; color: #0f172a; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px;}
+        .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; margin-bottom: 40px; }
+        
+        .stat-card { 
+            background: white; padding: 25px 15px; border-radius: 30px; 
+            border: 2px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.03); 
+            display: flex; flex-direction: column; align-items: center; text-align: center; transition: 0.3s; 
+            position: relative; overflow: hidden;
+        }
+        .stat-card:hover { transform: translateY(-5px); border-color: #cbd5e1; box-shadow: 0 10px 20px rgba(0,0,0,0.06); }
+        
+        .stat-icon { font-size: 32px; margin-bottom: 12px; z-index: 2; }
+        .stat-value { font-size: 32px; font-weight: 900; color: #0f172a; line-height: 1; margin-bottom: 8px; z-index: 2; }
+        .stat-label { font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; z-index: 2; }
+        
+        .stat-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 8px; transition: 0.3s; }
+        .stat-card.blue::after { background: #3b82f6; }
+        .stat-card.orange::after { background: #f97316; }
+        .stat-card.green::after { background: #10b981; }
+        .stat-card.red::after { background: #ef4444; }
+        .stat-card:hover::after { height: 100%; opacity: 0.05; }
 
         /* 🎯 PROGRESS MISI PER TIM */
-        .team-progress-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; }
-        .progress-box { background: white; padding: 18px; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.02); transition: 0.3s; }
-        .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .progress-title { font-weight: 800; font-size: 13px; margin: 0; display: flex; align-items: center; gap: 6px; }
-        .dash-txt { font-weight: 900; font-size: 12px; padding: 4px 10px; border-radius: 20px; }
+        .team-progress-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .progress-box { background: white; padding: 22px; border-radius: 24px; border: 2px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.03); transition: 0.3s; }
+        .progress-box:hover { border-color: #cbd5e1; transform: scale(1.02); box-shadow: 0 10px 25px rgba(0,0,0,0.06); }
         
-        .progress-bar-bg { width: 100%; height: 10px; background: #f1f5f9; border-radius: 20px; overflow: hidden; }
-        .progress-bar-fill { height: 100%; width: 0%; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 20px; }
+        .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .progress-title { font-weight: 900; font-size: 15px; color: #0f172a; margin: 0; display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px;}
+        .dash-txt { font-weight: 900; font-size: 12px; padding: 6px 12px; border-radius: 20px; }
+        
+        .progress-bar-bg { width: 100%; height: 14px; background: #f1f5f9; border-radius: 20px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);}
+        .progress-bar-fill { height: 100%; width: 0%; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 20px; position: relative;}
+        
+        .progress-bar-fill::after {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
+            animation: shimmer 2s infinite;
+        }
+        @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
 
-        /* Warna Custom Tiap Tim */
-        .team-speaker .progress-title { color: #3b82f6; }
-        .team-speaker .dash-txt { background: #eff6ff; color: #2563eb; }
+        .team-speaker .progress-title { color: #2563eb; }
+        .team-speaker .dash-txt { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
         .team-speaker .progress-bar-fill { background: linear-gradient(90deg, #60a5fa, #3b82f6); }
 
-        .team-kabel .progress-title { color: #8b5cf6; }
-        .team-kabel .dash-txt { background: #f5f3ff; color: #7c3aed; }
+        .team-kabel .progress-title { color: #7c3aed; }
+        .team-kabel .dash-txt { background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe; }
         .team-kabel .progress-bar-fill { background: linear-gradient(90deg, #a78bfa, #8b5cf6); }
 
-        .team-booth .progress-title { color: #ec4899; }
-        .team-booth .dash-txt { background: #fdf2f8; color: #db2777; }
+        .team-booth .progress-title { color: #db2777; }
+        .team-booth .dash-txt { background: #fdf2f8; color: #db2777; border: 1px solid #fbcfe8; }
         .team-booth .progress-bar-fill { background: linear-gradient(90deg, #f472b6, #ec4899); }
 
-        .team-inventaris .progress-title { color: #f59e0b; }
-        .team-inventaris .dash-txt { background: #fffbeb; color: #d97706; }
-        .team-inventaris .progress-bar-fill { background: linear-gradient(90deg, #fbbf24, #f59e0b); }
+        .team-inventaris .progress-title { color: #f97316; }
+        .team-inventaris .dash-txt { background: #fff7ed; color: #ea580c; border: 1px solid #fed7aa; }
+        .team-inventaris .progress-bar-fill { background: linear-gradient(90deg, #fbbf24, #f97316); }
 
-        /* 🌙 DARK MODE SAKTI (GEN-Z VIBES) */
-        body.dark-mode, [data-theme="dark"] { background-color: #0f172a; color: #e2e8f0; }
-        body.dark-mode .hero-section { background: linear-gradient(135deg, #020617, #0f172a); border-bottom: 1px solid #1e293b; box-shadow: none; }
-        body.dark-mode .gudang-btn { background: linear-gradient(135deg, #1e293b, #334155); color: #f8fafc; border-color: #475569; }
-        body.dark-mode .misi-btn { border-color: #3b82f6; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); }
+        /* 🌙 DARK MODE SAKTI (NAVY & ORANGE NEON) */
+        body.dark-mode, [data-theme="dark"] { background-color: #020617; color: #e2e8f0; }
+        
+        body.dark-mode .hero-section { background: #0f172a; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        body.dark-mode .greeting-box p { background: #020617; border-color: #1e293b; color: #cbd5e1; }
+        
+        /* Dark Mode: Tombol Chunky */
+        body.dark-mode .btn-quick { background: #1e293b; color: #f8fafc; border-color: #334155; box-shadow: 0 8px 0 #0f172a; }
+        body.dark-mode .btn-quick:hover { border-color: #475569; background: #273549; box-shadow: 0 11px 0 #0f172a; }
+        body.dark-mode .btn-quick:active { box-shadow: 0 3px 0 #0f172a; }
+        
+        body.dark-mode .btn-quick.misi-btn { background: #ea580c; color: white; border-color: #c2410c; box-shadow: 0 8px 0 #7c2d12; }
+        body.dark-mode .btn-quick.misi-btn:hover { background: #f97316; border-color: #ea580c; box-shadow: 0 11px 0 #7c2d12; }
+        body.dark-mode .btn-quick.misi-btn:active { box-shadow: 0 3px 0 #7c2d12; }
         
         body.dark-mode .section-title { color: #f8fafc; }
-        body.dark-mode .stat-card, body.dark-mode .progress-box { background: #1e293b; border-color: #334155; }
+        
+        body.dark-mode .stat-card, body.dark-mode .progress-box { background: #0f172a; border-color: #1e293b; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        body.dark-mode .stat-card:hover, body.dark-mode .progress-box:hover { border-color: #334155; background: #1e293b; }
+        
         body.dark-mode .stat-value { color: #f8fafc; }
         body.dark-mode .stat-label { color: #94a3b8; }
-        body.dark-mode .progress-bar-bg { background: #0f172a; border: 1px solid #334155; }
+        body.dark-mode .progress-bar-bg { background: #020617; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); }
 
-        body.dark-mode .team-speaker .dash-txt { background: #1e3a8a; color: #93c5fd; }
-        body.dark-mode .team-kabel .dash-txt { background: #4c1d95; color: #c4b5fd; }
-        body.dark-mode .team-booth .dash-txt { background: #831843; color: #fbcfe8; }
-        body.dark-mode .team-inventaris .dash-txt { background: #78350f; color: #fde68a; }
+        body.dark-mode .team-speaker .progress-title { color: #60a5fa; }
+        body.dark-mode .team-speaker .dash-txt { background: rgba(59, 130, 246, 0.1); color: #93c5fd; border-color: rgba(59, 130, 246, 0.2); }
+        
+        body.dark-mode .team-kabel .progress-title { color: #a78bfa; }
+        body.dark-mode .team-kabel .dash-txt { background: rgba(139, 92, 246, 0.1); color: #c4b5fd; border-color: rgba(139, 92, 246, 0.2); }
+        
+        body.dark-mode .team-booth .progress-title { color: #f472b6; }
+        body.dark-mode .team-booth .dash-txt { background: rgba(236, 72, 153, 0.1); color: #fbcfe8; border-color: rgba(236, 72, 153, 0.2); }
+        
+        body.dark-mode .team-inventaris .progress-title { color: #fbbf24; }
+        body.dark-mode .team-inventaris .dash-txt { background: rgba(245, 158, 11, 0.1); color: #fde68a; border-color: rgba(245, 158, 11, 0.2); }
     </style>
 </head>
 <body>
     {% include navbar.html %}
 
     <div class="hero-section">
-        <h1 class="hero-title">A/V COMMAND CENTER</h1>
+        <h1 class="hero-title">A/V <span>COMMAND CENTER</span></h1>
         <p class="hero-subtitle">Sistem Pemantauan Logistik & Misi Lapangan</p>
     </div>
 
     <div class="dashboard-container">
         
-        <!-- ⚡ AKSES CEPAT (ALWAYS ON) -->
+        <!-- 👋 GREETING FUN -->
+        <div class="greeting-box">
+            <h2>Haii Tim A/V! 👋</h2>
+            <p>Pusat komando siap. Klik button yang kamu mau yaaa~ 🚀</p>
+        </div>
+
+        <!-- ⚡ AKSES CEPAT (4 TOMBOL CHUNKY) -->
         <div class="quick-access-wrapper">
             <div class="quick-access-grid">
-                <a href="{{ site.baseurl }}/inventaris/" class="btn-quick gudang-btn">
+                <a href="{{ site.baseurl }}/inventaris/" class="btn-quick">
                     <span class="icon">🏢</span>
                     <span class="text">Gudang Inventaris</span>
                 </a>
@@ -106,39 +185,51 @@ location: "HOME"
                     <span class="icon">🎯</span>
                     <span class="text">Mission Control</span>
                 </a>
+                <a href="{{ site.baseurl }}/apendiks/" class="btn-quick">
+                    <span class="icon">🗺️</span>
+                    <span class="text">Apendiks & Denah</span>
+                </a>
+                <a href="{{ site.baseurl }}/ja-01/" class="btn-quick">
+                    <span class="icon">👥</span>
+                    <span class="text">Struktur Personil</span>
+                </a>
             </div>
         </div>
 
-        <div id="loadingDash">Membaca Data Satelit... 🛰️</div>
+        <!-- 📡 ANIMASI BOUNCING KETIKA LOAD -->
+        <div id="loadingDash">
+            <div style="font-size:24px; margin-bottom:10px;">🛰️</div>
+            Mengsinkronisasi Data Satelit...
+        </div>
 
         <!-- 📊 DATA DASHBOARD (MUNCUL SETELAH LOADING) -->
         <div id="dashContent" class="hidden">
             
-            <h2 class="section-title">📦 Status Logistik</h2>
+            <h2 class="section-title">📦 Status Logistik Gudang</h2>
             <div class="grid-stats">
-                <div class="stat-card" style="border-bottom: 4px solid #3b82f6;">
+                <div class="stat-card blue">
                     <div class="stat-icon">🗂️</div>
                     <div class="stat-value" id="dash-total">0</div>
                     <div class="stat-label">Alat Terdata</div>
                 </div>
-                <div class="stat-card" style="border-bottom: 4px solid #f59e0b;">
+                <div class="stat-card orange">
                     <div class="stat-icon">🛒</div>
                     <div class="stat-value" id="dash-packing">0</div>
                     <div class="stat-label">Akan Dibawa</div>
                 </div>
-                <div class="stat-card" style="border-bottom: 4px solid #10b981;">
+                <div class="stat-card green">
                     <div class="stat-icon">📍</div>
                     <div class="stat-value" id="dash-event">0</div>
                     <div class="stat-label">Di Lokasi Event</div>
                 </div>
-                <div class="stat-card" style="border-bottom: 4px solid #ef4444;">
+                <div class="stat-card red">
                     <div class="stat-icon">🛠️</div>
                     <div class="stat-value" id="dash-rusak">0</div>
                     <div class="stat-label">Perbaikan</div>
                 </div>
             </div>
 
-            <h2 class="section-title" style="margin-top: 40px;">🎯 Progress Misi Per-Divisi</h2>
+            <h2 class="section-title" style="margin-top: 40px;">🎯 Progress Misi Lapangan</h2>
             <div class="team-progress-grid">
                 
                 <!-- TIM SPEAKER -->
@@ -227,7 +318,7 @@ location: "HOME"
                 document.getElementById('dashContent').classList.remove('hidden');
 
             } catch(e) {
-                document.getElementById('loadingDash').innerHTML = `<span style="color:#ef4444; background:#fef2f2; padding:8px 15px; border-radius:10px;">⚠️ Koneksi Satelit Terputus. Gagal memuat data.</span>`;
+                document.getElementById('loadingDash').innerHTML = `<span style="color:#ef4444; background:#fef2f2; padding:10px 20px; border-radius:15px; border: 2px solid #fca5a5;">⚠️ Koneksi Satelit Terputus. Gagal memuat data.</span>`;
             }
         };
     </script>

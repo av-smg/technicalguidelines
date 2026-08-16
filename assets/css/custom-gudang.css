@@ -36,24 +36,28 @@
 .pill-btn[data-filter="Di Gudang"].active { 
     background: #10b981 !important; 
     border-color: #10b981 !important; 
+    color: white !important;
 }
 
 /* KHUSUS: Sedang Dipakai -> BIRU */
 .pill-btn[data-filter="Sedang Dipakai"].active { 
     background: #3b82f6 !important; 
     border-color: #3b82f6 !important; 
+    color: white !important;
 }
 
 /* KHUSUS: Perbaikan / Rusak -> MERAH */
 .pill-btn[data-filter="Rusak"].active { 
     background: #ef4444 !important; 
     border-color: #ef4444 !important; 
+    color: white !important; /* MENCEGAH TULISAN HILANG */
 }
 
-/* KHUSUS: Di Lokasi Event -> KUNING/AMBER (Beda dengan Akan Dibawa) */
+/* KHUSUS: Di Lokasi Event -> KUNING/AMBER */
 .pill-btn[data-filter="Di Lokasi Event"].active { 
     background: #f59e0b !important; 
     border-color: #f59e0b !important; 
+    color: white !important; /* MENCEGAH TULISAN HILANG */
 }
 
 /* CARDS 2 KOLOM SHOPEE (Untuk HP) */

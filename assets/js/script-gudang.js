@@ -415,3 +415,50 @@ function closeScannerModal() {
     if (html5QrCode) { html5QrCode.stop().catch(e=>console.log(e)); html5QrCode = null; } 
     const m = document.getElementById("tempScannerModal"); if(m) m.remove(); 
 }
+/* ==========================================
+   TAMBAHAN JS: LOGIKA FILTER LANJUTAN
+   ========================================== */
+const btnBukaFilter = document.getElementById('btnBukaFilter');
+const panelFilter = document.getElementById('panelFilterLanjutan');
+const semuaCekbox = document.querySelectorAll('.cek-tim, .cek-status');
+
+// Fungsi buka/tutup laci filter
+btnBukaFilter.addEventListener('click', () => {
+    if (panelFilter.style.display === 'none') {
+        panelFilter.style.display = 'block';
+        btnBukaFilter.innerHTML = '❌ TUTUP FILTER';
+        btnBukaFilter.style.background = '#ef4444';
+    } else {
+        panelFilter.style.display = 'none';
+        btnBukaFilter.innerHTML = '⚙️ FILTER LANJUTAN';
+        btnBukaFilter.style.background = '#334155';
+    }
+});
+
+// Fungsi memproses centang
+semuaCekbox.forEach(cek => {
+    cek.addEventListener('change', () => {
+        // Ambil nilai yang dicentang
+        const timAktif = Array.from(document.querySelectorAll('.cek-tim:checked')).map(cb => cb.value);
+        const statusAktif = Array.from(document.querySelectorAll('.cek-status:checked')).map(cb => cb.value);
+        
+        // Ambil semua kartu barang
+        const semuaKartu = document.querySelectorAll('.mission-card'); // Sesuaikan class jika beda
+        
+        semuaKartu.forEach(kartu => {
+            const timKartu = kartu.getAttribute('data-team') || "";
+            const statusKartu = kartu.getAttribute('data-status') || "";
+            
+            // Cek apakah kartu cocok dengan filter
+            const cocokTim = timAktif.length === 0 || timAktif.includes(timKartu);
+            const cocokStatus = statusAktif.length === 0 || statusAktif.includes(statusKartu);
+            
+            // Tampilkan atau sembunyikan
+            if (cocokTim && cocokStatus) {
+                kartu.parentElement.style.display = 'block'; // Asumsi kartu ada di dalam div wrapper
+            } else {
+                kartu.parentElement.style.display = 'none';
+            }
+        });
+    });
+});

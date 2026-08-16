@@ -9,46 +9,80 @@ location: "HOME"
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f8fafc; transition: 0.3s; margin: 0; padding: 0; }
         
-        .hero-section { background: linear-gradient(135deg, #1e293b, #0f172a); color: white; padding: 40px 20px; text-align: center; border-radius: 0 0 20px 20px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .hero-title { margin: 0 0 10px 0; font-size: 24px; font-weight: 900; }
-        .hero-subtitle { margin: 0; font-size: 13px; color: #cbd5e1; }
+        /* 🚀 HERO SECTION (FUN & MODERN) */
+        .hero-section { background: linear-gradient(135deg, #1e293b, #0f172a); color: white; padding: 40px 20px 60px 20px; text-align: center; border-radius: 0 0 30px 30px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); position: relative; }
+        .hero-title { margin: 0 0 5px 0; font-size: 28px; font-weight: 900; letter-spacing: -0.5px; background: linear-gradient(90deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero-subtitle { margin: 0; font-size: 13px; color: #cbd5e1; font-weight: 500; }
 
         .dashboard-container { max-width: 1000px; margin: 0 auto; padding: 0 20px 40px 20px; }
-        .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px; }
         
-        .stat-card { background: white; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; flex-direction: column; align-items: center; text-align: center; transition: 0.3s; }
-        .stat-card.blue { border-bottom: 4px solid #3b82f6; }
-        .stat-card.orange { border-bottom: 4px solid #f59e0b; }
-        .stat-card.green { border-bottom: 4px solid #10b981; }
-        .stat-card.red { border-bottom: 4px solid #ef4444; }
+        /* ⚡ AKSES CEPAT (MUNCUL DULUAN, CHUNKY BUTTONS) */
+        .quick-access-wrapper { margin-top: -35px; position: relative; z-index: 10; margin-bottom: 30px; }
+        .quick-access-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; }
+        .btn-quick { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px 15px; border-radius: 20px; text-decoration: none; font-weight: 800; font-size: 13px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .btn-quick:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
+        .btn-quick:active { transform: translateY(2px); }
+        .btn-quick .icon { font-size: 32px; margin-bottom: 8px; }
         
-        .stat-icon { font-size: 28px; margin-bottom: 10px; }
-        .stat-value { font-size: 28px; font-weight: 900; color: #1e293b; line-height: 1; margin-bottom: 5px; }
-        .stat-label { font-size: 11px; font-weight: bold; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+        .gudang-btn { background: linear-gradient(135deg, #ffffff, #f1f5f9); color: #1e293b; border: 2px solid #e2e8f0; }
+        .misi-btn { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; border: 2px solid #1d4ed8; }
 
-        .progress-box { background: white; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.02); margin-bottom: 20px; transition: 0.3s;}
-        .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .progress-title { font-weight: 900; font-size: 14px; color: #1e293b; margin: 0; }
-        .progress-bar-bg { width: 100%; height: 12px; background: #e2e8f0; border-radius: 20px; overflow: hidden; }
-        .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #3b82f6, #10b981); width: 0%; transition: width 1s ease-in-out; }
-
-        .btn-action { display: block; width: 100%; padding: 15px; background: #1e293b; color: white; text-align: center; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 14px; margin-bottom: 10px; transition: 0.2s; }
-        .btn-action:hover { background: #334155; }
-        .btn-action.secondary { background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; }
-        .btn-action.secondary:hover { background: #e2e8f0; }
-
-        #loadingDash { text-align: center; padding: 50px; font-weight: bold; color: #64748b; font-size: 12px; }
+        /* 📡 LOADING STATE */
+        #loadingDash { text-align: center; padding: 30px; font-weight: bold; color: #64748b; font-size: 13px; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; transform: scale(1.05); } 100% { opacity: 0.5; } }
         .hidden { display: none !important; }
 
-        /* 🌙 SUNTIKAN DARK MODE */
+        /* 📊 STATISTIK GUDANG (GRID) */
+        .section-title { font-size: 16px; font-weight: 900; color: #1e293b; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .stat-card { background: white; padding: 20px 15px; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; flex-direction: column; align-items: center; text-align: center; transition: 0.3s; }
+        .stat-icon { font-size: 26px; margin-bottom: 8px; }
+        .stat-value { font-size: 26px; font-weight: 900; color: #1e293b; line-height: 1; margin-bottom: 5px; }
+        .stat-label { font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* 🎯 PROGRESS MISI PER TIM */
+        .team-progress-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; }
+        .progress-box { background: white; padding: 18px; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.02); transition: 0.3s; }
+        .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .progress-title { font-weight: 800; font-size: 13px; margin: 0; display: flex; align-items: center; gap: 6px; }
+        .dash-txt { font-weight: 900; font-size: 12px; padding: 4px 10px; border-radius: 20px; }
+        
+        .progress-bar-bg { width: 100%; height: 10px; background: #f1f5f9; border-radius: 20px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; width: 0%; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 20px; }
+
+        /* Warna Custom Tiap Tim */
+        .team-speaker .progress-title { color: #3b82f6; }
+        .team-speaker .dash-txt { background: #eff6ff; color: #2563eb; }
+        .team-speaker .progress-bar-fill { background: linear-gradient(90deg, #60a5fa, #3b82f6); }
+
+        .team-kabel .progress-title { color: #8b5cf6; }
+        .team-kabel .dash-txt { background: #f5f3ff; color: #7c3aed; }
+        .team-kabel .progress-bar-fill { background: linear-gradient(90deg, #a78bfa, #8b5cf6); }
+
+        .team-booth .progress-title { color: #ec4899; }
+        .team-booth .dash-txt { background: #fdf2f8; color: #db2777; }
+        .team-booth .progress-bar-fill { background: linear-gradient(90deg, #f472b6, #ec4899); }
+
+        .team-inventaris .progress-title { color: #f59e0b; }
+        .team-inventaris .dash-txt { background: #fffbeb; color: #d97706; }
+        .team-inventaris .progress-bar-fill { background: linear-gradient(90deg, #fbbf24, #f59e0b); }
+
+        /* 🌙 DARK MODE SAKTI (GEN-Z VIBES) */
         body.dark-mode, [data-theme="dark"] { background-color: #0f172a; color: #e2e8f0; }
-        body.dark-mode .hero-section { background: linear-gradient(135deg, #020617, #0f172a); border-bottom: 1px solid #1e293b; }
+        body.dark-mode .hero-section { background: linear-gradient(135deg, #020617, #0f172a); border-bottom: 1px solid #1e293b; box-shadow: none; }
+        body.dark-mode .gudang-btn { background: linear-gradient(135deg, #1e293b, #334155); color: #f8fafc; border-color: #475569; }
+        body.dark-mode .misi-btn { border-color: #3b82f6; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); }
+        
+        body.dark-mode .section-title { color: #f8fafc; }
         body.dark-mode .stat-card, body.dark-mode .progress-box { background: #1e293b; border-color: #334155; }
-        body.dark-mode .stat-value, body.dark-mode .progress-title { color: #f8fafc; }
+        body.dark-mode .stat-value { color: #f8fafc; }
         body.dark-mode .stat-label { color: #94a3b8; }
-        body.dark-mode .progress-bar-bg { background: #334155; }
-        body.dark-mode .btn-action.secondary { background: #334155; color: #e2e8f0; border-color: #475569; }
-        body.dark-mode .btn-action.secondary:hover { background: #475569; }
+        body.dark-mode .progress-bar-bg { background: #0f172a; border: 1px solid #334155; }
+
+        body.dark-mode .team-speaker .dash-txt { background: #1e3a8a; color: #93c5fd; }
+        body.dark-mode .team-kabel .dash-txt { background: #4c1d95; color: #c4b5fd; }
+        body.dark-mode .team-booth .dash-txt { background: #831843; color: #fbcfe8; }
+        body.dark-mode .team-inventaris .dash-txt { background: #78350f; color: #fde68a; }
     </style>
 </head>
 <body>
@@ -59,50 +93,93 @@ location: "HOME"
         <p class="hero-subtitle">Sistem Pemantauan Logistik & Misi Lapangan</p>
     </div>
 
-    <div id="loadingDash">Membaca Data Satelit... 🛰️</div>
-
-    <div class="dashboard-container hidden" id="dashContent">
+    <div class="dashboard-container">
         
-        <div class="progress-box">
-            <div class="progress-header">
-                <h3 class="progress-title">🎯 PROGRESS MISI LAPANGAN</h3>
-                <span id="dash-misi-text" style="font-weight:bold; font-size:14px; color:#3b82f6;">0/0</span>
-            </div>
-            <div class="progress-bar-bg">
-                <div class="progress-bar-fill" id="dash-misi-bar"></div>
+        <!-- ⚡ AKSES CEPAT (ALWAYS ON) -->
+        <div class="quick-access-wrapper">
+            <div class="quick-access-grid">
+                <a href="{{ site.baseurl }}/inventaris/" class="btn-quick gudang-btn">
+                    <span class="icon">🏢</span>
+                    <span class="text">Gudang Inventaris</span>
+                </a>
+                <a href="{{ site.baseurl }}/misi/" class="btn-quick misi-btn">
+                    <span class="icon">🎯</span>
+                    <span class="text">Mission Control</span>
+                </a>
             </div>
         </div>
 
-        <div class="grid-stats">
-            <div class="stat-card blue">
-                <div class="stat-icon">📦</div>
-                <div class="stat-value" id="dash-total">0</div>
-                <div class="stat-label">Total Alat Terdata</div>
-            </div>
+        <div id="loadingDash">Membaca Data Satelit... 🛰️</div>
+
+        <!-- 📊 DATA DASHBOARD (MUNCUL SETELAH LOADING) -->
+        <div id="dashContent" class="hidden">
             
-            <div class="stat-card orange">
-                <div class="stat-icon">🛒</div>
-                <div class="stat-value" id="dash-packing">0</div>
-                <div class="stat-label">Akan Dibawa (Packing)</div>
+            <h2 class="section-title">📦 Status Logistik</h2>
+            <div class="grid-stats">
+                <div class="stat-card" style="border-bottom: 4px solid #3b82f6;">
+                    <div class="stat-icon">🗂️</div>
+                    <div class="stat-value" id="dash-total">0</div>
+                    <div class="stat-label">Alat Terdata</div>
+                </div>
+                <div class="stat-card" style="border-bottom: 4px solid #f59e0b;">
+                    <div class="stat-icon">🛒</div>
+                    <div class="stat-value" id="dash-packing">0</div>
+                    <div class="stat-label">Akan Dibawa</div>
+                </div>
+                <div class="stat-card" style="border-bottom: 4px solid #10b981;">
+                    <div class="stat-icon">📍</div>
+                    <div class="stat-value" id="dash-event">0</div>
+                    <div class="stat-label">Di Lokasi Event</div>
+                </div>
+                <div class="stat-card" style="border-bottom: 4px solid #ef4444;">
+                    <div class="stat-icon">🛠️</div>
+                    <div class="stat-value" id="dash-rusak">0</div>
+                    <div class="stat-label">Perbaikan</div>
+                </div>
             </div>
 
-            <div class="stat-card green">
-                <div class="stat-icon">📍</div>
-                <div class="stat-value" id="dash-event">0</div>
-                <div class="stat-label">Sedang di Lokasi</div>
-            </div>
+            <h2 class="section-title" style="margin-top: 40px;">🎯 Progress Misi Per-Divisi</h2>
+            <div class="team-progress-grid">
+                
+                <!-- TIM SPEAKER -->
+                <div class="progress-box team-speaker">
+                    <div class="progress-header">
+                        <h3 class="progress-title">🔊 Tim Speaker</h3>
+                        <span id="dash-txt-speaker" class="dash-txt">0/0 (0%)</span>
+                    </div>
+                    <div class="progress-bar-bg"><div class="progress-bar-fill" id="dash-bar-speaker"></div></div>
+                </div>
 
-            <div class="stat-card red">
-                <div class="stat-icon">🛠️</div>
-                <div class="stat-value" id="dash-rusak">0</div>
-                <div class="stat-label">Rusak / Perbaikan</div>
+                <!-- TIM KABEL -->
+                <div class="progress-box team-kabel">
+                    <div class="progress-header">
+                        <h3 class="progress-title">🔌 Tim Kabel</h3>
+                        <span id="dash-txt-kabel" class="dash-txt">0/0 (0%)</span>
+                    </div>
+                    <div class="progress-bar-bg"><div class="progress-bar-fill" id="dash-bar-kabel"></div></div>
+                </div>
+
+                <!-- TIM BOOTH -->
+                <div class="progress-box team-booth">
+                    <div class="progress-header">
+                        <h3 class="progress-title">🎛️ Tim Booth</h3>
+                        <span id="dash-txt-booth" class="dash-txt">0/0 (0%)</span>
+                    </div>
+                    <div class="progress-bar-bg"><div class="progress-bar-fill" id="dash-bar-booth"></div></div>
+                </div>
+
+                <!-- TIM INVENTARIS -->
+                <div class="progress-box team-inventaris">
+                    <div class="progress-header">
+                        <h3 class="progress-title">🗂️ Tim Inventaris</h3>
+                        <span id="dash-txt-inventaris" class="dash-txt">0/0 (0%)</span>
+                    </div>
+                    <div class="progress-bar-bg"><div class="progress-bar-fill" id="dash-bar-inventaris"></div></div>
+                </div>
+
             </div>
         </div>
 
-        <h3 style="font-size:14px; color:#64748b; margin-bottom:10px; border-bottom:1px solid #cbd5e1; padding-bottom:5px;">Akses Cepat:</h3>
-        <a href="{{ site.baseurl }}/inventaris/" class="btn-action">🏢 Buka Gudang Inventaris</a>
-        <a href="{{ site.baseurl }}/misi/" class="btn-action secondary">🎯 Buka Mission Control</a>
-        
     </div>
 
     <script>
@@ -122,30 +199,35 @@ location: "HOME"
                 let rusak = inventory.filter(i => (i.kondisi || "").toLowerCase() === 'rusak' || (i.kondisi || "").toLowerCase() === 'periksa' || (i.status_digunakan || "").toLowerCase().includes('servis')).length;
                 let packing = inventory.filter(i => i.status_digunakan === 'Akan Dibawa').length;
 
-                // KALKULASI MISI
-                let totalMisi = missions.length;
-                let misiSelesai = missions.filter(m => (m.status_misi || "").toLowerCase() === 'selesai').length;
-                let progress = totalMisi === 0 ? 0 : Math.round((misiSelesai / totalMisi) * 100);
-
-                // INJEKSI KE HTML
+                // UPDATE UI GUDANG
                 document.getElementById('dash-total').innerText = totalAlat;
                 document.getElementById('dash-event').innerText = diEvent;
                 document.getElementById('dash-rusak').innerText = rusak;
                 document.getElementById('dash-packing').innerText = packing;
                 
-                document.getElementById('dash-misi-text').innerText = `${misiSelesai} dari ${totalMisi} Selesai (${progress}%)`;
+                // KALKULASI & UPDATE UI MISI PER TIM
+                const teams = ['speaker', 'kabel', 'booth', 'inventaris'];
                 
-                // Animasi Loading selesai
+                teams.forEach(team => {
+                    let teamMissions = missions.filter(m => String(m.tim || "").toLowerCase().includes(team));
+                    let total = teamMissions.length;
+                    let selesai = teamMissions.filter(m => String(m.status_misi || "").toLowerCase() === 'selesai').length;
+                    let prog = total === 0 ? 0 : Math.round((selesai / total) * 100);
+
+                    document.getElementById(`dash-txt-${team}`).innerText = `${selesai}/${total} (${prog}%)`;
+                    
+                    // Delay render bar for smooth animation
+                    setTimeout(() => {
+                        document.getElementById(`dash-bar-${team}`).style.width = `${prog}%`;
+                    }, 150);
+                });
+
+                // Tampilkan Data & Sembunyikan Loading
                 document.getElementById('loadingDash').classList.add('hidden');
                 document.getElementById('dashContent').classList.remove('hidden');
-                
-                // Delay sedikit untuk animasi Bar
-                setTimeout(() => {
-                    document.getElementById('dash-misi-bar').style.width = `${progress}%`;
-                }, 100);
 
             } catch(e) {
-                document.getElementById('loadingDash').innerHTML = `<span style="color:red;">Koneksi Satelit Terputus. Gagal memuat data.</span>`;
+                document.getElementById('loadingDash').innerHTML = `<span style="color:#ef4444; background:#fef2f2; padding:8px 15px; border-radius:10px;">⚠️ Koneksi Satelit Terputus. Gagal memuat data.</span>`;
             }
         };
     </script>

@@ -1,5 +1,5 @@
 // ==========================================
-// MESIN LOGIKA MISSION CONTROL (V.16.2 - UPDATE LABEL KEBUTUHAN PANJANG)
+// MESIN LOGIKA MISSION CONTROL (V.16.3 - DARK MODE READY & PRIORITAS)
 // ==========================================
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec"; 
@@ -115,13 +115,13 @@ function renderMissions() {
     let persentase = Math.round((selesaiMisi / totalMisi) * 100);
     let teamLower = activeTeam.toLowerCase();
 
-    // BANNER CONTACT PERSON
+    // 1. BANNER CONTACT PERSON
     let rosterHtml = "";
     let foundTeamKey = Object.keys(teamRoster).find(k => teamLower.includes(k));
     if (foundTeamKey) {
         let cp = teamRoster[foundTeamKey];
         rosterHtml = `
-        <div style="background:#eff6ff; border:1px solid #bfdbfe; color:#1e3a8a; padding:6px 10px; border-radius:6px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; grid-column: 1 / -1;">
+        <div style="background:#eff6ff; border:1px solid #bfdbfe; color:#1e3a8a; padding:6px 10px; border-radius:6px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; grid-column: 1 / -1;">
             <div>
                 <div style="font-size:8px; font-weight:bold; color:#3b82f6; margin-bottom:2px;">📞 CONTACT PERSON</div>
                 <div style="font-size:10px;"><b>👑 Kapten:</b> ${cp.kapten} &nbsp; <b>🛠️ Asisten:</b> ${cp.asisten}</div>
@@ -130,7 +130,25 @@ function renderMissions() {
         </div>`;
     }
 
-    // BANNER APD 
+    // 2. KOTAK PRIORITAS PEMASANGAN
+    let prioritasHtml = `
+    <div class="priority-box" style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:6px; margin-bottom:8px; grid-column: 1 / -1; overflow:hidden;">
+        <div class="priority-header" onclick="this.nextElementSibling.classList.toggle('open')" style="cursor:pointer; padding:6px 10px; font-size:9px; font-weight:bold; color:#1e293b; background:#e2e8f0; display:flex; justify-content:space-between; align-items:center;">
+            <span>📋 PRIORITAS PEMASANGAN (KLIK)</span>
+            <span style="font-size:10px;">▼</span>
+        </div>
+        <div class="mission-content priority-content" style="padding:8px 10px; font-size:10px; color:#334155; line-height:1.5;">
+            <ol style="margin:0; padding-left:15px;">
+                <li><b>Area Hadirin</b> (Zona D1, D2, E, F)</li>
+                <li><b>Area Ruang Belakang Panggung</b> (Zona A)</li>
+                <li><b>Area Samping Panggung</b> (Zona B)</li>
+                <li><b>Area Ruang P3K</b> (Zona F)</li>
+                <li><b>Area Panggung</b> (Zona C)</li>
+            </ol>
+        </div>
+    </div>`;
+
+    // 3. BANNER APD 
     let apdText = "";
     if (teamLower.includes("speaker")) { apdText = "🪖 Helm | 🥾 Sepatu | 🧤 Sarung Tangan"; } 
     else if (teamLower.includes("kabel")) { apdText = "🥾 Sepatu Safety | 🧤 Sarung Tangan"; } 
@@ -138,7 +156,7 @@ function renderMissions() {
 
     let apdHtml = apdText ? `<div style="background:#fffbeb; border:1px solid #fde68a; color:#b45309; padding:5px 8px; border-radius:6px; margin-bottom:6px; font-size:9px; font-weight:bold; display:flex; align-items:center; gap:4px;"><span style="font-size:12px;">⚠️</span> <span><b>APD:</b> ${apdText}</span></div>` : '';
 
-    // PROGRESS BAR
+    // 4. PROGRESS BAR
     let progressHtml = `
     <div class="mission-progress-container" style="margin-bottom:0; padding:6px 8px;">
         <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -148,13 +166,14 @@ function renderMissions() {
         <div class="progress-bar-bg" style="margin-top:4px;"><div class="progress-bar-fill" style="width:${persentase}%;"></div></div>
     </div>`;
     
-    // STICKY HEADER
+    // STICKY HEADER GABUNGAN
     let stickyHeaderHtml = `
     <div style="position: sticky; top: 50px; z-index: 90; background: rgba(248, 250, 252, 0.95); backdrop-filter: blur(8px); padding: 4px 0 8px 0; margin-bottom: 5px; grid-column: 1 / -1; border-bottom: 2px dashed #cbd5e1;">
         ${apdHtml} ${progressHtml}
     </div>`;
 
-    container.innerHTML = rosterHtml + stickyHeaderHtml;
+    // INJECT SEMUANYA
+    container.innerHTML = rosterHtml + prioritasHtml + stickyHeaderHtml;
 
     filtered.sort((a, b) => {
         let statA = String(a.status_misi || "").toLowerCase() === 'selesai' ? 1 : -1;
@@ -207,7 +226,7 @@ function renderMissions() {
 
             // --- BUILD UI SMART TAGS ---
             let extraUI = "";
-            if (txtPanjang) extraUI += `<div style="background:#fffbeb; color:#b45309; padding:4px 8px; border-radius:6px; font-size:9px; font-weight:bold; display:inline-flex; align-items:center; margin-right:5px; margin-bottom:5px; border:1px solid #fde68a;">📏 Kebutuhan Panjang: ${txtPanjang}</div>`;
+            if (txtPanjang) extraUI += `<div class="tag-panjang" style="background:#fffbeb; color:#b45309; padding:4px 8px; border-radius:6px; font-size:9px; font-weight:bold; display:inline-flex; align-items:center; margin-right:5px; margin-bottom:5px; border:1px solid #fde68a;">📏 Kebutuhan Panjang: ${txtPanjang}</div>`;
 
             let denahHtml = "";
             if (txtDenah) {
@@ -219,7 +238,7 @@ function renderMissions() {
             }
 
             let detailHtml = (finalDetailText || extraUI || denahHtml) ? `
-                <div style="background:#f8fafc; border-left:3px solid #3b82f6; padding:8px; font-size:10px; color:#334155; margin-bottom:8px; border-radius:6px; line-height:1.4;">
+                <div class="instruction-box" style="background:#f8fafc; border-left:3px solid #3b82f6; padding:8px; font-size:10px; color:#334155; margin-bottom:8px; border-radius:6px; line-height:1.4;">
                     ${finalDetailText ? `<b style="color:#1d4ed8; font-size:9px;">📝 INSTRUKSI:</b><br>${finalDetailText}<br><div style="margin-bottom:6px;"></div>` : ''}
                     ${extraUI}
                     ${denahHtml}
@@ -250,7 +269,7 @@ function renderMissions() {
                         
                         packageHtml += `
                         <div class="box-group" style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:6px; margin-bottom:4px; overflow:hidden;">
-                            <div onclick="openItemDetail('${wadah}')" style="cursor:pointer; background:#e2e8f0; padding:4px 6px; font-size:9px; font-weight:bold; color:#0f172a; border-bottom:1px solid #cbd5e1; display:flex; justify-content:space-between; align-items:center;">
+                            <div class="box-group-header" onclick="openItemDetail('${wadah}')" style="cursor:pointer; background:#e2e8f0; padding:4px 6px; font-size:9px; font-weight:bold; color:#0f172a; border-bottom:1px solid #cbd5e1; display:flex; justify-content:space-between; align-items:center;">
                                 <div style="display:flex; align-items:center; gap:4px;">
                                     <img src="${boxThumbUrl}" style="width:20px; height:20px; object-fit:cover; border-radius:3px; border:1px solid #cbd5e1; background:white;">
                                     <span>🧰 ${boxName}</span>

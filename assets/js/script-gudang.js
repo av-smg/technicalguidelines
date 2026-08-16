@@ -1,5 +1,5 @@
 // ==========================================
-// MESIN LOGIKA GUDANG (V.32.0 - DARK MODE AUTO-INJECT)
+// MESIN LOGIKA GUDANG (V.32.1 - SURAT JALAN A4 & A-Z SORTING)
 // ==========================================
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec"; 
@@ -265,29 +265,80 @@ function openDetailModal(item) {
     document.body.insertAdjacentHTML('beforeend', modalHtml);
 }
 
+// 🖨️ FUNGSI CETAK SURAT JALAN / MANIFEST (UPDATE V.32.1 - SORT A-Z & A4 READY)
 function printSuratJalan() { 
     let bawaData = allItems.filter(i => i.status_digunakan === 'Akan Dibawa'); 
     if(bawaData.length === 0) return alert("Belum ada barang dengan status '🛒 Akan Dibawa' (Packing)."); 
     
     let eventName = bawaData[0].tujuan || "____________________"; 
     
+    // Sort Data A-Z berdasarkan Nama Barang
+    bawaData.sort((a, b) => (a.nama_barang || "").localeCompare(b.nama_barang || ""));
+    
     let grouped = {}; let lepasan = [];
-    bawaData.forEach(item => { let wadah = (item.kode_wadah || "").toUpperCase().trim(); if (wadah) { if (!grouped[wadah]) grouped[wadah] = []; grouped[wadah].push(item); } else { lepasan.push(item); } });
+    bawaData.forEach(item => { 
+        let wadah = (item.kode_wadah || "").toUpperCase().trim(); 
+        if (wadah) { 
+            if (!grouped[wadah]) grouped[wadah] = []; 
+            grouped[wadah].push(item); 
+        } else { 
+            lepasan.push(item); 
+        } 
+    });
 
     let printWin = window.open('', '', 'width=800,height=800'); 
-    let html = `<html><head><title>Manifest - ${eventName}</title><style>body { font-family: 'Arial', sans-serif; padding: 20px; color: #000; } .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; } .event-info { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 20px; } .box-group { border: 2px solid #000; border-radius: 6px; margin-bottom: 15px; page-break-inside: avoid; } .box-header { background: #f0f0f0; padding: 10px 15px; font-weight: bold; font-size: 14px; display: flex; align-items: center; border-bottom: 2px solid #000; } .checkbox { display: inline-block; width: 18px; height: 18px; border: 2px solid #000; border-radius: 4px; margin-right: 12px; } .item-list { list-style: none; padding: 0; margin: 0; } .item-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 15px; border-bottom: 1px dashed #aaa; font-size: 13px; margin-left: 20px;} .item-row:last-child { border-bottom: none; } .qty { font-weight: bold; font-size: 14px; } .signatures { display: flex; justify-content: space-between; margin-top: 50px; padding: 0 40px; text-align: center; font-size: 14px; page-break-inside: avoid; } .sign-box { margin-top: 70px; border-top: 1px solid black; padding-top: 5px; width: 220px; } @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }</style></head><body onload="window.print()"><div class="header"><h2 style="margin:0;">MANIFEST LOGISTIK / SURAT JALAN</h2><p style="margin:5px 0 0 0; color:#444; font-size:14px;">Checklist Pengeluaran Gudang (Load-In)</p></div><div class="event-info"><div><b>Tujuan / Event:</b> <span style="font-size:16px;">${eventName.toUpperCase()}</span></div><div><b>Tanggal Cetak:</b> ${new Date().toLocaleString('id-ID')}</div></div>`;
+    let html = `<html><head><title>Manifest - ${eventName}</title>
+    <style>
+        @page { size: A4; margin: 15mm; }
+        body { font-family: 'Arial', sans-serif; padding: 0; color: #000; margin: 0; }
+        .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
+        .event-info { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 20px; }
+        .box-group { border: 1px solid #000; margin-bottom: 12px; page-break-inside: avoid; }
+        .box-header { background: #f0f0f0; padding: 6px 12px; font-weight: bold; font-size: 13px; display: flex; align-items: center; border-bottom: 1px solid #000; }
+        .checkbox { display: inline-block; width: 14px; height: 14px; border: 1px solid #000; margin-right: 8px; }
+        .item-list { list-style: none; padding: 0; margin: 0; }
+        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 12px; border-bottom: 1px dashed #ccc; font-size: 12px; margin-left: 10px;}
+        .item-row:last-child { border-bottom: none; }
+        .qty { font-weight: bold; font-size: 12px; }
+        .notes-area { margin-top: 30px; border: 1px solid #000; min-height: 150px; padding: 10px; font-size: 14px; }
+        @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+    </style></head><body onload="window.print()">
+    <div class="header">
+        <h2 style="margin:0;">MANIFEST LOGISTIK / SURAT JALAN</h2>
+        <p style="margin:5px 0 0 0; color:#444; font-size:12px;">Daftar Pengeluaran Gudang (Load-In)</p>
+    </div>
+    <div class="event-info">
+        <div><b>Tujuan / Event:</b> <span style="font-size:15px;">${eventName.toUpperCase()}</span></div>
+        <div><b>Tanggal Cetak:</b> ${new Date().toLocaleString('id-ID')}</div>
+    </div>`;
 
     if (Object.keys(grouped).length > 0) {
-        html += `<h4 style="margin-bottom:10px; border-bottom:2px solid #000; display:inline-block;">📦 PAKET HARDCASE / BOX</h4>`;
-        for (let wadah in grouped) { let boxItem = allItems.find(i => i.kode_barang && i.kode_barang.toUpperCase() === wadah); let boxName = boxItem ? boxItem.nama_barang.toUpperCase() : `WADAH #${wadah}`; html += `<div class="box-group"><div class="box-header"><div class="checkbox"></div> 🧰 ${boxName}  <span style="margin-left:auto; font-weight:normal; font-size:12px; color:#333;">#${wadah}</span></div><ul class="item-list">`; grouped[wadah].forEach(item => { html += `<li class="item-row"><span>- ${item.nama_barang} ${item.kode_barang ? ` <i style="color:#555; font-size:11px;">(#${item.kode_barang})</i>` : ''}</span><span class="qty">${item.jumlah} Pcs</span></li>`; }); html += `</ul></div>`; }
+        html += `<h4 style="margin-bottom:8px; border-bottom:2px solid #000; display:inline-block; font-size:14px;">📦 PAKET HARDCASE / BOX</h4>`;
+        for (let wadah in grouped) { 
+            let boxItem = allItems.find(i => i.kode_barang && i.kode_barang.toUpperCase() === wadah); 
+            let boxName = boxItem ? boxItem.nama_barang.toUpperCase() : `WADAH #${wadah}`; 
+            html += `<div class="box-group"><div class="box-header"><div class="checkbox"></div> 🧰 ${boxName}  <span style="margin-left:auto; font-weight:normal; font-size:11px; color:#333;">#${wadah}</span></div><ul class="item-list">`; 
+            grouped[wadah].forEach(item => { 
+                html += `<li class="item-row"><span>- ${item.nama_barang} ${item.kode_barang ? ` <i style="color:#555; font-size:10px;">(#${item.kode_barang})</i>` : ''}</span><span class="qty">${item.jumlah} Pcs</span></li>`; 
+            }); 
+            html += `</ul></div>`; 
+        }
     }
 
     if (lepasan.length > 0) {
-        html += `<h4 style="margin-top:20px; margin-bottom:10px; border-bottom:2px solid #000; display:inline-block;">📌 BARANG LEPASAN (TANPA BOX)</h4><div class="box-group"><ul class="item-list">`;
-        lepasan.forEach(item => { html += `<li class="item-row" style="padding:10px 15px; margin-left:0;"><div style="display:flex; align-items:center;"><div class="checkbox"></div> <span><b>${item.nama_barang.toUpperCase()}</b> ${item.kode_barang ? ` <i style="color:#555; font-size:11px;">(#${item.kode_barang})</i>` : ''}</span></div><span class="qty">${item.jumlah} Pcs</span></li>`; }); html += `</ul></div>`;
+        html += `<h4 style="margin-top:15px; margin-bottom:8px; border-bottom:2px solid #000; display:inline-block; font-size:14px;">📌 BARANG LEPASAN (TANPA BOX)</h4><div class="box-group"><ul class="item-list">`;
+        lepasan.forEach(item => { 
+            html += `<li class="item-row" style="padding:6px 12px; margin-left:0;"><div style="display:flex; align-items:center;"><div class="checkbox"></div> <span><b>${item.nama_barang.toUpperCase()}</b> ${item.kode_barang ? ` <i style="color:#555; font-size:10px;">(#${item.kode_barang})</i>` : ''}</span></div><span class="qty">${item.jumlah} Pcs</span></li>`; 
+        }); 
+        html += `</ul></div>`;
     }
 
-    html += `<div class="signatures"><div><b>Disiapkan Oleh (Gudang):</b><div class="sign-box">( Nama & Tanda Tangan )</div></div><div><b>Dicek & Dimuat Oleh (Loader):</b><div class="sign-box">( Nama & Tanda Tangan )</div></div></div></body></html>`;
+    html += `
+    <div class="notes-area">
+        <b>📝 Catatan Tambahan Lapangan:</b>
+    </div>
+    </body></html>`;
+    
     printWin.document.write(html); printWin.document.close(); 
 }
 

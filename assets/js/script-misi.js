@@ -1,5 +1,5 @@
 // ==========================================
-// MESIN LOGIKA MISSION CONTROL (V.15.0 - COMPACT UI & SCANNER FIX)
+// MESIN LOGIKA MISSION CONTROL (V.16.0 - COMPACT UI FIXED)
 // ==========================================
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec"; 
@@ -12,7 +12,6 @@ let isHideCompleted = false;
 let currentCameraFacing = "environment"; 
 let isFlashlightOn = false;
 
-// 📋 DATABASE KAPTEN & ASISTEN TIM
 const teamRoster = {
     "speaker": { kapten: "Malkhiel", asisten: "Yoka" },
     "kabel": { kapten: "Vina", asisten: "Anggid" },
@@ -106,52 +105,52 @@ function toggleMissionContent(element) {
 
 function renderMissions() {
     if (!isDataLoaded) return; const container = document.getElementById("missionsContainer"); container.innerHTML = "";
-    if (activeTeam === '') { container.innerHTML = `<div style="text-align:center; padding:40px 20px; color:#64748b; grid-column: 1 / -1;"><h3 style="margin-bottom:5px;">Pilih Divisi Tim 👆</h3></div>`; return; }
+    if (activeTeam === '') { container.innerHTML = `<div style="text-align:center; padding:30px 15px; color:#64748b; font-size:12px; grid-column: 1 / -1;"><h3 style="margin-bottom:5px;">Pilih Divisi Tim 👆</h3></div>`; return; }
     
     let filtered = allMissions.filter(m => String(m.tim || "").toLowerCase().includes(activeTeam.toLowerCase()));
-    if(filtered.length === 0) { container.innerHTML = `<div style="text-align:center; padding:40px 20px; color:#64748b; grid-column: 1 / -1;">✅ Belum ada tugas untuk tim ini.</div>`; return; }
+    if(filtered.length === 0) { container.innerHTML = `<div style="text-align:center; padding:30px 15px; color:#64748b; font-size:12px; grid-column: 1 / -1;">✅ Belum ada tugas untuk tim ini.</div>`; return; }
 
     let totalMisi = filtered.length;
     let selesaiMisi = filtered.filter(m => String(m.status_misi || "").toLowerCase() === 'selesai').length;
     let persentase = Math.round((selesaiMisi / totalMisi) * 100);
     let teamLower = activeTeam.toLowerCase();
 
-    // BANNER CONTACT PERSON
+    // BANNER CONTACT PERSON (Lebih Ramping)
     let rosterHtml = "";
     let foundTeamKey = Object.keys(teamRoster).find(k => teamLower.includes(k));
     if (foundTeamKey) {
         let cp = teamRoster[foundTeamKey];
         rosterHtml = `
-        <div style="background:#eff6ff; border:1px solid #bfdbfe; color:#1e3a8a; padding:10px 15px; border-radius:8px; margin-bottom:10px; font-size:11px; display:flex; justify-content:space-between; align-items:center; grid-column: 1 / -1;">
+        <div style="background:#eff6ff; border:1px solid #bfdbfe; color:#1e3a8a; padding:6px 10px; border-radius:6px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; grid-column: 1 / -1;">
             <div>
-                <div style="font-size:9px; font-weight:bold; color:#3b82f6; margin-bottom:2px;">📞 CONTACT PERSON TIM</div>
-                <div><b>👑 Kapten:</b> ${cp.kapten} &nbsp; <b>🛠️ Asisten:</b> ${cp.asisten}</div>
+                <div style="font-size:8px; font-weight:bold; color:#3b82f6; margin-bottom:2px;">📞 CONTACT PERSON</div>
+                <div style="font-size:10px;"><b>👑 Kapten:</b> ${cp.kapten} &nbsp; <b>🛠️ Asisten:</b> ${cp.asisten}</div>
             </div>
-            <div style="font-size:20px; opacity:0.8;">📱</div>
+            <div style="font-size:16px; opacity:0.8;">📱</div>
         </div>`;
     }
 
-    // BANNER APD 
+    // BANNER APD (Lebih Ramping)
     let apdText = "";
-    if (teamLower.includes("speaker")) { apdText = "🪖 Helm | 🥾 Sepatu Safety | 🧤 Sarung Tangan"; } 
+    if (teamLower.includes("speaker")) { apdText = "🪖 Helm | 🥾 Sepatu | 🧤 Sarung Tangan"; } 
     else if (teamLower.includes("kabel")) { apdText = "🥾 Sepatu Safety | 🧤 Sarung Tangan"; } 
     else if (teamLower.includes("booth")) { apdText = "🥾 Sepatu Safety | 🧤 Sarung Tangan"; }
 
-    let apdHtml = apdText ? `<div style="background:#fffbeb; border:1px solid #fde68a; color:#b45309; padding:8px 12px; border-radius:8px; margin-bottom:8px; font-size:10px; font-weight:bold; display:flex; align-items:center; gap:6px;"><span style="font-size:14px;">⚠️</span> <span><b>APD:</b> ${apdText}</span></div>` : '';
+    let apdHtml = apdText ? `<div style="background:#fffbeb; border:1px solid #fde68a; color:#b45309; padding:5px 8px; border-radius:6px; margin-bottom:6px; font-size:9px; font-weight:bold; display:flex; align-items:center; gap:4px;"><span style="font-size:12px;">⚠️</span> <span><b>APD:</b> ${apdText}</span></div>` : '';
 
-    // PROGRESS BAR
+    // PROGRESS BAR (Lebih Ramping)
     let progressHtml = `
-    <div class="mission-progress-container" style="margin-bottom:0; padding:10px;">
+    <div class="mission-progress-container" style="margin-bottom:0; padding:6px 8px;">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div style="font-size:12px; font-weight:bold; color:#1e293b;">📊 Progress: ${selesaiMisi}/${totalMisi} (${persentase}%)</div>
-            <button class="filter-toggle ${isHideCompleted ? 'active' : ''}" onclick="toggleHideCompleted()">${isHideCompleted ? '👁️ Tampilkan Semua' : '🙈 Sembunyikan Selesai'}</button>
+            <div style="font-size:10px; font-weight:bold; color:#1e293b;">📊 Progress: ${selesaiMisi}/${totalMisi} (${persentase}%)</div>
+            <button class="filter-toggle ${isHideCompleted ? 'active' : ''}" onclick="toggleHideCompleted()">${isHideCompleted ? '👁️ Semua' : '🙈 Sembunyikan'}</button>
         </div>
-        <div class="progress-bar-bg" style="margin-top:6px;"><div class="progress-bar-fill" style="width:${persentase}%;"></div></div>
+        <div class="progress-bar-bg" style="margin-top:4px;"><div class="progress-bar-fill" style="width:${persentase}%;"></div></div>
     </div>`;
     
     // STICKY HEADER
     let stickyHeaderHtml = `
-    <div style="position: sticky; top: 60px; z-index: 90; background: rgba(248, 250, 252, 0.95); backdrop-filter: blur(8px); padding: 5px 0 10px 0; margin-bottom: 5px; grid-column: 1 / -1; border-bottom: 2px dashed #cbd5e1;">
+    <div style="position: sticky; top: 50px; z-index: 90; background: rgba(248, 250, 252, 0.95); backdrop-filter: blur(8px); padding: 4px 0 8px 0; margin-bottom: 5px; grid-column: 1 / -1; border-bottom: 2px dashed #cbd5e1;">
         ${apdHtml} ${progressHtml}
     </div>`;
 
@@ -184,11 +183,11 @@ function renderMissions() {
             }
 
             let detailHtml = detailTugas ? `
-                <div style="background:#f8fafc; border-left:3px solid #3b82f6; padding:8px 10px; font-size:11px; color:#334155; margin-bottom:8px; border-radius:4px; line-height:1.4;">
-                    <b style="color:#1d4ed8; font-size:10px;">📝 INSTRUKSI:</b><br>${detailTugas}
+                <div style="background:#f8fafc; border-left:3px solid #3b82f6; padding:6px 8px; font-size:10px; color:#334155; margin-bottom:6px; border-radius:4px; line-height:1.3;">
+                    <b style="color:#1d4ed8; font-size:9px;">📝 INSTRUKSI:</b><br>${detailTugas}
                 </div>` : '';
 
-            let packageHtml = `<div class="package-list"><div style="font-size:9px; font-weight:bold; color:gray; margin-bottom:4px;">📦 Daftar Alat / Barang:</div>`;
+            let packageHtml = `<div class="package-list"><div style="font-size:8px; font-weight:bold; color:gray; margin-bottom:2px;">📦 Daftar Alat / Barang:</div>`;
             
             if (misi.kode_barang && String(misi.kode_barang).trim() !== "") {
                 let codes = String(misi.kode_barang).split(',').map(c => c.trim()).filter(c => c);
@@ -211,18 +210,18 @@ function renderMissions() {
                         let boxThumbUrl = boxItem ? getThumbUrl(boxItem) : 'https://placehold.co/100x100/EEEEEE/999999?text=BOX';
                         
                         packageHtml += `
-                        <div class="box-group" style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:6px; margin-bottom:6px; overflow:hidden;">
-                            <div onclick="openItemDetail('${wadah}')" style="cursor:pointer; background:#e2e8f0; padding:4px 8px; font-size:10px; font-weight:bold; color:#0f172a; border-bottom:1px solid #cbd5e1; display:flex; justify-content:space-between; align-items:center;">
-                                <div style="display:flex; align-items:center; gap:6px;">
-                                    <img src="${boxThumbUrl}" style="width:24px; height:24px; object-fit:cover; border-radius:4px; border:1px solid #cbd5e1; background:white;">
+                        <div class="box-group" style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:6px; margin-bottom:4px; overflow:hidden;">
+                            <div onclick="openItemDetail('${wadah}')" style="cursor:pointer; background:#e2e8f0; padding:4px 6px; font-size:9px; font-weight:bold; color:#0f172a; border-bottom:1px solid #cbd5e1; display:flex; justify-content:space-between; align-items:center;">
+                                <div style="display:flex; align-items:center; gap:4px;">
+                                    <img src="${boxThumbUrl}" style="width:20px; height:20px; object-fit:cover; border-radius:3px; border:1px solid #cbd5e1; background:white;">
                                     <span>🧰 ${boxName}</span>
                                 </div>
-                                <span style="font-size:12px;">🔍</span>
+                                <span style="font-size:10px;">🔍</span>
                             </div>
                             <div style="padding:4px;">`;
                             
                         items.forEach(foundItem => {
-                            packageHtml += `<div class="package-item" style="cursor:pointer; border:none; background:transparent; margin-bottom:2px; padding:4px; border-bottom:1px dashed #e2e8f0;" onclick="openItemDetail('${foundItem.kode_barang}')"><img src="${getThumbUrl(foundItem)}" class="pkg-img" loading="lazy"><div class="pkg-info"><div class="pkg-name">${foundItem.nama_barang}</div><div class="pkg-code">#${foundItem.kode_barang}</div></div></div>`;
+                            packageHtml += `<div class="package-item" style="cursor:pointer; border:none; background:transparent; margin-bottom:2px; padding:2px; border-bottom:1px dashed #e2e8f0;" onclick="openItemDetail('${foundItem.kode_barang}')"><img src="${getThumbUrl(foundItem)}" class="pkg-img" loading="lazy"><div class="pkg-info"><div class="pkg-name">${foundItem.nama_barang}</div><div class="pkg-code">#${foundItem.kode_barang}</div></div></div>`;
                         });
                         packageHtml += `</div></div>`;
                     }
@@ -235,13 +234,13 @@ function renderMissions() {
                 }
                 notFoundCodes.forEach(code => { packageHtml += `<div class="package-item"><div class="pkg-info"><div class="pkg-code" style="color:#ef4444;">#${code} (Tidak Ada)</div></div></div>`; });
             } else {
-                packageHtml += `<div style="font-size:10px; color:#ef4444; font-style:italic;">⚠️ Data barang belum di-input kapten.</div>`;
+                packageHtml += `<div style="font-size:9px; color:#ef4444; font-style:italic;">⚠️ Data barang belum di-input kapten.</div>`;
             }
             packageHtml += `</div>`;
             
             let buttonHtml = '';
             if (isSelesai) {
-                if (isAdminMode) buttonHtml = `<div style="display:flex; gap:8px; width:100%;"><div class="btn-complete done" style="flex:1; margin:0;">✅ Selesai: ${misi.waktu_selesai}</div><button class="btn-complete" style="background:#ef4444; flex:0 0 auto; padding:8px;" onclick="undoMission(event, '${misi.row_index}', '${misi.id_misi}', '${misi.kode_barang || ''}')">❌ Batal</button></div>`;
+                if (isAdminMode) buttonHtml = `<div style="display:flex; gap:6px; width:100%;"><div class="btn-complete done" style="flex:1; margin:0;">✅ Selesai: ${misi.waktu_selesai}</div><button class="btn-complete" style="background:#ef4444; flex:0 0 auto; padding:6px;" onclick="undoMission(event, '${misi.row_index}', '${misi.id_misi}', '${misi.kode_barang || ''}')">❌ Batal</button></div>`;
                 else buttonHtml = `<button class="btn-complete done" style="width:100%;">✅ SELESAI (${misi.waktu_selesai})</button>`;
             } else {
                 if (isAdminMode) {
@@ -249,7 +248,7 @@ function renderMissions() {
                     let scanBtn = `<button class="btn-complete" style="background:#2563eb; margin:0;" onclick="openMissionScanner('${misi.row_index}', '${misi.id_misi}', '${safeKodeBarang}')">📷 SCAN BARANG</button>`;
                     
                     if (teamLower.includes("booth") || teamLower.includes("kabel")) {
-                        buttonHtml = `<div style="display:flex; gap:8px; align-items:stretch; width:100%;">
+                        buttonHtml = `<div style="display:flex; gap:6px; align-items:stretch; width:100%;">
                             ${scanBtn}
                             <button class="btn-complete" style="background:#10b981; margin:0;" onclick="executeCompleteMission('${misi.row_index}', '${misi.id_misi}', '${safeKodeBarang}')">✅ SELESAI</button>
                         </div>`;
@@ -262,6 +261,7 @@ function renderMissions() {
 
             const card = document.createElement("div"); 
             card.className = `mission-card ${isSelesai ? 'selesai' : ''}`;
+            // MENGGUNAKAN CLASS .mission-title YANG SUDAH DI-OVERRIDE DI CSS
             card.innerHTML = `
                 <div class="mission-header-click" onclick="toggleMissionContent(this)">
                     <div class="mission-top">
@@ -269,9 +269,9 @@ function renderMissions() {
                         <span class="badge-zona">📍 ${misi.zona || '-'}</span>
                     </div>
                     ${isOverride ? '<span class="badge-diganti">⚠️ ALAT DIGANTI</span>' : ''}
-                    <h3 class="mission-title" style="margin:4px 0 0 0; display:flex; justify-content:space-between; align-items:center;">
-                        ${judulTugas} <span class="toggle-icon">▼</span>
-                    </h3>
+                    <div class="mission-title" style="display:flex; justify-content:space-between; align-items:center;">
+                        <span>${judulTugas}</span> <span class="toggle-icon">▼</span>
+                    </div>
                 </div>
                 <div class="mission-content">
                     ${detailHtml}
@@ -283,30 +283,30 @@ function renderMissions() {
         } catch (err) {
             console.error("Row Error:", err);
             const errCard = document.createElement("div"); errCard.className = "mission-card";
-            errCard.innerHTML = `<h3 style="color:red; margin:0; font-size:13px;">⚠️ Kesalahan Data Excel</h3><p style="font-size:10px;">ID: ${misi.id_misi || '?'}</p>`;
+            errCard.innerHTML = `<div style="color:red; font-size:12px; font-weight:bold; margin:0;">⚠️ Kesalahan Data Excel</div><p style="font-size:9px; margin:2px 0;">ID: ${misi.id_misi || '?'}</p>`;
             container.appendChild(errCard);
         }
     });
 }
 
 // ==========================================
-// SCANNER V.15 (MIRRORING GUDANG)
+// SCANNER V.16
 // ==========================================
 function openMissionScanner(rowIndex, idMisi, targetKodeBarangString) {
     let modal = document.createElement("div"); modal.id = "missionScannerModal"; modal.className = "modal-overlay active";
     modal.innerHTML = `
-        <div class="modal-content" style="max-width:400px; background:white; padding:20px; border-radius:15px; text-align:center; position:relative;">
-            <button onclick="closeMissionScanner()" style="position:absolute; top:15px; right:15px; border:none; background:#fef2f2; color:#dc2626; width:30px; height:30px; border-radius:50%; font-weight:bold; cursor:pointer; z-index:9999;">✕</button>
-            <h3 style="margin:0 0 5px 0; font-size:16px; color:#2563eb;">📷 Misi: ${idMisi}</h3>
-            <p style="font-size:11px; color:#64748b; margin-bottom:10px;">Scan target atau alat pengganti</p>
-            <div id="qr-reader-mission" style="width:100%; border-radius:10px; overflow:hidden; background:black;"></div>
+        <div class="modal-content" style="max-width:350px; background:white; padding:15px; border-radius:12px; text-align:center; position:relative;">
+            <button onclick="closeMissionScanner()" style="position:absolute; top:10px; right:10px; border:none; background:#fef2f2; color:#dc2626; width:25px; height:25px; border-radius:50%; font-weight:bold; cursor:pointer; font-size:10px; z-index:9999;">✕</button>
+            <h3 style="margin:0 0 5px 0; font-size:14px; color:#2563eb;">📷 Misi: ${idMisi}</h3>
+            <p style="font-size:10px; color:#64748b; margin-bottom:8px;">Scan target atau alat pengganti</p>
+            <div id="qr-reader-mission" style="width:100%; border-radius:8px; overflow:hidden; background:black;"></div>
             
-            <div class="scanner-controls" style="display:flex; gap:10px; justify-content:center; margin-top:15px;">
-                <button class="btn-scanner-action" style="padding:10px 15px; border-radius:8px; border:none; background:#e2e8f0; font-weight:bold; cursor:pointer; flex:1;" onclick="toggleCameraFacing()">🔄 Kamera</button>
-                <button class="btn-scanner-action" id="btnFlashlight" style="padding:10px 15px; border-radius:8px; border:none; background:#e2e8f0; font-weight:bold; cursor:pointer; flex:1;" onclick="toggleFlashlight()">🔦 Senter</button>
+            <div class="scanner-controls" style="display:flex; gap:8px; justify-content:center; margin-top:12px;">
+                <button class="btn-scanner-action" style="padding:8px 12px; border-radius:6px; border:none; background:#e2e8f0; font-weight:bold; cursor:pointer; flex:1; font-size:10px;" onclick="toggleCameraFacing()">🔄 Kamera</button>
+                <button class="btn-scanner-action" id="btnFlashlight" style="padding:8px 12px; border-radius:6px; border:none; background:#e2e8f0; font-weight:bold; cursor:pointer; flex:1; font-size:10px;" onclick="toggleFlashlight()">🔦 Senter</button>
             </div>
             
-            <div id="overrideForm" style="display:none; text-align:left; margin-top:15px; background:#fef2f2; border:1px solid #fca5a5; padding:15px; border-radius:10px;"></div>
+            <div id="overrideForm" style="display:none; text-align:left; margin-top:12px; background:#fef2f2; border:1px solid #fca5a5; padding:12px; border-radius:8px;"></div>
         </div>`; 
     document.body.appendChild(modal);
     isFlashlightOn = false; 
@@ -316,7 +316,7 @@ function openMissionScanner(rowIndex, idMisi, targetKodeBarangString) {
 function startScanner(rowIndex, idMisi, targetKodeBarangString) {
     if(html5QrCode) { html5QrCode.stop().catch(e=>console.log(e)); html5QrCode = null; }
     html5QrCode = new Html5Qrcode("qr-reader-mission");
-    let config = { fps: 10, qrbox: { width: 230, height: 230 } };
+    let config = { fps: 10, qrbox: { width: 200, height: 200 } };
     html5QrCode.start({ facingMode: currentCameraFacing }, config, 
         (decodedText) => { processScanResult(decodedText, rowIndex, idMisi, targetKodeBarangString); }, 
         (err) => {}
@@ -370,13 +370,13 @@ function processScanResult(decodedText, rowIndex, idMisi, targetKodeBarangString
             const form = document.getElementById("overrideForm");
             form.style.display = "block";
             form.innerHTML = `
-                <h3 style="margin:0 0 5px 0; font-size:16px; color:#dc2626;">⚠️ ALAT BERBEDA!</h3>
-                <p style="font-size:11px; color:#475569; margin:0 0 10px 0;">Men-scan:<br><b style="color:black; font-size:12px;">${validNewItem.nama_barang}</b> (#${scannedText.toUpperCase()})</p>
-                <label style="font-size:10px; font-weight:bold; color:#c2410c;">Gantikan alat awal:</label>
-                <select id="overrideSelect" style="width:100%; padding:8px; border-radius:6px; border:1px solid #cbd5e1; margin-bottom:10px; font-size:11px;">${optionsHtml}</select>
-                <label style="font-size:10px; font-weight:bold; color:#c2410c;">Alasan Ganti (Wajib):</label>
-                <input type="text" id="overrideReason" placeholder="Contoh: Kabel awal putus" style="width:100%; padding:8px; border-radius:6px; border:1px solid #cbd5e1; margin-bottom:15px; font-size:11px; box-sizing:border-box;">
-                <button onclick="executeOverrideMission('${rowIndex}', '${idMisi}', '${targetKodeBarangString}', '${scannedText}')" style="width:100%; padding:10px; background:#f97316; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">🔄 Konfirmasi & Selesai</button>
+                <div style="margin:0 0 4px 0; font-size:13px; font-weight:bold; color:#dc2626;">⚠️ ALAT BERBEDA!</div>
+                <p style="font-size:10px; color:#475569; margin:0 0 8px 0;">Men-scan:<br><b style="color:black; font-size:11px;">${validNewItem.nama_barang}</b> (#${scannedText.toUpperCase()})</p>
+                <label style="font-size:9px; font-weight:bold; color:#c2410c;">Gantikan alat awal:</label>
+                <select id="overrideSelect" style="width:100%; padding:6px; border-radius:6px; border:1px solid #cbd5e1; margin-bottom:8px; font-size:10px;">${optionsHtml}</select>
+                <label style="font-size:9px; font-weight:bold; color:#c2410c;">Alasan Ganti (Wajib):</label>
+                <input type="text" id="overrideReason" placeholder="Contoh: Kabel awal putus" style="width:100%; padding:6px; border-radius:6px; border:1px solid #cbd5e1; margin-bottom:10px; font-size:10px; box-sizing:border-box;">
+                <button onclick="executeOverrideMission('${rowIndex}', '${idMisi}', '${targetKodeBarangString}', '${scannedText}')" style="width:100%; padding:8px; background:#f97316; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer; font-size:11px;">🔄 Konfirmasi & Selesai</button>
             `;
         }).catch(e => console.log(e));
         return;
@@ -462,10 +462,10 @@ function openItemDetail(kodeBarang) {
                 let thumbW = getThumbUrl(w);
                 return `
                 <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px; padding:4px; background:#fff; border:1px solid #dcfce7; border-radius:6px; box-shadow:0 1px 2px rgba(0,0,0,0.05);">
-                    <img src="${thumbW}" style="width:35px; height:35px; object-fit:cover; border-radius:4px; border:1px solid #e2e8f0;">
+                    <img src="${thumbW}" style="width:30px; height:30px; object-fit:cover; border-radius:4px; border:1px solid #e2e8f0;">
                     <div style="flex:1; line-height:1.2; text-align:left;">
-                        <div style="font-size:10px; font-weight:bold; color:#1e293b;">${w.nama_barang}</div>
-                        <div style="font-size:9px; color:#ea580c; font-weight:bold; margin-top:2px;">#${w.kode_barang || '-'} <span style="color:#64748b; font-weight:normal;">• Qty: ${w.jumlah||0}</span></div>
+                        <div style="font-size:9px; font-weight:bold; color:#1e293b;">${w.nama_barang}</div>
+                        <div style="font-size:8px; color:#ea580c; font-weight:bold; margin-top:2px;">#${w.kode_barang || '-'} <span style="color:#64748b; font-weight:normal;">• Qty: ${w.jumlah||0}</span></div>
                     </div>
                 </div>`;
             }).join('');
@@ -486,24 +486,24 @@ function openItemDetail(kodeBarang) {
         let badgeHtml = Object.keys(statusCounts).map(status => {
             let bgCol = status.includes('Gudang') ? '#dcfce7' : (status.includes('Dipakai') || status.includes('Event') ? '#fef08a' : '#e2e8f0');
             let txtCol = status.includes('Gudang') ? '#166534' : (status.includes('Dipakai') || status.includes('Event') ? '#854d0e' : '#334155');
-            return `<span style="display:inline-block; margin-right:4px; margin-bottom:4px; padding:3px 6px; border-radius:4px; font-size:9px; background:${bgCol}; color:${txtCol}; font-weight:bold; border:1px solid #cbd5e1;">${status}: ${statusCounts[status]}</span>`;
+            return `<span style="display:inline-block; margin-right:4px; margin-bottom:4px; padding:3px 6px; border-radius:4px; font-size:8px; background:${bgCol}; color:${txtCol}; font-weight:bold; border:1px solid #cbd5e1;">${status}: ${statusCounts[status]}</span>`;
         }).join('');
         
         similarHtml = `
         <div style="text-align:left; margin-top:8px; background:#eff6ff; padding:10px; border-radius:8px; border:1px solid #bfdbfe;">
-            <div style="font-size:11px; font-weight:900; color:#1d4ed8; margin-bottom:4px;">📊 Cek Silang Stok:</div>
+            <div style="font-size:10px; font-weight:900; color:#1d4ed8; margin-bottom:4px;">📊 Cek Silang Stok:</div>
             <div style="display:flex; flex-wrap:wrap;">${badgeHtml}</div>
         </div>`;
     }
 
     const modalHtml = `
     <div id="detailModal" class="modal-overlay active">
-        <div class="modal-content" style="max-width:350px; background:white; padding:15px; border-radius:15px; text-align:center; position:relative;">
+        <div class="modal-content" style="max-width:320px; background:white; padding:15px; border-radius:12px; text-align:center; position:relative;">
             <button onclick="document.getElementById('detailModal').remove()" style="position:absolute; top:10px; right:10px; border:none; background:#f1f5f9; width:25px; height:25px; border-radius:50%; font-weight:bold; cursor:pointer; z-index:10; font-size:10px;">✕</button>
             ${galleryHtml}
-            <h3 style="margin:0; font-weight:900; color:#1e293b; font-size:15px;">${item.nama_barang}</h3>
-            <p style="margin:4px 0 8px 0; font-size:11px; color:#ea580c; font-weight:bold;">#${item.kode_barang || '-'} ${badgeWadahHtml}</p>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:11px; text-align:left; background:#f8fafc; padding:8px; border-radius:8px; border:1px solid #e2e8f0;">
+            <h3 style="margin:0; font-weight:900; color:#1e293b; font-size:14px;">${item.nama_barang}</h3>
+            <p style="margin:4px 0 8px 0; font-size:10px; color:#ea580c; font-weight:bold;">#${item.kode_barang || '-'} ${badgeWadahHtml}</p>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:10px; text-align:left; background:#f8fafc; padding:8px; border-radius:8px; border:1px solid #e2e8f0;">
                 <div><span style="color:gray;">Kondisi:</span> <br><b>${item.kondisi || '-'}</b></div>
                 <div><span style="color:gray;">📍 Lokasi:</span> <br><b>${lok}</b></div>
                 <div style="grid-column: 1 / -1;"><span style="color:gray;">🔌 Status Gudang:</span> <br><b>${stat}</b></div>

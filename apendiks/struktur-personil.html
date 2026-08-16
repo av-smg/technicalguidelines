@@ -48,7 +48,7 @@ location: "Apendiks"
 
     /* CORE MANAGEMENT (TOP LEVEL) */
     .management-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin-bottom: 50px; }
-    .management-grid .card { width: 100%; flex: 1 1 250px; max-width: 320px; }
+    .management-grid .card { width: 100%; flex: 1 1 250px; max-width: 380px; }
     
     .card { background: #ffffff; border-radius: 24px; padding: 25px 20px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03); border: 2px solid #e2e8f0; text-align: center; transition: 0.3s; }
     .card:hover { transform: translateY(-5px); border-color: #cbd5e1; box-shadow: 0 10px 20px rgba(0,0,0,0.06); }
@@ -65,10 +65,15 @@ location: "Apendiks"
     .dept-box:hover { box-shadow: 0 10px 25px rgba(0,0,0,0.06); }
     
     .dept-box.audio { border-color: #ef4444; }
+    .dept-box.video { border-color: #8b5cf6; }
+    .dept-box.it { border-color: #06b6d4; }
     .dept-box.podium { border-color: #10b981; }
 
     .dept-header { padding: 18px 20px; font-size: 1.3rem; font-weight: 900; color: #ffffff; display: flex; justify-content: center; align-items: center; letter-spacing: -0.5px;}
+    
     .dept-box.audio .dept-header { background: #ef4444; }
+    .dept-box.video .dept-header { background: #8b5cf6; }
+    .dept-box.it .dept-header { background: #06b6d4; }
     .dept-box.podium .dept-header { background: #10b981; }
     
     .dept-body { padding: 25px; display: flex; flex-direction: column; gap: 20px; }
@@ -78,7 +83,6 @@ location: "Apendiks"
     /* ========================================= */
     .audio-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
     
-    /* Responsive Audio Grid */
     @media (max-width: 768px) {
         .audio-grid { grid-template-columns: 1fr; }
         .audio-grid .wide-col { grid-column: auto !important; }
@@ -108,11 +112,12 @@ location: "Apendiks"
     .wide-col { grid-column: 1 / -1; }
 
     /* ========================================= */
-    /* STYLE UNTUK TIM PODIUM                    */
+    /* STYLE UNTUK TIM LAIN (VIDEO, IT, PODIUM)  */
     /* ========================================= */
     .supervisor-block { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 16px; padding: 20px; text-align: center; }
     .supervisor-block .role { font-size: 0.85rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
     .supervisor-block .names { font-size: 1.2rem; font-weight: 900; color: #0f172a; }
+    .supervisor-block a.names:hover { color: #f97316 !important; text-decoration: underline !important; }
     
     .hierarchy-arrow { text-align: center; color: #cbd5e1; font-size: 1.8rem; line-height: 1; margin: -5px 0; }
 
@@ -123,10 +128,11 @@ location: "Apendiks"
     .personnel-pool { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
     .personnel-tag { 
         background: #ffffff; color: #334155; padding: 8px 16px; border-radius: 20px; 
-        font-size: 0.9rem; font-weight: 700; border: 2px solid #e2e8f0; transition: all 0.2s; text-align: center;
+        font-size: 0.9rem; font-weight: 700; border: 2px solid #e2e8f0; transition: all 0.2s; text-align: center; cursor: default;
     }
     .personnel-tag.editable { border: 2px dashed #94a3b8; background: #f8fafc; color: #64748b; }
     .personnel-tag:hover { background: #f1f5f9; transform: scale(1.05); color: #0f172a; border-color: #cbd5e1; }
+    a.personnel-tag:hover { background: #f97316; color: white; border-color: #ea580c; cursor: pointer; }
 
     /* FOOTER */
     .footer { text-align: center; margin-top: 60px; padding: 20px 0; color: #94a3b8; font-weight: 700; font-size: 0.85rem; border-top: 2px dashed #e2e8f0; }
@@ -163,6 +169,7 @@ location: "Apendiks"
     body.dark-mode .personnel-tag { background: #1e293b; color: #cbd5e1; border-color: #334155; }
     body.dark-mode .personnel-tag.editable { background: #0f172a; border-color: #475569; }
     body.dark-mode .personnel-tag:hover { background: #334155; color: #f8fafc; }
+    body.dark-mode a.personnel-tag:hover { background: #f97316; color: white; border-color: #ea580c; }
     
     body.dark-mode .footer { border-top-color: #1e293b; color: #64748b; }
 
@@ -178,33 +185,17 @@ location: "Apendiks"
 
     <header class="main-header">
       <span class="year-badge">Departemen Tata Suara</span>
-      <h1>Struktur Teknis Regional 2026</h1>
+      <h1>Struktur Organisasi AV Regional 2026</h1>
     </header>
-
-    <!-- POSISI TERTINGGI -->
-    <div class="theocratic-head">
-      <div class="supreme-card">
-        <div class="supreme-title">Yehuwa</div>
-      </div>
-      <div class="supreme-arrow">⬇️</div>
-      <div class="supreme-card">
-        <div class="supreme-title">Yesus</div>
-      </div>
-      <div class="supreme-arrow">⬇️</div>
-    </div>
 
     <div class="management-grid">
       <div class="card card-core">
-        <div class="role-label">💼 Pengawas Acara</div>
-        <div class="name-display">Danis Sriwijaya</div>
-      </div>
-      <div class="card card-core">
-        <div class="role-label">💼 Asisten Pengawas Acara</div>
-        <div class="name-display">Bagus Andreanto</div>
+        <div class="role-label">💼 Pengawas Pertemuan Wilayah</div>
+        <div class="name-display">Radix Rahardjani</div>
       </div>
       <div class="card card-core">
         <div class="role-label">💼 Pengawas Audio Video</div>
-        <div class="name-display">Wilfred Krismasto</div>
+        <div class="name-display">Johan Kristy Pradana</div>
       </div>
     </div>
 
@@ -213,7 +204,7 @@ location: "Apendiks"
       <!-- 🎙️ TIM AUDIO -->
       <div class="dept-box audio">
         <div class="dept-header">
-          <span>🎙️ TIM AUDIO 2026</span>
+          <span>🎙️ TIM AUDIO</span>
         </div>
         <div class="dept-body">
           
@@ -223,7 +214,7 @@ location: "Apendiks"
               <div class="sub-card">
                   <div class="sub-head kabel">🔌 Tim Kabel</div>
                   <div class="sub-body">
-                      <!-- Ganti mahkota ke topi 🧢 -->
+                      <!-- Kapten dengan Topi 🧢 -->
                       <div class="captain-badge">🧢 Vina</div>
                       <div class="personnel-tag">Anggid</div>
                       <div class="personnel-tag">Sachi</div>
@@ -254,7 +245,7 @@ location: "Apendiks"
                   </div>
               </div>
 
-              <!-- INVENTARIS (Bawahnya, full width) -->
+              <!-- INVENTARIS -->
               <div class="sub-card wide-col">
                   <div class="sub-head inventaris">🗂️ Tim Inventaris</div>
                   <div class="sub-body" style="flex-direction: row; justify-content: center; flex-wrap: wrap;">
@@ -264,7 +255,7 @@ location: "Apendiks"
                   </div>
               </div>
 
-              <!-- TAMBAHAN TENAGA (Full width) -->
+              <!-- TAMBAHAN TENAGA -->
               <div class="sub-card wide-col">
                   <div class="sub-head tambahan">💪 Tambahan Tenaga (Backup)</div>
                   <div class="sub-body" style="flex-direction: row; justify-content: center; flex-wrap: wrap;">
@@ -279,30 +270,26 @@ location: "Apendiks"
         </div>
       </div>
 
-      <!-- 🎤 TIM PODIUM -->
+      <!-- 🎤 TIM PODIUM (BISA DIEDIT) -->
       <div class="dept-box podium">
         <div class="dept-header">
           <span>🎤 TIM PODIUM</span>
         </div>
         <div class="dept-body">
-          
           <div class="supervisor-block">
             <div class="role">Pengawas Podium</div>
-            <div class="names">[Ketik Nama Pengawas Di Sini]</div>
+            <div class="names">Sulistiyo</div>
           </div>
-          
           <div class="hierarchy-arrow">⬇️</div>
-          
           <div class="personnel-block">
             <div class="title">Personil Operasional</div>
             <div class="personnel-pool">
-              <div class="personnel-tag editable">[Nama Personil 1]</div>
-              <div class="personnel-tag editable">[Nama Personil 2]</div>
-              <div class="personnel-tag editable">[Nama Personil 3]</div>
-              <div class="personnel-tag editable">[Nama Personil 4]</div>
+              <div class="personnel-tag editable">Denny Utomo</div>
+              <div class="personnel-tag editable">Michael Widjaja</div>
+              <div class="personnel-tag editable">Gideon Adhy</div>
+              <div class="personnel-tag editable">Yosua Winatas</div>
             </div>
           </div>
-
         </div>
       </div>
 

@@ -115,7 +115,7 @@ function renderMissions() {
     let persentase = Math.round((selesaiMisi / totalMisi) * 100);
     let teamLower = activeTeam.toLowerCase();
 
-    // BANNER CONTACT PERSON (Lebih Ramping)
+    // BANNER CONTACT PERSON
     let rosterHtml = "";
     let foundTeamKey = Object.keys(teamRoster).find(k => teamLower.includes(k));
     if (foundTeamKey) {
@@ -130,7 +130,7 @@ function renderMissions() {
         </div>`;
     }
 
-    // BANNER APD (Lebih Ramping)
+    // BANNER APD 
     let apdText = "";
     if (teamLower.includes("speaker")) { apdText = "🪖 Helm | 🥾 Sepatu | 🧤 Sarung Tangan"; } 
     else if (teamLower.includes("kabel")) { apdText = "🥾 Sepatu Safety | 🧤 Sarung Tangan"; } 
@@ -138,7 +138,7 @@ function renderMissions() {
 
     let apdHtml = apdText ? `<div style="background:#fffbeb; border:1px solid #fde68a; color:#b45309; padding:5px 8px; border-radius:6px; margin-bottom:6px; font-size:9px; font-weight:bold; display:flex; align-items:center; gap:4px;"><span style="font-size:12px;">⚠️</span> <span><b>APD:</b> ${apdText}</span></div>` : '';
 
-    // PROGRESS BAR (Lebih Ramping)
+    // PROGRESS BAR
     let progressHtml = `
     <div class="mission-progress-container" style="margin-bottom:0; padding:6px 8px;">
         <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -179,13 +179,56 @@ function renderMissions() {
                 let parts = rawTugas.split("\n");
                 judulTugas = parts[0]; 
                 parts.shift(); 
-                detailTugas = parts.join("<br>"); 
+                detailTugas = parts.join("\n"); // Pertahankan \n untuk Smart Parsing
             }
 
-            let detailHtml = detailTugas ? `
-                <div style="background:#f8fafc; border-left:3px solid #3b82f6; padding:6px 8px; font-size:10px; color:#334155; margin-bottom:6px; border-radius:4px; line-height:1.3;">
-                    <b style="color:#1d4ed8; font-size:9px;">📝 INSTRUKSI:</b><br>${detailTugas}
+            // ==========================================
+            // 🤖 MESIN SMART PARSING (PANJANG, DENAH, ASET)
+            // ==========================================
+            let txtPanjang = "", txtDenah = "", txtAset = "";
+            let cleanDetail = [];
+
+            detailTugas.split("\n").forEach(line => {
+                let text = line.trim();
+                let lower = text.toLowerCase();
+                
+                if (lower.startsWith("panjang:")) {
+                    txtPanjang = text.substring(8).trim();
+                } else if (lower.startsWith("aset:")) {
+                    txtAset = text.substring(5).trim();
+                } else if (lower.startsWith("denah:")) {
+                    let url = text.substring(6).trim();
+                    // Ekstrak ID Google Drive otomatis untuk dijadikan Thumbnail
+                    let matchId = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
+                    txtDenah = matchId ? `https://drive.google.com/thumbnail?id=${matchId[1]}&sz=w800` : url;
+                } else if (text !== "") {
+                    cleanDetail.push(text);
+                }
+            });
+
+            let finalDetailText = cleanDetail.join("<br>");
+
+            // --- BUILD UI SMART TAGS ---
+            let extraUI = "";
+            if (txtPanjang) extraUI += `<div style="background:#fffbeb; color:#b45309; padding:4px 8px; border-radius:6px; font-size:9px; font-weight:bold; display:inline-flex; align-items:center; margin-right:5px; margin-bottom:5px; border:1px solid #fde68a;">📏 Panjang Real: ${txtPanjang}</div>`;
+            if (txtAset) extraUI += `<a href="${txtAset}" target="_blank" style="background:#eff6ff; color:#1d4ed8; padding:4px 8px; border-radius:6px; font-size:9px; font-weight:bold; display:inline-flex; align-items:center; text-decoration:none; margin-right:5px; margin-bottom:5px; border:1px solid #bfdbfe;">🔗 Cek Aset</a>`;
+
+            let denahHtml = "";
+            if (txtDenah) {
+                denahHtml = `
+                <div style="margin-top:8px; border-top:1px dashed #cbd5e1; padding-top:8px;">
+                    <div style="font-size:9px; font-weight:bold; color:#64748b; margin-bottom:4px; display:flex; align-items:center; gap:4px;">🗺️ DENAH LOKASI:</div>
+                    <img src="${txtDenah}" style="width:100%; max-height:120px; object-fit:cover; border-radius:6px; border:1px solid #cbd5e1; cursor:zoom-in; box-shadow:0 1px 3px rgba(0,0,0,0.1);" onclick="openZoomModal('${txtDenah.replace('w800', 's2000')}')">
+                </div>`;
+            }
+
+            let detailHtml = (finalDetailText || extraUI || denahHtml) ? `
+                <div style="background:#f8fafc; border-left:3px solid #3b82f6; padding:8px; font-size:10px; color:#334155; margin-bottom:8px; border-radius:6px; line-height:1.4;">
+                    ${finalDetailText ? `<b style="color:#1d4ed8; font-size:9px;">📝 INSTRUKSI:</b><br>${finalDetailText}<br><div style="margin-bottom:6px;"></div>` : ''}
+                    ${extraUI}
+                    ${denahHtml}
                 </div>` : '';
+            // ==========================================
 
             let packageHtml = `<div class="package-list"><div style="font-size:8px; font-weight:bold; color:gray; margin-bottom:2px;">📦 Daftar Alat / Barang:</div>`;
             
@@ -261,7 +304,6 @@ function renderMissions() {
 
             const card = document.createElement("div"); 
             card.className = `mission-card ${isSelesai ? 'selesai' : ''}`;
-            // MENGGUNAKAN CLASS .mission-title YANG SUDAH DI-OVERRIDE DI CSS
             card.innerHTML = `
                 <div class="mission-header-click" onclick="toggleMissionContent(this)">
                     <div class="mission-top">

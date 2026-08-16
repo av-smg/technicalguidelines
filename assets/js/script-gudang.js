@@ -1,5 +1,5 @@
 // ==========================================
-// MESIN LOGIKA GUDANG (V.31.1 - FIX MODAL OVERLAP & PLACEHOLDER)
+// MESIN LOGIKA GUDANG (V.32.0 - DARK MODE AUTO-INJECT)
 // ==========================================
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec"; 
@@ -12,7 +12,68 @@ let pendingAddFotos = [];
 let currentCameraFacing = "environment"; 
 let isFlashlightOn = false;
 
-window.onload = () => { checkAdminStatus(); loadData(); };
+window.onload = () => { injectGudangDarkModeCSS(); checkAdminStatus(); loadData(); };
+
+// 🌙 SUNTIKAN CSS DARK MODE OTOMATIS
+function injectGudangDarkModeCSS() {
+    if(document.getElementById('gudangDarkModeCss')) return;
+    const style = document.createElement('style');
+    style.id = 'gudangDarkModeCss';
+    style.innerHTML = `
+        /* 🌙 ANTI-GELAP GUDANG INVENTARIS 🌙 */
+        body.dark-mode, [data-theme="dark"] { background-color: #0f172a !important; color: #e2e8f0 !important; }
+        body.dark-mode .toolbar-card { background: #1e293b !important; border-color: #334155 !important; }
+        body.dark-mode .pill-btn { background: #334155 !important; color: #94a3b8 !important; border-color: #475569 !important; }
+        body.dark-mode .pill-btn.active { background: #ea580c !important; color: white !important; border-color: #c2410c !important; }
+        
+        body.dark-mode .mission-card, body.dark-mode .list-item { background: #1e293b !important; border-color: #334155 !important; }
+        body.dark-mode .card-title, body.dark-mode .list-title { color: #f8fafc !important; }
+        
+        /* Modal & Box */
+        body.dark-mode .modal-content { background: #1e293b !important; color: #e2e8f0 !important; border: 1px solid #334155 !important; }
+        body.dark-mode .modal-content h3 { color: #f8fafc !important; }
+        
+        body.dark-mode div[style*="background:#f8fafc"],
+        body.dark-mode div[style*="background:#f1f5f9"],
+        body.dark-mode div[style*="background:#eff6ff"],
+        body.dark-mode div[style*="background:#f0fdf4"],
+        body.dark-mode div[style*="background:#fff"],
+        body.dark-mode div[style*="background:#fff7ed"],
+        body.dark-mode div[style*="background:white"],
+        body.dark-mode div[style*="background:#fef2f2"] { 
+            background: #0f172a !important; border-color: #334155 !important; color: #cbd5e1 !important; 
+        }
+        
+        /* Warna Teks Khusus */
+        body.dark-mode div[style*="color:#1e293b"] { color: #f8fafc !important; }
+        body.dark-mode div[style*="color:#1d4ed8"], body.dark-mode div[style*="color:#16a34a"] { color: #60a5fa !important; }
+        body.dark-mode span[style*="color:gray"], body.dark-mode label[style*="color:gray"], body.dark-mode div[style*="color:gray"], body.dark-mode p[style*="color:gray"] { color: #94a3b8 !important; }
+        
+        /* Form, Select, Input */
+        body.dark-mode select, body.dark-mode input { background: #1e293b !important; color: #f8fafc !important; border-color: #475569 !important; }
+        
+        /* Bulk Bar */
+        body.dark-mode .bulk-bar { background: #0f172a !important; border-top: 1px solid #334155 !important; }
+        body.dark-mode .bulk-info { color: #f8fafc !important; }
+        
+        /* Badge Status */
+        body.dark-mode .badge-status.status-gudang { background: #064e3b !important; color: #34d399 !important; border-color: #047857 !important; }
+        body.dark-mode .badge-status.status-lokasi { background: #78350f !important; color: #fbbf24 !important; border-color: #92400e !important; }
+        body.dark-mode .badge-status.status-dipakai { background: #1e3a8a !important; color: #93c5fd !important; border-color: #1e40af !important; }
+        body.dark-mode .badge-status.status-keranjang { background: #4c1d95 !important; color: #a78bfa !important; border-color: #5b21b6 !important; }
+        body.dark-mode .badge-status.status-perjalanan { background: #374151 !important; color: #cbd5e1 !important; border-color: #475569 !important; }
+        
+        /* Badge Inline (Bagus/Rusak/Wadah) */
+        body.dark-mode span[style*="background:#f0fdf4"] { background: #064e3b !important; color: #34d399 !important; border-color: #047857 !important; }
+        body.dark-mode span[style*="background:#fef2f2"] { background: #7f1d1d !important; color: #fca5a5 !important; border-color: #991b1b !important; }
+        body.dark-mode span[style*="background:#fef3c7"] { background: #78350f !important; color: #fbbf24 !important; border-color: #92400e !important; }
+        
+        /* Scanner & Misc */
+        body.dark-mode .btn-scanner-action { background: #334155 !important; color: #f8fafc !important; border-color: #475569 !important; }
+        body.dark-mode .gallery-box { background: transparent !important; }
+    `;
+    document.head.appendChild(style);
+}
 
 function checkAdminStatus() { if (userPin && VALID_PINS.includes(userPin)) { isAdminMode = true; document.body.classList.add("admin-mode-active"); document.getElementById("modeStatusText").innerHTML = "🔴 Admin Mode"; document.getElementById("btnUnlock").innerText = "🔓 Tutup Akses"; } else { isAdminMode = false; userPin = ""; document.body.classList.remove("admin-mode-active"); document.getElementById("modeStatusText").innerHTML = "🟢 Read-Only Mode"; document.getElementById("btnUnlock").innerText = "🔒 Buka Akses"; } }
 function toggleAdminMode() { if (isAdminMode) { if(confirm("Tutup akses Admin? Memori PIN dihapus.")) { localStorage.removeItem("AV_INVENTORY_PIN"); userPin = ""; checkAdminStatus(); showToast("Mode Read-Only aktif."); applyFilters(); } } else { let input = prompt("Masukkan PIN Kapten / Admin Gudang:"); if (input) { let pinAttempt = input.trim().toLowerCase(); if (VALID_PINS.includes(pinAttempt)) { userPin = pinAttempt; localStorage.setItem("AV_INVENTORY_PIN", userPin); checkAdminStatus(); showToast("Akses Admin Terbuka!"); applyFilters(); } else { alert("⛔ AKSES DITOLAK! PIN tidak punya izin ke Gudang."); } } } }

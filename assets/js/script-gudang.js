@@ -363,7 +363,6 @@ async function processAssignMission(btn) {
 
     selectedCodes = [...new Set(selectedCodes)]; // Hapus Duplikat
     
-    // Validasi pencegahan error kalau mau nge-push ke misi tapi kode kosong
     if (missionId && selectedCodes.length === 0) { alert("Alat yang dipilih tidak memiliki Kode Barang/Wadah, tidak bisa diassign ke misi!"); return; }
 
     btn.disabled = true; 

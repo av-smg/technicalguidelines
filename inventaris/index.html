@@ -72,6 +72,32 @@ location: "MASTER"
         </div>
         <div id="loading" style="text-align: center; padding: 40px; color: gray; font-weight:bold;">Memuat Data Database...</div>
         <div id="dataContainer" class="grid-cards"></div>
+        <!-- ==========================================
+     TAMBAHAN HTML: PANEL FILTER LANJUTAN
+     ========================================== -->
+<div style="padding: 0 15px; margin-bottom: 15px;">
+    <button id="btnBukaFilter" style="background:#334155; color:white; border:none; padding:8px 15px; border-radius:8px; font-size:11px; font-weight:bold; cursor:pointer;">
+        ⚙️ FILTER LANJUTAN
+    </button>
+</div>
+
+<!-- Laci Checkbox (Tersembunyi secara default) -->
+<div id="panelFilterLanjutan" style="display:none; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:15px; margin:0 15px 15px 15px;">
+    
+    <div style="margin-bottom:10px; font-size:12px;"><strong>🛠️ Pilih Tim:</strong></div>
+    <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:15px; font-size:11px;">
+        <label><input type="checkbox" class="cek-tim" value="Tim Speaker"> Speaker</label>
+        <label><input type="checkbox" class="cek-tim" value="Tim Kabel"> Kabel</label>
+        <label><input type="checkbox" class="cek-tim" value="Tim Booth"> Booth</label>
+    </div>
+
+    <div style="margin-bottom:10px; font-size:12px;"><strong>📍 Pilih Status:</strong></div>
+    <div style="display:flex; flex-wrap:wrap; gap:10px; font-size:11px;">
+        <label><input type="checkbox" class="cek-status" value="Gudang"> Di Gudang</label>
+        <label><input type="checkbox" class="cek-status" value="Akan Dibawa"> Akan Dibawa</label>
+        <label><input type="checkbox" class="cek-status" value="Lokasi Event"> Lokasi Event</label>
+    </div>
+</div>
     </main>
 
     <!-- MODAL TAMBAH BARU & EDIT (Tetap Sama) -->

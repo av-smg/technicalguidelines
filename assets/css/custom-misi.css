@@ -1,9 +1,9 @@
 /* ========================================= */
-/* GAYA DESAIN MISSION CARD LAPANGAN (V.16)  */
+/* GAYA DESAIN MISSION CARD LAPANGAN (V.16.3)*/
 /* ========================================= */
-body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f8fafc; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f8fafc; margin: 0; padding: 0; transition: background 0.3s, color 0.3s; }
 .mission-header { background: #1e293b; color: white; padding: 10px 15px; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-.team-filters { display: flex; gap: 6px; padding: 8px 15px; overflow-x: auto; background: white; border-bottom: 1px solid #e2e8f0; }
+.team-filters { display: flex; gap: 6px; padding: 8px 15px; overflow-x: auto; background: white; border-bottom: 1px solid #e2e8f0; transition: background 0.3s; }
 .team-filters::-webkit-scrollbar { display: none; }
 .btn-team { padding: 5px 12px; border-radius: 20px; border: 1px solid #cbd5e1; background: #f1f5f9; color: #475569; font-weight: bold; font-size: 10px; cursor: pointer; white-space: nowrap; transition: 0.2s; }
 .btn-team.active { background: #3b82f6; color: white; border-color: #2563eb; }
@@ -11,12 +11,12 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 /* LAYOUT GRID SUPER PADAT UNTUK TABLET/HP */
 .missions-container { 
     display: grid; 
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); /* Lebar kartu dikecilkan sedikit */
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); 
     gap: 10px; 
     padding: 10px 15px 80px 15px; 
 }
 
-.mission-card { background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 6px; position: relative; border-left: 4px solid #f59e0b; }
+.mission-card { background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 6px; position: relative; border-left: 4px solid #f59e0b; transition: 0.3s; }
 .mission-card.selesai { border-left-color: #10b981; background: #f0fdf4; opacity: 0.8; }
 .mission-card.selesai .mission-title { text-decoration: line-through; color: #64748b; }
 
@@ -78,3 +78,53 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 .scanner-controls { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
 .btn-scanner-action { background: #f8fafc; border: 1px solid #cbd5e1; padding: 8px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; flex: 1; display: flex; align-items: center; justify-content: center; gap: 5px; }
 .badge-diganti { background: #fef08a; color: #a16207; font-size: 8px; padding: 2px 5px; border-radius: 4px; font-weight: bold; margin-bottom: 4px; display: inline-block; }
+
+
+/* ========================================= */
+/* 🌙 DARK MODE OVERRIDES (ANTI-GELAP) 🌙    */
+/* ========================================= */
+body.dark-mode, [data-theme="dark"] { background-color: #0f172a !important; color: #e2e8f0 !important; }
+body.dark-mode h2, body.dark-mode h3 { color: #f8fafc !important; }
+body.dark-mode .btn-lock { background: #334155 !important; color: #cbd5e1 !important; border-color: #475569 !important; }
+body.dark-mode .team-filters { background: #1e293b !important; border-bottom-color: #334155 !important; }
+body.dark-mode .btn-team { background: #334155 !important; color: #94a3b8 !important; border-color: #475569 !important; }
+body.dark-mode .btn-team.active { background: #3b82f6 !important; color: white !important; }
+
+/* Elemen dalam Mission Card */
+body.dark-mode .mission-card { background: #1e293b !important; border-color: #334155 !important; }
+body.dark-mode .mission-card.selesai { background: #064e3b !important; border-color: #047857 !important; border-left-color: #10b981 !important; opacity: 0.9; }
+body.dark-mode .mission-title { color: #f8fafc !important; }
+body.dark-mode .mission-header-click { border-bottom-color: #475569 !important; }
+body.dark-mode .mission-id { background: #334155 !important; color: #cbd5e1 !important; }
+body.dark-mode .toggle-icon { color: #cbd5e1 !important; }
+
+/* Block Instruksi & Smart Tags */
+body.dark-mode .instruction-box { background: #0f172a !important; color: #cbd5e1 !important; border-left-color: #3b82f6 !important; border: 1px solid #334155; }
+body.dark-mode .instruction-box b { color: #60a5fa !important; }
+body.dark-mode .tag-panjang { background: #78350f !important; color: #fde68a !important; border-color: #92400e !important; }
+body.dark-mode .tag-aset { background: #1e3a8a !important; color: #bfdbfe !important; border-color: #1e40af !important; }
+
+/* Block Daftar Alat */
+body.dark-mode .package-list { background: #0f172a !important; border-color: #334155 !important; }
+body.dark-mode .package-list > div { color: #94a3b8 !important; }
+body.dark-mode .box-group { background: #1e293b !important; border-color: #475569 !important; }
+body.dark-mode .box-group-header { background: #334155 !important; color: #f8fafc !important; border-bottom-color: #475569 !important; }
+body.dark-mode .package-item { background: #1e293b !important; border-color: #475569 !important; }
+body.dark-mode .pkg-name { color: #f8fafc !important; }
+body.dark-mode .pkg-img { border-color: #475569 !important; }
+
+/* Modal Detail & Priority Box */
+body.dark-mode .modal-content { background: #1e293b !important; color: #e2e8f0 !important; }
+body.dark-mode .modal-content h3 { color: #f8fafc !important; }
+body.dark-mode .modal-content div[style*="background:#f8fafc"] { background: #0f172a !important; border-color: #334155 !important; }
+body.dark-mode .modal-content div[style*="background:#eff6ff"] { background: #0f172a !important; border-color: #334155 !important; }
+body.dark-mode .modal-content div[style*="background:#f0fdf4"] { background: #064e3b !important; border-color: #047857 !important; }
+body.dark-mode .modal-content span[style*="color:gray"] { color: #94a3b8 !important; }
+
+body.dark-mode .priority-box { background: #1e293b !important; border-color: #334155 !important; }
+body.dark-mode .priority-header { background: #334155 !important; color: #f8fafc !important; }
+body.dark-mode .priority-content { background: #0f172a !important; color: #cbd5e1 !important; }
+
+body.dark-mode .mission-progress-container { background: #1e293b !important; border-color: #334155 !important; }
+body.dark-mode .mission-progress-container div { color: #f8fafc !important; }
+body.dark-mode .progress-bar-bg { background: #334155 !important; }

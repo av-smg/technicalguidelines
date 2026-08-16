@@ -108,26 +108,35 @@
 .toast-success { background: #10b981; }
 .toast-error { background: #ef4444; }
 /* ==========================================
-   TAMBAHAN CSS: WARNA TOMBOL FILTER AKTIF
+   PERBAIKAN CSS: WARNA TOMBOL FILTER AKTIF
    ========================================== */
-/* Hijau untuk Gudang */
-.pill-btn[data-filter="Gudang"].active { 
+
+/* Hijau: Semua Alat & Di Gudang */
+.pill-btn[onclick*="'all'"].active,
+.pill-btn[onclick*="'Di Gudang'"].active { 
     background: #10b981 !important; 
     border-color: #10b981 !important; 
     color: white !important; 
 }
-/* Biru untuk Lokasi Event / Dipakai */
-.pill-btn[data-filter="Lokasi Event"].active,
-.pill-btn[data-filter="Dipakai"].active { 
+
+/* Biru: Akan Dibawa & Dipakai */
+.pill-btn[onclick*="'Akan Dibawa'"].active,
+.pill-btn[onclick*="'Sedang Dipakai'"].active { 
     background: #3b82f6 !important; 
     border-color: #3b82f6 !important; 
     color: white !important; 
 }
-/* Merah untuk Perbaikan / Servis / Karantina */
-.pill-btn[data-filter="Perbaikan"].active,
-.pill-btn[data-filter="Servis"].active,
-.pill-btn[data-filter="Karantina"].active { 
+
+/* Merah: Perbaikan / Rusak */
+.pill-btn[onclick*="'Rusak'"].active { 
     background: #ef4444 !important; 
     border-color: #ef4444 !important; 
+    color: white !important; 
+}
+
+/* Oranye: Di Lokasi Event (Tombol Khusus) */
+.pill-btn[onclick*="'Di Lokasi Event'"].active { 
+    background: #f59e0b !important; 
+    border-color: #f59e0b !important; 
     color: white !important; 
 }

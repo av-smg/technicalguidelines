@@ -1,52 +1,54 @@
 /* ========================================= */
-/* GAYA DESAIN MISSION CARD LAPANGAN (V.15)  */
+/* GAYA DESAIN MISSION CARD LAPANGAN (V.16)  */
 /* ========================================= */
 body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f8fafc; margin: 0; padding: 0; }
-.mission-header { background: #1e293b; color: white; padding: 15px 20px; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-.team-filters { display: flex; gap: 8px; padding: 10px 20px; overflow-x: auto; background: white; border-bottom: 1px solid #e2e8f0; }
+.mission-header { background: #1e293b; color: white; padding: 10px 15px; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+.team-filters { display: flex; gap: 6px; padding: 8px 15px; overflow-x: auto; background: white; border-bottom: 1px solid #e2e8f0; }
 .team-filters::-webkit-scrollbar { display: none; }
-.btn-team { padding: 6px 14px; border-radius: 20px; border: 1px solid #cbd5e1; background: #f1f5f9; color: #475569; font-weight: bold; font-size: 11px; cursor: pointer; white-space: nowrap; transition: 0.2s; }
+.btn-team { padding: 5px 12px; border-radius: 20px; border: 1px solid #cbd5e1; background: #f1f5f9; color: #475569; font-weight: bold; font-size: 10px; cursor: pointer; white-space: nowrap; transition: 0.2s; }
 .btn-team.active { background: #3b82f6; color: white; border-color: #2563eb; }
 
-/* LAYOUT GRID LEBIH PADAT */
+/* LAYOUT GRID SUPER PADAT UNTUK TABLET/HP */
 .missions-container { 
     display: grid; 
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
-    gap: 12px; 
-    padding: 12px 20px 80px 20px; 
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); /* Lebar kartu dikecilkan sedikit */
+    gap: 10px; 
+    padding: 10px 15px 80px 15px; 
 }
 
-.mission-card { background: white; border-radius: 10px; border: 1px solid #e2e8f0; padding: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 8px; position: relative; border-left: 4px solid #f59e0b; }
+.mission-card { background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 6px; position: relative; border-left: 4px solid #f59e0b; }
 .mission-card.selesai { border-left-color: #10b981; background: #f0fdf4; opacity: 0.8; }
 .mission-card.selesai .mission-title { text-decoration: line-through; color: #64748b; }
 
-.mission-top { display: flex; justify-content: space-between; align-items: flex-start; }
-.mission-id { font-size: 10px; font-weight: 900; color: #64748b; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; }
-.badge-zona { font-size: 10px; background: #fef3c7; color: #d97706; padding: 2px 6px; border-radius: 4px; font-weight: bold; border: 1px solid #fde68a; display: inline-flex; align-items: center; gap: 4px; }
+.mission-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;}
+.mission-id { font-size: 9px; font-weight: 900; color: #64748b; background: #f1f5f9; padding: 2px 5px; border-radius: 4px; }
+.badge-zona { font-size: 9px; background: #fef3c7; color: #d97706; padding: 2px 5px; border-radius: 4px; font-weight: bold; border: 1px solid #fde68a; display: inline-flex; align-items: center; gap: 4px; }
 
-.mission-title { font-size: 13px; font-weight: 800; color: #0f172a; line-height: 1.3; margin: 0; }
+/* MENCEGAH JUDUL MENJADI RAKSASA */
+.mission-title { font-size: 12px !important; font-weight: 700 !important; color: #0f172a !important; line-height: 1.3 !important; margin: 0 !important; }
+.toggle-icon { font-size: 9px; color: #64748b; margin-left: 5px; }
 
 /* GAYA UNTUK PAKET BARANG & FOTO (MINIMALIS) */
-.package-list { display: flex; flex-direction: column; gap: 6px; background: #f8fafc; padding: 8px; border-radius: 6px; border: 1px solid #e2e8f0; }
-.package-item { display: flex; align-items: center; gap: 8px; background: white; padding: 5px; border-radius: 6px; border: 1px solid #cbd5e1; }
-.pkg-img { width: 30px; height: 30px; object-fit: cover; border-radius: 4px; border: 1px solid #e2e8f0; flex-shrink: 0; }
+.package-list { display: flex; flex-direction: column; gap: 4px; background: #f8fafc; padding: 6px; border-radius: 6px; border: 1px solid #e2e8f0; }
+.package-item { display: flex; align-items: center; gap: 8px; background: white; padding: 4px; border-radius: 6px; border: 1px solid #cbd5e1; }
+.pkg-img { width: 28px; height: 28px; object-fit: cover; border-radius: 4px; border: 1px solid #e2e8f0; flex-shrink: 0; }
 .pkg-info { flex: 1; overflow: hidden; }
 .pkg-name { font-size: 10px; font-weight: bold; color: #334155; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
 .pkg-code { font-size: 9px; font-weight: 900; color: #ea580c; }
 
 .mission-action { display: flex; justify-content: space-between; align-items: center; margin-top: auto; border-top: 1px dashed #cbd5e1; padding-top: 8px; }
-.btn-complete { border: none; padding: 8px 12px; border-radius: 6px; font-weight: 900; font-size: 11px; cursor: pointer; transition: 0.2s; flex: 1; display: flex; justify-content: center; align-items: center; gap: 5px; color: white;}
+.btn-complete { border: none; padding: 6px 10px; border-radius: 6px; font-weight: 900; font-size: 10px; cursor: pointer; transition: 0.2s; flex: 1; display: flex; justify-content: center; align-items: center; gap: 5px; color: white;}
 .btn-complete:disabled { background: #94a3b8; cursor: not-allowed; }
 .btn-complete.done { background: #f1f5f9; color: #10b981; border: 1px solid #10b981; pointer-events: none; }
 
-.toast-msg { visibility: hidden; min-width: 250px; background-color: #1e293b; color: #fff; text-align: center; border-radius: 30px; padding: 10px 20px; position: fixed; z-index: 99999; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 12px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.2); opacity: 0; transition: opacity 0.3s, bottom 0.3s; }
+.toast-msg { visibility: hidden; min-width: 250px; background-color: #1e293b; color: #fff; text-align: center; border-radius: 30px; padding: 10px 20px; position: fixed; z-index: 99999; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 11px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.2); opacity: 0; transition: opacity 0.3s, bottom 0.3s; }
 .toast-msg.show { visibility: visible; opacity: 1; bottom: 50px; }
 .toast-msg.error { background-color: #ef4444 !important; }
 
-/* MODAL & ZOOM DI-UPDATE MENGIKUTI GUDANG */
+/* MODAL & ZOOM */
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 99999; opacity: 0; pointer-events: none; transition: 0.2s; padding: 15px; box-sizing: border-box;}
 .modal-overlay.active { opacity: 1; pointer-events: auto; }
-.modal-content { width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transform: translateY(20px); transition: 0.3s; background: white; border-radius: 15px;}
+.modal-content { width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transform: translateY(20px); transition: 0.3s; background: white; border-radius: 12px;}
 .modal-overlay.active .modal-content { transform: translateY(0); }
 
 .detail-gallery { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; scroll-snap-type: x mandatory; }
@@ -56,23 +58,23 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 
 .zoom-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 999999; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: 0.3s; }
 .zoom-overlay.active { opacity: 1; pointer-events: auto; }
-.btn-back-zoom { position: absolute; top: 20px; left: 20px; background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.5); padding: 8px 15px; border-radius: 20px; font-weight: bold; font-size: 14px; backdrop-filter: blur(5px); cursor: pointer; }
+.btn-back-zoom { position: absolute; top: 20px; left: 20px; background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.5); padding: 6px 12px; border-radius: 20px; font-weight: bold; font-size: 12px; backdrop-filter: blur(5px); cursor: pointer; }
 
 /* MISC UI */
-.mission-progress-container { background: white; padding: 12px; border-radius: 10px; margin-bottom: 15px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 8px; }
-.progress-bar-bg { width: 100%; height: 6px; background: #e2e8f0; border-radius: 10px; overflow: hidden; }
+.mission-progress-container { background: white; padding: 8px 10px; border-radius: 8px; margin-bottom: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 6px; border: 1px solid #e2e8f0; }
+.progress-bar-bg { width: 100%; height: 5px; background: #e2e8f0; border-radius: 10px; overflow: hidden; }
 .progress-bar-fill { height: 100%; background: #10b981; width: 0%; transition: width 0.5s ease; }
-.filter-toggle { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 6px 10px; border-radius: 6px; font-size: 10px; font-weight: bold; color: #475569; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; }
+.filter-toggle { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 4px 8px; border-radius: 6px; font-size: 9px; font-weight: bold; color: #475569; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; }
 .filter-toggle.active { background: #3b82f6; color: white; border-color: #2563eb; }
 
 /* Collapsible Misi */
-.mission-header-click { cursor: pointer; user-select: none; padding-bottom: 5px; border-bottom: 1px dashed #e2e8f0; margin-bottom: 8px; }
+.mission-header-click { cursor: pointer; user-select: none; padding-bottom: 4px; border-bottom: 1px dashed #e2e8f0; margin-bottom: 6px; }
 .mission-header-click:active { background-color: #f8fafc; }
-.mission-content { display: none; margin-top: 5px; }
+.mission-content { display: none; margin-top: 4px; }
 .mission-content.open { display: block; animation: fadeInDown 0.2s ease; }
 @keyframes fadeInDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
 /* Scanner Custom Controls */
 .scanner-controls { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
-.btn-scanner-action { background: #f8fafc; border: 1px solid #cbd5e1; padding: 10px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; flex: 1; display: flex; align-items: center; justify-content: center; gap: 5px; }
-.badge-diganti { background: #fef08a; color: #a16207; font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: bold; margin-bottom: 4px; display: inline-block; }
+.btn-scanner-action { background: #f8fafc; border: 1px solid #cbd5e1; padding: 8px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; flex: 1; display: flex; align-items: center; justify-content: center; gap: 5px; }
+.badge-diganti { background: #fef08a; color: #a16207; font-size: 8px; padding: 2px 5px; border-radius: 4px; font-weight: bold; margin-bottom: 4px; display: inline-block; }

@@ -82,9 +82,57 @@ function getFilteredData() {
         return matchQ && matchPill; 
     }); 
 }
-function applyFilters() { render(getFilteredData()); }
-function getStatusClass(status) { if(status === 'Akan Dibawa') return 'badge-status status-keranjang'; if(status === 'Sedang Dipakai') return 'badge-status status-dipakai'; if(status.includes('Perjalanan')) return 'badge-status status-perjalanan'; return 'badge-status status-gudang'; }
+function getFilteredData() { 
+    const q = document.getElementById("searchInput").value.toLowerCase(); 
+    
+    // 🔍 1. BACA STATUS FILTER LANJUTAN
+    const panelFilter = document.getElementById('panelFilterLanjutan');
+    const isAdvancedOpen = panelFilter && panelFilter.style.display === 'block';
+    let timAktif = [];
+    let statusAktif = [];
 
+    if (isAdvancedOpen) {
+        // Ambil kata kunci tim (menghilangkan kata 'Tim ' agar lebih akurat)
+        timAktif = Array.from(document.querySelectorAll('.cek-tim:checked')).map(cb => cb.value.toLowerCase().replace('tim ', ''));
+        statusAktif = Array.from(document.querySelectorAll('.cek-status:checked')).map(cb => cb.value);
+    }
+
+    return allItems.filter(i => { 
+        // Pencarian Teks
+        const matchQ = i.nama_barang.toLowerCase().includes(q) || (i.kode_barang||"").toLowerCase().includes(q) || (i.kode_wadah||"").toLowerCase().includes(q); 
+        
+        let stat = i.status_digunakan || 'Di Gudang'; if(stat === 'FALSE') stat = 'Di Gudang'; 
+        let lok = i.lokasi || '';
+        let kategoriBarang = (i.kategori || i.tim || i.nama_barang || "").toLowerCase();
+        
+        // 🔍 2. LOGIKA TOMBOL FILTER ATAS (PILLS)
+        let matchPill = false;
+        if (activeFilterPill === 'all') matchPill = true;
+        else if (activeFilterPill === 'Rusak') { matchPill = (i.kondisi === 'Rusak' || i.kondisi === 'Periksa'); }
+        else if (activeFilterPill === 'Di Lokasi Event') { matchPill = (lok === 'Di Lokasi Event'); } 
+        else matchPill = (stat === activeFilterPill);
+        
+        // 🔍 3. LOGIKA FILTER LANJUTAN (CHECKBOX)
+        let matchAdvanced = true;
+        if (isAdvancedOpen) {
+            // Cek kecocokan Tim
+            let matchTim = timAktif.length === 0 || timAktif.some(t => kategoriBarang.includes(t));
+            
+            // Cek kecocokan Status
+            let matchStatus = statusAktif.length === 0;
+            if (!matchStatus) {
+                if (statusAktif.includes('Gudang') && stat === 'Di Gudang') matchStatus = true;
+                if (statusAktif.includes('Akan Dibawa') && stat === 'Akan Dibawa') matchStatus = true;
+                if (statusAktif.includes('Lokasi Event') && lok === 'Di Lokasi Event') matchStatus = true;
+            }
+            
+            matchAdvanced = matchTim && matchStatus;
+        }
+
+        // Tampilkan hanya jika lolos semua tes
+        return matchQ && matchPill && matchAdvanced; 
+    }); 
+}
 function render(data) {
     const container = document.getElementById("dataContainer"); container.innerHTML = "";
     data.forEach(item => {
@@ -435,30 +483,32 @@ btnBukaFilter.addEventListener('click', () => {
     }
 });
 
-// Fungsi memproses centang
+/* ==========================================
+   PERBAIKAN JS: LOGIKA FILTER LANJUTAN
+   ========================================== */
+const btnBukaFilter = document.getElementById('btnBukaFilter');
+const panelFilter = document.getElementById('panelFilterLanjutan');
+const semuaCekbox = document.querySelectorAll('.cek-tim, .cek-status');
+
+btnBukaFilter.addEventListener('click', () => {
+    if (panelFilter.style.display === 'none') {
+        panelFilter.style.display = 'block';
+        btnBukaFilter.innerHTML = '❌ TUTUP FILTER';
+        btnBukaFilter.style.background = '#ef4444';
+    } else {
+        panelFilter.style.display = 'none';
+        btnBukaFilter.innerHTML = '⚙️ FILTER LANJUTAN';
+        btnBukaFilter.style.background = '#334155';
+        
+        // Reset centang saat ditutup agar kembali ke "Semua Alat"
+        semuaCekbox.forEach(cek => cek.checked = false);
+        applyFilters(); 
+    }
+});
+
+// Panggil ulang render otomatis saat checkbox dicentang!
 semuaCekbox.forEach(cek => {
     cek.addEventListener('change', () => {
-        // Ambil nilai yang dicentang
-        const timAktif = Array.from(document.querySelectorAll('.cek-tim:checked')).map(cb => cb.value);
-        const statusAktif = Array.from(document.querySelectorAll('.cek-status:checked')).map(cb => cb.value);
-        
-        // Ambil semua kartu barang
-        const semuaKartu = document.querySelectorAll('.mission-card'); // Sesuaikan class jika beda
-        
-        semuaKartu.forEach(kartu => {
-            const timKartu = kartu.getAttribute('data-team') || "";
-            const statusKartu = kartu.getAttribute('data-status') || "";
-            
-            // Cek apakah kartu cocok dengan filter
-            const cocokTim = timAktif.length === 0 || timAktif.includes(timKartu);
-            const cocokStatus = statusAktif.length === 0 || statusAktif.includes(statusKartu);
-            
-            // Tampilkan atau sembunyikan
-            if (cocokTim && cocokStatus) {
-                kartu.parentElement.style.display = 'block'; // Asumsi kartu ada di dalam div wrapper
-            } else {
-                kartu.parentElement.style.display = 'none';
-            }
-        });
+        applyFilters();
     });
 });

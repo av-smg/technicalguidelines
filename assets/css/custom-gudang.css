@@ -8,7 +8,6 @@
     gap: 8px;
     overflow-x: auto;
     padding-bottom: 5px;
-    margin-top: 10px;
     -webkit-overflow-scrolling: touch;
 }
 .filter-pills-wrapper::-webkit-scrollbar { display: none; }
@@ -25,10 +24,36 @@
     cursor: pointer;
     transition: 0.2s;
 }
+
+/* WARNA DASAR AKTIF (Untuk Semua Alat & Akan Dibawa) -> ORANYE */
 .pill-btn.active {
-    background: #ea580c; /* Oranye Kalem */
+    background: #ea580c; 
     color: white;
     border-color: #ea580c;
+}
+
+/* KHUSUS: Di Gudang -> HIJAU */
+.pill-btn[data-filter="Di Gudang"].active { 
+    background: #10b981 !important; 
+    border-color: #10b981 !important; 
+}
+
+/* KHUSUS: Sedang Dipakai -> BIRU */
+.pill-btn[data-filter="Sedang Dipakai"].active { 
+    background: #3b82f6 !important; 
+    border-color: #3b82f6 !important; 
+}
+
+/* KHUSUS: Perbaikan / Rusak -> MERAH */
+.pill-btn[data-filter="Rusak"].active { 
+    background: #ef4444 !important; 
+    border-color: #ef4444 !important; 
+}
+
+/* KHUSUS: Di Lokasi Event -> KUNING/AMBER (Beda dengan Akan Dibawa) */
+.pill-btn[data-filter="Di Lokasi Event"].active { 
+    background: #f59e0b !important; 
+    border-color: #f59e0b !important; 
 }
 
 /* CARDS 2 KOLOM SHOPEE (Untuk HP) */
@@ -51,7 +76,7 @@
     border-radius: 12px; 
     padding: 10px; 
     cursor: pointer; 
-    transition: 0.2s; s
+    transition: 0.2s; 
     border: 1px solid #e2e8f0; 
     display: flex; 
     flex-direction: column; 
@@ -85,7 +110,7 @@
 .status-gudang { background: #f1f5f9; color: #64748b; }
 .status-keranjang { background: #fff7ed; color: #ea580c; border: 1px solid #fed7aa; }
 .status-perjalanan { background: #f3e8ff; color: #7e22ce; }
-.status-lokasi { background: #eff6ff; color: #2563eb; }
+.status-lokasi { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; } /* Beda dengan keranjang */
 .status-dipakai { background: #f0fdf4; color: #16a34a; }
 .status-karantina { background: #fef2f2; color: #dc2626; border: 1px dashed #f87171; }
 
@@ -107,36 +132,3 @@
 .toast-msg.show { opacity: 1; top: 40px; }
 .toast-success { background: #10b981; }
 .toast-error { background: #ef4444; }
-/* ==========================================
-   PERBAIKAN CSS: WARNA TOMBOL FILTER AKTIF
-   ========================================== */
-
-/* Hijau: Semua Alat & Di Gudang */
-.pill-btn[onclick*="'all'"].active,
-.pill-btn[onclick*="'Di Gudang'"].active { 
-    background: #10b981 !important; 
-    border-color: #10b981 !important; 
-    color: white !important; 
-}
-
-/* Biru: Akan Dibawa & Dipakai */
-.pill-btn[onclick*="'Akan Dibawa'"].active,
-.pill-btn[onclick*="'Sedang Dipakai'"].active { 
-    background: #3b82f6 !important; 
-    border-color: #3b82f6 !important; 
-    color: white !important; 
-}
-
-/* Merah: Perbaikan / Rusak */
-.pill-btn[onclick*="'Rusak'"].active { 
-    background: #ef4444 !important; 
-    border-color: #ef4444 !important; 
-    color: white !important; 
-}
-
-/* Oranye: Di Lokasi Event (Tombol Khusus) */
-.pill-btn[onclick*="'Di Lokasi Event'"].active { 
-    background: #f59e0b !important; 
-    border-color: #f59e0b !important; 
-    color: white !important; 
-}

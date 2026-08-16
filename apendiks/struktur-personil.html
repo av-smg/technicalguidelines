@@ -74,7 +74,7 @@ location: "Apendiks"
     .dept-body { padding: 25px; display: flex; flex-direction: column; gap: 20px; }
 
     /* ========================================= */
-    /* GRID LAYOUT TIM AUDIO (BARU)              */
+    /* GRID LAYOUT TIM AUDIO                     */
     /* ========================================= */
     .audio-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
     
@@ -91,11 +91,11 @@ location: "Apendiks"
     .sub-card:hover { border-color: #cbd5e1; transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.05); }
     
     .sub-head { padding: 12px 10px; font-size: 1.1rem; font-weight: 900; text-align: center; color: white; display: flex; align-items: center; justify-content: center; gap: 8px; }
-    .sub-head.kabel { background: #f59e0b; color: #0f172a; } /* Kuning/Orange */
-    .sub-head.speaker { background: #dc2626; } /* Merah */
-    .sub-head.booth { background: #57534e; } /* Coklat/Abu Tua */
-    .sub-head.inventaris { background: #1e293b; } /* Navy Blue */
-    .sub-head.tambahan { background: #3b82f6; } /* Biru Muda */
+    .sub-head.kabel { background: #f59e0b; color: #0f172a; } 
+    .sub-head.speaker { background: #dc2626; } 
+    .sub-head.booth { background: #57534e; } 
+    .sub-head.inventaris { background: #1e293b; } 
+    .sub-head.tambahan { background: #3b82f6; } 
 
     .sub-body { padding: 15px; display: flex; flex-direction: column; align-items: center; gap: 10px; flex-grow: 1; }
     
@@ -108,7 +108,7 @@ location: "Apendiks"
     .wide-col { grid-column: 1 / -1; }
 
     /* ========================================= */
-    /* STYLE UNTUK TIM PODIUM (BISA DIEDIT)      */
+    /* STYLE UNTUK TIM PODIUM                    */
     /* ========================================= */
     .supervisor-block { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 16px; padding: 20px; text-align: center; }
     .supervisor-block .role { font-size: 0.85rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
@@ -119,7 +119,7 @@ location: "Apendiks"
     .personnel-block { background: #ffffff; border: 2px dashed #cbd5e1; border-radius: 16px; padding: 20px; flex-grow: 1; }
     .personnel-block .title { font-size: 0.85rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 15px; text-align: center; }
     
-    /* PERSONNEL TAGS POOL (Pills) */
+    /* PERSONNEL TAGS POOL */
     .personnel-pool { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
     .personnel-tag { 
         background: #ffffff; color: #334155; padding: 8px 16px; border-radius: 20px; 
@@ -152,7 +152,6 @@ location: "Apendiks"
 
     body.dark-mode .dept-box { background: #0f172a; border-color: #1e293b; }
     
-    /* Dark Mode: Audio Sub-Cards */
     body.dark-mode .sub-card { background: #020617; border-color: #1e293b; }
     body.dark-mode .captain-badge { background: #1e293b; color: #f8fafc; border-color: #334155; }
     
@@ -179,7 +178,7 @@ location: "Apendiks"
 
     <header class="main-header">
       <span class="year-badge">Departemen Tata Suara</span>
-      <h1>Struktur Organisasi AV Regional 2026</h1>
+      <h1>Struktur Teknis Regional 2026</h1>
     </header>
 
     <!-- POSISI TERTINGGI -->
@@ -192,31 +191,29 @@ location: "Apendiks"
         <div class="supreme-title">Yesus</div>
       </div>
       <div class="supreme-arrow">⬇️</div>
-    <div class="supreme-card">
-        <div class="supreme-title"></div>
-      </div>
-      <div class="supreme-arrow">⬇️</div>
     </div>
-    
 
     <div class="management-grid">
       <div class="card card-core">
         <div class="role-label">💼 Pengawas Acara</div>
-        <div class="name-display">Radix Rahardjani</div>
+        <div class="name-display">Danis Sriwijaya</div>
       </div>
-
+      <div class="card card-core">
+        <div class="role-label">💼 Asisten Pengawas Acara</div>
+        <div class="name-display">Bagus Andreanto</div>
+      </div>
       <div class="card card-core">
         <div class="role-label">💼 Pengawas Audio Video</div>
-        <div class="name-display">Johan Kristy Pradana</div>
+        <div class="name-display">Wilfred Krismasto</div>
       </div>
     </div>
 
     <div class="departments-container">
       
-      <!-- 🎙️ TIM AUDIO (NEW GRID LAYOUT) -->
+      <!-- 🎙️ TIM AUDIO -->
       <div class="dept-box audio">
         <div class="dept-header">
-          <span>🎙️ TIM AUDIO</span>
+          <span>🎙️ TIM AUDIO 2026</span>
         </div>
         <div class="dept-body">
           
@@ -226,7 +223,8 @@ location: "Apendiks"
               <div class="sub-card">
                   <div class="sub-head kabel">🔌 Tim Kabel</div>
                   <div class="sub-body">
-                      <div class="captain-badge">👑 Vina</div>
+                      <!-- Ganti mahkota ke topi 🧢 -->
+                      <div class="captain-badge">🧢 Vina</div>
                       <div class="personnel-tag">Anggid</div>
                       <div class="personnel-tag">Sachi</div>
                       <div class="personnel-tag">Surya</div>
@@ -239,7 +237,7 @@ location: "Apendiks"
               <div class="sub-card">
                   <div class="sub-head speaker">🔊 Tim Speaker</div>
                   <div class="sub-body">
-                      <div class="captain-badge">👑 Malkhiel</div>
+                      <div class="captain-badge">🧢 Malkhiel</div>
                       <div class="personnel-tag">Yoka</div>
                       <div class="personnel-tag">Jojo</div>
                       <div class="personnel-tag">Naela</div>
@@ -251,7 +249,7 @@ location: "Apendiks"
               <div class="sub-card">
                   <div class="sub-head booth">🎛️ Tim Booth</div>
                   <div class="sub-body">
-                      <div class="captain-badge">👑 Truna</div>
+                      <div class="captain-badge">🧢 Truna</div>
                       <div class="personnel-tag">Edo</div>
                   </div>
               </div>
@@ -261,7 +259,7 @@ location: "Apendiks"
                   <div class="sub-head inventaris">🗂️ Tim Inventaris</div>
                   <div class="sub-body" style="flex-direction: row; justify-content: center; flex-wrap: wrap;">
                       <div class="personnel-tag">Sarah (Kabel)</div>
-                      <div class="captain-badge" style="margin: 0 10px;">👑 Emma (Booth)</div>
+                      <div class="captain-badge" style="margin: 0 10px;">🧢 Emma (Booth)</div>
                       <div class="personnel-tag">Peni (Speaker)</div>
                   </div>
               </div>
@@ -270,7 +268,6 @@ location: "Apendiks"
               <div class="sub-card wide-col">
                   <div class="sub-head tambahan">💪 Tambahan Tenaga (Backup)</div>
                   <div class="sub-body" style="flex-direction: row; justify-content: center; flex-wrap: wrap;">
-                      <!-- Ganti tag di bawah ini dengan nama personil tambahan -->
                       <div class="personnel-tag editable">[Nama Tambahan 1]</div>
                       <div class="personnel-tag editable">[Nama Tambahan 2]</div>
                       <div class="personnel-tag editable">[Nama Tambahan 3]</div>
@@ -282,7 +279,7 @@ location: "Apendiks"
         </div>
       </div>
 
-      <!-- 🎤 TIM PODIUM (AREA EDITABLE) -->
+      <!-- 🎤 TIM PODIUM -->
       <div class="dept-box podium">
         <div class="dept-header">
           <span>🎤 TIM PODIUM</span>
@@ -291,7 +288,7 @@ location: "Apendiks"
           
           <div class="supervisor-block">
             <div class="role">Pengawas Podium</div>
-            <div class="names">Sulisto</div>
+            <div class="names">[Ketik Nama Pengawas Di Sini]</div>
           </div>
           
           <div class="hierarchy-arrow">⬇️</div>
@@ -299,7 +296,6 @@ location: "Apendiks"
           <div class="personnel-block">
             <div class="title">Personil Operasional</div>
             <div class="personnel-pool">
-              <!-- KOMANDAN BISA EDIT BAGIAN INI NANTI -->
               <div class="personnel-tag editable">[Nama Personil 1]</div>
               <div class="personnel-tag editable">[Nama Personil 2]</div>
               <div class="personnel-tag editable">[Nama Personil 3]</div>

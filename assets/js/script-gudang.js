@@ -1,10 +1,9 @@
 // ==========================================
-// MESIN LOGIKA GUDANG (V.30.0 - LIST VIEW MINIMALIS & ASSIGN MISSION)
+// MESIN LOGIKA GUDANG (V.31.0 - DUAL BULK MODAL SEPARATED)
 // ==========================================
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec"; 
 
-// HANYA ADMIN GUDANG DAN MASTER DEV
 const VALID_PINS = ["a1b2c3", "v9t6c2"];
 let allItems = []; let optionsData = { lokasi: [], tim: [] }; let userPin = localStorage.getItem("AV_INVENTORY_PIN") || ""; 
 let html5QrCode = null; 
@@ -92,9 +91,6 @@ function getStatusClass(status, lokasi) {
     return 'badge-status status-gudang'; 
 }
 
-// =====================================
-// RENDER HTML YANG SUDAH DIBIKIN TIPIS/MINIMALIS
-// =====================================
 function render(data) {
     const container = document.getElementById("dataContainer"); container.innerHTML = "";
     data.forEach(item => {
@@ -232,35 +228,57 @@ function printSuratJalan() {
     html += `<div class="signatures"><div><b>Disiapkan Oleh (Gudang):</b><div class="sign-box">( Nama & Tanda Tangan )</div></div><div><b>Dicek & Dimuat Oleh (Loader):</b><div class="sign-box">( Nama & Tanda Tangan )</div></div></div></body></html>`;
     printWin.document.write(html); printWin.document.close(); 
 }
-function toggleBulkMode() { isBulkMode = !isBulkMode; let bar = document.getElementById("bulkBar"); if(!bar) { document.body.insertAdjacentHTML('beforeend', `<div id="bulkBar" class="bulk-bar" style="position:fixed; bottom:0; left:0; width:100%; background:#1e293b; color:white; padding:15px; z-index:99; display:none; justify-content:space-between; align-items:center;"><span id="bulkCount" class="bulk-info" style="font-weight:bold;">0 Terpilih</span><div style="display:flex; gap:8px;"><button onclick="selectAllVisible()" style="background:#e2e8f0; color:#334155; border:none; padding:8px 12px; border-radius:8px; font-weight:bold; font-size:12px;">☑️ Semua</button><button onclick="openBulkUpdateModal()" class="btn-bulk-process" style="padding:8px 12px; font-size:12px; background:#ea580c; color:white; border:none; border-radius:8px; font-weight:bold;">Ubah Massal</button></div></div>`); bar = document.getElementById("bulkBar"); } const btnMode = document.getElementById("btnBulkMode"); if (isBulkMode) { btnMode.innerHTML = `❌ Batal Massal`; btnMode.style.background = "#ef4444"; bar.style.display = "flex"; } else { btnMode.innerHTML = `🛒 Mode Massal`; btnMode.style.background = "#ea580c"; bar.style.display = "none"; selectedRows.clear(); document.getElementById("bulkCount").innerText = `0 Terpilih`; } applyFilters(); }
+
+// ==========================================
+// TAMPILAN 2 TOMBOL BULK (BARU)
+// ==========================================
+function toggleBulkMode() { 
+    isBulkMode = !isBulkMode; 
+    let bar = document.getElementById("bulkBar"); 
+    if(!bar) { 
+        document.body.insertAdjacentHTML('beforeend', `
+        <div id="bulkBar" class="bulk-bar" style="position:fixed; bottom:0; left:0; right:0; background:#1e293b; color:white; padding:12px 15px; z-index:9000; display:none; justify-content:space-between; align-items:center;">
+            <span id="bulkCount" class="bulk-info" style="font-weight:bold; font-size:12px;">0 Terpilih</span>
+            <div style="display:flex; gap:6px;">
+                <button onclick="selectAllVisible()" style="background:#e2e8f0; color:#334155; border:none; padding:8px 10px; border-radius:6px; font-weight:bold; font-size:11px;">☑️</button>
+                <button onclick="openAssignMissionModal()" style="padding:8px 10px; font-size:11px; background:#2563eb; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">🎯 Misi/Event</button>
+                <button onclick="openBulkUpdateModal()" class="btn-bulk-process" style="padding:8px 10px; font-size:11px; background:#ea580c; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">⚙️ Status/Lokasi</button>
+            </div>
+        </div>`); 
+        bar = document.getElementById("bulkBar"); 
+    } 
+    const btnMode = document.getElementById("btnBulkMode"); 
+    if (isBulkMode) { 
+        btnMode.innerHTML = `❌ Batal Massal`; 
+        btnMode.style.background = "#ef4444"; 
+        bar.style.display = "flex"; 
+    } else { 
+        btnMode.innerHTML = `🛒 Massal`; 
+        btnMode.style.background = "#ea580c"; 
+        bar.style.display = "none"; 
+        selectedRows.clear(); 
+        document.getElementById("bulkCount").innerText = `0 Terpilih`; 
+    } 
+    applyFilters(); 
+}
+
 function toggleSelection(rowIndex) { if (selectedRows.has(rowIndex)) selectedRows.delete(rowIndex); else selectedRows.add(rowIndex); document.getElementById("bulkCount").innerText = `${selectedRows.size} Terpilih`; applyFilters(); }
 function selectAllVisible() { getFilteredData().forEach(item => selectedRows.add(item.row_index)); document.getElementById("bulkCount").innerText = `${selectedRows.size} Terpilih`; applyFilters(); }
 
-// =========== FITUR BARU: MODAL DENGAN ASSIGN TO MISSION ==================
+// ==========================================
+// MODAL 1: STATUS DAN LOKASI (Harian)
+// ==========================================
 function openBulkUpdateModal() { 
     if (selectedRows.size === 0) { alert("Pilih minimal 1 barang!"); return; } 
     const modalHtml = `
     <div id="bulkModal" class="modal-overlay active">
-        <div class="modal-content" style="max-width:350px; padding:20px; background:white; border-radius:15px; position:relative; max-height:85vh; overflow-y:auto;">
+        <div class="modal-content" style="max-width:350px; padding:20px; background:white; border-radius:15px; position:relative;">
             <button onclick="document.getElementById('bulkModal').remove()" style="position:absolute; top:15px; right:15px; border:none; background:#f1f5f9; width:30px; height:30px; border-radius:50%; font-weight:bold; cursor:pointer;">✕</button>
-            <h3 style="margin-top:0; color:#1e293b;">Ubah Massal (${selectedRows.size} Alat)</h3>
+            <h3 style="margin-top:0; color:#ea580c;">⚙️ Update Status & Lokasi</h3>
+            <p style="font-size:11px; color:gray; margin-top:-10px;">${selectedRows.size} Alat Terpilih</p>
             
-            <!-- FITUR BARU: ASSIGN TO MISSION -->
-            <div style="background:#eff6ff; border:1px solid #bfdbfe; padding:15px; border-radius:10px; margin-bottom:15px;">
-                <label style="font-size:11px; font-weight:bold; color:#1d4ed8; display:block; margin-bottom:6px;">🎯 TUGASKAN KE MISI LAPANGAN:</label>
-                <input type="text" id="bulkAssignMission" placeholder="Ketik ID Misi (Contoh: M-001)" style="width:100%; padding:10px; border-radius:8px; border:1px solid #93c5fd; font-weight:bold; text-transform:uppercase; margin-bottom:8px; box-sizing:border-box;">
-                <button onclick="processAssignMission(this)" style="width:100%; padding:10px; background:#2563eb; color:white; border:none; border-radius:8px; font-weight:bold; font-size:12px; cursor:pointer;">KIRIM KE MISSION CARD 🚀</button>
-            </div>
-
-            <div style="text-align:center; color:gray; font-size:10px; font-weight:bold; margin-bottom:15px;">ATAU UPDATE STATUS BIASA ⬇️</div>
-
-            <!-- UPDATE STATUS LAMA -->
             <div style="text-align:left; margin-bottom:12px;">
-                <label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">🎯 Nama Event / Tujuan:</label>
-                <input type="text" id="bulkNewTujuan" placeholder="Kosongkan jika tidak diubah..." style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; font-weight:bold; box-sizing:border-box;">
-            </div>
-            <div style="text-align:left; margin-bottom:12px;">
-                <label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">📍 Ubah Lokasi:</label>
+                <label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">📍 Ubah Lokasi (Kolom O):</label>
                 <select id="bulkNewLokasi" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; font-weight:bold;">
                     <option value="TETAP">-- Jangan Ubah Lokasi --</option>
                     <option value="Gudang KC (SMG)">🏢 Gudang KC (SMG)</option>
@@ -271,7 +289,7 @@ function openBulkUpdateModal() {
                 </select>
             </div>
             <div style="text-align:left; margin-bottom:15px;">
-                <label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">🔌 Ubah Status:</label>
+                <label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">🔌 Ubah Status (Kolom R):</label>
                 <select id="bulkNewStatus" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; font-weight:bold;">
                     <option value="TETAP">-- Jangan Ubah Status --</option>
                     <option value="Akan Dibawa">🛒 Akan Dibawa (Packing)</option>
@@ -285,12 +303,52 @@ function openBulkUpdateModal() {
     document.body.insertAdjacentHTML('beforeend', modalHtml); 
 }
 
-async function processBulkUpdate(btn) { const newLokasi = document.getElementById("bulkNewLokasi").value; const newStatus = document.getElementById("bulkNewStatus").value; const newTujuan = document.getElementById("bulkNewTujuan").value; if (newLokasi === "TETAP" && newStatus === "TETAP" && newTujuan === "") { alert("Isi atau pilih minimal satu perubahan!"); return; } btn.disabled = true; btn.innerText = "MEMPROSES... (JANGAN DITUTUP)"; try { const payload = { action: "update_status_lokasi", pin: userPin, rows: Array.from(selectedRows), new_lokasi: newLokasi !== "TETAP" ? newLokasi : null, new_status: newStatus !== "TETAP" ? newStatus : null, new_tujuan: newTujuan || "TETAP" }; const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) }); const data = await response.json(); if(data.status === "success") { document.getElementById('bulkModal').remove(); toggleBulkMode(); loadData(); showToast("✅ Update massal berhasil!"); } else { alert("Gagal:\n" + data.message); } } catch (e) { alert("Error Sistem:\n" + e.message); } finally { btn.disabled = false; btn.innerText = "PROSES UPDATE MASSAL"; } }
+async function processBulkUpdate(btn) { 
+    const newLokasi = document.getElementById("bulkNewLokasi").value; 
+    const newStatus = document.getElementById("bulkNewStatus").value; 
+    if (newLokasi === "TETAP" && newStatus === "TETAP") { alert("Pilih minimal satu perubahan!"); return; } 
+    btn.disabled = true; btn.innerText = "MEMPROSES... (JANGAN DITUTUP)"; 
+    try { 
+        const payload = { action: "update_status_lokasi", pin: userPin, rows: Array.from(selectedRows), new_lokasi: newLokasi !== "TETAP" ? newLokasi : null, new_status: newStatus !== "TETAP" ? newStatus : null, new_tujuan: "TETAP" }; 
+        const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) }); 
+        const data = await response.json(); 
+        if(data.status === "success") { document.getElementById('bulkModal').remove(); toggleBulkMode(); loadData(); showToast("✅ Update massal berhasil!"); } else { alert("Gagal:\n" + data.message); } 
+    } catch (e) { alert("Error Sistem:\n" + e.message); } finally { btn.disabled = false; btn.innerText = "PROSES UPDATE MASSAL"; } 
+}
 
-// =========== FITUR BARU: FUNGSI ASSIGN TO MISSION ==================
+// ==========================================
+// MODAL 2: ASSIGN MISI & EVENT (Jarang / Persiapan)
+// ==========================================
+function openAssignMissionModal() { 
+    if (selectedRows.size === 0) { alert("Pilih minimal 1 barang!"); return; } 
+    const modalHtml = `
+    <div id="assignModal" class="modal-overlay active">
+        <div class="modal-content" style="max-width:350px; padding:20px; background:white; border-radius:15px; position:relative;">
+            <button onclick="document.getElementById('assignModal').remove()" style="position:absolute; top:15px; right:15px; border:none; background:#f1f5f9; width:30px; height:30px; border-radius:50%; font-weight:bold; cursor:pointer;">✕</button>
+            <h3 style="margin-top:0; color:#2563eb;">🎯 Tugas Misi & Event</h3>
+            <p style="font-size:11px; color:gray; margin-top:-10px;">${selectedRows.size} Alat Terpilih</p>
+            
+            <div style="text-align:left; margin-bottom:12px;">
+                <label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">🎪 Nama Event / Tujuan (Kolom P):</label>
+                <input type="text" id="assignNewTujuan" placeholder="Contoh: HUT Kemerdekaan RI..." style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; font-weight:bold; box-sizing:border-box;">
+            </div>
+
+            <div style="background:#eff6ff; border:1px solid #bfdbfe; padding:15px; border-radius:10px; margin-bottom:15px;">
+                <label style="font-size:11px; font-weight:bold; color:#1d4ed8; display:block; margin-bottom:6px;">🎯 ID Misi Lapangan (Opsional):</label>
+                <input type="text" id="assignMissionId" placeholder="Ketik ID Misi (Contoh: M-001)" style="width:100%; padding:10px; border-radius:8px; border:1px solid #93c5fd; font-weight:bold; text-transform:uppercase; margin-bottom:8px; box-sizing:border-box;">
+            </div>
+
+            <button onclick="processAssignMission(this)" style="width:100%; padding:12px; background:#2563eb; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">KIRIM UPDATE 🚀</button>
+        </div>
+    </div>`; 
+    document.body.insertAdjacentHTML('beforeend', modalHtml); 
+}
+
 async function processAssignMission(btn) {
-    const missionId = document.getElementById("bulkAssignMission").value.trim().toUpperCase();
-    if (!missionId) { alert("Masukkan ID Misi terlebih dahulu!"); return; }
+    const missionId = document.getElementById("assignMissionId").value.trim().toUpperCase();
+    const eventName = document.getElementById("assignNewTujuan").value;
+
+    if (!missionId && !eventName) { alert("Isi Nama Event atau ID Misi!"); return; }
     
     let selectedCodes = [];
     Array.from(selectedRows).forEach(rowIndex => {
@@ -303,18 +361,21 @@ async function processAssignMission(btn) {
         }
     });
 
-    selectedCodes = [...new Set(selectedCodes)];
-
-    if (selectedCodes.length === 0) { alert("Alat yang dipilih tidak memiliki Kode Barang/Wadah!"); return; }
+    selectedCodes = [...new Set(selectedCodes)]; // Hapus Duplikat
+    
+    // Validasi pencegahan error kalau mau nge-push ke misi tapi kode kosong
+    if (missionId && selectedCodes.length === 0) { alert("Alat yang dipilih tidak memiliki Kode Barang/Wadah, tidak bisa diassign ke misi!"); return; }
 
     btn.disabled = true; 
-    btn.innerText = "MENGIRIM KE MISI... 🚀"; 
+    btn.innerText = "MENGIRIM KE SERVER... 🚀"; 
     
     try { 
         const payload = { 
             action: "assign_to_mission", 
             pin: userPin, 
             id_misi: missionId,
+            new_tujuan: eventName,
+            rows: Array.from(selectedRows),
             kode_barang_array: selectedCodes 
         }; 
         
@@ -322,9 +383,10 @@ async function processAssignMission(btn) {
         const data = await response.json(); 
         
         if(data.status === "success") { 
-            document.getElementById('bulkModal').remove(); 
+            document.getElementById('assignModal').remove(); 
             toggleBulkMode(); 
-            showToast(`✅ ${selectedCodes.length} Barang ditugaskan ke ${missionId}!`); 
+            showToast(`✅ Data Misi / Event berhasil diupdate!`); 
+            loadData();
         } else { 
             alert("Gagal:\n" + data.message); 
         } 
@@ -332,7 +394,7 @@ async function processAssignMission(btn) {
         alert("Error Sistem:\n" + e.message); 
     } finally { 
         btn.disabled = false; 
-        btn.innerText = "KIRIM KE MISSION CARD 🚀"; 
+        btn.innerText = "KIRIM UPDATE 🚀"; 
     }
 }
 // ===================================================================
@@ -378,11 +440,11 @@ function startScanner() {
     html5QrCode.start({ facingMode: currentCameraFacing }, config, 
         (decodedText) => { 
             const now = Date.now(); 
-            if (now - lastScanTime < 2000) return; // Prevent double scan
+            if (now - lastScanTime < 2000) return; 
             lastScanTime = now; 
             
             let scanResult = decodedText.trim(); 
-            triggerFeedback('success'); // Suara & Getar Sukses
+            triggerFeedback('success'); 
             
             if (isBulkMode) { 
                 const foundItem = allItems.find(i => (i.kode_barang||"").toString().toLowerCase() === scanResult.toLowerCase() || (i.kode_wadah||"").toString().toLowerCase() === scanResult.toLowerCase()); 
@@ -421,7 +483,7 @@ function toggleFlashlight() {
     html5QrCode.applyVideoConstraints({
         advanced: [{ torch: isFlashlightOn }]
     }).then(() => {
-        document.getElementById("btnFlashlight").style.background = isFlashlightOn ? "#fef08a" : "#e2e8f0"; // Warna kuning jika nyala
+        document.getElementById("btnFlashlight").style.background = isFlashlightOn ? "#fef08a" : "#e2e8f0"; 
     }).catch(err => {
         showToast("Senter tidak didukung/kamera depan aktif.", false);
         isFlashlightOn = false;

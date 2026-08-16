@@ -1,5 +1,5 @@
 // ==========================================
-// MESIN LOGIKA MISSION CONTROL (V.16.0 - COMPACT UI FIXED)
+// MESIN LOGIKA MISSION CONTROL (V.16.1 - SMART TAGS: PANJANG & DENAH ONLY)
 // ==========================================
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec"; 
@@ -179,13 +179,13 @@ function renderMissions() {
                 let parts = rawTugas.split("\n");
                 judulTugas = parts[0]; 
                 parts.shift(); 
-                detailTugas = parts.join("\n"); // Pertahankan \n untuk Smart Parsing
+                detailTugas = parts.join("\n"); 
             }
 
             // ==========================================
-            // 🤖 MESIN SMART PARSING (PANJANG, DENAH, ASET)
+            // 🤖 MESIN SMART PARSING (PANJANG & DENAH)
             // ==========================================
-            let txtPanjang = "", txtDenah = "", txtAset = "";
+            let txtPanjang = "", txtDenah = "";
             let cleanDetail = [];
 
             detailTugas.split("\n").forEach(line => {
@@ -194,11 +194,8 @@ function renderMissions() {
                 
                 if (lower.startsWith("panjang:")) {
                     txtPanjang = text.substring(8).trim();
-                } else if (lower.startsWith("aset:")) {
-                    txtAset = text.substring(5).trim();
                 } else if (lower.startsWith("denah:")) {
                     let url = text.substring(6).trim();
-                    // Ekstrak ID Google Drive otomatis untuk dijadikan Thumbnail
                     let matchId = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
                     txtDenah = matchId ? `https://drive.google.com/thumbnail?id=${matchId[1]}&sz=w800` : url;
                 } else if (text !== "") {
@@ -211,7 +208,6 @@ function renderMissions() {
             // --- BUILD UI SMART TAGS ---
             let extraUI = "";
             if (txtPanjang) extraUI += `<div style="background:#fffbeb; color:#b45309; padding:4px 8px; border-radius:6px; font-size:9px; font-weight:bold; display:inline-flex; align-items:center; margin-right:5px; margin-bottom:5px; border:1px solid #fde68a;">📏 Panjang Real: ${txtPanjang}</div>`;
-            if (txtAset) extraUI += `<a href="${txtAset}" target="_blank" style="background:#eff6ff; color:#1d4ed8; padding:4px 8px; border-radius:6px; font-size:9px; font-weight:bold; display:inline-flex; align-items:center; text-decoration:none; margin-right:5px; margin-bottom:5px; border:1px solid #bfdbfe;">🔗 Cek Aset</a>`;
 
             let denahHtml = "";
             if (txtDenah) {
@@ -528,7 +524,7 @@ function openItemDetail(kodeBarang) {
         let badgeHtml = Object.keys(statusCounts).map(status => {
             let bgCol = status.includes('Gudang') ? '#dcfce7' : (status.includes('Dipakai') || status.includes('Event') ? '#fef08a' : '#e2e8f0');
             let txtCol = status.includes('Gudang') ? '#166534' : (status.includes('Dipakai') || status.includes('Event') ? '#854d0e' : '#334155');
-            return `<span style="display:inline-block; margin-right:4px; margin-bottom:4px; padding:3px 6px; border-radius:4px; font-size:8px; background:${bgCol}; color:${txtCol}; font-weight:bold; border:1px solid #cbd5e1;">${status}: ${statusCounts[status]}</span>`;
+            return `<span style="display:inline-block; margin-right:4px; margin-bottom:4px; padding:3px 6px; border-radius:4px; font-size:9px; background:${bgCol}; color:${txtCol}; font-weight:bold; border:1px solid #cbd5e1;">${status}: ${statusCounts[status]}</span>`;
         }).join('');
         
         similarHtml = `

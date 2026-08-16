@@ -1,5 +1,5 @@
 // ==========================================
-// MESIN LOGIKA GUDANG (V.29.1 - FULL CLEAN INLINE STYLES)
+// MESIN LOGIKA GUDANG (V.30.0 - ASSIGN TO MISSION READY & CLEAN STYLES)
 // ==========================================
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec"; 
@@ -55,7 +55,6 @@ function setupStickyHeader() {
         toolbar.style.borderBottom = "1px solid #e2e8f0";
         toolbar.style.boxShadow = "0 4px 6px -1px rgba(0, 0, 0, 0.05)";
         
-        // BEBAS INLINE STYLES! Sepenuhnya diatur oleh CSS
         let pillsWrapper = document.querySelector(".filter-pills-wrapper");
         if(pillsWrapper && !pillsWrapper.innerHTML.includes("Di Lokasi Event")) {
             pillsWrapper.insertAdjacentHTML('beforeend', `<button class="pill-btn" data-filter="Di Lokasi Event" onclick="setFilterPill('Di Lokasi Event', this)">⚠️ Di Lokasi Event</button>`);
@@ -76,7 +75,6 @@ function setFilterPill(status, btnElement) {
 function getFilteredData() { 
     const q = document.getElementById("searchInput").value.toLowerCase(); 
     
-    // Baca status laci filter lanjutan
     const panelFilter = document.getElementById('panelFilterLanjutan');
     const isAdvancedOpen = panelFilter && panelFilter.style.display === 'block';
     let timAktif = [];
@@ -86,27 +84,23 @@ function getFilteredData() {
     }
 
     return allItems.filter(i => { 
-        // 1. Filter Pencarian Teks
         const matchQ = (i.nama_barang||"").toLowerCase().includes(q) || (i.kode_barang||"").toLowerCase().includes(q) || (i.kode_wadah||"").toLowerCase().includes(q); 
         
         let stat = i.status_digunakan || 'Di Gudang'; if(stat === 'FALSE') stat = 'Di Gudang'; 
         let lok = i.lokasi || '';
         let kategoriBarang = (i.kategori || i.tim || i.nama_barang || "").toLowerCase();
         
-        // 2. Filter Tombol Kapsul (Atas)
         let matchPill = false;
         if (activeFilterPill === 'all') matchPill = true;
         else if (activeFilterPill === 'Rusak') { matchPill = (i.kondisi === 'Rusak' || i.kondisi === 'Periksa'); }
         else if (activeFilterPill === 'Di Lokasi Event') { matchPill = (lok === 'Di Lokasi Event'); } 
         else matchPill = (stat === activeFilterPill);
         
-        // 3. Filter Laci Lanjutan (HANYA CEK TIM)
         let matchAdvanced = true;
         if (isAdvancedOpen) {
             matchAdvanced = timAktif.length === 0 || timAktif.some(t => kategoriBarang.includes(t));
         }
 
-        // Tampilkan hanya jika lolos ketiga filter
         return matchQ && matchPill && matchAdvanced; 
     }); 
 }
@@ -234,6 +228,7 @@ function toggleBulkMode() { isBulkMode = !isBulkMode; let bar = document.getElem
 function toggleSelection(rowIndex) { if (selectedRows.has(rowIndex)) selectedRows.delete(rowIndex); else selectedRows.add(rowIndex); document.getElementById("bulkCount").innerText = `${selectedRows.size} Terpilih`; applyFilters(); }
 function selectAllVisible() { getFilteredData().forEach(item => selectedRows.add(item.row_index)); document.getElementById("bulkCount").innerText = `${selectedRows.size} Terpilih`; applyFilters(); }
 
+// =========== FITUR BARU: MODAL DENGAN ASSIGN TO MISSION ==================
 function openBulkUpdateModal() { 
     if (selectedRows.size === 0) { alert("Pilih minimal 1 barang!"); return; } 
     const modalHtml = `
@@ -281,6 +276,62 @@ function openBulkUpdateModal() {
     </div>`; 
     document.body.insertAdjacentHTML('beforeend', modalHtml); 
 }
+
+async function processBulkUpdate(btn) { const newLokasi = document.getElementById("bulkNewLokasi").value; const newStatus = document.getElementById("bulkNewStatus").value; const newTujuan = document.getElementById("bulkNewTujuan").value; if (newLokasi === "TETAP" && newStatus === "TETAP" && newTujuan === "") { alert("Isi atau pilih minimal satu perubahan!"); return; } btn.disabled = true; btn.innerText = "MEMPROSES... (JANGAN DITUTUP)"; try { const payload = { action: "update_status_lokasi", pin: userPin, rows: Array.from(selectedRows), new_lokasi: newLokasi !== "TETAP" ? newLokasi : null, new_status: newStatus !== "TETAP" ? newStatus : null, new_tujuan: newTujuan || "TETAP" }; const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) }); const data = await response.json(); if(data.status === "success") { document.getElementById('bulkModal').remove(); toggleBulkMode(); loadData(); showToast("✅ Update massal berhasil!"); } else { alert("Gagal:\n" + data.message); } } catch (e) { alert("Error Sistem:\n" + e.message); } finally { btn.disabled = false; btn.innerText = "PROSES UPDATE MASSAL"; } }
+
+// =========== FITUR BARU: FUNGSI ASSIGN TO MISSION ==================
+async function processAssignMission(btn) {
+    const missionId = document.getElementById("bulkAssignMission").value.trim().toUpperCase();
+    if (!missionId) { alert("Masukkan ID Misi terlebih dahulu!"); return; }
+    
+    // Kumpulkan kode barang dari baris yang dipilih
+    let selectedCodes = [];
+    Array.from(selectedRows).forEach(rowIndex => {
+        let item = allItems.find(i => i.row_index === rowIndex);
+        // Prioritaskan mengambil kode_wadah jika ada, agar seluruh box terkirim
+        if (item) {
+            let codeToPush = item.kode_wadah ? item.kode_wadah : item.kode_barang;
+            if (codeToPush && codeToPush.trim() !== "") {
+                selectedCodes.push(codeToPush);
+            }
+        }
+    });
+
+    // Hilangkan duplikat (kalau 2 barang dari box yang sama dipilih)
+    selectedCodes = [...new Set(selectedCodes)];
+
+    if (selectedCodes.length === 0) { alert("Alat yang dipilih tidak memiliki Kode Barang/Wadah!"); return; }
+
+    btn.disabled = true; 
+    btn.innerText = "MENGIRIM KE MISI... 🚀"; 
+    
+    try { 
+        const payload = { 
+            action: "assign_to_mission", 
+            pin: userPin, 
+            id_misi: missionId,
+            kode_barang_array: selectedCodes 
+        }; 
+        
+        const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) }); 
+        const data = await response.json(); 
+        
+        if(data.status === "success") { 
+            document.getElementById('bulkModal').remove(); 
+            toggleBulkMode(); // Matikan mode massal & bersihkan seleksi
+            showToast(`✅ ${selectedCodes.length} Barang berhasil ditugaskan ke ${missionId}!`); 
+        } else { 
+            alert("Gagal:\n" + data.message); 
+        } 
+    } catch (e) { 
+        alert("Error Sistem:\n" + e.message); 
+    } finally { 
+        btn.disabled = false; 
+        btn.innerText = "KIRIM KE MISSION CARD 🚀"; 
+    }
+}
+// ===================================================================
+
 function openAddModal() { if(!isAdminMode) return; document.getElementById("formAdd").reset(); pendingAddFotos = []; renderPreviewAddFotos(); document.getElementById("modalAdd").classList.add("active"); }
 function closeAddModal() { document.getElementById("modalAdd").classList.remove("active"); }
 function handleNewFotos(input) { if (!input.files || input.files.length === 0) return; for (let i = 0; i < input.files.length; i++) { if (pendingAddFotos.length < 3) pendingAddFotos.push(input.files[i]); } input.value = ""; renderPreviewAddFotos(); }

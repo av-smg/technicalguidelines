@@ -1,55 +1,32 @@
-<!-- KODE NAVBAR FIXED (Header Aman & Dark Mode Anti-Ngumpet) -->
+<!-- KODE NAVBAR FIXED (Header & Login Dinamis) -->
 <style>
-  /* Wrapper Header Atas (Biar Header Asli Gak Ilang) */
-  .top-navbar-wrapper {
-    position: relative; 
-    width: 100%; 
-    padding: 15px 20px;
-    z-index: 100;
-  }
-  
-  .hamburger-btn {
-    background: white; border: 2px solid #e2e8f0; border-radius: 12px;
-    font-size: 1.5rem; padding: 6px 12px; cursor: pointer; color: #0f172a;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: 0.2s;
-  }
+  .top-navbar-wrapper { position: relative; width: 100%; padding: 15px 20px; z-index: 100; }
+  .hamburger-btn { background: white; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 1.5rem; padding: 6px 12px; cursor: pointer; color: #0f172a; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: 0.2s; }
   .hamburger-btn:active { transform: scale(0.95); }
   body.dark-mode .hamburger-btn { background: #1e293b; border-color: #334155; color: white; }
 
-  /* Menu Samping */
   .side-menu {
     position: fixed; top: 0; left: -280px; width: 260px; height: 100%;
     background: #ffffff; box-shadow: 4px 0 20px rgba(0,0,0,0.1);
     transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 9999; padding: 20px;
-    display: flex; flex-direction: column; gap: 12px;
-    overflow-y: auto; /* Aman untuk layar HP kecil */
+    display: flex; flex-direction: column; gap: 12px; overflow-y: auto;
   }
   .side-menu.active { left: 0; }
   
   .side-menu a {
-    display: flex; align-items: center; gap: 10px;
-    text-decoration: none; color: #0f172a; font-weight: 800; font-size: 1.1rem;
-    padding: 12px 15px; border-radius: 12px; transition: 0.2s;
-    background: #f8fafc;
+    display: flex; align-items: center; gap: 10px; text-decoration: none; color: #0f172a; 
+    font-weight: 800; font-size: 1.1rem; padding: 12px 15px; border-radius: 12px; transition: 0.2s; background: #f8fafc;
   }
   .side-menu a:hover, .side-menu a.active-link { background: #e2e8f0; color: #f97316; }
   
-  .close-menu { 
-    align-self: flex-end; background: none; border: none; font-size: 1.8rem; 
-    font-weight: bold; cursor: pointer; color: #0f172a; margin-bottom: 10px; 
+  .close-menu { align-self: flex-end; background: none; border: none; font-size: 1.8rem; font-weight: bold; cursor: pointer; color: #0f172a; margin-bottom: 10px; }
+  
+  .mobile-dark-btn {
+    margin-top: auto; margin-bottom: 15px;
+    background: #1e293b; color: white; border: none; padding: 15px; border-radius: 12px; 
+    font-weight: 800; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
   }
   
-  /* Tombol Dark Mode (FIXED POSISI) */
-  .mobile-dark-btn {
-    margin-top: 30px; /* Langsung di bawah link Apendiks, gak perlu scroll */
-    background: #1e293b; color: white; border: none; padding: 15px;
-    border-radius: 12px; font-weight: 800; font-size: 1rem; cursor: pointer;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    transition: 0.2s;
-  }
-  .mobile-dark-btn:active { transform: scale(0.95); }
-
-  /* Tampilan Dark Mode */
   body.dark-mode .side-menu { background: #0f172a; box-shadow: 4px 0 20px rgba(0,0,0,0.5); }
   body.dark-mode .side-menu a { background: #1e293b; color: #e2e8f0; }
   body.dark-mode .side-menu a:hover, body.dark-mode .side-menu a.active-link { background: #334155; color: #f97316; }
@@ -57,12 +34,10 @@
   body.dark-mode .mobile-dark-btn { background: #f1f5f9; color: #0f172a; }
 </style>
 
-<!-- Area Header -->
 <div class="top-navbar-wrapper">
   <button class="hamburger-btn" onclick="toggleMenu()">☰</button>
 </div>
 
-<!-- Menu Samping (Sidebar) -->
 <div class="side-menu" id="sideMenu">
   <button class="close-menu" onclick="toggleMenu()">×</button>
   
@@ -71,32 +46,47 @@
   <a href="{{ site.baseurl }}/misi/" class="nav-item">🎯 Mission Control</a>
   <a href="{{ site.baseurl }}/apendiks/struktur-personil.html" class="nav-item">📋 Apendiks</a>
   
-  <!-- Tombol Dark Mode yang sekarang nongkrong manis di atas -->
   <button class="mobile-dark-btn" onclick="toggleDarkMode()">
     <span id="darkIconMobile">🌙</span> <span id="darkTextMobile">Dark Mode</span>
   </button>
+
+  <!-- Area Profil & Login (Dinamis) -->
+  <div id="userProfileArea" style="margin-top: 5px; padding-top: 15px; border-top: 1px solid #e2e8f0;"></div>
 </div>
 
 <script>
-  function toggleMenu() {
-    document.getElementById('sideMenu').classList.toggle('active');
-  }
+  function toggleMenu() { document.getElementById('sideMenu').classList.toggle('active'); }
 
-  // Active Link Highlighter
   document.addEventListener("DOMContentLoaded", function() {
     const currentUrl = window.location.pathname;
-    const navItems = document.querySelectorAll('.nav-item');
-    
-    navItems.forEach(link => {
+    document.querySelectorAll('.nav-item').forEach(link => {
       const linkHref = link.getAttribute('href');
-      // Fix agar Home (/) tidak men-trigger aktif di semua halaman
       if (currentUrl === linkHref || (linkHref !== '/' && currentUrl.includes(linkHref))) {
         link.classList.add('active-link');
       }
     });
+
+    // Cek Status Login di Navbar
+    const userName = localStorage.getItem('av_session_nama');
+    const userRole = localStorage.getItem('av_session_role');
+    const profileArea = document.getElementById('userProfileArea');
+
+    if (userName) {
+      profileArea.innerHTML = `
+        <div style="color: inherit; font-weight: bold; margin-bottom: 10px;">
+          👋 Hi, ${userName} <br><span style="font-size: 0.8rem; color: #f97316;">(${userRole})</span>
+        </div>
+        <button onclick="prosesLogout()" style="background: #ef4444; color: white; border: none; padding: 10px; border-radius: 8px; width: 100%; cursor: pointer; font-weight: bold;">🚪 Logout</button>
+      `;
+    } else {
+      profileArea.innerHTML = `
+        <a href="{{ site.baseurl }}/login.html" style="background: #f97316; color: white; text-align: center; justify-content: center; text-decoration: none; padding: 12px; border-radius: 8px; font-weight: bold; display: flex; gap: 5px;">
+          🔑 Login Kru
+        </a>
+      `;
+    }
   });
 
-  // Dark Mode Logic
   function toggleDarkMode() {
     document.body.classList.toggle('dark-mode');
     const isDark = document.body.classList.contains('dark-mode');
@@ -107,10 +97,7 @@
   function updateDarkModeUI(isDark) {
     const icon = document.getElementById('darkIconMobile');
     const text = document.getElementById('darkTextMobile');
-    if(icon && text) {
-      icon.textContent = isDark ? '☀️' : '🌙';
-      text.textContent = isDark ? 'Light Mode' : 'Dark Mode';
-    }
+    if(icon && text) { icon.textContent = isDark ? '☀️' : '🌙'; text.textContent = isDark ? 'Light Mode' : 'Dark Mode'; }
   }
 
   if (localStorage.getItem('theme') === 'dark') {

@@ -1,44 +1,66 @@
-<!-- KODE NAVBAR TERBARU -->
+<!-- KODE NAVBAR FIXED (Header Aman & Dark Mode Anti-Ngumpet) -->
 <style>
-  /* Menambahkan style khusus untuk menu samping agar Dark Mode tidak tertutup */
+  /* Wrapper Header Atas (Biar Header Asli Gak Ilang) */
+  .top-navbar-wrapper {
+    position: relative; 
+    width: 100%; 
+    padding: 15px 20px;
+    z-index: 100;
+  }
+  
+  .hamburger-btn {
+    background: white; border: 2px solid #e2e8f0; border-radius: 12px;
+    font-size: 1.5rem; padding: 6px 12px; cursor: pointer; color: #0f172a;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: 0.2s;
+  }
+  .hamburger-btn:active { transform: scale(0.95); }
+  body.dark-mode .hamburger-btn { background: #1e293b; border-color: #334155; color: white; }
+
+  /* Menu Samping */
   .side-menu {
-    position: fixed; top: 0; left: -250px; width: 250px; height: 100vh;
-    background: #ffffff; box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-    transition: 0.3s; z-index: 9999; padding: 20px;
-    display: flex; flex-direction: column; gap: 15px;
+    position: fixed; top: 0; left: -280px; width: 260px; height: 100%;
+    background: #ffffff; box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 9999; padding: 20px;
+    display: flex; flex-direction: column; gap: 12px;
+    overflow-y: auto; /* Aman untuk layar HP kecil */
   }
   .side-menu.active { left: 0; }
   
   .side-menu a {
+    display: flex; align-items: center; gap: 10px;
     text-decoration: none; color: #0f172a; font-weight: 800; font-size: 1.1rem;
-    padding: 10px; border-radius: 10px; transition: 0.2s;
+    padding: 12px 15px; border-radius: 12px; transition: 0.2s;
+    background: #f8fafc;
   }
-  .side-menu a:hover, .side-menu a.active-link { background: #f1f5f9; color: #f97316; }
+  .side-menu a:hover, .side-menu a.active-link { background: #e2e8f0; color: #f97316; }
   
-  .close-menu { align-self: flex-end; background: none; border: none; font-size: 1.5rem; font-weight: bold; cursor: pointer; color: #0f172a; margin-bottom: 10px; }
+  .close-menu { 
+    align-self: flex-end; background: none; border: none; font-size: 1.8rem; 
+    font-weight: bold; cursor: pointer; color: #0f172a; margin-bottom: 10px; 
+  }
   
-  /* Tombol Dark Mode di dalam Sidebar */
+  /* Tombol Dark Mode (FIXED POSISI) */
   .mobile-dark-btn {
-    margin-top: auto; /* Mendorong tombol ke bagian paling bawah menu */
-    background: #1e293b; color: white; border: none; padding: 12px;
-    border-radius: 12px; font-weight: 800; cursor: pointer;
+    margin-top: 30px; /* Langsung di bawah link Apendiks, gak perlu scroll */
+    background: #1e293b; color: white; border: none; padding: 15px;
+    border-radius: 12px; font-weight: 800; font-size: 1rem; cursor: pointer;
     display: flex; align-items: center; justify-content: center; gap: 8px;
     transition: 0.2s;
   }
   .mobile-dark-btn:active { transform: scale(0.95); }
 
-  /* Dark Mode Styles untuk Sidebar */
-  body.dark-mode .side-menu { background: #0f172a; box-shadow: 2px 0 10px rgba(0,0,0,0.5); }
-  body.dark-mode .side-menu a { color: #e2e8f0; }
-  body.dark-mode .side-menu a:hover, body.dark-mode .side-menu a.active-link { background: #1e293b; color: #f97316; }
+  /* Tampilan Dark Mode */
+  body.dark-mode .side-menu { background: #0f172a; box-shadow: 4px 0 20px rgba(0,0,0,0.5); }
+  body.dark-mode .side-menu a { background: #1e293b; color: #e2e8f0; }
+  body.dark-mode .side-menu a:hover, body.dark-mode .side-menu a.active-link { background: #334155; color: #f97316; }
   body.dark-mode .close-menu { color: #f8fafc; }
   body.dark-mode .mobile-dark-btn { background: #f1f5f9; color: #0f172a; }
 </style>
 
-<!-- Tombol Hamburger (Bisa disesuaikan dengan posisi aslinya) -->
-<button class="hamburger-btn" onclick="toggleMenu()" style="position: absolute; top: 15px; left: 15px; background: none; border: none; font-size: 1.5rem; cursor: pointer; z-index: 100;">
-  ☰
-</button>
+<!-- Area Header -->
+<div class="top-navbar-wrapper">
+  <button class="hamburger-btn" onclick="toggleMenu()">☰</button>
+</div>
 
 <!-- Menu Samping (Sidebar) -->
 <div class="side-menu" id="sideMenu">
@@ -49,31 +71,32 @@
   <a href="{{ site.baseurl }}/misi/" class="nav-item">🎯 Mission Control</a>
   <a href="{{ site.baseurl }}/apendiks/struktur-personil.html" class="nav-item">📋 Apendiks</a>
   
-  <!-- Tombol Dark Mode yang aman dari bug visual -->
+  <!-- Tombol Dark Mode yang sekarang nongkrong manis di atas -->
   <button class="mobile-dark-btn" onclick="toggleDarkMode()">
     <span id="darkIconMobile">🌙</span> <span id="darkTextMobile">Dark Mode</span>
   </button>
 </div>
 
 <script>
-  // Fungsi Buka/Tutup Menu
   function toggleMenu() {
     document.getElementById('sideMenu').classList.toggle('active');
   }
 
-  // Fungsi Deteksi Halaman Aktif (Auto-Highlight)
+  // Active Link Highlighter
   document.addEventListener("DOMContentLoaded", function() {
     const currentUrl = window.location.pathname;
     const navItems = document.querySelectorAll('.nav-item');
     
     navItems.forEach(link => {
-      if(link.getAttribute('href') === currentUrl || currentUrl.includes(link.getAttribute('href') && link.getAttribute('href') !== '/')) {
+      const linkHref = link.getAttribute('href');
+      // Fix agar Home (/) tidak men-trigger aktif di semua halaman
+      if (currentUrl === linkHref || (linkHref !== '/' && currentUrl.includes(linkHref))) {
         link.classList.add('active-link');
       }
     });
   });
 
-  // Fungsi Dark Mode Toggle
+  // Dark Mode Logic
   function toggleDarkMode() {
     document.body.classList.toggle('dark-mode');
     const isDark = document.body.classList.contains('dark-mode');
@@ -90,7 +113,6 @@
     }
   }
 
-  // Cek preferensi saat load
   if (localStorage.getItem('theme') === 'dark') {
     document.body.classList.add('dark-mode');
     updateDarkModeUI(true);

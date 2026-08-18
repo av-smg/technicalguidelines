@@ -39,7 +39,14 @@
 <div class="top-navbar-wrapper">
   <button class="hamburger-btn" onclick="toggleMenu()">☰</button>
 </div>
-
+<!-- ========================================== -->
+<!-- EMERGENCY BANNER (PENGUMUMAN GLOBAL)       -->
+<!-- ========================================== -->
+<!-- Cara Pakai: Ubah style="display: none;" menjadi style="display: block;" untuk menyalakan -->
+<div id="emergencyBanner" style="display: none; background: #ef4444; color: white; text-align: center; padding: 8px 15px; font-size: 11px; font-weight: bold; z-index: 900; position: relative; width: 100%; box-sizing: border-box; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    ⚠️ <span id="bannerText">INFO KOMANDAN: Semua kru kumpul di Panggung Utama dalam 5 Menit!</span>
+    <button onclick="document.getElementById('emergencyBanner').style.display='none'" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: white; font-weight: bold; font-size: 12px; cursor: pointer;">✕</button>
+</div>
 <div class="side-menu" id="sideMenu">
   <button class="close-menu" onclick="toggleMenu()">×</button>
   

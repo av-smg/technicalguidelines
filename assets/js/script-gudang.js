@@ -116,9 +116,13 @@ async function loadData() { try { document.getElementById("loading").style.displ
 function setupStickyHeader() {
     let toolbar = document.querySelector(".toolbar-card");
     if(toolbar) {
-        toolbar.style.position = "sticky"; toolbar.style.top = "60px"; toolbar.style.zIndex = "90";
-        toolbar.style.background = "rgba(255, 255, 255, 0.95)"; toolbar.style.backdropFilter = "blur(8px)";
-        toolbar.style.boxShadow = "0 4px 6px -1px rgba(0, 0, 0, 0.05)";
+        // FITUR STICKY AKTIF TANPA CELAH BOLONG
+        toolbar.style.position = "sticky"; 
+        toolbar.style.top = "0px"; // <--- SEBELUMNYA 60px (Ini biang kerok yang bikin barang ngintip)
+        toolbar.style.zIndex = "99";
+        toolbar.style.background = "rgba(255, 255, 255, 0.95)"; 
+        toolbar.style.backdropFilter = "blur(8px)";
+        toolbar.style.boxShadow = "0 4px 10px rgba(0, 0, 0, 0.05)";
         
         let pillsWrapper = document.querySelector(".filter-pills-wrapper");
         if(pillsWrapper && !pillsWrapper.innerHTML.includes("Di Lokasi Event")) {

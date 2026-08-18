@@ -1,16 +1,20 @@
 // ==========================================
-// MESIN LOGIKA GUDANG (V.32.1 - SURAT JALAN A4 & A-Z SORTING)
+// MESIN LOGIKA GUDANG (V.33.0 - GLOBAL LOGIN INTEGRATION)
 // ==========================================
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec"; 
+const API_BACKEND_PIN = "a1b2c3"; // Ghost PIN untuk menembus server GAS lama
 
-const VALID_PINS = ["a1b2c3", "v9t6c2"];
-let allItems = []; let optionsData = { lokasi: [], tim: [] }; let userPin = localStorage.getItem("AV_INVENTORY_PIN") || ""; 
+let allItems = []; let optionsData = { lokasi: [], tim: [] }; 
 let html5QrCode = null; 
 let isAdminMode = false, isBulkMode = false, selectedRows = new Set(), lastScanTime = 0, activeFilterPill = 'all', currentViewMode = 'grid'; 
 let pendingAddFotos = [];
 let currentCameraFacing = "environment"; 
 let isFlashlightOn = false;
+
+// Ambil Sesi Login Global
+const currentUserRole = localStorage.getItem('av_session_role');
+const currentUserName = localStorage.getItem('av_session_nama');
 
 window.onload = () => { injectGudangDarkModeCSS(); checkAdminStatus(); loadData(); };
 
@@ -75,8 +79,17 @@ function injectGudangDarkModeCSS() {
     document.head.appendChild(style);
 }
 
-function checkAdminStatus() { if (userPin && VALID_PINS.includes(userPin)) { isAdminMode = true; document.body.classList.add("admin-mode-active"); document.getElementById("modeStatusText").innerHTML = "🔴 Admin Mode"; document.getElementById("btnUnlock").innerText = "🔓 Tutup Akses"; } else { isAdminMode = false; userPin = ""; document.body.classList.remove("admin-mode-active"); document.getElementById("modeStatusText").innerHTML = "🟢 Read-Only Mode"; document.getElementById("btnUnlock").innerText = "🔒 Buka Akses"; } }
-function toggleAdminMode() { if (isAdminMode) { if(confirm("Tutup akses Admin? Memori PIN dihapus.")) { localStorage.removeItem("AV_INVENTORY_PIN"); userPin = ""; checkAdminStatus(); showToast("Mode Read-Only aktif."); applyFilters(); } } else { let input = prompt("Masukkan PIN Kapten / Admin Gudang:"); if (input) { let pinAttempt = input.trim().toLowerCase(); if (VALID_PINS.includes(pinAttempt)) { userPin = pinAttempt; localStorage.setItem("AV_INVENTORY_PIN", userPin); checkAdminStatus(); showToast("Akses Admin Terbuka!"); applyFilters(); } else { alert("⛔ AKSES DITOLAK! PIN tidak punya izin ke Gudang."); } } } }
+function checkAdminStatus() { 
+    // Otomatis cek apakah yang login berhak edit Gudang (Master atau Kru)
+    if (currentUserRole === "Master" || currentUserRole === "Kru") { 
+        isAdminMode = true; 
+        document.body.classList.add("admin-mode-active"); 
+    } else { 
+        isAdminMode = false; 
+        document.body.classList.remove("admin-mode-active"); 
+    } 
+}
+
 function showToast(msg, isSuccess = true) { const t = document.getElementById("toastMsg"); if(!t) return; t.innerText = msg; t.className = "toast-msg show " + (isSuccess ? "toast-success" : "toast-error"); setTimeout(() => { t.classList.remove("show"); }, 4000); }
 
 function triggerFeedback(type) {
@@ -265,7 +278,7 @@ function openDetailModal(item) {
     document.body.insertAdjacentHTML('beforeend', modalHtml);
 }
 
-// 🖨️ FUNGSI CETAK SURAT JALAN / MANIFEST (UPDATE V.32.1 - SORT A-Z & A4 READY)
+// 🖨️ FUNGSI CETAK SURAT JALAN / MANIFEST
 function printSuratJalan() { 
     let bawaData = allItems.filter(i => i.status_digunakan === 'Akan Dibawa'); 
     if(bawaData.length === 0) return alert("Belum ada barang dengan status '🛒 Akan Dibawa' (Packing)."); 
@@ -423,11 +436,25 @@ async function processBulkUpdate(btn) {
     if (newLokasi === "TETAP" && newStatus === "TETAP") { alert("Pilih minimal satu perubahan!"); return; } 
     btn.disabled = true; btn.innerText = "MEMPROSES... (JANGAN DITUTUP)"; 
     try { 
-        const payload = { action: "update_status_lokasi", pin: userPin, rows: Array.from(selectedRows), new_lokasi: newLokasi !== "TETAP" ? newLokasi : null, new_status: newStatus !== "TETAP" ? newStatus : null, new_tujuan: "TETAP" }; 
+        const payload = { action: "update_status_lokasi", pin: API_BACKEND_PIN, rows: Array.from(selectedRows), new_lokasi: newLokasi !== "TETAP" ? newLokasi : null, new_status: newStatus !== "TETAP" ? newStatus : null, new_tujuan: "TETAP" }; 
         const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) }); 
         const data = await response.json(); 
         if(data.status === "success") { document.getElementById('bulkModal').remove(); toggleBulkMode(); loadData(); showToast("✅ Update massal berhasil!"); } else { alert("Gagal:\n" + data.message); } 
     } catch (e) { alert("Error Sistem:\n" + e.message); } finally { btn.disabled = false; btn.innerText = "PROSES UPDATE MASSAL"; } 
+}
+
+// SIMPAN LOKASI & STATUS DARI DETAIL MODAL
+async function saveEditLokasiStatus(rowIndex) {
+    const btn = event.target;
+    const newLokasi = document.getElementById("editLokasi").value;
+    const newStatus = document.getElementById("editStatus").value;
+    btn.disabled = true; btn.innerText = "MENYIMPAN...";
+    try {
+        const payload = { action: "update_status_lokasi", pin: API_BACKEND_PIN, rows: [rowIndex], new_lokasi: newLokasi, new_status: newStatus, new_tujuan: "TETAP" };
+        const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
+        const data = await response.json();
+        if(data.status === "success") { document.getElementById('detailModal').remove(); loadData(); showToast("✅ Status & Lokasi Diperbarui!"); } else { alert("Gagal:\n" + data.message); }
+    } catch (e) { alert("Error Sistem:\n" + e.message); } finally { btn.disabled = false; btn.innerText = "💾 SIMPAN STATUS"; }
 }
 
 // ==========================================
@@ -486,7 +513,7 @@ async function processAssignMission(btn) {
     try { 
         const payload = { 
             action: "assign_to_mission", 
-            pin: userPin, 
+            pin: API_BACKEND_PIN, 
             id_misi: missionId,
             new_tujuan: eventName,
             rows: Array.from(selectedRows),
@@ -519,13 +546,13 @@ function handleNewFotos(input) { if (!input.files || input.files.length === 0) r
 function removeAddFoto(index) { pendingAddFotos.splice(index, 1); renderPreviewAddFotos(); }
 function renderPreviewAddFotos() { const container = document.getElementById("previewAddFotos"); container.innerHTML = ""; if (pendingAddFotos.length === 0) { container.innerHTML = `<span style="font-size:11px; color:gray;">Belum ada foto terpilih.</span>`; return; } pendingAddFotos.forEach((file, index) => { const reader = new FileReader(); reader.onload = (e) => { container.innerHTML += `<div style="position:relative; width:70px; height:70px; border-radius:8px; overflow:hidden; border:1px solid #ccc;"><img src="${e.target.result}" style="width:100%; height:100%; object-fit:cover;"><button type="button" onclick="removeAddFoto(${index})" style="position:absolute; top:2px; right:2px; background:#ef4444; color:white; border:none; border-radius:50%; width:20px; height:20px; font-size:10px; font-weight:bold; cursor:pointer;">✕</button></div>`; }; reader.readAsDataURL(file); }); }
 function compressImage(file, maxWidth = 1000) { return new Promise((resolve) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = (event) => { const img = new Image(); img.src = event.target.result; img.onload = () => { const canvas = document.createElement('canvas'); const scaleSize = maxWidth / img.width; canvas.width = maxWidth; canvas.height = img.height * scaleSize; const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, canvas.width, canvas.height); resolve(canvas.toDataURL('image/jpeg', 0.6)); }; }; }); }
-async function submitNewItem(e) { e.preventDefault(); const btn = document.getElementById("btnSubmitAdd"); btn.innerText = "MENGOMPRES & UPLOAD..."; btn.disabled = true; try { let base64Fotos = ["", "", ""]; let maxFiles = Math.min(pendingAddFotos.length, 3); for (let i = 0; i < maxFiles; i++) { base64Fotos[i] = await compressImage(pendingAddFotos[i]); } const payload = { action: "add_item", pin: userPin, nama: document.getElementById("addNama").value, kode_barang: document.getElementById("addKode").value, kode_wadah: document.getElementById("addWadah").value, jumlah: document.getElementById("addJumlah").value, kondisi: document.getElementById("addKondisi").value, keterangan_ref: document.getElementById("addKet").value, fotos: base64Fotos }; const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) }); const data = await response.json(); if (data.status === "success") { showToast("✅ Alat Tersimpan!"); closeAddModal(); loadData(); } else { alert("Gagal:\n" + data.message); } } catch (err) { alert("Error Sistem:\n" + err.message); } finally { btn.innerText = "💾 SIMPAN ALAT"; btn.disabled = false; } }
+async function submitNewItem(e) { e.preventDefault(); const btn = document.getElementById("btnSubmitAdd"); btn.innerText = "MENGOMPRES & UPLOAD..."; btn.disabled = true; try { let base64Fotos = ["", "", ""]; let maxFiles = Math.min(pendingAddFotos.length, 3); for (let i = 0; i < maxFiles; i++) { base64Fotos[i] = await compressImage(pendingAddFotos[i]); } const payload = { action: "add_item", pin: API_BACKEND_PIN, nama: document.getElementById("addNama").value, kode_barang: document.getElementById("addKode").value, kode_wadah: document.getElementById("addWadah").value, jumlah: document.getElementById("addJumlah").value, kondisi: document.getElementById("addKondisi").value, keterangan_ref: document.getElementById("addKet").value, fotos: base64Fotos }; const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) }); const data = await response.json(); if (data.status === "success") { showToast("✅ Alat Tersimpan!"); closeAddModal(); loadData(); } else { alert("Gagal:\n" + data.message); } } catch (err) { alert("Error Sistem:\n" + err.message); } finally { btn.innerText = "💾 SIMPAN ALAT"; btn.disabled = false; } }
 
 function openEditFullModal(item) { document.getElementById('detailModal').remove(); document.getElementById('modalEditFull').classList.add("active"); document.getElementById("editRowIndex").value = item.row_index; document.getElementById("editNama").value = item.nama_barang; document.getElementById("editKode").value = item.barang || item.kode_barang || ""; document.getElementById("editWadah").value = item.kode_wadah || ""; document.getElementById("editJumlah").value = item.jumlah || 0; document.getElementById("editKondisi").value = item.kondisi || "Bagus"; document.getElementById("editKet").value = item.keterangan_ref || ""; let safeFileIds = item.file_ids || item.fotos || []; for(let i=0; i<3; i++) { let fileId = safeFileIds[i]; let preview = document.getElementById("previewFoto" + i); let btnRemove = document.getElementById("btnRemove" + i); let btnUpload = document.getElementById("btnUpload" + i); let existInput = document.getElementById("existingId" + i); let fileInput = document.getElementById("editFoto" + i); fileInput.value = ""; if (fileId && fileId.length > 5) { preview.src = fileId.includes("http") ? fileId : `https://drive.google.com/thumbnail?id=${fileId}&sz=w400`; preview.style.display = "block"; btnRemove.style.display = "block"; btnUpload.style.display = "none"; existInput.value = fileId; } else { preview.style.display = "none"; btnRemove.style.display = "none"; btnUpload.style.display = "block"; existInput.value = ""; } } }
 function closeEditFullModal() { document.getElementById('modalEditFull').classList.remove("active"); }
 function removeFotoEdit(index) { document.getElementById("previewFoto" + index).style.display = "none"; document.getElementById("btnRemove" + index).style.display = "none"; document.getElementById("btnUpload" + index).style.display = "block"; document.getElementById("existingId" + index).value = ""; document.getElementById("editFoto" + index).value = ""; }
 function previewNewFoto(index) { let fileInput = document.getElementById("editFoto" + index); if(fileInput.files.length > 0) { let reader = new FileReader(); reader.onload = function(e) { document.getElementById("previewFoto" + index).src = e.target.result; document.getElementById("previewFoto" + index).style.display = "block"; document.getElementById("btnRemove" + index).style.display = "block"; document.getElementById("btnUpload" + index).style.display = "none"; document.getElementById("existingId" + index).value = "NEW_BASE64"; }; reader.readAsDataURL(fileInput.files[0]); } }
-async function submitEditFull(e) { e.preventDefault(); const btn = document.getElementById("btnSubmitEditFull"); btn.innerText = "MENYIMPAN..."; btn.disabled = true; try { let finalFotos = ["", "", ""]; for(let i=0; i<3; i++) { let existVal = document.getElementById("existingId" + i).value; let fileInput = document.getElementById("editFoto" + i); if (existVal === "NEW_BASE64" && fileInput.files.length > 0) { finalFotos[i] = await compressImage(fileInput.files[0]); } else if (existVal && existVal.length > 5) { finalFotos[i] = existVal; } else { finalFotos[i] = ""; } } const payload = { action: "full_edit_item", pin: userPin, row_index: document.getElementById("editRowIndex").value, nama: document.getElementById("editNama").value, kode_barang: document.getElementById("editKode").value, kode_wadah: document.getElementById("editWadah").value, jumlah: document.getElementById("editJumlah").value, kondisi: document.getElementById("editKondisi").value, keterangan_ref: document.getElementById("editKet").value, fotos: finalFotos }; const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) }); const data = await response.json(); if (data.status === "success") { showToast("✅ Data Diperbarui!"); closeEditFullModal(); loadData(); } else { alert("Gagal:\n" + data.message); } } catch (err) { alert("Error Sistem:\n" + err.message); } finally { btn.innerText = "💾 UPDATE DATA & FOTO"; btn.disabled = false; } }
+async function submitEditFull(e) { e.preventDefault(); const btn = document.getElementById("btnSubmitEditFull"); btn.innerText = "MENYIMPAN..."; btn.disabled = true; try { let finalFotos = ["", "", ""]; for(let i=0; i<3; i++) { let existVal = document.getElementById("existingId" + i).value; let fileInput = document.getElementById("editFoto" + i); if (existVal === "NEW_BASE64" && fileInput.files.length > 0) { finalFotos[i] = await compressImage(fileInput.files[0]); } else if (existVal && existVal.length > 5) { finalFotos[i] = existVal; } else { finalFotos[i] = ""; } } const payload = { action: "full_edit_item", pin: API_BACKEND_PIN, row_index: document.getElementById("editRowIndex").value, nama: document.getElementById("editNama").value, kode_barang: document.getElementById("editKode").value, kode_wadah: document.getElementById("editWadah").value, jumlah: document.getElementById("editJumlah").value, kondisi: document.getElementById("editKondisi").value, keterangan_ref: document.getElementById("editKet").value, fotos: finalFotos }; const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) }); const data = await response.json(); if (data.status === "success") { showToast("✅ Data Diperbarui!"); closeEditFullModal(); loadData(); } else { alert("Gagal:\n" + data.message); } } catch (err) { alert("Error Sistem:\n" + err.message); } finally { btn.innerText = "💾 UPDATE DATA & FOTO"; btn.disabled = false; } }
 
 function openScannerModal() { 
     let modal = document.createElement("div"); modal.id = "tempScannerModal"; modal.className = "modal-overlay active"; 

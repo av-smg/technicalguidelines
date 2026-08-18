@@ -1,4 +1,4 @@
-<!-- KODE NAVBAR FIXED (Header Native App, Login Dinamis, & Notifikasi Radar 15s) -->
+<!-- KODE NAVBAR FIXED (Header Native App, Login Dinamis, Radar 15s, & Gatekeeper Publik) -->
 <style>
   /* Header Khas Aplikasi Native */
   .top-navbar-wrapper { 
@@ -59,6 +59,17 @@
   body.dark-mode .mobile-dark-btn { background: #f1f5f9; color: #0f172a; }
 </style>
 
+<!-- ========================================== -->
+<!-- GERBANG KEAMANAN (GATEKEEPER)              -->
+<!-- ========================================== -->
+<div id="gatekeeperOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; z-index: 9999999; flex-direction: column; justify-content: center; align-items: center; color: white;">
+    <h2 style="margin-bottom: 5px;">🔒 Akses Terbatas</h2>
+    <p style="margin-bottom: 25px; font-size: 13px; color: #94a3b8;">Masukkan PIN untuk mode Read-Only</p>
+    <input type="password" id="guestPinInput" placeholder="PIN Akses..." style="padding: 15px; border-radius: 12px; border: none; outline: none; width: 250px; text-align: center; font-size: 18px; font-weight: bold; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+    <button onclick="cekGuestPin()" style="background: #f97316; color: white; border: none; padding: 15px; width: 250px; border-radius: 12px; font-weight: 900; font-size: 16px; cursor: pointer; box-shadow: 0 4px 10px rgba(249, 115, 22, 0.3);">BUKA AKSES</button>
+    <p style="margin-top: 30px; font-size: 13px; color: #cbd5e1;">Kru internal? <a href="{{ site.baseurl }}/login.html" style="color: #f97316; font-weight: bold; text-decoration: none;">Login di sini</a></p>
+</div>
+
 <!-- HEADER UTAMA -->
 <div class="top-navbar-wrapper">
   <button class="hamburger-btn" onclick="toggleMenu()">☰</button>
@@ -92,7 +103,32 @@
 <script>
   function toggleMenu() { document.getElementById('sideMenu').classList.toggle('active'); }
 
+  // Fungsi Cek PIN Gatekeeper
+  function cekGuestPin() {
+      const input = document.getElementById('guestPinInput').value;
+      if (input === 'AVSMGOKT26') {
+          localStorage.setItem('av_guest_pin', 'AVSMGOKT26');
+          document.getElementById('gatekeeperOverlay').style.display = 'none';
+          document.body.style.overflow = 'auto'; // Kembalikan scroll
+      } else {
+          alert('❌ PIN Salah! Akses ditolak.');
+          document.getElementById('guestPinInput').value = '';
+      }
+  }
+
   document.addEventListener("DOMContentLoaded", function() {
+    // 1. GATEKEEPER LOGIC (Cek Sesi)
+    const isLoginPage = window.location.pathname.includes('login');
+    const isCrew = localStorage.getItem('av_session_nama');
+    const isGuest = localStorage.getItem('av_guest_pin') === 'AVSMGOKT26';
+
+    // Jika bukan Kru, bukan Guest, dan sedang TIDAK di halaman login -> KUNCI!
+    if (!isCrew && !isGuest && !isLoginPage) {
+        document.getElementById('gatekeeperOverlay').style.display = 'flex';
+        document.body.style.overflow = 'hidden'; // Kunci layar agar tidak bisa di-scroll
+    }
+
+    // 2. HIGHLIGHT MENU AKTIF
     const currentUrl = window.location.pathname;
     document.querySelectorAll('.nav-item').forEach(link => {
       const linkHref = link.getAttribute('href');
@@ -101,6 +137,7 @@
       }
     });
 
+    // 3. RENDER PROFIL & TOMBOL LOGIN/LOGOUT
     const userName = localStorage.getItem('av_session_nama');
     const userRole = localStorage.getItem('av_session_role');
     const profileArea = document.getElementById('userProfileArea');
@@ -120,9 +157,7 @@
       `;
     }
     
-    // ==========================================
-    // MESIN RADAR NOTIFIKASI (Cek tiap 15 Detik)
-    // ==========================================
+    // 4. MESIN RADAR NOTIFIKASI (Cek tiap 15 Detik)
     const URL_SERVER = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec?action=api";
     
     function cekBannerDarurat() {
@@ -133,11 +168,8 @@
                 if (data.banner && data.banner.status === "ON") {
                     document.getElementById("bannerText").innerText = data.banner.pesan;
                     
-                    // Jika banner BARU SAJA muncul dari kondisi mati
                     if(bannerDiv.style.display !== "block") {
                         bannerDiv.style.display = "block";
-                        
-                        // 📳 POLA GETAR DARURAT: 3x Getar Panjang
                         if(navigator.vibrate) {
                             navigator.vibrate([400, 200, 400, 200, 600]);
                         }
@@ -149,22 +181,20 @@
             .catch(err => console.log("Gagal memuat status banner."));
     }
 
-    // Eksekusi pertama kali saat web dibuka
     cekBannerDarurat();
-    
-    // Eksekusi otomatis setiap 15 detik (15000 milidetik)
     setInterval(cekBannerDarurat, 15000);
-    
-  }); // <--- INI DIA TERSANGKANYA! (Kurung penutup yang sebelumnya hilang)
+  }); 
 
-  // FUNGSI LOGOUT
+  // FUNGSI LOGOUT (Ditambah penghapus sesi Guest)
   function prosesLogout() {
     localStorage.removeItem('av_session_pin');
     localStorage.removeItem('av_session_role');
     localStorage.removeItem('av_session_nama');
+    localStorage.removeItem('av_guest_pin'); // Hapus izin publik saat logout
     window.location.href = "{{ site.baseurl }}/"; 
   }
 
+  // FUNGSI TEMA GELAP
   function toggleDarkMode() {
     document.body.classList.toggle('dark-mode');
     const isDark = document.body.classList.contains('dark-mode');

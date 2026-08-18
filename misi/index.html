@@ -14,6 +14,11 @@ location: "MISSION CARD"
         body.admin-mode-active .admin-only { display: inline-block !important; }
         .btn-lock { background: #f1f5f9; border: 1px solid #cbd5e1; color: #334155; padding: 4px 10px; border-radius: 6px; font-weight: 800; cursor: pointer; font-size:10px;}
         body.admin-mode-active .btn-lock { background: #f0fdf4; border-color: #22c55e; color: #16a34a; }
+        
+        /* GEMBOK KEAMANAN: Tombol disembunyikan dari Publik secara baku */
+        .aksi-misi, .aksi-gudang { 
+            display: none !important; 
+        }
     </style>
 </head>
 <body id="missionBody">
@@ -25,7 +30,7 @@ location: "MISSION CARD"
                 <h2 style="font-weight:900; margin:0; font-size:16px;">🎯 MISSION CONTROL</h2>
                 <p style="font-size:9px; color:gray; margin:0;">Status: <span id="modeStatusText">🟢 Read-Only Mode</span></p>
             </div>
-            <button id="btnUnlock" onclick="toggleAdminMode()" class="btn-lock">🔒 Buka Akses</button>
+            <!-- Tombol Unlock Manual Dihapus karena sudah pakai Sistem PIN -->
         </div>
 
         <div class="team-filters" id="teamFilters">
@@ -43,5 +48,44 @@ location: "MISSION CARD"
     <div id="toastMsg" class="toast-msg">Notifikasi</div>
 
     <script src="{{ site.baseurl }}/assets/js/script-misi.js?v=18.5"></script>
+
+    <!-- SCRIPT KEAMANAN RBAC & AUDIT TRAIL UNTUK KARTU DINAMIS -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        const userRole = localStorage.getItem('av_session_role');
+        const userName = localStorage.getItem('av_session_nama');
+        const statusText = document.getElementById('modeStatusText');
+
+        if (!userRole) return; 
+
+        // 1. LOGIKA RBAC: Kalau yang login Master atau Kapten, paksa munculkan tombol Misi
+        if (userRole === "Master" || userRole === "Kapten") {
+            const style = document.createElement('style');
+            style.innerHTML = '.aksi-misi { display: inline-block !important; }';
+            document.head.appendChild(style);
+
+            if(statusText) {
+                statusText.innerHTML = "🔴 Mission Mode Aktif";
+                statusText.style.color = "#ef4444";
+            }
+        }
+
+        // 2. LOGIKA AUDIT TRAIL (Event Delegation untuk Kartu dari Database)
+        document.body.addEventListener('click', function(event) {
+            // Mengecek apakah yang diklik memiliki class 'aksi-misi'
+            if (event.target && event.target.classList.contains('aksi-misi')) {
+                const waktu = new Date();
+                const jam = waktu.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                
+                // Mengubah wujud tombol menjadi Badge Laporan
+                event.target.outerHTML = `
+                  <div style="background: #dcfce7; color: #166534; padding: 8px 12px; border-radius: 8px; font-size: 0.9rem; font-weight: bold; border: 1px solid #bbf7d0; display: inline-block; margin-top: 10px;">
+                    ✅ Selesai ${jam} WIB oleh ${userName}
+                  </div>
+                `;
+            }
+        });
+      });
+    </script>
 </body>
 </html>

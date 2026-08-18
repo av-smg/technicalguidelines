@@ -1,26 +1,130 @@
 ---
-layout: default
-title: Login Kru
+location: "LOGIN"
 ---
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    {% include head.html %}
+    <title>Login Kru - A/V Command Center</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800;900&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #0f172a; margin: 0; padding: 0; color: #f8fafc; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        
+        .login-card { background: #1e293b; padding: 40px 25px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); width: 100%; max-width: 320px; text-align: center; border: 1px solid #334155; }
+        .login-title { font-size: 24px; font-weight: 900; margin: 0 0 5px 0; color: #f8fafc; }
+        .login-title span { color: #f97316; }
+        .login-subtitle { font-size: 12px; color: #94a3b8; margin-bottom: 30px; }
+        
+        .pin-input { width: 100%; padding: 15px; font-size: 24px; font-weight: 900; text-align: center; letter-spacing: 5px; text-transform: uppercase; background: #0f172a; border: 2px solid #475569; color: #f97316; border-radius: 12px; margin-bottom: 20px; box-sizing: border-box; outline: none; transition: 0.3s; }
+        .pin-input:focus { border-color: #f97316; box-shadow: 0 0 15px rgba(249, 115, 22, 0.2); }
+        
+        .btn-login { width: 100%; padding: 15px; background: #f97316; color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 900; cursor: pointer; transition: 0.2s; }
+        .btn-login:hover { background: #ea580c; transform: translateY(-2px); }
+        .btn-login:active { transform: translateY(2px); }
+        
+        .btn-back { display: inline-block; margin-top: 20px; color: #94a3b8; font-size: 12px; font-weight: bold; text-decoration: none; }
+    </style>
+</head>
+<body>
 
-<div style="max-width: 400px; margin: 40px auto; padding: 30px; background: white; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center;">
-  <h2 style="margin-bottom: 10px; color: #0f172a;">🔒 Akses Kru A/V</h2>
-  <p style="color: #64748b; margin-bottom: 25px;">Masukkan 5 karakter PIN Personal Anda.</p>
-  
-  <form onsubmit="prosesLogin(event)">
-    <input 
-      type="text" 
-      id="inputPin" 
-      maxlength="5" 
-      placeholder="Contoh: K7N2X" 
-      style="width: 100%; padding: 15px; font-size: 1.5rem; text-align: center; letter-spacing: 5px; text-transform: uppercase; border: 2px solid #e2e8f0; border-radius: 10px; margin-bottom: 15px; font-weight: bold;" 
-      required
-    >
-    <button type="submit" id="btnSubmit" style="width: 100%; padding: 15px; background: #f97316; color: white; border: none; border-radius: 10px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: 0.3s;">LOGIN MASUK 🚀</button>
-  </form>
-  
-  <p id="errorMsg" style="color: #ef4444; display: none; font-weight: bold; margin-top: 15px; background: #fee2e2; padding: 10px; border-radius: 8px;"></p>
-</div>
+    <div class="login-card">
+        <div style="font-size: 40px; margin-bottom: 10px;">🔐</div>
+        <h1 class="login-title">A/V <span>LOGIN</span></h1>
+        <p class="login-subtitle">Masukkan 5 Digit PIN Otorisasi</p>
 
-<!-- Panggil Script Auth -->
-<script src="{{ site.baseurl }}/assets/js/auth.js"></script>
+        <input type="text" id="inputPin" class="pin-input" maxlength="5" placeholder="•••••" autocomplete="off" autocorrect="off" spellcheck="false">
+        
+        <button class="btn-login" onclick="prosesLogin()">AKSES MASUK</button>
+        
+        <a href="{{ site.baseurl }}/" class="btn-back">⬅ Kembali ke Beranda Publik</a>
+    </div>
+
+    <!-- KAMUS PIN & NAMA KRU -->
+    <script>
+        // DI SINI TEMPAT KOMANDAN MENGEDIT NAMA KRU (Ubah teks di dalam tanda kutip)
+        const databaseKru = {
+            // 👑 MASTER KEY (Akses Penuh: Misi & Gudang)
+            "M9X2A": { nama: "Radix Rahardjani", role: "Master" },
+            "M4B7Y": { nama: "Johan Kristy", role: "Master" },
+            "M1C8Z": { nama: "Master 3", role: "Master" },
+            "M6P3K": { nama: "Master 4", role: "Master" },
+            "M2W5Q": { nama: "Master 5", role: "Master" },
+
+            // 🧢 KAPTEN TIM (Akses Misi Lapangan)
+            "K7N2X": { nama: "Edo (Booth)", role: "Kapten" },
+            "K3P9M": { nama: "Truna (Audio)", role: "Kapten" },
+            "K8R4T": { nama: "Malkhiel (Speaker)", role: "Kapten" },
+            "K1L6J": { nama: "Vina (Kabel)", role: "Kapten" },
+            "K5V8D": { nama: "Evan (Booth)", role: "Kapten" },
+            "K9F2B": { nama: "Kapten 6", role: "Kapten" },
+            "K4H7C": { nama: "Kapten 7", role: "Kapten" },
+            "K2Y5W": { nama: "Kapten 8", role: "Kapten" },
+            "K6M3P": { nama: "Kapten 9", role: "Kapten" },
+            "K8Z1N": { nama: "Kapten 10", role: "Kapten" },
+            "K3X9L": { nama: "Kapten 11", role: "Kapten" },
+            "K7T4R": { nama: "Kapten 12", role: "Kapten" },
+            "K5B6F": { nama: "Kapten 13", role: "Kapten" },
+            "K1J8V": { nama: "Kapten 14", role: "Kapten" },
+            "K9D2H": { nama: "Kapten 15", role: "Kapten" },
+
+            // 📦 KRU INVENTARIS (Akses Gudang Saja)
+            "V4X1M": { nama: "Emma (Inventaris)", role: "Kru" },
+            "V8N7K": { nama: "Peni (Inventaris)", role: "Kru" },
+            "V2P5L": { nama: "Kru Gudang 3", role: "Kru" },
+            "V9R3T": { nama: "Kru Gudang 4", role: "Kru" },
+            "V6B8F": { nama: "Kru Gudang 5", role: "Kru" },
+            "V1C4J": { nama: "Kru Gudang 6", role: "Kru" },
+            "V5H2D": { nama: "Kru Gudang 7", role: "Kru" },
+            "V7M9W": { nama: "Kru Gudang 8", role: "Kru" },
+            "V3Z6P": { nama: "Kru Gudang 9", role: "Kru" },
+            "V8L1N": { nama: "Kru Gudang 10", role: "Kru" },
+            "V4T5R": { nama: "Kru Gudang 11", role: "Kru" },
+            "V2K7X": { nama: "Kru Gudang 12", role: "Kru" },
+            "V9J3B": { nama: "Kru Gudang 13", role: "Kru" },
+            "V6V8C": { nama: "Kru Gudang 14", role: "Kru" },
+            "V1F4H": { nama: "Kru Gudang 15", role: "Kru" },
+            "V5N2M": { nama: "Kru Gudang 16", role: "Kru" },
+            "V7P9K": { nama: "Kru Gudang 17", role: "Kru" },
+            "V3R6L": { nama: "Kru Gudang 18", role: "Kru" },
+            "V8B1T": { nama: "Kru Gudang 19", role: "Kru" },
+            "V4C5F": { nama: "Kru Gudang 20", role: "Kru" },
+            "V2H7J": { nama: "Kru Gudang 21", role: "Kru" },
+            "V9M3D": { nama: "Kru Gudang 22", role: "Kru" },
+            "V6Z8W": { nama: "Kru Gudang 23", role: "Kru" },
+            "V1L4P": { nama: "Kru Gudang 24", role: "Kru" },
+            "V5T2N": { nama: "Kru Gudang 25", role: "Kru" }
+        };
+
+        function prosesLogin() {
+            const inputField = document.getElementById("inputPin");
+            const pinDiformat = inputField.value.trim().toUpperCase();
+
+            // Cek apakah PIN ada di dalam databaseKru
+            if (databaseKru.hasOwnProperty(pinDiformat)) {
+                const dataKru = databaseKru[pinDiformat];
+                
+                // Simpan NAMA dan ROLE ke memori HP
+                localStorage.setItem('av_session_pin', pinDiformat);
+                localStorage.setItem('av_session_nama', dataKru.nama);
+                localStorage.setItem('av_session_role', dataKru.role);
+
+                alert(`Berhasil masuk! Selamat bertugas, ${dataKru.nama} (${dataKru.role}).`);
+                
+                // Arahkan ke Beranda
+                window.location.href = "{{ site.baseurl }}/";
+            } else {
+                alert("⛔ AKSES DITOLAK! PIN tidak terdaftar dalam sistem.");
+                inputField.value = ""; // Kosongkan kolom jika salah
+            }
+        }
+
+        // Fitur tekan 'Enter' di keyboard untuk Login
+        document.getElementById("inputPin").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                prosesLogin();
+            }
+        });
+    </script>
+</body>
+</html>

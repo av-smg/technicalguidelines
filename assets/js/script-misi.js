@@ -1,10 +1,13 @@
 // ==========================================
-// MESIN LOGIKA MISSION CONTROL (V.16.3 - DARK MODE READY & PRIORITAS)
+// MESIN LOGIKA MISSION CONTROL (V.17.0 - GLOBAL LOGIN & AUDIT TRAIL)
 // ==========================================
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec"; 
-const VALID_MISSION_PINS = ["123456", "v9t6c2", "spk001", "kbl002", "bth003", "dev999"]; 
-let userPin = localStorage.getItem("AV_MISSION_PIN") || ""; 
+const API_BACKEND_PIN = "123456"; // Ghost PIN untuk menembus server GAS lama
+
+// Ambil Sesi Login Global dari Navbar
+const currentUserRole = localStorage.getItem('av_session_role');
+const currentUserName = localStorage.getItem('av_session_nama');
 
 let isAdminMode = false, allMissions = [], allInventory = [], activeTeam = '', isDataLoaded = false;
 let html5QrCode = null; 
@@ -22,29 +25,15 @@ const teamRoster = {
 window.onload = () => { checkAdminStatus(); loadMissions(); };
 
 function checkAdminStatus() {
-    if (userPin && VALID_MISSION_PINS.includes(userPin)) {
-        isAdminMode = true; document.body.classList.add("admin-mode-active");
-        document.getElementById("modeStatusText").innerHTML = "🔓 Akses Kru Lapangan Terbuka"; document.getElementById("btnUnlock").innerText = "🔒 Tutup Akses";
+    // Otomatis cek apakah yang login berhak eksekusi Misi (Master atau Kapten)
+    if (currentUserRole === "Master" || currentUserRole === "Kapten") {
+        isAdminMode = true; 
+        document.body.classList.add("admin-mode-active");
     } else {
-        isAdminMode = false; userPin = ""; document.body.classList.remove("admin-mode-active");
-        document.getElementById("modeStatusText").innerHTML = "🟢 Read-Only Mode"; document.getElementById("btnUnlock").innerText = "🔓 Buka Akses";
+        isAdminMode = false; 
+        document.body.classList.remove("admin-mode-active");
     }
     if (isDataLoaded) renderMissions();
-}
-
-function toggleAdminMode() {
-    if (isAdminMode) {
-        if(confirm("Tutup akses Kru Lapangan? Memori PIN akan dihapus.")) { 
-            localStorage.removeItem("AV_MISSION_PIN"); showToast("Sistem dikunci. Memuat ulang..."); 
-            setTimeout(() => { window.location.reload(); }, 800); 
-        }
-    } else {
-        let input = prompt("Masukkan PIN Tim Lapangan / Master:");
-        if (input && VALID_MISSION_PINS.includes(input.trim().toLowerCase())) {
-            localStorage.setItem("AV_MISSION_PIN", input.trim().toLowerCase()); showToast("Akses Terbuka! Memuat ulang..."); 
-            setTimeout(() => { window.location.reload(); }, 800); 
-        } else if (input) alert("⛔ AKSES DITOLAK! PIN tidak dikenali.");
-    }
 }
 
 function showToast(msg, isSuccess = true) { 
@@ -298,23 +287,31 @@ function renderMissions() {
             
             let buttonHtml = '';
             if (isSelesai) {
-                if (isAdminMode) buttonHtml = `<div style="display:flex; gap:6px; width:100%;"><div class="btn-complete done" style="flex:1; margin:0;">✅ Selesai: ${misi.waktu_selesai}</div><button class="btn-complete" style="background:#ef4444; flex:0 0 auto; padding:6px;" onclick="undoMission(event, '${misi.row_index}', '${misi.id_misi}', '${misi.kode_barang || ''}')">❌ Batal</button></div>`;
-                else buttonHtml = `<button class="btn-complete done" style="width:100%;">✅ SELESAI (${misi.waktu_selesai})</button>`;
+                if (isAdminMode) {
+                    // Tombol BATAL diberi class aksi-misi agar tersambung Audit Trail
+                    buttonHtml = `<div style="display:flex; gap:6px; width:100%;"><div class="btn-complete done" style="flex:1; margin:0;">✅ Selesai: ${misi.waktu_selesai}</div><button class="btn-complete aksi-misi" style="background:#ef4444; flex:0 0 auto; padding:6px;" onclick="undoMission(event, '${misi.row_index}', '${misi.id_misi}', '${misi.kode_barang || ''}')">❌ Batal</button></div>`;
+                }
+                else {
+                    buttonHtml = `<div class="btn-complete done" style="width:100%;">✅ SELESAI (${misi.waktu_selesai})</div>`;
+                }
             } else {
                 if (isAdminMode) {
                     let safeKodeBarang = String(misi.kode_barang || "");
                     let scanBtn = `<button class="btn-complete" style="background:#2563eb; margin:0;" onclick="openMissionScanner('${misi.row_index}', '${misi.id_misi}', '${safeKodeBarang}')">📷 SCAN BARANG</button>`;
                     
                     if (teamLower.includes("booth") || teamLower.includes("kabel")) {
+                        // Tombol SELESAI diberi class aksi-misi agar berubah jadi label "Diselesaikan oleh..."
                         buttonHtml = `<div style="display:flex; gap:6px; align-items:stretch; width:100%;">
                             ${scanBtn}
-                            <button class="btn-complete" style="background:#10b981; margin:0;" onclick="executeCompleteMission('${misi.row_index}', '${misi.id_misi}', '${safeKodeBarang}')">✅ SELESAI</button>
+                            <button class="btn-complete aksi-misi" style="background:#10b981; margin:0;" onclick="executeCompleteMission('${misi.row_index}', '${misi.id_misi}', '${safeKodeBarang}')">✅ SELESAI</button>
                         </div>`;
                     } else {
                         buttonHtml = `<div style="width:100%; display:flex;">${scanBtn}</div>`;
                     }
                 }
-                else buttonHtml = `<button class="btn-complete" style="background:#94a3b8; width:100%;" onclick="toggleAdminMode()">🔒 KUNCI (LOGIN)</button>`;
+                else {
+                    buttonHtml = `<div style="margin-top:5px; padding:10px; background:#f1f5f9; border-radius:8px; font-size:11px; color:#64748b; text-align:center; font-weight:bold;">🔒 Login Kapten/Master untuk eksekusi misi</div>`;
+                }
             }
 
             const card = document.createElement("div"); 
@@ -347,7 +344,7 @@ function renderMissions() {
 }
 
 // ==========================================
-// SCANNER V.16
+// SCANNER V.17
 // ==========================================
 function openMissionScanner(rowIndex, idMisi, targetKodeBarangString) {
     let modal = document.createElement("div"); modal.id = "missionScannerModal"; modal.className = "modal-overlay active";
@@ -433,7 +430,7 @@ function processScanResult(decodedText, rowIndex, idMisi, targetKodeBarangString
                 <select id="overrideSelect" style="width:100%; padding:6px; border-radius:6px; border:1px solid #cbd5e1; margin-bottom:8px; font-size:10px;">${optionsHtml}</select>
                 <label style="font-size:9px; font-weight:bold; color:#c2410c;">Alasan Ganti (Wajib):</label>
                 <input type="text" id="overrideReason" placeholder="Contoh: Kabel awal putus" style="width:100%; padding:6px; border-radius:6px; border:1px solid #cbd5e1; margin-bottom:10px; font-size:10px; box-sizing:border-box;">
-                <button onclick="executeOverrideMission('${rowIndex}', '${idMisi}', '${targetKodeBarangString}', '${scannedText}')" style="width:100%; padding:8px; background:#f97316; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer; font-size:11px;">🔄 Konfirmasi & Selesai</button>
+                <button class="aksi-misi" onclick="executeOverrideMission('${rowIndex}', '${idMisi}', '${targetKodeBarangString}', '${scannedText}')" style="width:100%; padding:8px; background:#f97316; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer; font-size:11px;">🔄 Konfirmasi & Selesai</button>
             `;
         }).catch(e => console.log(e));
         return;
@@ -447,7 +444,7 @@ function closeMissionScanner() { if (html5QrCode) { html5QrCode.stop().catch(e =
 async function executeCompleteMission(rowIndex, idMisi, kodeBarang) {
     showToast(`⏳ Memproses ${idMisi}...`);
     try {
-        const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "complete_mission", pin: userPin, row_index: rowIndex, id_misi: idMisi, kode_barang: kodeBarang }) });
+        const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "complete_mission", pin: API_BACKEND_PIN, row_index: rowIndex, id_misi: idMisi, kode_barang: kodeBarang }) });
         const data = await response.json();
         if (data.status === "success") { showToast(`✅ Misi Selesai!`); triggerFeedback('success'); loadMissions(); } 
         else { alert("Gagal:\n" + data.message); triggerFeedback('error'); }
@@ -466,7 +463,7 @@ async function executeOverrideMission(rowIndex, idMisi, oldTargetString, newScan
     try {
         const response = await fetch(SCRIPT_URL, { 
             method: "POST", 
-            body: JSON.stringify({ action: "complete_mission", pin: userPin, row_index: rowIndex, id_misi: idMisi, kode_barang: finalKodeString, update_kode: finalKodeString, alasan_override: reason }) 
+            body: JSON.stringify({ action: "complete_mission", pin: API_BACKEND_PIN, row_index: rowIndex, id_misi: idMisi, kode_barang: finalKodeString, update_kode: finalKodeString, alasan_override: reason }) 
         });
         const data = await response.json();
         if (data.status === "success") { showToast(`✅ Alat diganti & Misi Selesai!`); triggerFeedback('success'); loadMissions(); } 
@@ -478,7 +475,7 @@ async function undoMission(event, rowIndex, idMisi, kodeBarang) {
     if (!confirm(`Batalkan misi ${idMisi}?`)) return;
     const btn = event.target; btn.innerText = "⏳..."; btn.disabled = true;
     try {
-        const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "undo_mission", pin: userPin, row_index: rowIndex, id_misi: idMisi, kode_barang: kodeBarang }) });
+        const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "undo_mission", pin: API_BACKEND_PIN, row_index: rowIndex, id_misi: idMisi, kode_barang: kodeBarang }) });
         const data = await response.json();
         if (data.status === "success") { showToast(`✅ Dibatalkan!`); loadMissions(); } 
         else { alert("Gagal:\n" + data.message); btn.innerText = "❌ BATALKAN"; btn.disabled = false; }

@@ -5,7 +5,6 @@ location: "HOME"
 <html lang="id">
 <head>
     {% include head.html %}
-    <title>A/V Command Center</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800;900&display=swap');
 
@@ -16,7 +15,7 @@ location: "HOME"
             background: #0f172a; 
             background-image: radial-gradient(circle at 100% 0%, #1e293b 0%, transparent 50%), radial-gradient(circle at 0% 100%, #f97316 0%, transparent 40%);
             color: white; 
-            padding: 40px 20px 60px 20px; /* <--- PADDING BAWAH DITAMBAH AGAR TIDAK MEPET */
+            padding: 40px 20px 60px 20px; 
             text-align: center; 
             border-radius: 0 0 40px 40px; 
             box-shadow: 0 10px 30px rgba(15, 23, 42, 0.3); 
@@ -30,17 +29,16 @@ location: "HOME"
         .dashboard-container { max-width: 1000px; margin: 0 auto; padding: 0 20px 40px 20px; }
 
         /* 👋 FUN GREETING & BADGE */
-        .greeting-box { text-align: center; margin-top: -20px; margin-bottom: 30px; position: relative; z-index: 10; } /* <--- MARGIN DISESUAIKAN */
-        .greeting-box h2 { font-size: 22px; font-weight: 900; color: #f97316; margin: 0 0 5px 0; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .greeting-box { text-align: center; margin-top: -20px; margin-bottom: 30px; position: relative; z-index: 10; } 
         .greeting-box p { font-size: 13px; font-weight: 700; color: #f8fafc; margin: 0; background: #1e293b; display: inline-block; padding: 6px 15px; border-radius: 20px; border: 2px solid #334155; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         
-        /* ⚡ AKSES CEPAT (4 TOMBOL CHUNKY) */
-        .quick-access-wrapper { position: relative; z-index: 10; margin-bottom: 25px; }
-        .quick-access-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; }
+        /* ⚡ AKSES CEPAT (KOTAK BESAR) */
+        .quick-access-wrapper { position: relative; z-index: 10; margin-bottom: 15px; }
+        .quick-access-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         
         .btn-quick { 
             display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
-            padding: 20px 10px; border-radius: 24px; text-decoration: none; font-weight: 800; font-size: 13px; 
+            padding: 25px 10px; border-radius: 24px; text-decoration: none; font-weight: 800; font-size: 13px; 
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
             background: white; color: #0f172a;
             border: 3px solid #e2e8f0;
@@ -57,7 +55,7 @@ location: "HOME"
         .btn-quick.misi-btn:hover { border-color: #c2410c; box-shadow: 0 11px 0 #c2410c; background: #f97316; }
         .btn-quick.misi-btn:active { box-shadow: 0 3px 0 #c2410c; }
 
-        /* 📑 APENDIKS MEMANJANG (WIDE CARDS) */
+        /* 📑 APENDIKS MEMANJANG (PILL/WIDE CARDS) */
         .apendiks-section { margin-bottom: 40px; }
         .section-title { font-size: 18px; font-weight: 900; color: #0f172a; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px;}
         
@@ -84,9 +82,8 @@ location: "HOME"
         @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
         .hidden { display: none !important; }
 
-        /* 📊 STATISTIK GUDANG (PILL SHAPE) */
+        /* 📊 STATISTIK GUDANG */
         .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; margin-bottom: 40px; }
-        
         .stat-card { 
             background: white; padding: 25px 15px; border-radius: 30px; 
             border: 2px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.03); 
@@ -94,7 +91,6 @@ location: "HOME"
             position: relative; overflow: hidden;
         }
         .stat-card:hover { transform: translateY(-5px); border-color: #cbd5e1; box-shadow: 0 10px 20px rgba(0,0,0,0.06); }
-        
         .stat-icon { font-size: 32px; margin-bottom: 12px; z-index: 2; }
         .stat-value { font-size: 32px; font-weight: 900; color: #0f172a; line-height: 1; margin-bottom: 8px; z-index: 2; }
         .stat-label { font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; z-index: 2; }
@@ -172,13 +168,10 @@ location: "HOME"
 
         body.dark-mode .team-speaker .progress-title { color: #60a5fa; }
         body.dark-mode .team-speaker .dash-txt { background: rgba(59, 130, 246, 0.1); color: #93c5fd; border-color: rgba(59, 130, 246, 0.2); }
-        
         body.dark-mode .team-kabel .progress-title { color: #a78bfa; }
         body.dark-mode .team-kabel .dash-txt { background: rgba(139, 92, 246, 0.1); color: #c4b5fd; border-color: rgba(139, 92, 246, 0.2); }
-        
         body.dark-mode .team-booth .progress-title { color: #f472b6; }
         body.dark-mode .team-booth .dash-txt { background: rgba(236, 72, 153, 0.1); color: #fbcfe8; border-color: rgba(236, 72, 153, 0.2); }
-        
         body.dark-mode .team-inventaris .progress-title { color: #fbbf24; }
         body.dark-mode .team-inventaris .dash-txt { background: rgba(245, 158, 11, 0.1); color: #fde68a; border-color: rgba(245, 158, 11, 0.2); }
     </style>
@@ -190,44 +183,55 @@ location: "HOME"
         <h1 class="hero-title">A/V <span>COMMAND CENTER</span></h1>
         <p class="hero-subtitle">Sistem Pemantauan Logistik & Misi Lapangan</p>
         
-        <!-- TEKS SAPAAN DIMASUKKAN KE DALAM HERO AGAR BACKGROUND BIRUNYA MENYATU -->
         <h2 id="homeGreetingText" style="font-size: 24px; font-weight: 900; color: #f97316; margin: 30px 0 0 0; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">Haii Tim A/V! 👋</h2>
     </div>
 
     <div class="dashboard-container">
         
-        <!-- BADGE MENU DIBUAT OVERLAPPING / MENUMPUK DI TENGAH TRANSISI LENGKUNGAN -->
         <div class="greeting-box">
             <p>Klik menu yang kamu butuhkan yaaa~ 🚀</p>
         </div>
 
-        <!-- ⚡ AKSES CEPAT (4 TOMBOL SHORTCUT) -->
+        <!-- ⚡ AKSES CEPAT (2 KOTAK UTAMA) -->
         <div class="quick-access-wrapper">
             <div class="quick-access-grid">
                 <a href="{{ site.baseurl }}/inventaris/" class="btn-quick">
                     <span class="icon">🏢</span>
-                    <span class="text">Gudang Inventaris</span>
+                    <span class="text">Inventaris Gudang</span>
                 </a>
                 <a href="{{ site.baseurl }}/misi/" class="btn-quick misi-btn">
                     <span class="icon">🎯</span>
                     <span class="text">Mission Control</span>
                 </a>
-                <a href="{{ site.baseurl }}/apendiks/struktur-personil.html" class="btn-quick">
-                    <span class="icon">👥</span>
-                    <span class="text">Struktur Personil</span>
-                </a>
-                <a href="{{ site.baseurl }}/apendiks/layout.html" class="btn-quick">
-                    <span class="icon">🗺️</span>
-                    <span class="text">Layout Area</span>
-                </a>
             </div>
         </div>
 
-        <!-- 📑 APENDIKS MEMANJANG (DI BAWAH TOMBOL) -->
+        <!-- STRUKTUR MENU SEKUNDER (TOMBOL MEMANJANG) -->
+        <div class="apendiks-list" style="margin-bottom: 25px; position: relative; z-index: 10;">
+            <a href="{{ site.baseurl }}/apendiks/struktur-personil.html" class="apendiks-card">
+                <div class="apendiks-info">
+                    <div class="apendiks-icon" style="width:40px; height:40px; font-size:20px;">👥</div>
+                    <div class="apendiks-text">
+                        <h3 style="font-size:14px;">Struktur Personil</h3>
+                    </div>
+                </div>
+                <div class="apendiks-arrow">➔</div>
+            </a>
+            <a href="{{ site.baseurl }}/apendiks/layout.html" class="apendiks-card">
+                <div class="apendiks-info">
+                    <div class="apendiks-icon" style="width:40px; height:40px; font-size:20px;">🗺️</div>
+                    <div class="apendiks-text">
+                        <h3 style="font-size:14px;">Layout Area</h3>
+                    </div>
+                </div>
+                <div class="apendiks-arrow">➔</div>
+            </a>
+        </div>
+
+        <!-- 📑 APENDIKS MEMANJANG (DOKUMEN) -->
         <div class="apendiks-section">
             <h2 class="section-title">📑 Apendiks & Dokumen Tambahan</h2>
             <div class="apendiks-list">
-                
                 <a href="{{ site.baseurl }}/apendiks/routing-audio.html" class="apendiks-card">
                     <div class="apendiks-info">
                         <div class="apendiks-icon">🎛️</div>
@@ -241,7 +245,7 @@ location: "HOME"
             </div>
         </div>
 
-        <!-- 📡 ANIMASI BOUNCING KETIKA LOAD -->
+        <!-- 📡 LOADING STATE -->
         <div id="loadingDash">
             <div style="font-size:24px; margin-bottom:10px;">🛰️</div>
             Mengsinkronisasi Data Satelit...
@@ -321,7 +325,6 @@ location: "HOME"
             const greetingElement = document.getElementById('homeGreetingText');
             
             if (userName && greetingElement) {
-                // Potong nama panjang jadi kata panggilan (misal: "Truna (Audio)" -> "Truna")
                 const namaPendek = userName.split(' ')[0];
                 greetingElement.innerHTML = `Haii, ${namaPendek}! 👋`;
             }

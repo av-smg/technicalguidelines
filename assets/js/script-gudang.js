@@ -659,72 +659,100 @@ semuaCekbox.forEach(cek => {
     cek.addEventListener('change', () => { applyFilters(); });
 });
 // ==========================================
-// MESIN EXPORT EXCEL (CSV) DENGAN POPUP
+// MESIN EXPORT EXCEL CUSTOM FILTER (V.2)
 // ==========================================
 function exportToExcel() {
-    // Tampilkan popup pilihan
-    document.getElementById('modalExport').classList.add('active');
+    if (!allInventory || allInventory.length === 0) {
+        alert("⚠️ Data inventaris belum selesai dimuat dari satelit!"); return;
+    }
+
+    // 1. Ambil elemen dropdown lokasi
+    const selectLokasi = document.getElementById('exportLokasi');
+    selectLokasi.innerHTML = '<option value="ALL">📦 Semua Gudang / Lokasi</option>';
+    
+    // 2. Baca seluruh nama Gudang/Lokasi yang ada di Database secara dinamis
+    // Jadi kalau Komandan tambah gudang baru, otomatis muncul di dropdown ini!
+    let daftarGudang = [...new Set(allInventory.map(item => item.lokasi))].filter(l => l && l.trim() !== '');
+    
+    daftarGudang.forEach(gudang => {
+        let opt = document.createElement('option');
+        opt.value = gudang;
+        opt.text = `📍 ${gudang}`;
+        selectLokasi.appendChild(opt);
+    });
+
+    // 3. Paksa tampilkan modal (Anti nyangkut SweetAlert)
+    const modal = document.getElementById('modalExport');
+    if(modal) {
+        modal.style.display = 'flex';
+        modal.classList.add('active');
+    }
 }
 
 function closeExportModal() {
-    // Tutup popup pilihan
-    document.getElementById('modalExport').classList.remove('active');
+    const modal = document.getElementById('modalExport');
+    if(modal) {
+        modal.style.display = 'none';
+        modal.classList.remove('active');
+    }
 }
 
-function executeExport(tipeExport) {
-    if (!allInventory || allInventory.length === 0) {
-        alert("⚠️ Data inventaris belum dimuat dari server!"); return;
-    }
+function executeCustomExport() {
+    // 1. Baca nilai filter yang dipilih Komandan
+    let valLokasi = document.getElementById('exportLokasi').value;
+    let valTim = document.getElementById('exportTim').value.toLowerCase();
+    let valKondisi = document.getElementById('exportKondisi').value.toLowerCase();
 
-    // Filter data berdasarkan pilihan tombol di popup
+    // 2. Filter data dari satelit (allInventory)
     let dataToExport = allInventory.filter(item => {
-        let kondisi = String(item.kondisi || "").toLowerCase();
-        
-        if (tipeExport === 'bagus') {
-            return kondisi === 'bagus';
-        } 
-        else if (tipeExport === 'rusak') {
-            return kondisi === 'rusak' || kondisi === 'periksa';
-        }
-        else {
-            return true; // 'all' (semua data)
-        }
+        let itemLokasi = String(item.lokasi || "");
+        let itemTim = String(item.tim || "").toLowerCase();
+        let itemKondisi = String(item.kondisi || "").toLowerCase();
+
+        // Cek kecocokan (Kalau ALL, anggap cocok semua)
+        let matchLokasi = (valLokasi === "ALL") || (itemLokasi === valLokasi);
+        let matchTim = (valTim === "ALL") || itemTim.includes(valTim);
+        let matchKondisi = (valKondisi === "ALL") || (itemKondisi === valKondisi);
+
+        return matchLokasi && matchTim && matchKondisi;
     });
 
     if (dataToExport.length === 0) {
-        alert("❌ Tidak ada data untuk kategori ini!"); return;
+        alert("❌ Kosong! Tidak ada barang yang cocok dengan filter yang dipilih."); return;
     }
 
-    // Susun format CSV
+    // 3. Susun format CSV Excel
     let csvContent = "data:text/csv;charset=utf-8,";
-    csvContent += "Kode Barang,Nama Alat,Wadah,Kondisi,Status Lokasi,Total Qty,Tim Terkait\n";
+    // Header (Saya tambahkan kolom 'Lokasi' agar lebih jelas)
+    csvContent += "Kode Barang,Nama Alat,Wadah,Kondisi,Lokasi Gudang,Status Pemakaian,Total Qty,Tim Terkait\n";
 
     dataToExport.forEach(row => {
         let nama = `"${(row.nama_barang || "").replace(/"/g, '""')}"`;
         let kode = `"${row.kode_barang || "-"}"`;
         let wadah = `"${row.kode_wadah || "-"}"`;
         let kondisi = `"${row.kondisi || "Bagus"}"`;
+        let lokasi = `"${row.lokasi || "-"}"`;
         let status = `"${row.status_digunakan && row.status_digunakan !== 'FALSE' ? row.status_digunakan : 'Di Gudang'}"`;
         let qty = `"${row.jumlah || 1}"`;
         let tim = `"${row.tim || "-"}"`;
         
-        csvContent += `${kode},${nama},${wadah},${kondisi},${status},${qty},${tim}\n`;
+        csvContent += `${kode},${nama},${wadah},${kondisi},${lokasi},${status},${qty},${tim}\n`;
     });
 
-    // Proses Download
+    // 4. Unduh File
     let encodedUri = encodeURI(csvContent);
     let link = document.createElement("a");
     link.setAttribute("href", encodedUri);
     
+    // Nama file menyesuaikan tanggal cetak
     let dateStr = new Date().toISOString().slice(0,10);
-    let namaFile = tipeExport === 'all' ? 'SemuaBarang' : (tipeExport === 'bagus' ? 'BarangBagus' : 'BarangRusak');
-    link.setAttribute("download", `Data_GudangAV_${namaFile}_${dateStr}.csv`);
+    link.setAttribute("download", `Laporan_GudangAV_${dateStr}.csv`);
     
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
 
-    // Tutup popup dan beri notifikasi
+    // 5. Tutup & Beritahu jumlah data
     closeExportModal();
-    showToast(`✅ File Excel berhasil diunduh!`);
+    alert(`✅ ${dataToExport.length} barang berhasil diekspor menjadi Excel!`);
 }

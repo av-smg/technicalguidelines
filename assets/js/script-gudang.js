@@ -655,14 +655,12 @@ btnBukaFilter.addEventListener('click', () => {
     }
 });
 
-semuaCekbox.forEach(cek => {
-    cek.addEventListener('change', () => { applyFilters(); });
-});
 // ==========================================
-// MESIN EXPORT EXCEL CUSTOM FILTER (V.4 - FULL DYNAMIC)
+// MESIN EXPORT EXCEL CUSTOM FILTER (V.4.1 - FINAL & CLEAN)
 // ==========================================
 function exportToExcel() {
-    if (!allInventory || allInventory.length === 0) {
+    // FIX: Menggunakan variabel allItems sesuai dengan sistem Komandan
+    if (!allItems || allItems.length === 0) {
         alert("⚠️ Data inventaris belum selesai dimuat dari satelit!"); return;
     }
 
@@ -678,14 +676,14 @@ function exportToExcel() {
     let daftarGudang = new Set();
     let daftarTim = new Set();
 
-    allInventory.forEach(item => {
-        // Melacak Kolom O ("Lokasi Saat Ini" atau "lokasi")
+    allItems.forEach(item => {
+        // Melacak Kolom O ("Lokasi Saat Ini")
         let lok = item.lokasi_saat_ini || item.lokasi || item["Lokasi Saat Ini"] || "";
         if (lok && lok.trim() !== "") {
             daftarGudang.add(lok.trim());
         }
 
-        // Melacak Kolom N ("Tim") - Contoh: Audio-F2000, Audio-Mixer
+        // Melacak Kolom N ("Tim")
         let tim = item.tim || item["Tim"] || "";
         if (tim && tim.trim() !== "") {
             daftarTim.add(tim.trim());
@@ -738,7 +736,7 @@ function executeCustomExport() {
     let valKondisi = document.getElementById('exportKondisi').value.toLowerCase();
 
     // FILTERING DATA
-    let dataToExport = allInventory.filter(item => {
+    let dataToExport = allItems.filter(item => {
         let itemLokasi = (item.lokasi_saat_ini || item.lokasi || item["Lokasi Saat Ini"] || "").trim();
         // Fallback bawaan sistem Komandan
         if (!itemLokasi) itemLokasi = "Gudang KC (SMG)";
@@ -792,5 +790,5 @@ function executeCustomExport() {
     document.body.removeChild(link);
 
     closeExportModal();
-    alert(`✅ SUKSES: ${dataToExport.length} data barang berhasil diekspor menjadi Excel!`);
+    showToast(`✅ SUKSES: ${dataToExport.length} data berhasil diekspor!`);
 }

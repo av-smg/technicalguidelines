@@ -3,7 +3,7 @@
 // ==========================================
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec"; 
-const API_BACKEND_PIN = "123456"; // Ghost PIN untuk menembus server GAS lama
+const API_BACKEND_PIN = "AV-SERVER-2026"; // Ghost PIN untuk menembus server GAS lama
 
 // Ambil Sesi Login Global dari Navbar
 const currentUserRole = localStorage.getItem('av_session_role');
@@ -286,13 +286,22 @@ function renderMissions() {
             packageHtml += `</div>`;
             
             let buttonHtml = '';
+            // TAMPILAN JIKA MISI SUDAH SELESAI (MUNCULKAN NAMA EKSEKUTOR)
             if (isSelesai) {
                 if (isAdminMode) {
-                    // Tombol BATAL diberi class aksi-misi agar tersambung Audit Trail
-                    buttonHtml = `<div style="display:flex; gap:6px; width:100%;"><div class="btn-complete done" style="flex:1; margin:0;">✅ Selesai: ${misi.waktu_selesai}</div><button class="btn-complete aksi-misi" style="background:#ef4444; flex:0 0 auto; padding:6px;" onclick="undoMission(event, '${misi.row_index}', '${misi.id_misi}', '${misi.kode_barang || ''}')">❌ Batal</button></div>`;
+                    buttonHtml = `<div style="display:flex; gap:6px; width:100%;">
+                        <div class="btn-complete done" style="flex:1; margin:0; text-align:left; padding-left:12px; display:flex; flex-direction:column; justify-content:center;">
+                            <div style="font-size:11px;">✅ SELESAI</div>
+                            <div style="font-size:9px; font-weight:normal; margin-top:2px;">${misi.waktu_selesai} • Oleh: <b>${misi.eksekutor || 'Kru A/V'}</b></div>
+                        </div>
+                        <button class="btn-complete aksi-misi" style="background:#ef4444; flex:0 0 auto; padding:6px 15px;" onclick="undoMission(event, '${misi.row_index}', '${misi.id_misi}', '${misi.kode_barang || ''}')">❌ Batal</button>
+                    </div>`;
                 }
                 else {
-                    buttonHtml = `<div class="btn-complete done" style="width:100%;">✅ SELESAI (${misi.waktu_selesai})</div>`;
+                    buttonHtml = `<div class="btn-complete done" style="width:100%; text-align:left; padding-left:15px; display:flex; flex-direction:column; justify-content:center;">
+                        <div style="font-size:12px;">✅ SELESAI</div>
+                        <div style="font-size:9px; font-weight:normal; margin-top:3px;">${misi.waktu_selesai} • Oleh: <b>${misi.eksekutor || 'Kru A/V'}</b></div>
+                    </div>`;
                 }
             } else {
                 if (isAdminMode) {
@@ -300,7 +309,6 @@ function renderMissions() {
                     let scanBtn = `<button class="btn-complete" style="background:#2563eb; margin:0;" onclick="openMissionScanner('${misi.row_index}', '${misi.id_misi}', '${safeKodeBarang}')">📷 SCAN BARANG</button>`;
                     
                     if (teamLower.includes("booth") || teamLower.includes("kabel")) {
-                        // Tombol SELESAI diberi class aksi-misi agar berubah jadi label "Diselesaikan oleh..."
                         buttonHtml = `<div style="display:flex; gap:6px; align-items:stretch; width:100%;">
                             ${scanBtn}
                             <button class="btn-complete aksi-misi" style="background:#10b981; margin:0;" onclick="executeCompleteMission('${misi.row_index}', '${misi.id_misi}', '${safeKodeBarang}')">✅ SELESAI</button>
@@ -444,7 +452,10 @@ function closeMissionScanner() { if (html5QrCode) { html5QrCode.stop().catch(e =
 async function executeCompleteMission(rowIndex, idMisi, kodeBarang) {
     showToast(`⏳ Memproses ${idMisi}...`);
     try {
-        const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "complete_mission", pin: API_BACKEND_PIN, row_index: rowIndex, id_misi: idMisi, kode_barang: kodeBarang }) });
+        const response = await fetch(SCRIPT_URL, { 
+            method: "POST", 
+            body: JSON.stringify({ action: "complete_mission", pin: API_BACKEND_PIN, user_name: currentUserName, row_index: rowIndex, id_misi: idMisi, kode_barang: kodeBarang }) 
+        });
         const data = await response.json();
         if (data.status === "success") { showToast(`✅ Misi Selesai!`); triggerFeedback('success'); loadMissions(); } 
         else { alert("Gagal:\n" + data.message); triggerFeedback('error'); }
@@ -463,7 +474,7 @@ async function executeOverrideMission(rowIndex, idMisi, oldTargetString, newScan
     try {
         const response = await fetch(SCRIPT_URL, { 
             method: "POST", 
-            body: JSON.stringify({ action: "complete_mission", pin: API_BACKEND_PIN, row_index: rowIndex, id_misi: idMisi, kode_barang: finalKodeString, update_kode: finalKodeString, alasan_override: reason }) 
+            body: JSON.stringify({ action: "complete_mission", pin: API_BACKEND_PIN, user_name: currentUserName, row_index: rowIndex, id_misi: idMisi, kode_barang: finalKodeString, update_kode: finalKodeString, alasan_override: reason }) 
         });
         const data = await response.json();
         if (data.status === "success") { showToast(`✅ Alat diganti & Misi Selesai!`); triggerFeedback('success'); loadMissions(); } 
@@ -475,7 +486,10 @@ async function undoMission(event, rowIndex, idMisi, kodeBarang) {
     if (!confirm(`Batalkan misi ${idMisi}?`)) return;
     const btn = event.target; btn.innerText = "⏳..."; btn.disabled = true;
     try {
-        const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "undo_mission", pin: API_BACKEND_PIN, row_index: rowIndex, id_misi: idMisi, kode_barang: kodeBarang }) });
+        const response = await fetch(SCRIPT_URL, { 
+            method: "POST", 
+            body: JSON.stringify({ action: "undo_mission", pin: API_BACKEND_PIN, user_name: currentUserName, row_index: rowIndex, id_misi: idMisi, kode_barang: kodeBarang }) 
+        });
         const data = await response.json();
         if (data.status === "success") { showToast(`✅ Dibatalkan!`); loadMissions(); } 
         else { alert("Gagal:\n" + data.message); btn.innerText = "❌ BATALKAN"; btn.disabled = false; }

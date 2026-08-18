@@ -1,10 +1,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
+<!-- ========================================== -->
+<!-- PWA (PROGRESSIVE WEB APP) CONFIGURATION    -->
+<!-- ========================================== -->
+<link rel="manifest" href="{{ '/manifest.json' | relative_url }}">
+<meta name="theme-color" content="#0f172a">
+<link rel="apple-touch-icon" href="{{ '/assets/image_94faf8.png' | relative_url }}">
+
 <title>{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}</title>
 
 <link rel="stylesheet" href="{{ '/style.css' | relative_url }}">
-
 <link rel="icon" type="image/png" href="{{ '/assets/image_94faf8.png' | relative_url }}">
 
 <script src="{{ '/assets/js/main.js' | relative_url }}"></script>
@@ -33,4 +39,17 @@
             });
         }
     });
+</script>
+
+<!-- ========================================== -->
+<!-- MESIN SERVICE WORKER (PWA ENGINE)          -->
+<!-- ========================================== -->
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register("{{ '/sw.js' | relative_url }}")
+                .then(reg => console.log('⚙️ PWA Engine Aktif! Siap di-install.'))
+                .catch(err => console.log('⚠️ PWA Engine Gagal:', err));
+        });
+    }
 </script>

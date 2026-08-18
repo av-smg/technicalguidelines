@@ -62,7 +62,6 @@
 <!-- ========================================== -->
 <!-- GERBANG KEAMANAN (DEFAULT TERKUNCI)        -->
 <!-- ========================================== -->
-<!-- Diubah menjadi display: flex; sebagai default agar tertutup sejak awal -->
 <div id="gatekeeperOverlay" style="display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; z-index: 9999999; flex-direction: column; justify-content: center; align-items: center; color: white;">
     <h2 style="margin-bottom: 5px;">🔒 Akses Terbatas</h2>
     <p style="margin-bottom: 25px; font-size: 13px; color: #94a3b8;">Masukkan PIN untuk mode Read-Only</p>
@@ -79,9 +78,8 @@
 </div>
 
 <!-- ========================================== -->
-<!-- EMERGENCY BANNER (UKURAN DIPERBESAR)       -->
+<!-- EMERGENCY BANNER                           -->
 <!-- ========================================== -->
-<!-- Font size jadi 18px, padding 20px, text-transform uppercase -->
 <div id="emergencyBanner" style="display: none; background: #ef4444; color: white; text-align: center; padding: 20px; font-size: 18px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; z-index: 900; position: relative; width: 100%; box-sizing: border-box; box-shadow: 0 6px 15px rgba(239, 68, 68, 0.4); line-height: 1.4; border-bottom: 4px solid #b91c1c;">
     🚨 <span id="bannerText"></span> 🚨
 </div>
@@ -91,9 +89,12 @@
   <button class="close-menu" onclick="toggleMenu()">×</button>
   
   <a href="{{ site.baseurl }}/" class="nav-item">🏠 Home</a>
-  <a href="{{ site.baseurl }}/inventaris/" class="nav-item">📦 Inventaris</a>
+  <a href="{{ site.baseurl }}/inventaris/" class="nav-item">📦 Inventaris Gudang</a>
   <a href="{{ site.baseurl }}/misi/" class="nav-item">🎯 Mission Control</a>
   <a href="{{ site.baseurl }}/apendiks/struktur-personil.html" class="nav-item">📋 Apendiks</a>
+  <a href="#" onclick="window.location.reload(true);" style="color: #10b981; font-weight: bold; margin-top: 15px; border-top: 1px dashed #cbd5e1; padding-top: 15px;">
+    🔄 Update Aplikasi
+  </a>
   
   <button class="mobile-dark-btn" onclick="toggleDarkMode()">
     <span id="darkIconMobile">🌙</span> <span id="darkTextMobile">Dark Mode</span>
@@ -122,15 +123,14 @@
   }
 
   document.addEventListener("DOMContentLoaded", function() {
-    // 1. GATEKEEPER LOGIC (Sistem Fail-Closed)
+    // 1. GATEKEEPER LOGIC
     const isLoginPage = window.location.pathname.includes('login');
     const isCrew = localStorage.getItem('av_session_nama');
     const isGuest = localStorage.getItem('av_guest_pin') === 'AVSMGOKT26';
 
-    // JIKA dia adalah Kru, ATAU Guest Resmi, ATAU sedang berada di halaman Login -> Buka Layar
     if (isCrew || isGuest || isLoginPage) {
         document.getElementById('gatekeeperOverlay').style.display = 'none';
-        document.body.style.overflow = 'auto'; // Kembalikan scroll
+        document.body.style.overflow = 'auto'; 
     }
 
     // 2. HIGHLIGHT MENU AKTIF
@@ -142,7 +142,7 @@
       }
     });
 
-    // 3. RENDER PROFIL & TOMBOL LOGIN/LOGOUT
+    // 3. RENDER PROFIL
     const userName = localStorage.getItem('av_session_nama');
     const userRole = localStorage.getItem('av_session_role');
     const profileArea = document.getElementById('userProfileArea');
@@ -162,7 +162,7 @@
       `;
     }
     
-    // 4. MESIN RADAR NOTIFIKASI (Cek tiap 15 Detik)
+    // 4. MESIN RADAR NOTIFIKASI
     const URL_SERVER = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec?action=api";
     
     function cekBannerDarurat() {
@@ -171,13 +171,16 @@
             .then(data => {
                 const bannerDiv = document.getElementById("emergencyBanner");
                 if (data.banner && data.banner.status === "ON") {
-                    document.getElementById("bannerText").innerText = data.banner.pesan;
-                    
-                    if(bannerDiv.style.display !== "block") {
+                    if (bannerDiv.style.display !== "block") {
+                        document.getElementById("bannerText").innerText = data.banner.pesan;
                         bannerDiv.style.display = "block";
-                        if(navigator.vibrate) {
-                            navigator.vibrate([400, 200, 400, 200, 600]);
-                        }
+                        try {
+                            if ("vibrate" in navigator) {
+                                navigator.vibrate([1000, 500, 1000]); 
+                            }
+                        } catch(e) { console.log("Getar diblokir sistem"); }
+                    } else {
+                        document.getElementById("bannerText").innerText = data.banner.pesan;
                     }
                 } else {
                     bannerDiv.style.display = "none";
@@ -190,12 +193,12 @@
     setInterval(cekBannerDarurat, 15000);
   }); 
 
-  // FUNGSI LOGOUT (Ditambah penghapus sesi Guest)
+  // FUNGSI LOGOUT
   function prosesLogout() {
     localStorage.removeItem('av_session_pin');
     localStorage.removeItem('av_session_role');
     localStorage.removeItem('av_session_nama');
-    localStorage.removeItem('av_guest_pin'); // Hapus izin publik saat logout
+    localStorage.removeItem('av_guest_pin');
     window.location.href = "{{ site.baseurl }}/"; 
   }
 

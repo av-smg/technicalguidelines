@@ -33,6 +33,16 @@ location: "MASTER"
         .list-title { font-weight: 800; font-size: 12px; margin: 0 0 2px 0; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
         .toast-msg { z-index: 9999999 !important; }
         
+        /* FIX OVERLAP SAAT SCROLL (Sticky Toolbar Background) */
+        .toolbar-card {
+            position: sticky;
+            top: 0;
+            z-index: 95;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+
         /* GEMBOK KEAMANAN: Tombol disembunyikan dari Publik secara baku */
         .aksi-misi, .aksi-gudang { 
             display: none !important; 
@@ -47,7 +57,11 @@ location: "MASTER"
                 <h2 style="font-weight:900; margin:0; font-size:18px;">LOGISTIK UTAMA</h2>
                 <p style="font-size:10px; color:gray; margin:0;">Status: <span id="modeStatusText">🟢 Read-Only Mode</span></p>
             </div>
-            <!-- Tombol Unlock Manual Dihapus karena sudah pakai Sistem PIN -->
+        </div>
+
+        <!-- PENGINGAT APD INVENTARIS -->
+        <div style="background:#fffbeb; border:1px solid #fde68a; color:#b45309; padding:8px 12px; border-radius:8px; margin-bottom:10px; font-size:10px; font-weight:bold; display:flex; align-items:center; gap:6px;">
+            <span style="font-size:14px;">⚠️</span> <span><b>PENGINGAT APD:</b> Wajib mengenakan 🥾 Sepatu | 🦺 Rompi | 🧤 Sarung Tangan.</span>
         </div>
 
         <div class="toolbar-card" style="margin-bottom:10px; padding: 10px; border-radius: 8px;">
@@ -108,7 +122,6 @@ location: "MASTER"
 
         if (!userRole) return; 
 
-        // Kalau yang login Master atau Kru Inventaris, munculkan tombol Gudang
         if (userRole === "Master" || userRole === "Kru") {
           document.querySelectorAll('.aksi-gudang').forEach(btn => {
             btn.style.display = "inline-flex"; 

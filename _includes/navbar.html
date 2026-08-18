@@ -120,8 +120,8 @@
       `;
     }
     
-    // ==========================================
-    // MESIN RADAR NOTIFIKASI (Cek tiap 30 Detik)
+   // ==========================================
+    // MESIN RADAR NOTIFIKASI (Cek tiap 15 Detik)
     // ==========================================
     const URL_SERVER = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec?action=api";
     
@@ -132,10 +132,16 @@
                 const bannerDiv = document.getElementById("emergencyBanner");
                 if (data.banner && data.banner.status === "ON") {
                     document.getElementById("bannerText").innerText = data.banner.pesan;
+                    
+                    // Jika banner BARU SAJA muncul dari kondisi mati
                     if(bannerDiv.style.display !== "block") {
-                        // Munculkan dengan animasi getar sedikit jika baru muncul
                         bannerDiv.style.display = "block";
-                        if(navigator.vibrate) navigator.vibrate([200, 100, 200]);
+                        
+                        // 📳 POLA GETAR DARURAT: 3x Getar Panjang
+                        // (Nyala 400ms, Mati 200ms, Nyala 400ms, Mati 200ms, Nyala 600ms)
+                        if(navigator.vibrate) {
+                            navigator.vibrate([400, 200, 400, 200, 600]);
+                        }
                     }
                 } else {
                     bannerDiv.style.display = "none";
@@ -148,9 +154,7 @@
     cekBannerDarurat();
     
     // Eksekusi otomatis setiap 15 detik (15000 milidetik)
-    setInterval(cekBannerDarurat, 15000);
-  });
-
+    setInterval(cekBannerDarurat, 10000);
   function prosesLogout() {
     localStorage.removeItem('av_session_pin');
     localStorage.removeItem('av_session_role');

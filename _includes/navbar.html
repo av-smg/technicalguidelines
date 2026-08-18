@@ -6,11 +6,13 @@
   body.dark-mode .hamburger-btn { background: #1e293b; border-color: #334155; color: white; }
 
   .side-menu {
-    position: fixed; top: 0; left: -280px; width: 260px; height: 100%;
-    background: #ffffff; box-shadow: 4px 0 20px rgba(0,0,0,0.1);
-    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 9999; padding: 20px;
-    display: flex; flex-direction: column; gap: 12px; overflow-y: auto;
-  }
+  position: fixed; top: 0; left: -280px; width: 260px; height: 100%;
+  background: #ffffff; box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+  transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+  z-index: 99999 !important; /* <--- KUNCI UTAMA DI SINI */
+  padding: 20px;
+  display: flex; flex-direction: column; gap: 12px; overflow-y: auto;
+}
   .side-menu.active { left: 0; }
   
   .side-menu a {
@@ -86,6 +88,14 @@
       `;
     }
   });
+
+  // FUNGSI LOGOUT (Wajib ada di sini)
+  function prosesLogout() {
+    localStorage.removeItem('av_session_pin');
+    localStorage.removeItem('av_session_role');
+    localStorage.removeItem('av_session_nama');
+    window.location.href = "{{ site.baseurl }}/"; // Tendang kembali ke Home Publik
+  }
 
   function toggleDarkMode() {
     document.body.classList.toggle('dark-mode');

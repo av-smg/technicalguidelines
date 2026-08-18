@@ -659,29 +659,64 @@ semuaCekbox.forEach(cek => {
     cek.addEventListener('change', () => { applyFilters(); });
 });
 // ==========================================
-// MESIN EXPORT EXCEL CUSTOM FILTER (V.2)
+// MESIN EXPORT EXCEL CUSTOM FILTER (V.4 - FULL DYNAMIC)
 // ==========================================
 function exportToExcel() {
     if (!allInventory || allInventory.length === 0) {
         alert("⚠️ Data inventaris belum selesai dimuat dari satelit!"); return;
     }
 
-    // 1. Ambil elemen dropdown lokasi
+    // 1. Ambil elemen dropdown
     const selectLokasi = document.getElementById('exportLokasi');
+    const selectTim = document.getElementById('exportTim');
+
+    // Reset isi dropdown ke kondisi awal
     selectLokasi.innerHTML = '<option value="ALL">📦 Semua Gudang / Lokasi</option>';
+    selectTim.innerHTML = '<option value="ALL">👥 Semua Tim</option>';
     
-    // 2. Baca seluruh nama Gudang/Lokasi yang ada di Database secara dinamis
-    // Jadi kalau Komandan tambah gudang baru, otomatis muncul di dropdown ini!
-    let daftarGudang = [...new Set(allInventory.map(item => item.lokasi))].filter(l => l && l.trim() !== '');
-    
+    // 2. Kumpulkan daftar Lokasi & Tim unik langsung dari Spreadsheet Komandan
+    let daftarGudang = new Set();
+    let daftarTim = new Set();
+
+    allInventory.forEach(item => {
+        // Melacak Kolom O ("Lokasi Saat Ini" atau "lokasi")
+        let lok = item.lokasi_saat_ini || item.lokasi || item["Lokasi Saat Ini"] || "";
+        if (lok && lok.trim() !== "") {
+            daftarGudang.add(lok.trim());
+        }
+
+        // Melacak Kolom N ("Tim") - Contoh: Audio-F2000, Audio-Mixer
+        let tim = item.tim || item["Tim"] || "";
+        if (tim && tim.trim() !== "") {
+            daftarTim.add(tim.trim());
+        }
+    });
+
+    // Fallback Darurat: Jika sistem backend sedang lambat membaca kolom O
+    if(daftarGudang.size === 0) {
+        daftarGudang.add("Gudang KC (SMG)");
+        daftarGudang.add("Gudang KC (JKT)");
+        daftarGudang.add("Gedung UTC");
+        daftarGudang.add("Di Lokasi Event");
+    }
+
+    // 3. Suntikkan nama Gudang ke Dropdown HTML
     daftarGudang.forEach(gudang => {
         let opt = document.createElement('option');
-        opt.value = gudang;
+        opt.value = gudang; // Pakai value aslinya
         opt.text = `📍 ${gudang}`;
         selectLokasi.appendChild(opt);
     });
 
-    // 3. Paksa tampilkan modal (Anti nyangkut SweetAlert)
+    // 4. Suntikkan nama Tim ke Dropdown HTML
+    daftarTim.forEach(tim => {
+        let opt = document.createElement('option');
+        opt.value = tim;
+        opt.text = `🏷️ ${tim}`;
+        selectTim.appendChild(opt);
+    });
+
+    // 5. Tampilkan Modal
     const modal = document.getElementById('modalExport');
     if(modal) {
         modal.style.display = 'flex';
@@ -698,32 +733,37 @@ function closeExportModal() {
 }
 
 function executeCustomExport() {
-    // 1. Baca nilai filter yang dipilih Komandan
     let valLokasi = document.getElementById('exportLokasi').value;
-    let valTim = document.getElementById('exportTim').value.toLowerCase();
+    let valTim = document.getElementById('exportTim').value;
     let valKondisi = document.getElementById('exportKondisi').value.toLowerCase();
 
-    // 2. Filter data dari satelit (allInventory)
+    // FILTERING DATA
     let dataToExport = allInventory.filter(item => {
-        let itemLokasi = String(item.lokasi || "");
-        let itemTim = String(item.tim || "").toLowerCase();
-        let itemKondisi = String(item.kondisi || "").toLowerCase();
+        let itemLokasi = (item.lokasi_saat_ini || item.lokasi || item["Lokasi Saat Ini"] || "").trim();
+        // Fallback bawaan sistem Komandan
+        if (!itemLokasi) itemLokasi = "Gudang KC (SMG)";
 
-        // Cek kecocokan (Kalau ALL, anggap cocok semua)
+        let itemTim = (item.tim || item["Tim"] || "").trim();
+        let itemKondisi = (item.kondisi || "bagus").trim().toLowerCase();
+
+        // Logika penyaringan pintar
         let matchLokasi = (valLokasi === "ALL") || (itemLokasi === valLokasi);
-        let matchTim = (valTim === "ALL") || itemTim.includes(valTim);
-        let matchKondisi = (valKondisi === "ALL") || (itemKondisi === valKondisi);
+        let matchTim = (valTim === "ALL") || (itemTim === valTim);
+        
+        let matchKondisi = false;
+        if (valKondisi === "ALL") matchKondisi = true;
+        else if (valKondisi === "rusak") matchKondisi = (itemKondisi === "rusak" || itemKondisi === "periksa");
+        else matchKondisi = (itemKondisi === valKondisi);
 
         return matchLokasi && matchTim && matchKondisi;
     });
 
     if (dataToExport.length === 0) {
-        alert("❌ Kosong! Tidak ada barang yang cocok dengan filter yang dipilih."); return;
+        alert("❌ Kosong! Tidak ada barang yang cocok dengan filter spesifik tersebut."); return;
     }
 
-    // 3. Susun format CSV Excel
+    // SUSUN DATA EXCEL (CSV)
     let csvContent = "data:text/csv;charset=utf-8,";
-    // Header (Saya tambahkan kolom 'Lokasi' agar lebih jelas)
     csvContent += "Kode Barang,Nama Alat,Wadah,Kondisi,Lokasi Gudang,Status Pemakaian,Total Qty,Tim Terkait\n";
 
     dataToExport.forEach(row => {
@@ -731,7 +771,7 @@ function executeCustomExport() {
         let kode = `"${row.kode_barang || "-"}"`;
         let wadah = `"${row.kode_wadah || "-"}"`;
         let kondisi = `"${row.kondisi || "Bagus"}"`;
-        let lokasi = `"${row.lokasi || "-"}"`;
+        let lokasi = `"${row.lokasi_saat_ini || row.lokasi || row["Lokasi Saat Ini"] || "Gudang KC (SMG)"}"`;
         let status = `"${row.status_digunakan && row.status_digunakan !== 'FALSE' ? row.status_digunakan : 'Di Gudang'}"`;
         let qty = `"${row.jumlah || 1}"`;
         let tim = `"${row.tim || "-"}"`;
@@ -739,12 +779,11 @@ function executeCustomExport() {
         csvContent += `${kode},${nama},${wadah},${kondisi},${lokasi},${status},${qty},${tim}\n`;
     });
 
-    // 4. Unduh File
+    // PROSES DOWNLOAD
     let encodedUri = encodeURI(csvContent);
     let link = document.createElement("a");
     link.setAttribute("href", encodedUri);
     
-    // Nama file menyesuaikan tanggal cetak
     let dateStr = new Date().toISOString().slice(0,10);
     link.setAttribute("download", `Laporan_GudangAV_${dateStr}.csv`);
     
@@ -752,7 +791,6 @@ function executeCustomExport() {
     link.click();
     document.body.removeChild(link);
 
-    // 5. Tutup & Beritahu jumlah data
     closeExportModal();
-    alert(`✅ ${dataToExport.length} barang berhasil diekspor menjadi Excel!`);
+    alert(`✅ SUKSES: ${dataToExport.length} data barang berhasil diekspor menjadi Excel!`);
 }

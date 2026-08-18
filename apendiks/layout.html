@@ -1,0 +1,56 @@
+---
+location: "APENDIKS"
+---
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    {% include head.html %}
+    <style>
+        .document-card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            border: 1px solid #e2e8f0;
+        }
+        body.dark-mode .document-card {
+            background: #1e293b;
+            border-color: #334155;
+        }
+        .layout-img {
+            width: 100%;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            cursor: zoom-in;
+            transition: transform 0.2s;
+        }
+        body.dark-mode .layout-img { border-color: #475569; }
+        .layout-img:hover { opacity: 0.9; }
+    </style>
+</head>
+<body id="apendiksBody">
+    {% include navbar.html %}
+    <main style="padding: 15px 10px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <div>
+                <h2 style="font-weight:900; margin:0; font-size:18px;">LAYOUT AREA</h2>
+                <p style="font-size:11px; color:gray; margin:0;">Denah penempatan alat & titik panggung</p>
+            </div>
+            <a href="{{ site.baseurl }}/" style="padding:6px 12px; background:#f1f5f9; color:#334155; border-radius:6px; text-decoration:none; font-weight:bold; font-size:11px; border:1px solid #ccc;">⬅ Kembali</a>
+        </div>
+
+        <div class="document-card">
+            <!-- ⚠️ GANTI 'layout-terbaru.jpg' DENGAN NAMA FILE GAMBAR KOMANDAN -->
+            <img src="{{ site.baseurl }}/assets/img/layout-terbaru.jpg" class="layout-img" alt="Layout Area" onclick="window.open(this.src, '_blank')" title="Klik untuk memperbesar">
+            
+            <div style="margin-top:15px; text-align:center;">
+                <!-- ⚠️ GANTI JUGA 'layout-terbaru.jpg' DI SINI UNTUK LINK DOWNLOAD -->
+                <a href="{{ site.baseurl }}/assets/img/layout-terbaru.jpg" download style="display:inline-block; padding:10px 20px; background:#2563eb; color:white; font-weight:bold; text-decoration:none; border-radius:8px; font-size:12px; box-shadow:0 2px 4px rgba(37,99,235,0.3);">
+                    📥 Download Gambar High-Res
+                </a>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

@@ -1,18 +1,41 @@
-<!-- KODE NAVBAR FIXED (Header, Login Dinamis, & Notifikasi) -->
+<!-- KODE NAVBAR FIXED (Header Native App, Login Dinamis, & Notifikasi Radar) -->
 <style>
-  .top-navbar-wrapper { position: relative; width: 100%; padding: 15px 20px; z-index: 100; }
-  .hamburger-btn { background: white; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 1.5rem; padding: 6px 12px; cursor: pointer; color: #0f172a; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: 0.2s; }
-  .hamburger-btn:active { transform: scale(0.95); }
-  body.dark-mode .hamburger-btn { background: #1e293b; border-color: #334155; color: white; }
+  /* Header Khas Aplikasi Native */
+  .top-navbar-wrapper { 
+    position: relative; width: 100%; padding: 12px 20px; z-index: 100; 
+    background: #ffffff; border-bottom: 1px solid #e2e8f0;
+    display: flex; justify-content: space-between; align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+  }
+  
+  .hamburger-btn { 
+    background: transparent; border: none; font-size: 1.8rem; padding: 0; 
+    cursor: pointer; color: #0f172a; transition: 0.2s; line-height: 1;
+  }
+  .hamburger-btn:active { transform: scale(0.90); }
+  
+  .app-header-title {
+    font-size: 1.1rem; font-weight: 900; color: #0f172a; letter-spacing: 0.5px;
+  }
+  .app-header-title span { color: #f97316; }
+  
+  .sync-indicator {
+    font-size: 0.8rem; font-weight: bold; color: #10b981;
+    display: flex; align-items: center; gap: 4px;
+  }
 
+  body.dark-mode .top-navbar-wrapper { background: #0f172a; border-bottom-color: #1e293b; }
+  body.dark-mode .hamburger-btn, body.dark-mode .app-header-title { color: #f8fafc; }
+
+  /* Menu Samping */
   .side-menu {
-  position: fixed; top: 0; left: -280px; width: 260px; height: 100%;
-  background: #ffffff; box-shadow: 4px 0 20px rgba(0,0,0,0.1);
-  transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-  z-index: 99999 !important; /* <--- KUNCI UTAMA DI SINI */
-  padding: 20px;
-  display: flex; flex-direction: column; gap: 12px; overflow-y: auto;
-}
+    position: fixed; top: 0; left: -280px; width: 260px; height: 100%;
+    background: #ffffff; box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+    z-index: 99999 !important; 
+    padding: 20px;
+    display: flex; flex-direction: column; gap: 12px; overflow-y: auto;
+  }
   .side-menu.active { left: 0; }
   
   .side-menu a {
@@ -36,17 +59,21 @@
   body.dark-mode .mobile-dark-btn { background: #f1f5f9; color: #0f172a; }
 </style>
 
+<!-- HEADER UTAMA -->
 <div class="top-navbar-wrapper">
   <button class="hamburger-btn" onclick="toggleMenu()">☰</button>
+  <div class="app-header-title">A/V <span>COMMAND</span></div>
+  <div class="sync-indicator">🟢 <span style="font-size: 9px; color:gray;">Online</span></div>
 </div>
 
 <!-- ========================================== -->
-<!-- EMERGENCY BANNER (OTOMATIS DARI GOOGLE SHEETS) -->
+<!-- EMERGENCY BANNER (RADAR OTOMATIS)          -->
 <!-- ========================================== -->
-<div id="emergencyBanner" style="display: none; background: #ef4444; color: white; text-align: center; padding: 10px 15px; font-size: 11px; font-weight: bold; z-index: 900; position: relative; width: 100%; box-sizing: border-box; box-shadow: 0 4px 10px rgba(239, 68, 68, 0.4);">
-    ⚠️ <span id="bannerText"></span>
+<div id="emergencyBanner" style="display: none; background: #ef4444; color: white; text-align: center; padding: 15px 20px; font-size: 14px; font-weight: 900; z-index: 900; position: relative; width: 100%; box-sizing: border-box; box-shadow: 0 6px 15px rgba(239, 68, 68, 0.4); line-height: 1.4; border-bottom: 3px solid #b91c1c;">
+    🚨 <span id="bannerText"></span> 🚨
 </div>
 
+<!-- MENU SAMPING -->
 <div class="side-menu" id="sideMenu">
   <button class="close-menu" onclick="toggleMenu()">×</button>
   
@@ -59,7 +86,6 @@
     <span id="darkIconMobile">🌙</span> <span id="darkTextMobile">Dark Mode</span>
   </button>
 
-  <!-- Area Profil & Login (Dinamis) -->
   <div id="userProfileArea" style="margin-top: 5px; padding-top: 15px; border-top: 1px solid #e2e8f0;"></div>
 </div>
 
@@ -75,7 +101,6 @@
       }
     });
 
-    // Cek Status Login di Navbar
     const userName = localStorage.getItem('av_session_nama');
     const userRole = localStorage.getItem('av_session_role');
     const profileArea = document.getElementById('userProfileArea');
@@ -96,27 +121,41 @@
     }
     
     // ==========================================
-    // LOGIKA TARIK DATA NOTIFIKASI DARI GOOGLE SHEETS
+    // MESIN RADAR NOTIFIKASI (Cek tiap 30 Detik)
     // ==========================================
     const URL_SERVER = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec?action=api";
     
-    fetch(URL_SERVER)
-        .then(response => response.json())
-        .then(data => {
-            if (data.banner && data.banner.status === "ON") {
-                document.getElementById("bannerText").innerText = data.banner.pesan;
-                document.getElementById("emergencyBanner").style.display = "block";
-            }
-        })
-        .catch(err => console.log("Gagal memuat status banner."));
+    function cekBannerDarurat() {
+        fetch(URL_SERVER)
+            .then(response => response.json())
+            .then(data => {
+                const bannerDiv = document.getElementById("emergencyBanner");
+                if (data.banner && data.banner.status === "ON") {
+                    document.getElementById("bannerText").innerText = data.banner.pesan;
+                    if(bannerDiv.style.display !== "block") {
+                        // Munculkan dengan animasi getar sedikit jika baru muncul
+                        bannerDiv.style.display = "block";
+                        if(navigator.vibrate) navigator.vibrate([200, 100, 200]);
+                    }
+                } else {
+                    bannerDiv.style.display = "none";
+                }
+            })
+            .catch(err => console.log("Gagal memuat status banner."));
+    }
+
+    // Eksekusi pertama kali saat web dibuka
+    cekBannerDarurat();
+    
+    // Eksekusi otomatis setiap 15 detik (15000 milidetik)
+    setInterval(cekBannerDarurat, 15000);
   });
 
-  // FUNGSI LOGOUT (Wajib ada di sini)
   function prosesLogout() {
     localStorage.removeItem('av_session_pin');
     localStorage.removeItem('av_session_role');
     localStorage.removeItem('av_session_nama');
-    window.location.href = "{{ site.baseurl }}/"; // Tendang kembali ke Home Publik
+    window.location.href = "{{ site.baseurl }}/"; 
   }
 
   function toggleDarkMode() {

@@ -659,63 +659,47 @@ semuaCekbox.forEach(cek => {
     cek.addEventListener('change', () => { applyFilters(); });
 });
 // ==========================================
-// MESIN EXPORT EXCEL (CSV) CERDAS V.1
+// MESIN EXPORT EXCEL (CSV) DENGAN POPUP
 // ==========================================
 function exportToExcel() {
-    // Pastikan data sudah termuat dari Google Sheets
+    // Tampilkan popup pilihan
+    document.getElementById('modalExport').classList.add('active');
+}
+
+function closeExportModal() {
+    // Tutup popup pilihan
+    document.getElementById('modalExport').classList.remove('active');
+}
+
+function executeExport(tipeExport) {
     if (!allInventory || allInventory.length === 0) {
-        alert("⚠️ Data inventaris belum dimuat sepenuhnya dari satelit!"); return;
+        alert("⚠️ Data inventaris belum dimuat dari server!"); return;
     }
 
-    // 1. MEMBACA STATE FILTER DARI UI (Kotak Pencarian, Pill, & Checkbox)
-    let searchVal = document.getElementById("searchInput").value.toLowerCase();
-    let activePillBtn = document.querySelector('.pill-btn.active');
-    let activeFilter = activePillBtn ? activePillBtn.getAttribute('data-filter') : 'all';
-    let checkedTeams = Array.from(document.querySelectorAll('.cek-tim:checked')).map(cb => cb.value.toLowerCase());
-
-    // 2. FILTER DATA (Menyaring berdasarkan kondisi layar saat ini)
+    // Filter data berdasarkan pilihan tombol di popup
     let dataToExport = allInventory.filter(item => {
-        let matchSearch = true, matchPill = true, matchTeam = true;
+        let kondisi = String(item.kondisi || "").toLowerCase();
         
-        // A. Filter Pencarian Teks
-        if (searchVal) {
-            let text = `${item.nama_barang} ${item.kode_barang} ${item.kode_wadah}`.toLowerCase();
-            matchSearch = text.includes(searchVal);
+        if (tipeExport === 'bagus') {
+            return kondisi === 'bagus';
+        } 
+        else if (tipeExport === 'rusak') {
+            return kondisi === 'rusak' || kondisi === 'periksa';
         }
-        
-        // B. Filter Kategori (Pill)
-        if (activeFilter !== 'all') {
-            let stat = item.status_digunakan || "Di Gudang";
-            if (stat === 'FALSE') stat = "Di Gudang";
-            
-            if (activeFilter === "Rusak") {
-                matchPill = (item.kondisi === "Rusak" || item.kondisi === "Periksa");
-            } else {
-                matchPill = stat.includes(activeFilter);
-            }
+        else {
+            return true; // 'all' (semua data)
         }
-        
-        // C. Filter Tim (Checkbox Laci Lanjutan)
-        if (checkedTeams.length > 0) {
-            let timItem = String(item.tim || "").toLowerCase();
-            matchTeam = checkedTeams.some(t => timItem.includes(t));
-        }
-        
-        return matchSearch && matchPill && matchTeam;
     });
 
-    // Cegah export jika hasil filter kosong
     if (dataToExport.length === 0) {
-        alert("❌ Pilihan filter ini kosong. Tidak ada data barang yang bisa diekspor!"); return;
+        alert("❌ Tidak ada data untuk kategori ini!"); return;
     }
 
-    // 3. KONVERSI KE FORMAT CSV (Standard Excel)
+    // Susun format CSV
     let csvContent = "data:text/csv;charset=utf-8,";
-    // Header Kolom Excel
     csvContent += "Kode Barang,Nama Alat,Wadah,Kondisi,Status Lokasi,Total Qty,Tim Terkait\n";
 
     dataToExport.forEach(row => {
-        // Membersihkan tanda kutip ganda otomatis agar tabel Excel tidak hancur
         let nama = `"${(row.nama_barang || "").replace(/"/g, '""')}"`;
         let kode = `"${row.kode_barang || "-"}"`;
         let wadah = `"${row.kode_wadah || "-"}"`;
@@ -724,22 +708,23 @@ function exportToExcel() {
         let qty = `"${row.jumlah || 1}"`;
         let tim = `"${row.tim || "-"}"`;
         
-        // Susun per baris
         csvContent += `${kode},${nama},${wadah},${kondisi},${status},${qty},${tim}\n`;
     });
 
-    // 4. TRIGGER UNDUHAN OTOMATIS
+    // Proses Download
     let encodedUri = encodeURI(csvContent);
     let link = document.createElement("a");
     link.setAttribute("href", encodedUri);
     
-    // Pembuatan nama file dinamis berdasarkan filter dan tanggal hari ini
-    let dateStr = new Date().toISOString().slice(0,10); // Format: YYYY-MM-DD
-    let filterName = activeFilter === 'all' ? 'SemuaData' : activeFilter.replace(/\s+/g, '');
-    link.setAttribute("download", `Laporan_GudangAV_${filterName}_${dateStr}.csv`);
+    let dateStr = new Date().toISOString().slice(0,10);
+    let namaFile = tipeExport === 'all' ? 'SemuaBarang' : (tipeExport === 'bagus' ? 'BarangBagus' : 'BarangRusak');
+    link.setAttribute("download", `Data_GudangAV_${namaFile}_${dateStr}.csv`);
     
-    // Eksekusi klik unduh tersembunyi
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+
+    // Tutup popup dan beri notifikasi
+    closeExportModal();
+    showToast(`✅ File Excel berhasil diunduh!`);
 }

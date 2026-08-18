@@ -16,7 +16,7 @@ location: "HOME"
             background: #0f172a; 
             background-image: radial-gradient(circle at 100% 0%, #1e293b 0%, transparent 50%), radial-gradient(circle at 0% 100%, #f97316 0%, transparent 40%);
             color: white; 
-            padding: 40px 20px 70px 20px; 
+            padding: 40px 20px 60px 20px; /* <--- PADDING BAWAH DITAMBAH AGAR TIDAK MEPET */
             text-align: center; 
             border-radius: 0 0 40px 40px; 
             box-shadow: 0 10px 30px rgba(15, 23, 42, 0.3); 
@@ -29,8 +29,8 @@ location: "HOME"
 
         .dashboard-container { max-width: 1000px; margin: 0 auto; padding: 0 20px 40px 20px; }
 
-        /* 👋 FUN GREETING */
-        .greeting-box { text-align: center; margin-top: -30px; margin-bottom: 20px; position: relative; z-index: 10; }
+        /* 👋 FUN GREETING & BADGE */
+        .greeting-box { text-align: center; margin-top: -20px; margin-bottom: 30px; position: relative; z-index: 10; } /* <--- MARGIN DISESUAIKAN */
         .greeting-box h2 { font-size: 22px; font-weight: 900; color: #f97316; margin: 0 0 5px 0; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         .greeting-box p { font-size: 13px; font-weight: 700; color: #f8fafc; margin: 0; background: #1e293b; display: inline-block; padding: 6px 15px; border-radius: 20px; border: 2px solid #334155; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         
@@ -189,13 +189,15 @@ location: "HOME"
     <div class="hero-section">
         <h1 class="hero-title">A/V <span>COMMAND CENTER</span></h1>
         <p class="hero-subtitle">Sistem Pemantauan Logistik & Misi Lapangan</p>
+        
+        <!-- TEKS SAPAAN DIMASUKKAN KE DALAM HERO AGAR BACKGROUND BIRUNYA MENYATU -->
+        <h2 id="homeGreetingText" style="font-size: 24px; font-weight: 900; color: #f97316; margin: 30px 0 0 0; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">Haii Tim A/V! 👋</h2>
     </div>
 
     <div class="dashboard-container">
         
-        <!-- 👋 GREETING FUN -->
+        <!-- BADGE MENU DIBUAT OVERLAPPING / MENUMPUK DI TENGAH TRANSISI LENGKUNGAN -->
         <div class="greeting-box">
-            <h2>Haii Tim A/V! 👋</h2>
             <p>Klik menu yang kamu butuhkan yaaa~ 🚀</p>
         </div>
 
@@ -311,6 +313,20 @@ location: "HOME"
         </div>
 
     </div>
+
+    <!-- SCRIPT TAMPILAN NAMA OTOMATIS JIKA LOGIN -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const userName = localStorage.getItem('av_session_nama');
+            const greetingElement = document.getElementById('homeGreetingText');
+            
+            if (userName && greetingElement) {
+                // Potong nama panjang jadi kata panggilan (misal: "Truna (Audio)" -> "Truna")
+                const namaPendek = userName.split(' ')[0];
+                greetingElement.innerHTML = `Haii, ${namaPendek}! 👋`;
+            }
+        });
+    </script>
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec";

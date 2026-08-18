@@ -25,7 +25,6 @@ const teamRoster = {
 window.onload = () => { checkAdminStatus(); loadMissions(); };
 
 function checkAdminStatus() {
-    // Otomatis cek apakah yang login berhak eksekusi Misi (Master atau Kapten)
     if (currentUserRole === "Master" || currentUserRole === "Kapten") {
         isAdminMode = true; 
         document.body.classList.add("admin-mode-active");
@@ -119,7 +118,7 @@ function renderMissions() {
         </div>`;
     }
 
-    // 2. KOTAK PRIORITAS PEMASANGAN
+    // 2. KOTAK PRIORITAS PEMASANGAN (DIPERBARUI)
     let prioritasHtml = `
     <div class="priority-box" style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:6px; margin-bottom:8px; grid-column: 1 / -1; overflow:hidden;">
         <div class="priority-header" onclick="this.nextElementSibling.classList.toggle('open')" style="cursor:pointer; padding:6px 10px; font-size:9px; font-weight:bold; color:#1e293b; background:#e2e8f0; display:flex; justify-content:space-between; align-items:center;">
@@ -129,21 +128,23 @@ function renderMissions() {
         <div class="mission-content priority-content" style="padding:8px 10px; font-size:10px; color:#334155; line-height:1.5;">
             <ol style="margin:0; padding-left:15px;">
                 <li><b>Area Hadirin</b> (Zona D1, D2, E, F)</li>
-                <li><b>Area Ruang Belakang Panggung</b> (Zona A)</li>
                 <li><b>Area Samping Panggung</b> (Zona B)</li>
-                <li><b>Area Ruang P3K</b> (Zona F)</li>
+                <li><b>Area Ruang Belakang Panggung</b> (Zona A)</li>
+                <li><b>Area Ruang P3K</b> (Zona G)</li>
                 <li><b>Area Panggung</b> (Zona C)</li>
             </ol>
         </div>
     </div>`;
 
-    // 3. BANNER APD 
-    let apdText = "";
-    if (teamLower.includes("speaker")) { apdText = "🪖 Helm | 🥾 Sepatu | 🧤 Sarung Tangan"; } 
-    else if (teamLower.includes("kabel")) { apdText = "🥾 Sepatu Safety | 🧤 Sarung Tangan"; } 
-    else if (teamLower.includes("booth")) { apdText = "🥾 Sepatu Safety | 🧤 Sarung Tangan"; }
+    // 3. BANNER APD (DITAMBAHKAN ROMPI UNTUK SEMUA ROLE) 
+    let apdText = "🥾 Sepatu | 🦺 Rompi | 🧤 Sarung Tangan"; 
+    if (teamLower.includes("speaker")) { 
+        apdText = "🪖 Helm | 🥾 Sepatu | 🦺 Rompi | 🧤 Sarung Tangan"; 
+    } else {
+        apdText = "🥾 Sepatu | 🦺 Rompi | 🧤 Sarung Tangan";
+    }
 
-    let apdHtml = apdText ? `<div style="background:#fffbeb; border:1px solid #fde68a; color:#b45309; padding:5px 8px; border-radius:6px; margin-bottom:6px; font-size:9px; font-weight:bold; display:flex; align-items:center; gap:4px;"><span style="font-size:12px;">⚠️</span> <span><b>APD:</b> ${apdText}</span></div>` : '';
+    let apdHtml = `<div style="background:#fffbeb; border:1px solid #fde68a; color:#b45309; padding:5px 8px; border-radius:6px; margin-bottom:6px; font-size:9px; font-weight:bold; display:flex; align-items:center; gap:4px;"><span style="font-size:12px;">⚠️</span> <span><b>APD:</b> ${apdText}</span></div>`;
 
     // 4. PROGRESS BAR
     let progressHtml = `
@@ -190,9 +191,6 @@ function renderMissions() {
                 detailTugas = parts.join("\n"); 
             }
 
-            // ==========================================
-            // 🤖 MESIN SMART PARSING (PANJANG & DENAH)
-            // ==========================================
             let txtPanjang = "", txtDenah = "";
             let cleanDetail = [];
 
@@ -213,7 +211,6 @@ function renderMissions() {
 
             let finalDetailText = cleanDetail.join("<br>");
 
-            // --- BUILD UI SMART TAGS ---
             let extraUI = "";
             if (txtPanjang) extraUI += `<div class="tag-panjang" style="background:#fffbeb; color:#b45309; padding:4px 8px; border-radius:6px; font-size:9px; font-weight:bold; display:inline-flex; align-items:center; margin-right:5px; margin-bottom:5px; border:1px solid #fde68a;">📏 Kebutuhan Panjang: ${txtPanjang}</div>`;
 
@@ -232,7 +229,6 @@ function renderMissions() {
                     ${extraUI}
                     ${denahHtml}
                 </div>` : '';
-            // ==========================================
 
             let packageHtml = `<div class="package-list"><div style="font-size:8px; font-weight:bold; color:gray; margin-bottom:2px;">📦 Daftar Alat / Barang:</div>`;
             
@@ -266,7 +262,7 @@ function renderMissions() {
                                 <span style="font-size:10px;">🔍</span>
                             </div>
                             <div style="padding:4px;">`;
-                            
+                        
                         items.forEach(foundItem => {
                             packageHtml += `<div class="package-item" style="cursor:pointer; border:none; background:transparent; margin-bottom:2px; padding:2px; border-bottom:1px dashed #e2e8f0;" onclick="openItemDetail('${foundItem.kode_barang}')"><img src="${getThumbUrl(foundItem)}" class="pkg-img" loading="lazy"><div class="pkg-info"><div class="pkg-name">${foundItem.nama_barang}</div><div class="pkg-code">#${foundItem.kode_barang}</div></div></div>`;
                         });
@@ -286,7 +282,6 @@ function renderMissions() {
             packageHtml += `</div>`;
             
             let buttonHtml = '';
-            // TAMPILAN JIKA MISI SUDAH SELESAI (MUNCULKAN NAMA EKSEKUTOR)
             if (isSelesai) {
                 if (isAdminMode) {
                     buttonHtml = `<div style="display:flex; gap:6px; width:100%;">
@@ -308,7 +303,7 @@ function renderMissions() {
                     let safeKodeBarang = String(misi.kode_barang || "");
                     let scanBtn = `<button class="btn-complete" style="background:#2563eb; margin:0;" onclick="openMissionScanner('${misi.row_index}', '${misi.id_misi}', '${safeKodeBarang}')">📷 SCAN BARANG</button>`;
                     
-                    if (teamLower.includes("booth") || teamLower.includes("kabel")) {
+                    if (teamLower.includes("booth") || teamLower.includes("kabel") || teamLower.includes("speaker") || teamLower.includes("inventaris")) {
                         buttonHtml = `<div style="display:flex; gap:6px; align-items:stretch; width:100%;">
                             ${scanBtn}
                             <button class="btn-complete aksi-misi" style="background:#10b981; margin:0;" onclick="executeCompleteMission('${misi.row_index}', '${misi.id_misi}', '${safeKodeBarang}')">✅ SELESAI</button>

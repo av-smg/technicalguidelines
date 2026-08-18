@@ -62,26 +62,21 @@ location: "MASTER"
             </div>
         </div>
 
-        <!-- PENGINGAT APD INVENTARIS -->
-        <div style="background:#fffbeb; border:1px solid #fde68a; color:#b45309; padding:8px 12px; border-radius:8px; margin-bottom:10px; font-size:10px; font-weight:bold; display:flex; align-items:center; gap:6px;">
-            <span style="font-size:14px;">⚠️</span> <span><b>PENGINGAT APD:</b> Wajib mengenakan 🥾 Sepatu | 🦺 Rompi | 🧤 Sarung Tangan.</span>
-        </div>
-
-        <!-- STYLE INLINE DIHAPUS, DIGANTI CLASS FULL WIDTH -->
         <div class="toolbar-card">
             <div style="display:flex; gap:6px; margin-bottom:8px;">
                 <input type="text" id="searchInput" class="search-input-modern" placeholder="Cari alat, merk, atau kode..." oninput="applyFilters()" style="flex:1; padding:8px 10px; border-radius:6px; border:1px solid #ccc; font-size:12px;">
                 <button onclick="openScannerModal()" style="padding:8px 12px; border-radius:6px; background:#1e293b; color:white; border:none; font-weight:bold; font-size:11px; display:flex; align-items:center; gap:4px;">📷 Scan QR</button>
             </div>
             
+            <!-- DITAMBAHKAN TOMBOL EXPORT EXCEL -->
             <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
                 <button onclick="openAddModal()" class="aksi-gudang" style="padding:6px 12px; border-radius:6px; background:#16a34a; color:white; border:none; font-weight:bold; font-size:11px;">➕ Tambah</button>
                 <button id="btnBulkMode" onclick="toggleBulkMode()" class="aksi-gudang" style="padding:6px 12px; border-radius:6px; background:#ea580c; color:white; border:none; font-weight:bold; font-size:11px;">🛒 Massal</button>
                 <button onclick="printSuratJalan()" class="aksi-gudang" style="padding:6px 12px; border-radius:6px; background:#3b82f6; color:white; border:none; font-weight:bold; font-size:11px;">📄 Cetak</button>
+                <button onclick="exportToExcel()" class="aksi-gudang" style="padding:6px 12px; border-radius:6px; background:#10b981; color:white; border:none; font-weight:bold; font-size:11px;">📥 Export Excel</button>
                 <button id="btnViewToggle" onclick="toggleViewMode()" style="padding:6px 12px; border-radius:6px; background:#f1f5f9; color:#334155; border:1px solid #ccc; font-weight:bold; font-size:11px; margin-left:auto;">📄 List View</button>
             </div>
             
-            <!-- FILTER PILLS -->
             <div class="filter-pills-wrapper" style="margin-top:8px; margin-bottom:8px;">
                 <button class="pill-btn active" data-filter="all" onclick="setFilterPill('all', this)">Semua Alat</button>
                 <button class="pill-btn" data-filter="Akan Dibawa" onclick="setFilterPill('Akan Dibawa', this)">🛒 Akan Dibawa</button>
@@ -96,7 +91,6 @@ location: "MASTER"
                 </button>
             </div>
 
-            <!-- Laci Checkbox -->
             <div id="panelFilterLanjutan" style="display:none; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:10px; margin-top: 6px;">
                 <div style="display:flex; flex-wrap:wrap; gap:10px; font-size:11px; font-weight:bold;">
                     <label><input type="checkbox" class="cek-tim" value="Speaker"> Speaker</label>

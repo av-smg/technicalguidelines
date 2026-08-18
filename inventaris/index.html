@@ -9,11 +9,6 @@ location: "MASTER"
     <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/custom-gudang.css?v=28.0">
     
     <style>
-        .admin-only { display: none !important; }
-        body.admin-mode-active .admin-only { display: inline-flex !important; }
-        body.admin-mode-active .admin-only-block { display: flex !important; }
-        .btn-lock { background: #f1f5f9; border: 1px solid #cbd5e1; color: #334155; padding: 4px 10px; border-radius: 6px; font-weight: 800; cursor: pointer; font-size:11px;}
-        body.admin-mode-active .btn-lock { background: #f0fdf4; border-color: #22c55e; color: #16a34a; }
         .form-input { width: 100%; padding: 10px; margin-bottom: 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 12px; }
         .form-label { font-size: 11px; font-weight: bold; color: gray; display: block; margin-bottom: 4px; }
         .detail-gallery { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; scroll-snap-type: x mandatory; }
@@ -37,6 +32,11 @@ location: "MASTER"
         .list-info { flex: 1; min-width: 0; }
         .list-title { font-weight: 800; font-size: 12px; margin: 0 0 2px 0; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
         .toast-msg { z-index: 9999999 !important; }
+        
+        /* GEMBOK KEAMANAN: Tombol disembunyikan dari Publik secara baku */
+        .aksi-misi, .aksi-gudang { 
+            display: none !important; 
+        }
     </style>
 </head>
 <body id="inventoryBody">
@@ -47,7 +47,7 @@ location: "MASTER"
                 <h2 style="font-weight:900; margin:0; font-size:18px;">LOGISTIK UTAMA</h2>
                 <p style="font-size:10px; color:gray; margin:0;">Status: <span id="modeStatusText">🟢 Read-Only Mode</span></p>
             </div>
-            <button id="btnUnlock" onclick="toggleAdminMode()" class="btn-lock">🔒 Buka Akses</button>
+            <!-- Tombol Unlock Manual Dihapus karena sudah pakai Sistem PIN -->
         </div>
 
         <div class="toolbar-card" style="margin-bottom:10px; padding: 10px; border-radius: 8px;">
@@ -57,9 +57,10 @@ location: "MASTER"
             </div>
             
             <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
-                <button onclick="openAddModal()" class="admin-only" style="padding:6px 12px; border-radius:6px; background:#16a34a; color:white; border:none; font-weight:bold; font-size:11px;">➕ Tambah</button>
-                <button id="btnBulkMode" onclick="toggleBulkMode()" class="admin-only" style="padding:6px 12px; border-radius:6px; background:#ea580c; color:white; border:none; font-weight:bold; font-size:11px;">🛒 Massal</button>
-                <button onclick="printSuratJalan()" class="admin-only" style="padding:6px 12px; border-radius:6px; background:#3b82f6; color:white; border:none; font-weight:bold; font-size:11px;">📄 Cetak</button>
+                <!-- CLASS sudah diubah jadi aksi-gudang -->
+                <button onclick="openAddModal()" class="aksi-gudang" style="padding:6px 12px; border-radius:6px; background:#16a34a; color:white; border:none; font-weight:bold; font-size:11px;">➕ Tambah</button>
+                <button id="btnBulkMode" onclick="toggleBulkMode()" class="aksi-gudang" style="padding:6px 12px; border-radius:6px; background:#ea580c; color:white; border:none; font-weight:bold; font-size:11px;">🛒 Massal</button>
+                <button onclick="printSuratJalan()" class="aksi-gudang" style="padding:6px 12px; border-radius:6px; background:#3b82f6; color:white; border:none; font-weight:bold; font-size:11px;">📄 Cetak</button>
                 <button id="btnViewToggle" onclick="toggleViewMode()" style="padding:6px 12px; border-radius:6px; background:#f1f5f9; color:#334155; border:1px solid #ccc; font-weight:bold; font-size:11px; margin-left:auto;">📄 List View</button>
             </div>
             
@@ -98,5 +99,28 @@ location: "MASTER"
     <div id="zoomModal" class="zoom-overlay" onclick="closeZoomModal()"><button class="btn-back-zoom" onclick="closeZoomModal()">⬅ Kembali</button><img id="zoomImgSrc" src="" onclick="event.stopPropagation()"></div>
     <div id="toastMsg" class="toast-msg">Notifikasi</div>
     <script src="{{ site.baseurl }}/assets/js/script-gudang.js?v=29.0"></script>
+    
+    <!-- SCRIPT KEAMANAN RBAC -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        const userRole = localStorage.getItem('av_session_role');
+        const statusText = document.getElementById('modeStatusText');
+
+        if (!userRole) return; 
+
+        // Kalau yang login Master atau Kru Inventaris, munculkan tombol Gudang
+        if (userRole === "Master" || userRole === "Kru") {
+          document.querySelectorAll('.aksi-gudang').forEach(btn => {
+            btn.style.display = "inline-flex"; 
+            btn.style.setProperty("display", "inline-flex", "important");
+          });
+          
+          if(statusText) {
+             statusText.innerHTML = "🔴 Edit Mode Aktif";
+             statusText.style.color = "#ef4444";
+          }
+        }
+      });
+    </script>
 </body>
 </html>

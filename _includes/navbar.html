@@ -1,4 +1,4 @@
-<!-- KODE NAVBAR FIXED (Header Native App, Login Dinamis, & Notifikasi Radar) -->
+<!-- KODE NAVBAR FIXED (Header Native App, Login Dinamis, & Notifikasi Radar 15s) -->
 <style>
   /* Header Khas Aplikasi Native */
   .top-navbar-wrapper { 
@@ -120,7 +120,7 @@
       `;
     }
     
-   // ==========================================
+    // ==========================================
     // MESIN RADAR NOTIFIKASI (Cek tiap 15 Detik)
     // ==========================================
     const URL_SERVER = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec?action=api";
@@ -138,7 +138,6 @@
                         bannerDiv.style.display = "block";
                         
                         // 📳 POLA GETAR DARURAT: 3x Getar Panjang
-                        // (Nyala 400ms, Mati 200ms, Nyala 400ms, Mati 200ms, Nyala 600ms)
                         if(navigator.vibrate) {
                             navigator.vibrate([400, 200, 400, 200, 600]);
                         }
@@ -154,7 +153,11 @@
     cekBannerDarurat();
     
     // Eksekusi otomatis setiap 15 detik (15000 milidetik)
-    setInterval(cekBannerDarurat, 10000);
+    setInterval(cekBannerDarurat, 15000);
+    
+  }); // <--- INI DIA TERSANGKANYA! (Kurung penutup yang sebelumnya hilang)
+
+  // FUNGSI LOGOUT
   function prosesLogout() {
     localStorage.removeItem('av_session_pin');
     localStorage.removeItem('av_session_role');

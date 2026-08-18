@@ -1,4 +1,4 @@
-<!-- KODE NAVBAR FIXED (Header Native App, Login Dinamis, Radar 15s, & Gatekeeper Publik) -->
+<!-- KODE NAVBAR FIXED (Header Native App, Login Dinamis, Radar 15s, & Gatekeeper Anti-Bypass) -->
 <style>
   /* Header Khas Aplikasi Native */
   .top-navbar-wrapper { 
@@ -60,9 +60,10 @@
 </style>
 
 <!-- ========================================== -->
-<!-- GERBANG KEAMANAN (GATEKEEPER)              -->
+<!-- GERBANG KEAMANAN (DEFAULT TERKUNCI)        -->
 <!-- ========================================== -->
-<div id="gatekeeperOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; z-index: 9999999; flex-direction: column; justify-content: center; align-items: center; color: white;">
+<!-- Diubah menjadi display: flex; sebagai default agar tertutup sejak awal -->
+<div id="gatekeeperOverlay" style="display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; z-index: 9999999; flex-direction: column; justify-content: center; align-items: center; color: white;">
     <h2 style="margin-bottom: 5px;">🔒 Akses Terbatas</h2>
     <p style="margin-bottom: 25px; font-size: 13px; color: #94a3b8;">Masukkan PIN untuk mode Read-Only</p>
     <input type="password" id="guestPinInput" placeholder="PIN Akses..." style="padding: 15px; border-radius: 12px; border: none; outline: none; width: 250px; text-align: center; font-size: 18px; font-weight: bold; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
@@ -78,9 +79,10 @@
 </div>
 
 <!-- ========================================== -->
-<!-- EMERGENCY BANNER (RADAR OTOMATIS)          -->
+<!-- EMERGENCY BANNER (UKURAN DIPERBESAR)       -->
 <!-- ========================================== -->
-<div id="emergencyBanner" style="display: none; background: #ef4444; color: white; text-align: center; padding: 15px 20px; font-size: 14px; font-weight: 900; z-index: 900; position: relative; width: 100%; box-sizing: border-box; box-shadow: 0 6px 15px rgba(239, 68, 68, 0.4); line-height: 1.4; border-bottom: 3px solid #b91c1c;">
+<!-- Font size jadi 18px, padding 20px, text-transform uppercase -->
+<div id="emergencyBanner" style="display: none; background: #ef4444; color: white; text-align: center; padding: 20px; font-size: 18px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; z-index: 900; position: relative; width: 100%; box-sizing: border-box; box-shadow: 0 6px 15px rgba(239, 68, 68, 0.4); line-height: 1.4; border-bottom: 4px solid #b91c1c;">
     🚨 <span id="bannerText"></span> 🚨
 </div>
 
@@ -101,6 +103,9 @@
 </div>
 
 <script>
+  // Amankan scroll layar dari awal
+  document.body.style.overflow = 'hidden';
+
   function toggleMenu() { document.getElementById('sideMenu').classList.toggle('active'); }
 
   // Fungsi Cek PIN Gatekeeper
@@ -117,15 +122,15 @@
   }
 
   document.addEventListener("DOMContentLoaded", function() {
-    // 1. GATEKEEPER LOGIC (Cek Sesi)
+    // 1. GATEKEEPER LOGIC (Sistem Fail-Closed)
     const isLoginPage = window.location.pathname.includes('login');
     const isCrew = localStorage.getItem('av_session_nama');
     const isGuest = localStorage.getItem('av_guest_pin') === 'AVSMGOKT26';
 
-    // Jika bukan Kru, bukan Guest, dan sedang TIDAK di halaman login -> KUNCI!
-    if (!isCrew && !isGuest && !isLoginPage) {
-        document.getElementById('gatekeeperOverlay').style.display = 'flex';
-        document.body.style.overflow = 'hidden'; // Kunci layar agar tidak bisa di-scroll
+    // JIKA dia adalah Kru, ATAU Guest Resmi, ATAU sedang berada di halaman Login -> Buka Layar
+    if (isCrew || isGuest || isLoginPage) {
+        document.getElementById('gatekeeperOverlay').style.display = 'none';
+        document.body.style.overflow = 'auto'; // Kembalikan scroll
     }
 
     // 2. HIGHLIGHT MENU AKTIF

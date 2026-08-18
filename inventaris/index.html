@@ -33,15 +33,18 @@ location: "MASTER"
         .list-title { font-weight: 800; font-size: 12px; margin: 0 0 2px 0; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
         .toast-msg { z-index: 9999999 !important; }
         
-        /* FIX OVERLAP SAAT SCROLL (Sticky Toolbar Background) */
+        /* FIX OVERLAP SAAT SCROLL (TEMBOK PENAHAN FULL WIDTH) */
         .toolbar-card {
             position: sticky;
             top: 0;
             z-index: 95;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
+            background: #ffffff; /* Warna solid penahan */
+            margin: 0 -10px 10px -10px; /* Tarik mentok ke kiri & kanan layar */
+            padding: 15px 10px 15px 10px; /* Kembalikan padding ke dalam */
+            border-bottom: 1px solid #e2e8f0;
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
         }
+        body.dark-mode .toolbar-card { background: #0f172a; border-bottom: 1px solid #1e293b; }
 
         /* GEMBOK KEAMANAN: Tombol disembunyikan dari Publik secara baku */
         .aksi-misi, .aksi-gudang { 
@@ -64,14 +67,14 @@ location: "MASTER"
             <span style="font-size:14px;">⚠️</span> <span><b>PENGINGAT APD:</b> Wajib mengenakan 🥾 Sepatu | 🦺 Rompi | 🧤 Sarung Tangan.</span>
         </div>
 
-        <div class="toolbar-card" style="margin-bottom:10px; padding: 10px; border-radius: 8px;">
+        <!-- STYLE INLINE DIHAPUS, DIGANTI CLASS FULL WIDTH -->
+        <div class="toolbar-card">
             <div style="display:flex; gap:6px; margin-bottom:8px;">
                 <input type="text" id="searchInput" class="search-input-modern" placeholder="Cari alat, merk, atau kode..." oninput="applyFilters()" style="flex:1; padding:8px 10px; border-radius:6px; border:1px solid #ccc; font-size:12px;">
                 <button onclick="openScannerModal()" style="padding:8px 12px; border-radius:6px; background:#1e293b; color:white; border:none; font-weight:bold; font-size:11px; display:flex; align-items:center; gap:4px;">📷 Scan QR</button>
             </div>
             
             <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
-                <!-- CLASS sudah diubah jadi aksi-gudang -->
                 <button onclick="openAddModal()" class="aksi-gudang" style="padding:6px 12px; border-radius:6px; background:#16a34a; color:white; border:none; font-weight:bold; font-size:11px;">➕ Tambah</button>
                 <button id="btnBulkMode" onclick="toggleBulkMode()" class="aksi-gudang" style="padding:6px 12px; border-radius:6px; background:#ea580c; color:white; border:none; font-weight:bold; font-size:11px;">🛒 Massal</button>
                 <button onclick="printSuratJalan()" class="aksi-gudang" style="padding:6px 12px; border-radius:6px; background:#3b82f6; color:white; border:none; font-weight:bold; font-size:11px;">📄 Cetak</button>

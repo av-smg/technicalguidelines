@@ -218,12 +218,36 @@ function closeZoomModal() { document.getElementById("zoomModal").classList.remov
 
 function openDetailModal(item) {
     const oldModal = document.getElementById("detailModal"); if(oldModal) oldModal.remove();
-    let stat = item.status_digunakan || "Di Gudang"; if(stat === 'FALSE') stat = "Di Gudang"; let lok = item.lokasi_saat_ini || item.lokasi || item["Lokasi Saat Ini"] || "Gudang KC (SMG)";
+    let stat = item.status_digunakan || "Di Gudang"; if(stat === 'FALSE') stat = "Di Gudang"; let lok = item.lokasi_saat_ini || item.lokasi || item["Lokasi Saat Ini"] || "Gudang Kanguru";
     let galleryHtml = `<div class="detail-gallery">`; let adaFoto = false; let safeFileIds = item.file_ids || item.fotos || [];
-    safeFileIds.forEach((fileId, i) => { if(fileId && fileId.length > 5) { let thumbUrl = fileId.includes("http") ? fileId : `https://drive.google.com/thumbnail?id=${fileId}&sz=w400`; let highResUrl = fileId.includes("http") ? fileId.replace('sz=800', 'sz=s2000') : `https://drive.google.com/thumbnail?id=${fileId}&sz=s2000`; if(i < 3) { galleryHtml += `<img src="${thumbUrl}" class="gallery-img" onclick="openZoomModal('${highResUrl}')">`; } else { galleryHtml += `<div class="gallery-box"><img src="${thumbUrl}" class="gallery-img" style="border:2px solid #ea580c;" onclick="openZoomModal('${highResUrl}')"><span class="badge-wadah">📦 WADAH</span></div>`; } adaFoto = true; } });
-    if(!adaFoto) galleryHtml += `<img src="https://placehold.co/300x200/EEEEEE/999999?text=Tidak+Ada+Foto" class="gallery-img" style="width:100%;">`; galleryHtml += `</div>`;
+    safeFileIds.forEach((fileId, i) => { if(fileId && fileId.length > 5) { let thumbUrl = fileId.includes("http") ? fileId : `https://drive.google.com/thumbnail?id=${fileId}&sz=w400`; let highResUrl = fileId.includes("http") ? fileId.replace('sz=800', 'sz=s2000') : `https://drive.google.com/thumbnail?id=${fileId}&sz=s2000`; if(i < 3) { galleryHtml += `<img src="${thumbUrl}" class="gallery-img" onclick="openZoomModal('${highResUrl}')">`; } adaFoto = true; } });
     
-    let badgeWadahHtml = item.kode_wadah ? `<span onclick="document.getElementById('detailModal').remove(); document.getElementById('searchInput').value='${item.kode_wadah}'; applyFilters();" style="cursor:pointer; display:inline-block; margin-left:5px; background:#fef3c7; color:#d97706; padding:2px 8px; border-radius:4px; border:1px solid #fde68a;">🧰 Lihat Wadah: ${item.kode_wadah} 🔍</span>` : `<span style="color:gray; margin-left:5px;">📦 Wadah: -</span>`;
+    // --- 🌟 LOGIKA BARU: TARIK GAMBAR WADAH ---
+    let badgeWadahHtml = `<span style="color:gray; margin-left:5px;">📦 Wadah: -</span>`;
+    if (item.kode_wadah && item.kode_wadah.trim() !== "") {
+        // Cari wadahnya di database
+        let wadahItem = allItems.find(w => w.kode_barang && w.kode_barang.toLowerCase() === item.kode_wadah.toLowerCase());
+        
+        if (wadahItem) {
+            // Ambil gambar wadah (Foto 1)
+            let wFotos = wadahItem.file_ids || wadahItem.fotos || [];
+            let firstWFoto = wFotos.find(id => id && id.length > 5);
+            if (firstWFoto) {
+                let thumbWUrl = firstWFoto.includes("http") ? firstWFoto : `https://drive.google.com/thumbnail?id=${firstWFoto}&sz=w400`;
+                let highResWUrl = firstWFoto.includes("http") ? firstWFoto.replace('sz=800', 'sz=s2000') : `https://drive.google.com/thumbnail?id=${firstWFoto}&sz=s2000`;
+                // Sisipkan ke dalam galeri sebelah foto utama
+                galleryHtml += `<div class="gallery-box"><img src="${thumbWUrl}" class="gallery-img" style="border:2px solid #ea580c;" onclick="openZoomModal('${highResWUrl}')"><span class="badge-wadah">📦 WADAH</span></div>`;
+                adaFoto = true;
+            }
+            badgeWadahHtml = `<span style="display:inline-block; margin-left:5px; background:#fef3c7; color:#d97706; padding:2px 8px; border-radius:4px; border:1px solid #fde68a;">🧰 Disimpan di: ${wadahItem.nama_barang} (#${item.kode_wadah})</span>`;
+        } else {
+            // Jika wadah dicatat tapi belum diinput fisiknya ke sistem
+            badgeWadahHtml = `<span style="display:inline-block; margin-left:5px; background:#f1f5f9; color:#64748b; padding:2px 8px; border-radius:4px; border:1px dashed #cbd5e1;">🧰 Menunggu wadah: #${item.kode_wadah}</span>`;
+        }
+    }
+    // ------------------------------------------
+
+    if(!adaFoto) galleryHtml += `<img src="https://placehold.co/300x200/EEEEEE/999999?text=Tidak+Ada+Foto" class="gallery-img" style="width:100%;">`; galleryHtml += `</div>`;
     
     let isiWadahHtml = ""; 
     if (item.kode_barang) { 
@@ -277,7 +301,7 @@ function openDetailModal(item) {
     
     let actionButtons = isAdminMode ? `<button onclick='openEditFullModal(${JSON.stringify(item).replace(/'/g, "&#39;")})' style="width:100%; padding:10px; background:#f59e0b; color:white; border:none; border-radius:8px; font-weight:bold; margin-bottom:15px;">✏️ EDIT DATA & FOTO LENGKAP</button><div style="text-align:left; border-top:1px dashed #ccc; padding-top:15px;"><label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">📍 Update Lokasi (Cell O):</label><select id="editLokasi" style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc; margin-bottom:12px;">${optionsLokasi}</select><label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">🔌 Update Status (Cell R):</label><select id="editStatus" style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc; margin-bottom:12px; font-weight:bold;">${optionsStatus}</select><button onclick="saveEditLokasiStatus(${item.row_index})" style="width:100%; padding:12px; background:#ea580c; color:white; border:none; border-radius:8px; font-weight:bold;">💾 SIMPAN STATUS</button></div>` : `<div style="margin-top:15px; padding:10px; background:#f1f5f9; border-radius:8px; font-size:12px; color:#64748b;">🔒 Login Akses untuk mengubah status/lokasi.</div>`;
     
-    const modalHtml = `<div id="detailModal" class="modal-overlay active"><div class="modal-content" style="max-width:400px; background:white; padding:20px; border-radius:15px; text-align:center; position:relative;"><button onclick="document.getElementById('detailModal').remove()" style="position:absolute; top:15px; right:15px; border:none; background:#f1f5f9; width:30px; height:30px; border-radius:50%; font-weight:bold; cursor:pointer; z-index:10;">✕</button>${galleryHtml}<h3 style="margin:0; font-weight:900; color:#1e293b; font-size:18px;">${item.nama_barang}</h3><div style="font-size:10px; color:gray; margin-bottom:8px;">⏱️ Update: ${item.timestamp || '-'}</div><p style="margin:5px 0 10px 0; font-size:12px; color:#ea580c; font-weight:bold;">#${item.kode_barang || '-'} ${badgeWadahHtml}</p><div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:12px; text-align:left; background:#f8fafc; padding:10px; border-radius:8px; border:1px solid #e2e8f0;"><div><span style="color:gray;">Item Ini:</span> <br><b>${item.jumlah || 0} Pcs</b></div><div><span style="color:gray;">Kondisi:</span> <br><b>${item.kondisi || '-'}</b></div><div><span style="color:gray;">📍 Lokasi:</span> <br><b>${lok}</b></div><div><span style="color:gray;">🔌 Status:</span> <br><b>${stat}</b></div></div>${similarHtml}${isiWadahHtml}<div style="text-align:left; margin-top:10px; font-size:11px; color:#475569; background:#fff7ed; padding:8px; border-radius:6px; border:1px solid #fed7aa; margin-bottom:5px;"><b>📝 Ket:</b> ${item.keterangan_ref || 'Tidak ada catatan.'}</div><div style="text-align:left; font-size:11px; margin-bottom:15px; color:#3b82f6;"><b>🎯 Tujuan (Event):</b> ${item.tujuan || '-'}</div>${logHtml}${actionButtons}</div></div>`; 
+    const modalHtml = `<div id="detailModal" class="modal-overlay active"><div class="modal-content" style="max-width:400px; background:white; padding:20px; border-radius:15px; text-align:center; position:relative;"><button onclick="document.getElementById('detailModal').remove()" style="position:absolute; top:15px; right:15px; border:none; background:#f1f5f9; width:30px; height:30px; border-radius:50%; font-weight:bold; cursor:pointer; z-index:10;">✕</button>${galleryHtml}<h3 style="margin:0; font-weight:900; color:#1e293b; font-size:18px;">${item.nama_barang}</h3><div style="font-size:10px; color:gray; margin-bottom:8px;">⏱️ Update: ${item.timestamp || '-'}</div><p style="margin:5px 0 10px 0; font-size:12px; color:#ea580c; font-weight:bold;">#${item.kode_barang || '-'} <br><br>${badgeWadahHtml}</p><div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:12px; text-align:left; background:#f8fafc; padding:10px; border-radius:8px; border:1px solid #e2e8f0;"><div><span style="color:gray;">Item Ini:</span> <br><b>${item.jumlah || 0} Pcs</b></div><div><span style="color:gray;">Kondisi:</span> <br><b>${item.kondisi || '-'}</b></div><div><span style="color:gray;">📍 Lokasi:</span> <br><b>${lok}</b></div><div><span style="color:gray;">🔌 Status:</span> <br><b>${stat}</b></div></div>${similarHtml}${isiWadahHtml}<div style="text-align:left; margin-top:10px; font-size:11px; color:#475569; background:#fff7ed; padding:8px; border-radius:6px; border:1px solid #fed7aa; margin-bottom:5px;"><b>📝 Ket:</b> ${item.keterangan_ref || 'Tidak ada catatan.'}</div><div style="text-align:left; font-size:11px; margin-bottom:15px; color:#3b82f6;"><b>🎯 Tujuan (Event):</b> ${item.tujuan || '-'}</div>${logHtml}${actionButtons}</div></div>`; 
     document.body.insertAdjacentHTML('beforeend', modalHtml);
 }
 

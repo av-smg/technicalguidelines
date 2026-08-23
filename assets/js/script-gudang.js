@@ -516,7 +516,8 @@ async function submitNewItem(e) {
         let base64Fotos = ["", "", ""]; let maxFiles = Math.min(pendingAddFotos.length, 3); for (let i = 0; i < maxFiles; i++) { base64Fotos[i] = await compressImage(pendingAddFotos[i]); } 
         const payload = { 
             action: "add_item", 
-            pin: API_BACKEND_PIN, 
+            pin: API_BACKEND_PIN,
+            user_name: currentUserName, // <--- INI KUNCI PENTINGNYA
             nama: document.getElementById("addNama").value, 
             kode_barang: document.getElementById("addKode").value, 
             kode_wadah: document.getElementById("addWadah").value, 
@@ -525,7 +526,7 @@ async function submitNewItem(e) {
             keterangan_ref: document.getElementById("addKet").value, 
             lokasi: document.getElementById("addLokasi") ? document.getElementById("addLokasi").value : "Gudang Kanguru", 
             fotos: base64Fotos 
-        }; 
+        };
         const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) }); const data = await response.json(); 
         if (data.status === "success") { showToast("✅ Alat Tersimpan!"); closeAddModal(); loadData(); } else { alert("Gagal:\n" + data.message); } 
     } catch (err) { alert("Error Sistem:\n" + err.message); } finally { btn.innerText = "💾 SIMPAN ALAT"; btn.disabled = false; } 

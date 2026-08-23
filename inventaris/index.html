@@ -6,7 +6,7 @@ location: "MASTER"
 <head>
     {% include head.html %}
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-    <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/custaom-gudang.css?v=28.0">
+    <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/custom-gudang.css?v=28.0">
     
     <style>
         .form-input { width: 100%; padding: 10px; margin-bottom: 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 12px; }
@@ -104,21 +104,122 @@ location: "MASTER"
         <div id="dataContainer" class="grid-cards"></div>
     </main>
 
-    <div id="modalAdd" class="modal-overlay"><div class="modal-content" style="max-width:400px; max-height:85vh; overflow-y:auto; background:white; padding:20px; border-radius:15px;"><h3 style="margin-top:0; color:#16a34a; margin-bottom:20px;">➕ Tambah Alat Baru</h3><form id="formAdd" onsubmit="submitNewItem(event)"><div style="background:#f8fafc; padding:15px; border-radius:8px; border:1px dashed #cbd5e1; margin-bottom:15px; text-align:center;"><label class="form-label" style="color:#1e293b; margin-bottom:10px; font-size:12px;">📸 Tambahkan Foto (Maksimal 3)</label><div style="display:flex; gap:10px; justify-content:center; margin-bottom:10px;"><button type="button" onclick="document.getElementById('addFotoKamera').click()" style="flex:1; padding:10px; border-radius:8px; background:#3b82f6; color:white; border:none; font-weight:bold; cursor:pointer; font-size:11px;">📷 Buka Kamera</button><button type="button" onclick="document.getElementById('addFotoGaleri').click()" style="flex:1; padding:10px; border-radius:8px; background:#8b5cf6; color:white; border:none; font-weight:bold; cursor:pointer; font-size:11px;">🖼️ Pilih Galeri</button></div><input type="file" id="addFotoKamera" accept="image/*" capture="environment" style="display:none;" onchange="handleNewFotos(this)"><input type="file" id="addFotoGaleri" accept="image/*" multiple style="display:none;" onchange="handleNewFotos(this)"><div id="previewAddFotos" style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:10px;"></div></div><label class="form-label">Nama Alat Utama *</label><input type="text" id="addNama" class="form-input" required><div style="display:flex; gap:10px;"><div style="flex:1;"><label class="form-label">Kode Barang</label><input type="text" id="addKode" class="form-input"></div><div style="flex:1;"><label class="form-label">Kode Wadah</label><input type="text" id="addWadah" class="form-input"></div></div><div style="display:flex; gap:10px;"><div style="flex:1;"><label class="form-label">Total (Qty)</label><input type="number" id="addJumlah" class="form-input" value="1" required></div><div style="flex:1;"><label class="form-label">Kondisi</label><select id="addKondisi" class="form-input"><option value="Bagus">Bagus</option><option value="Periksa">Periksa</option><option value="Rusak">Rusak</option></select></div></div><label class="form-label">Keterangan / Ref</label><input type="text" id="addKet" class="form-input"><label class="form-label">Lokasi Gudang</label>
-<select id="addLokasi" class="form-input">
-    <option value="Gudang Kanguru">Gudang Kanguru</option>
-    <option value="Gudang Mrican">Gudang Mrican</option>
-</select><button type="submit" id="btnSubmitAdd" style="width:100%; padding:14px; background:#16a34a; color:white; border:none; border-radius:8px; font-weight:900; margin-top:10px;">💾 SIMPAN ALAT</button><button type="button" onclick="closeAddModal()" style="width:100%; padding:12px; background:#f1f5f9; color:#334155; border:none; border-radius:8px; font-weight:bold; margin-top:8px;">⬅ BATAL</button></form></div></div>
-    <div id="modalEditFull" class="modal-overlay"><div class="modal-content" style="max-width:400px; max-height:85vh; overflow-y:auto; background:white; padding:20px; border-radius:15px;"><h3 style="margin-top:0; color:#ea580c; margin-bottom:20px;">✏️ Edit Data & Foto Alat</h3><form id="formEditFull" onsubmit="submitEditFull(event)"><input type="hidden" id="editRowIndex"><div style="background:#f8fafc; padding:15px; border-radius:8px; border:1px dashed #cbd5e1; margin-bottom:15px; text-align:center;">
-    <label class="form-label" style="color:#ea580c; margin-bottom:10px;">📸 Kelola Foto (Maksimal 3)</label>
-    <div id="previewEditFotos" style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-bottom:10px;"></div>
-    <div id="btnContainerEditFoto" style="display:flex; gap:10px; justify-content:center;">
-        <button type="button" onclick="document.getElementById('editFotoKamera').click()" style="flex:1; padding:10px; border-radius:8px; background:#3b82f6; color:white; border:none; font-weight:bold; cursor:pointer; font-size:11px;">📷 Buka Kamera</button>
-        <button type="button" onclick="document.getElementById('editFotoGaleri').click()" style="flex:1; padding:10px; border-radius:8px; background:#8b5cf6; color:white; border:none; font-weight:bold; cursor:pointer; font-size:11px;">🖼️ Pilih Galeri</button>
+    <!-- MODAL TAMBAH ALAT BARU -->
+    <div id="modalAdd" class="modal-overlay">
+        <div class="modal-content" style="max-width:400px; max-height:85vh; overflow-y:auto; background:white; padding:20px; border-radius:15px;">
+            <h3 style="margin-top:0; color:#16a34a; margin-bottom:20px;">➕ Tambah Alat Baru</h3>
+            <form id="formAdd" onsubmit="submitNewItem(event)">
+                <div style="background:#f8fafc; padding:15px; border-radius:8px; border:1px dashed #cbd5e1; margin-bottom:15px; text-align:center;">
+                    <label class="form-label" style="color:#1e293b; margin-bottom:10px; font-size:12px;">📸 Tambahkan Foto (Maksimal 3)</label>
+                    <div style="display:flex; gap:10px; justify-content:center; margin-bottom:10px;">
+                        <button type="button" onclick="document.getElementById('addFotoKamera').click()" style="flex:1; padding:10px; border-radius:8px; background:#3b82f6; color:white; border:none; font-weight:bold; cursor:pointer; font-size:11px;">📷 Buka Kamera</button>
+                        <button type="button" onclick="document.getElementById('addFotoGaleri').click()" style="flex:1; padding:10px; border-radius:8px; background:#8b5cf6; color:white; border:none; font-weight:bold; cursor:pointer; font-size:11px;">🖼️ Pilih Galeri</button>
+                    </div>
+                    <input type="file" id="addFotoKamera" accept="image/*" capture="environment" style="display:none;" onchange="handleNewFotos(this)">
+                    <input type="file" id="addFotoGaleri" accept="image/*" multiple style="display:none;" onchange="handleNewFotos(this)">
+                    <div id="previewAddFotos" style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:10px;"></div>
+                </div>
+                
+                <label class="form-label">Nama Alat Utama *</label>
+                <input type="text" id="addNama" class="form-input" required>
+                
+                <div style="display:flex; gap:10px;">
+                    <div style="flex:1;">
+                        <label class="form-label">Kode Barang</label>
+                        <input type="text" id="addKode" class="form-input">
+                    </div>
+                    <div style="flex:1;">
+                        <label class="form-label">Kode Wadah</label>
+                        <input type="text" id="addWadah" class="form-input">
+                    </div>
+                </div>
+                
+                <div style="display:flex; gap:10px;">
+                    <div style="flex:1;">
+                        <label class="form-label">Total (Qty)</label>
+                        <input type="number" id="addJumlah" class="form-input" value="1" required>
+                    </div>
+                    <div style="flex:1;">
+                        <label class="form-label">Kondisi</label>
+                        <select id="addKondisi" class="form-input">
+                            <option value="Bagus">Bagus</option>
+                            <option value="Periksa">Periksa</option>
+                            <option value="Rusak">Rusak</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <label class="form-label">Keterangan / Ref</label>
+                <input type="text" id="addKet" class="form-input">
+                
+                <label class="form-label">Lokasi Gudang</label>
+                <select id="addLokasi" class="form-input">
+                    <option value="Gudang Kanguru">Gudang Kanguru</option>
+                    <option value="Gudang Mrican">Gudang Mrican</option>
+                </select>
+                
+                <button type="submit" id="btnSubmitAdd" style="width:100%; padding:14px; background:#16a34a; color:white; border:none; border-radius:8px; font-weight:900; margin-top:10px;">💾 SIMPAN ALAT</button>
+                <button type="button" onclick="closeAddModal()" style="width:100%; padding:12px; background:#f1f5f9; color:#334155; border:none; border-radius:8px; font-weight:bold; margin-top:8px;">⬅ BATAL</button>
+            </form>
+        </div>
     </div>
-    <input type="file" id="editFotoKamera" accept="image/*" capture="environment" style="display:none;" onchange="handleNewEditFotos(this)">
-    <input type="file" id="editFotoGaleri" accept="image/*" multiple style="display:none;" onchange="handleNewEditFotos(this)">
-</div>/div>
+
+    <!-- MODAL EDIT DATA & FOTO (SUDAH DIPERBAIKI) -->
+    <div id="modalEditFull" class="modal-overlay">
+        <div class="modal-content" style="max-width:400px; max-height:85vh; overflow-y:auto; background:white; padding:20px; border-radius:15px;">
+            <h3 style="margin-top:0; color:#ea580c; margin-bottom:20px;">✏️ Edit Data & Foto Alat</h3>
+            <form id="formEditFull" onsubmit="submitEditFull(event)">
+                <input type="hidden" id="editRowIndex">
+                
+                <div style="background:#f8fafc; padding:15px; border-radius:8px; border:1px dashed #cbd5e1; margin-bottom:15px; text-align:center;">
+                    <label class="form-label" style="color:#ea580c; margin-bottom:10px;">📸 Kelola Foto (Maksimal 3)</label>
+                    <div id="previewEditFotos" style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-bottom:10px;"></div>
+                    <div id="btnContainerEditFoto" style="display:flex; gap:10px; justify-content:center;">
+                        <button type="button" onclick="document.getElementById('editFotoKamera').click()" style="flex:1; padding:10px; border-radius:8px; background:#3b82f6; color:white; border:none; font-weight:bold; cursor:pointer; font-size:11px;">📷 Buka Kamera</button>
+                        <button type="button" onclick="document.getElementById('editFotoGaleri').click()" style="flex:1; padding:10px; border-radius:8px; background:#8b5cf6; color:white; border:none; font-weight:bold; cursor:pointer; font-size:11px;">🖼️ Pilih Galeri</button>
+                    </div>
+                    <input type="file" id="editFotoKamera" accept="image/*" capture="environment" style="display:none;" onchange="handleNewEditFotos(this)">
+                    <input type="file" id="editFotoGaleri" accept="image/*" multiple style="display:none;" onchange="handleNewEditFotos(this)">
+                </div>
+                
+                <label class="form-label">Nama Alat Utama *</label>
+                <input type="text" id="editNama" class="form-input" required>
+                
+                <div style="display:flex; gap:10px;">
+                    <div style="flex:1;">
+                        <label class="form-label">Kode Barang</label>
+                        <input type="text" id="editKode" class="form-input">
+                    </div>
+                    <div style="flex:1;">
+                        <label class="form-label">Kode Wadah</label>
+                        <input type="text" id="editWadah" class="form-input">
+                    </div>
+                </div>
+                
+                <div style="display:flex; gap:10px;">
+                    <div style="flex:1;">
+                        <label class="form-label">Total Qty</label>
+                        <input type="number" id="editJumlah" class="form-input" required>
+                    </div>
+                    <div style="flex:1;">
+                        <label class="form-label">Kondisi</label>
+                        <select id="editKondisi" class="form-input">
+                            <option value="Bagus">Bagus</option>
+                            <option value="Periksa">Periksa</option>
+                            <option value="Rusak">Rusak</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <label class="form-label">Keterangan / Ref</label>
+                <input type="text" id="editKet" class="form-input">
+                
+                <button type="submit" id="btnSubmitEditFull" style="width:100%; padding:14px; background:#ea580c; color:white; border:none; border-radius:8px; font-weight:900; margin-top:10px;">💾 UPDATE DATA & FOTO</button>
+                <button type="button" onclick="closeEditFullModal()" style="width:100%; padding:12px; background:#f1f5f9; color:#334155; border:none; border-radius:8px; font-weight:bold; margin-top:8px;">⬅ BATAL</button>
+            </form>
+        </div>
+    </div>
+
     <!-- ========================================== -->
     <!-- MODAL EXPORT EXCEL CUSTOM (FILTER)         -->
     <!-- ========================================== -->
@@ -155,9 +256,12 @@ location: "MASTER"
             <button onclick="executeCustomExport()" style="width:100%; padding:14px; background:#10b981; color:white; border:none; border-radius:10px; font-weight:900; cursor:pointer; font-size:13px; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2);">🚀 DOWNLOAD EXCEL</button>
         </div>
     </div>
+    
     <div id="zoomModal" class="zoom-overlay" onclick="closeZoomModal()"><button class="btn-back-zoom" onclick="closeZoomModal()">⬅ Kembali</button><img id="zoomImgSrc" src="" onclick="event.stopPropagation()"></div>
     <div id="toastMsg" class="toast-msg">Notifikasi</div>
-    <script src="{{ site.baseurl }}/assets/js/script-gudang.js?v=32.0"></script>
+    
+    <!-- MENGGUNAKAN VERSI 33.0 UNTUK MENCEGAH CACHE -->
+    <script src="{{ site.baseurl }}/assets/js/script-gudang.js?v=33.0"></script>
     
     <!-- SCRIPT KEAMANAN RBAC -->
     <script>

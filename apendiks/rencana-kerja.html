@@ -51,11 +51,13 @@ location: "APENDIKS"
         .team-role { font-size: 12px; line-height: 1.6; margin-bottom: 5px; }
         .team-role.capt { color: #16a34a; font-weight: 900; }
         .team-role.crew { color: #3b82f6; font-weight: 700; }
-        .team-mission { font-size: 11px; background: #fff7ed; border: 1px solid #fed7aa; padding: 8px; border-radius: 8px; color: #c2410c; font-weight: 600; margin-top: 10px; }
+        .team-mission { font-size: 11px; background: #fff7ed; border: 1px solid #fed7aa; padding: 10px; border-radius: 8px; color: #c2410c; font-weight: 600; margin-top: 10px; line-height:1.5; }
 
         .rules-list { list-style: none; padding: 0; margin: 0; font-size: 13px; }
         .rules-list li { margin-bottom: 12px; padding-left: 28px; position: relative; color: #334155; font-weight: 600; line-height: 1.5; }
         .rules-list li span.emoji { position: absolute; left: 0; top: 0; font-size: 16px; }
+        
+        .closing-note { text-align: center; margin-top: 30px; font-weight: 800; color: #ea580c; background: #fff7ed; padding: 15px; border-radius: 15px; border: 1px dashed #fdba74; font-size: 13px; }
 
         /* 🌙 DARK MODE OVERRIDES */
         body.dark-mode, [data-theme="dark"] { background: #020617; color: #f8fafc; }
@@ -70,6 +72,7 @@ location: "APENDIKS"
         body.dark-mode .team-role.crew { color: #60a5fa; }
         body.dark-mode .team-mission { background: rgba(249, 115, 22, 0.1); border-color: rgba(249, 115, 22, 0.2); color: #fdba74; }
         body.dark-mode .rules-list li { color: #cbd5e1; }
+        body.dark-mode .closing-note { background: #431407; border-color: #7c2d12; color: #fed7aa; }
     </style>
 </head>
 <body id="inventoryBody">
@@ -102,28 +105,28 @@ location: "APENDIKS"
         <div class="card-section">
             <h2>💡 Konsep Kerja: OVERLAPPING</h2>
             <p style="font-size: 13px; line-height: 1.6; color: inherit; font-weight: 600; margin: 0;">
-                Kita akan menggunakan sistem estafet (overlapping) agar tidak ada waktu tunggu. Alurnya: <b>Barang keluar ➡️ Langsung dibersihkan ➡️ Diperiksa ➡️ Diukur ➡️ Didata</b>. Semua tim bergerak bersamaan! 😎🔥
+                Kita pakai sistem estafet alias gak pake nunggu! Barang keluar ➡️ langsung dibersihin ➡️ langsung diperiksa ➡️ langsung diukur ➡️ langsung didata. Semua tim bergerak barengan biar asik dan cepet selesai! 😎🔥
             </p>
         </div>
 
         <!-- PEMBAGIAN ZONA -->
         <div class="card-section">
-            <h2>🗺️ Pembagian Zona & Area Kerja</h2>
+            <h2>🗺️ Pembagian Zona & Plot Lokasi</h2>
             <table class="zone-table">
                 <tr>
                     <th>Luar Balai</th>
                     <td>• Cuci container pakai air & sabun<br>• Rakit stand speaker (besi-besi)</td>
                 </tr>
                 <tr>
-                    <th>Dalam Balai (Depan)</th>
-                    <td>• Plot speaker & barang-barang berukuran besar</td>
+                    <th>Dalam Balai - Paling Depan</th>
+                    <td>• Plot speaker & barang-barang besar</td>
                 </tr>
                 <tr>
-                    <th>Dalam Balai (Tengah)</th>
-                    <td>• Plot barang kecil<br>• Pusat kletek stiker & lap hardcase</td>
+                    <th>Dalam Balai - Area Tengah</th>
+                    <td>• Plot barang kecil-kecil<br>• Pusat kletek stiker & lap hardcase</td>
                 </tr>
                 <tr>
-                    <th>Dalam Balai (Belakang)</th>
+                    <th>Dalam Balai - Paling Belakang</th>
                     <td>• Plot khusus pengelompokan & ukur kabel</td>
                 </tr>
             </table>
@@ -131,49 +134,49 @@ location: "APENDIKS"
 
         <!-- DAFTAR TIM -->
         <div class="card-section">
-            <h2>👥 Daftar Tim & Tugas Utama</h2>
+            <h2>👥 Daftar Tim & Tugas-tugas</h2>
             <div class="team-grid">
                 
                 <div class="team-box">
-                    <h3>📦 1. Tim Sortir & Angkut</h3>
-                    <div class="team-role capt">🧢 Kapten: Rico</div>
-                    <div class="team-role crew">🤝 Anggota: Andreas, Angga S, Dedi, Galed, Heaven, Parlindungan, Prima</div>
-                    <div class="team-mission">🎯 Misi: Awal masuk pinggirin kursi & nyalakan AC. Keluarin barang dari gudang. Pisahkan yang di luar & di dalam balai. Lanjut bantu Tim Cleaning!</div>
+                    <h3>📦 Tim Sortir, Ngeluarin & Ngembaliin Barang</h3>
+                    <div class="team-role capt">👑 Kapten: Rico</div>
+                    <div class="team-role crew">🤝 Anggota: Andreas, Angga S, Parlindungan, Galed, Dedi, Prima, Heaven, Verish, Viktor</div>
+                    <div class="team-mission">🎯 Misi: Awal masuk pinggirin kursi & nyalain AC. Terus keluarin barang dari gudang. Pisahin mana yang stay di luar (rangka besi panjang) dan masuk balai (hardcase, box, container). Kalo udah selesai, langsung bantuin tim Cleaning! Kalau semua udah, tolong bantu balikin ke gudang lagi ya.</div>
                 </div>
 
                 <div class="team-box">
-                    <h3>🧹 2. Tim Cleaning</h3>
-                    <div class="team-role capt">🧢 Kapten: Truna</div>
-                    <div class="team-role crew">🤝 Anggota: Dhara, Emma, Hani, Johan, Karen, Naela, Ponco, Riyanti, Sachi, Sarah, Tina</div>
-                    <div class="team-mission">🎯 Misi: Keluarkan SEMUA isi box/hardcase. Lap kabel & barang berdebu, kletek stiker lama. Cuci box di luar jika sangat kotor.</div>
+                    <h3>🧽 Tim Cleaning</h3>
+                    <div class="team-role capt">👑 Kapten: Truna</div>
+                    <div class="team-role crew">🤝 Anggota: Johan, Riyanti, Sarah, Dhara, Ponco, Emma, Karen, Hani, Naela, Sachi, Tina</div>
+                    <div class="team-mission">🎯 Misi: Keluarin SEMUA isi box/hardcase. Lap kabel & barang berdebu, kletek stiker lama. Cuci box di luar balai kalo kotor banget.</div>
                 </div>
 
                 <div class="team-box">
-                    <h3>📏 3. Tim Ukur Kabel</h3>
-                    <div class="team-role capt">🧢 Kapten: Dhara</div>
-                    <div class="team-role crew">🤝 Anggota: Michel, Peni, Ponco, Tia, Truna, Vina</div>
-                    <div class="team-mission">🎯 Misi: Ambil kabel yang sudah dilap, ukur, pisahkan, dan tempel label. Belah ujung kabel dan tandai Merah (+) & Hitam (-).</div>
+                    <h3>📏 Tim Ukur Kabel</h3>
+                    <div class="team-role capt">👑 Kapten: Dhara</div>
+                    <div class="team-role crew">🤝 Anggota: Michel, Tia, Peni, Vina, Truna, Ponco</div>
+                    <div class="team-mission">🎯 Misi: Ambil kabel yang udah dilap, ukur ulang (kalau perlu), pisahin, dan tempelin label berapa meter panjang kabelnya. Belah kabelnya trus tandain pake solatip merah buat (+) solatip hitam buat (-).</div>
                 </div>
 
                 <div class="team-box">
-                    <h3>⚙️ 4. Tim Tes Stand Speaker</h3>
-                    <div class="team-role capt">🧢 Kapten: Yokanan</div>
-                    <div class="team-role crew">🤝 Anggota: Hazell, Malkhiel, Ryan</div>
-                    <div class="team-mission">🎯 Misi: Rakit 4 stand speaker (siapkan 1 spare jika sempat). Tes kelayakan, tandai, lalu minta tim Inventaris untuk barcode.</div>
+                    <h3>⚙️ Tim Tes Stand Speaker</h3>
+                    <div class="team-role capt">👑 Kapten: Yokanan</div>
+                    <div class="team-role crew">🤝 Anggota: Malkhiel, Ryan, Hazell, Viktor</div>
+                    <div class="team-mission">🎯 Misi: Rakit 4 stand speaker baru (kalo sempet, rakit 1 lagi buat spare jadi 5). Tes dan tandain mana yang oke dipakai, minta tim inventaris buat tempelin barcode.</div>
                 </div>
 
                 <div class="team-box">
-                    <h3>📍 5. Tim Tata Wadah</h3>
-                    <div class="team-role capt">🧢 Kapten: Ponco</div>
-                    <div class="team-role crew">🤝 Anggota: Gadis, Karen, Nia, Okta, Sachi</div>
-                    <div class="team-mission">🎯 Misi: Tentukan peruntukan setiap box. Pisahkan barang Bawa vs Tinggal (Bawa = taruh depan; Tinggal = masuk gudang duluan).</div>
+                    <h3>📍 Tim Ngrapiin Lokasi Wadah</h3>
+                    <div class="team-role capt">👑 Kapten: Ponco</div>
+                    <div class="team-role crew">🤝 Anggota: Gadis, Karen, Nia, Sachi, Okta</div>
+                    <div class="team-mission">🎯 Misi: Nentuin box ini buat barang apa. Pisahin barang Bawa vs Tinggal. (Barang dibawa = taruh depan, Barang ditinggal = masukin gudang duluan).</div>
                 </div>
 
                 <div class="team-box">
-                    <h3>💻 6. Tim Inventaris Sistem</h3>
-                    <div class="team-role capt">🧢 Kapten: Gadis</div>
-                    <div class="team-role crew">🤝 Anggota: Dhara, Emma, Hani, Michel, Tia</div>
-                    <div class="team-mission">🎯 Misi: Tempel barcode di tiap barang & wadahnya (kardus pasang 2 barcode). Input data ke sistem PWA menggunakan standar penamaan!</div>
+                    <h3>💻 Tim Inventaris (Sistem)</h3>
+                    <div class="team-role capt">👑 Kapten: Gadis</div>
+                    <div class="team-role crew">🤝 Anggota: Hani, Dhara, Tia, Michel, Emma</div>
+                    <div class="team-mission">🎯 Misi: Tempel barcode di tiap barang juga termasuk wadahnya (container, hardcase, karung, dll). Kalau barang ada dusnya pasang 2 barcode (1 di barang, 1 di kardus). Input data ke sistem pake standar penamaan dan catat kode wadah barunya biar gampang dicari!</div>
                 </div>
 
             </div>
@@ -181,15 +184,27 @@ location: "APENDIKS"
 
         <!-- PERLENGKAPAN & PENGINGAT -->
         <div class="card-section">
-            <h2>🛡️ Perlengkapan & Pengingat</h2>
-            <ul class="rules-list">
-                <li><span class="emoji">👕</span> <b>Pakaian & Sepatu:</b> Pakai baju & celana yang asik dan nyaman. Wajib bersepatu (NO SANDAL club!).</li>
-                <li><span class="emoji">😷</span> <b>Masker & Sarung Tangan:</b> Sangat disarankan karena area akan banyak debu.</li>
-                <li><span class="emoji">👷</span> <b>Helm Proyek:</b> Wajib bagi tim yang mengangkat tiang/besi tinggi.</li>
-                <li><span class="emoji">💧</span> <b>Air Minum:</b> WAJIB BAWA! Tidak boleh ada yang dehidrasi.</li>
-                <li><span class="emoji">🍪</span> <b>Jajanan:</b> Boleh banget dibawa untuk bagi-bagi, terutama bagi yang memiliki masalah lambung.</li>
-                <li><span class="emoji">🛌</span> <b>Istirahat:</b> Jika merasa lelah, silakan istirahat. Jangan memaksakan diri.</li>
+            <h2>🛡️ O YA, JANGAN LUPA INI yaaa . .</h2>
+            <h3 style="font-size:14px; margin-bottom:10px; color:#f97316;">ALAT PELINDUNG DIRI (APD)</h3>
+            <ul class="rules-list" style="margin-bottom: 20px;">
+                <li><span class="emoji">👟</span> <b>BISA BAWA SENDIRI:</b> Sepatu (NO SANDAL club!), Masker (disarankan, banyak debu), Sarung tangan.</li>
+                <li><span class="emoji">👷</span> <b>HELM PROYEK:</b> Wajib buat tim yang angkat-angkat tiang/besi tinggi.</li>
+                <li><span class="emoji">🦺</span> <b>ROMPI?:</b> Boleh kalau mau pake.</li>
             </ul>
+            
+            <h3 style="font-size:14px; margin-bottom:10px; color:#f97316;">SELAIN APD</h3>
+            <ul class="rules-list">
+                <li><span class="emoji">🧼</span> <b>HAND SANITIZER:</b> Opsional, boleh bawa masing-masing.</li>
+                <li><span class="emoji">💧</span> <b>AIR:</b> Wajib bawa, pokoknya ga ada yg boleh dehidrasi.</li>
+                <li><span class="emoji">🍪</span> <b>JAJANAN:</b> Boleh banget dibawa buat bagi-bagi, apalagi yang buat asam lambungnya gampang naek.</li>
+                <li><span class="emoji">👕</span> <b>BAJU & CELANA:</b> Pakai yang cocok buat pekerjaan ini ya.</li>
+                <li><span class="emoji">🫩</span> <b>CAPEK?:</b> Istirahat dulu, jangan dipaksain.</li>
+            </ul>
+        </div>
+
+        <!-- CLOSING NOTE -->
+        <div class="closing-note">
+            Buat yang uda selesai bisa bantu tim lain yaa . . . Makasii banyak! ✨
         </div>
 
         <div style="text-align: center; margin-top: 30px;">

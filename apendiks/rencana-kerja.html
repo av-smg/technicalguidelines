@@ -1,0 +1,201 @@
+---
+location: "APENDIKS"
+---
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    {% include head.html %}
+    <title>Rencana Kerja Inventaris AV</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800;900&display=swap');
+
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; color: #0f172a; margin: 0; padding: 0; transition: 0.3s; }
+        
+        .header-doc {
+            background: #0f172a;
+            background-image: radial-gradient(circle at top right, #1e293b 0%, transparent 60%);
+            color: white;
+            padding: 40px 20px 50px 20px;
+            text-align: center;
+            border-radius: 0 0 30px 30px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        .header-doc h1 { margin: 0; font-size: 24px; font-weight: 900; color: #f8fafc; line-height: 1.2; }
+        .header-doc h1 span { color: #f97316; }
+        .header-doc p { margin: 10px 0 0 0; font-size: 13px; color: #94a3b8; font-weight: bold; }
+
+        .doc-container { max-width: 900px; margin: -30px auto 40px auto; padding: 0 15px; position: relative; z-index: 10; }
+
+        .info-pill {
+            background: white; border: 2px solid #e2e8f0; border-radius: 16px; padding: 15px;
+            display: flex; justify-content: space-around; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+        .info-item { text-align: center; flex: 1; min-width: 100px; }
+        .info-item span { display: block; font-size: 10px; color: #64748b; font-weight: bold; text-transform: uppercase; margin-bottom: 4px; }
+        .info-item strong { font-size: 14px; color: #0f172a; font-weight: 900; }
+
+        .card-section { background: white; border-radius: 20px; padding: 25px 20px; margin-bottom: 20px; border: 2px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        .card-section h2 { margin: 0 0 15px 0; font-size: 16px; font-weight: 900; color: #1e293b; display: flex; align-items: center; gap: 8px; border-bottom: 2px dashed #e2e8f0; padding-bottom: 10px; }
+        
+        .zone-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .zone-table th, .zone-table td { padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: left; vertical-align: top; }
+        .zone-table th { color: #f97316; font-weight: 900; width: 35%; }
+        .zone-table td { font-weight: 600; color: #475569; }
+
+        .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; }
+        .team-box { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 16px; padding: 15px; transition: 0.2s; }
+        .team-box:hover { border-color: #94a3b8; transform: translateY(-3px); box-shadow: 0 5px 10px rgba(0,0,0,0.05); }
+        .team-box h3 { margin: 0 0 10px 0; font-size: 15px; color: #0f172a; font-weight: 900; }
+        .team-role { font-size: 12px; line-height: 1.6; margin-bottom: 5px; }
+        .team-role.capt { color: #16a34a; font-weight: 900; }
+        .team-role.crew { color: #3b82f6; font-weight: 700; }
+        .team-mission { font-size: 11px; background: #fff7ed; border: 1px solid #fed7aa; padding: 8px; border-radius: 8px; color: #c2410c; font-weight: 600; margin-top: 10px; }
+
+        .rules-list { list-style: none; padding: 0; margin: 0; font-size: 13px; }
+        .rules-list li { margin-bottom: 12px; padding-left: 28px; position: relative; color: #334155; font-weight: 600; line-height: 1.5; }
+        .rules-list li span.emoji { position: absolute; left: 0; top: 0; font-size: 16px; }
+
+        /* 🌙 DARK MODE OVERRIDES */
+        body.dark-mode, [data-theme="dark"] { background: #020617; color: #f8fafc; }
+        body.dark-mode .info-pill, body.dark-mode .card-section { background: #0f172a; border-color: #1e293b; }
+        body.dark-mode .info-item span { color: #94a3b8; }
+        body.dark-mode .info-item strong, body.dark-mode .card-section h2 { color: #f8fafc; border-color: #1e293b; }
+        body.dark-mode .zone-table th, body.dark-mode .zone-table td { border-color: #1e293b; }
+        body.dark-mode .zone-table td { color: #cbd5e1; }
+        body.dark-mode .team-box { background: #1e293b; border-color: #334155; }
+        body.dark-mode .team-box h3 { color: #f8fafc; }
+        body.dark-mode .team-role.capt { color: #34d399; }
+        body.dark-mode .team-role.crew { color: #60a5fa; }
+        body.dark-mode .team-mission { background: rgba(249, 115, 22, 0.1); border-color: rgba(249, 115, 22, 0.2); color: #fdba74; }
+        body.dark-mode .rules-list li { color: #cbd5e1; }
+    </style>
+</head>
+<body id="inventoryBody">
+    {% include navbar.html %}
+
+    <div class="header-doc">
+        <h1>🚀 RENCANA KERJA <span>INVENTARIS</span></h1>
+        <p>SOP & Pembagian Tugas Sortir Barang AV</p>
+    </div>
+
+    <div class="doc-container">
+        
+        <!-- INFO BAR -->
+        <div class="info-pill">
+            <div class="info-item">
+                <span>📍 Lokasi Utama</span>
+                <strong>Gudang Kanguru</strong>
+            </div>
+            <div class="info-item">
+                <span>📅 Tanggal</span>
+                <strong>29 Agustus 2026</strong>
+            </div>
+            <div class="info-item">
+                <span>🕘 Waktu Mulai</span>
+                <strong>09.00 WIB</strong>
+            </div>
+        </div>
+
+        <!-- KONSEP KERJA -->
+        <div class="card-section">
+            <h2>💡 Konsep Kerja: OVERLAPPING</h2>
+            <p style="font-size: 13px; line-height: 1.6; color: inherit; font-weight: 600; margin: 0;">
+                Kita akan menggunakan sistem estafet (overlapping) agar tidak ada waktu tunggu. Alurnya: <b>Barang keluar ➡️ Langsung dibersihkan ➡️ Diperiksa ➡️ Diukur ➡️ Didata</b>. Semua tim bergerak bersamaan! 😎🔥
+            </p>
+        </div>
+
+        <!-- PEMBAGIAN ZONA -->
+        <div class="card-section">
+            <h2>🗺️ Pembagian Zona & Area Kerja</h2>
+            <table class="zone-table">
+                <tr>
+                    <th>Luar Balai</th>
+                    <td>• Cuci container pakai air & sabun<br>• Rakit stand speaker (besi-besi)</td>
+                </tr>
+                <tr>
+                    <th>Dalam Balai (Depan)</th>
+                    <td>• Plot speaker & barang-barang berukuran besar</td>
+                </tr>
+                <tr>
+                    <th>Dalam Balai (Tengah)</th>
+                    <td>• Plot barang kecil<br>• Pusat kletek stiker & lap hardcase</td>
+                </tr>
+                <tr>
+                    <th>Dalam Balai (Belakang)</th>
+                    <td>• Plot khusus pengelompokan & ukur kabel</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- DAFTAR TIM -->
+        <div class="card-section">
+            <h2>👥 Daftar Tim & Tugas Utama</h2>
+            <div class="team-grid">
+                
+                <div class="team-box">
+                    <h3>📦 1. Tim Sortir & Angkut</h3>
+                    <div class="team-role capt">🧢 Kapten: Rico</div>
+                    <div class="team-role crew">🤝 Anggota: Andreas, Angga S, Dedi, Galed, Heaven, Parlindungan, Prima</div>
+                    <div class="team-mission">🎯 Misi: Awal masuk pinggirin kursi & nyalakan AC. Keluarin barang dari gudang. Pisahkan yang di luar & di dalam balai. Lanjut bantu Tim Cleaning!</div>
+                </div>
+
+                <div class="team-box">
+                    <h3>🧹 2. Tim Cleaning</h3>
+                    <div class="team-role capt">🧢 Kapten: Truna</div>
+                    <div class="team-role crew">🤝 Anggota: Dhara, Emma, Hani, Johan, Karen, Naela, Ponco, Riyanti, Sachi, Sarah, Tina</div>
+                    <div class="team-mission">🎯 Misi: Keluarkan SEMUA isi box/hardcase. Lap kabel & barang berdebu, kletek stiker lama. Cuci box di luar jika sangat kotor.</div>
+                </div>
+
+                <div class="team-box">
+                    <h3>📏 3. Tim Ukur Kabel</h3>
+                    <div class="team-role capt">🧢 Kapten: Dhara</div>
+                    <div class="team-role crew">🤝 Anggota: Michel, Peni, Ponco, Tia, Truna, Vina</div>
+                    <div class="team-mission">🎯 Misi: Ambil kabel yang sudah dilap, ukur, pisahkan, dan tempel label. Belah ujung kabel dan tandai Merah (+) & Hitam (-).</div>
+                </div>
+
+                <div class="team-box">
+                    <h3>⚙️ 4. Tim Tes Stand Speaker</h3>
+                    <div class="team-role capt">🧢 Kapten: Yokanan</div>
+                    <div class="team-role crew">🤝 Anggota: Hazell, Malkhiel, Ryan</div>
+                    <div class="team-mission">🎯 Misi: Rakit 4 stand speaker (siapkan 1 spare jika sempat). Tes kelayakan, tandai, lalu minta tim Inventaris untuk barcode.</div>
+                </div>
+
+                <div class="team-box">
+                    <h3>📍 5. Tim Tata Wadah</h3>
+                    <div class="team-role capt">🧢 Kapten: Ponco</div>
+                    <div class="team-role crew">🤝 Anggota: Gadis, Karen, Nia, Okta, Sachi</div>
+                    <div class="team-mission">🎯 Misi: Tentukan peruntukan setiap box. Pisahkan barang Bawa vs Tinggal (Bawa = taruh depan; Tinggal = masuk gudang duluan).</div>
+                </div>
+
+                <div class="team-box">
+                    <h3>💻 6. Tim Inventaris Sistem</h3>
+                    <div class="team-role capt">🧢 Kapten: Gadis</div>
+                    <div class="team-role crew">🤝 Anggota: Dhara, Emma, Hani, Michel, Tia</div>
+                    <div class="team-mission">🎯 Misi: Tempel barcode di tiap barang & wadahnya (kardus pasang 2 barcode). Input data ke sistem PWA menggunakan standar penamaan!</div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- PERLENGKAPAN & PENGINGAT -->
+        <div class="card-section">
+            <h2>🛡️ Perlengkapan & Pengingat</h2>
+            <ul class="rules-list">
+                <li><span class="emoji">👕</span> <b>Pakaian & Sepatu:</b> Pakai baju & celana yang asik dan nyaman. Wajib bersepatu (NO SANDAL club!).</li>
+                <li><span class="emoji">😷</span> <b>Masker & Sarung Tangan:</b> Sangat disarankan karena area akan banyak debu.</li>
+                <li><span class="emoji">👷</span> <b>Helm Proyek:</b> Wajib bagi tim yang mengangkat tiang/besi tinggi.</li>
+                <li><span class="emoji">💧</span> <b>Air Minum:</b> WAJIB BAWA! Tidak boleh ada yang dehidrasi.</li>
+                <li><span class="emoji">🍪</span> <b>Jajanan:</b> Boleh banget dibawa untuk bagi-bagi, terutama bagi yang memiliki masalah lambung.</li>
+                <li><span class="emoji">🛌</span> <b>Istirahat:</b> Jika merasa lelah, silakan istirahat. Jangan memaksakan diri.</li>
+            </ul>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="{{ site.baseurl }}/" style="padding: 12px 25px; background: #334155; color: white; text-decoration: none; font-weight: 900; border-radius: 12px; font-size: 13px;">⬅ KEMBALI KE BERANDA</a>
+        </div>
+
+    </div>
+</body>
+</html>

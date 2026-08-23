@@ -257,7 +257,10 @@ location: "MASTER"
         </div>
     </div>
     
-    <div id="zoomModal" class="zoom-overlay" onclick="closeZoomModal()"><button class="btn-back-zoom" onclick="closeZoomModal()">⬅ Kembali</button><img id="zoomImgSrc" src="" onclick="event.stopPropagation()"></div>
+    <div id="zoomModal" class="zoom-overlay" onclick="closeZoomModal()">
+    <button onclick="closeZoomModal()" style="position:absolute; top:20px; left:20px; padding:10px 16px; background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.4); border-radius:8px; color:white; font-weight:bold; cursor:pointer; backdrop-filter:blur(4px); z-index:1000000; box-shadow:0 4px 10px rgba(0,0,0,0.5);">⬅ Kembali</button>
+    <img id="zoomImgSrc" src="" onclick="event.stopPropagation()">
+</div>
     <div id="toastMsg" class="toast-msg">Notifikasi</div>
     
     <!-- MENGGUNAKAN VERSI 33.0 UNTUK MENCEGAH CACHE -->

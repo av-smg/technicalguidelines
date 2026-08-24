@@ -1,5 +1,5 @@
 // ==========================================
-// MESIN LOGIKA GUDANG (V.6 - CLEAN UI & DYNAMIC EDIT FOTO)
+// MESIN LOGIKA GUDANG (V.8 - NAMA KRU REAL-TIME & DYNAMIC EDIT)
 // ==========================================
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec"; 
@@ -9,12 +9,9 @@ let allItems = []; let optionsData = { lokasi: [], tim: [] };
 let html5QrCode = null; 
 let isAdminMode = false, isBulkMode = false, selectedRows = new Set(), lastScanTime = 0, activeFilterPill = 'all', currentViewMode = 'grid'; 
 let pendingAddFotos = [];
-let pendingEditFotos = []; // Array untuk multi-select edit foto
+let pendingEditFotos = []; 
 let currentCameraFacing = "environment"; 
 let isFlashlightOn = false;
-
-const currentUserRole = localStorage.getItem('av_session_role');
-const currentUserName = localStorage.getItem('av_session_nama');
 
 window.onload = () => { injectGudangDarkModeCSS(); checkAdminStatus(); loadData(); };
 
@@ -53,6 +50,7 @@ function injectGudangDarkModeCSS() {
 }
 
 function checkAdminStatus() { 
+    const currentUserRole = localStorage.getItem('av_session_role');
     if (currentUserRole === "Master" || currentUserRole === "Kru") { 
         isAdminMode = true; document.body.classList.add("admin-mode-active"); 
     } else { 
@@ -297,10 +295,9 @@ function openDetailModal(item) {
     let optionsLokasi = `<option value="Gudang Kanguru" ${lok.includes('Kanguru') ? 'selected':''}>🏢 Gudang Kanguru</option><option value="Gudang Mrican" ${lok.includes('Mrican') ? 'selected':''}>🏢 Gudang Mrican</option><option value="Dalam Perjalanan" ${lok === 'Dalam Perjalanan' ? 'selected':''}>🚚 Dalam Perjalanan</option><option value="Di Lokasi Event" ${lok === 'Di Lokasi Event' ? 'selected':''}>📍 Di Lokasi Event</option>`; 
     let optionsStatus = `<option value="Di Gudang" ${stat === 'Di Gudang' ? 'selected':''}>📦 Standby / Di Gudang</option><option value="Akan Dibawa" ${stat === 'Akan Dibawa' ? 'selected':''}>🛒 Akan Dibawa (Packing)</option><option value="Sedang Dipakai" ${stat === 'Sedang Dipakai' ? 'selected':''}>🔌 Sedang Dipakai / Aktivasi</option><option value="Sedang Diservis" ${stat === 'Sedang Diservis' ? 'selected':''}>🛠️ Sedang Diservis</option>`;
     
-    // TEXT SUDAH DIBERSIHKAN DARI CELL O DAN CELL R
     let actionButtons = isAdminMode ? `<button onclick='openEditFullModal(${JSON.stringify(item).replace(/'/g, "&#39;")})' style="width:100%; padding:10px; background:#f59e0b; color:white; border:none; border-radius:8px; font-weight:bold; margin-bottom:15px;">✏️ EDIT DATA & FOTO LENGKAP</button><div style="text-align:left; border-top:1px dashed #ccc; padding-top:15px;"><label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">📍 Update Lokasi:</label><select id="editLokasi" style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc; margin-bottom:12px;">${optionsLokasi}</select><label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">🔌 Update Status:</label><select id="editStatus" style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc; margin-bottom:12px; font-weight:bold;">${optionsStatus}</select><button onclick="saveEditLokasiStatus(${item.row_index})" style="width:100%; padding:12px; background:#ea580c; color:white; border:none; border-radius:8px; font-weight:bold;">💾 SIMPAN STATUS</button></div>` : `<div style="margin-top:15px; padding:10px; background:#f1f5f9; border-radius:8px; font-size:12px; color:#64748b;">🔒 Login Akses untuk mengubah status/lokasi.</div>`;
     
-const modalHtml = `<div id="detailModal" class="modal-overlay active"><div class="modal-content" style="max-width:400px; max-height:90vh; overflow-y:auto; background:white; padding:20px; border-radius:15px; text-align:center; position:relative;"><button onclick="document.getElementById('detailModal').remove()" style="position:absolute; top:15px; right:15px; border:none; background:#f1f5f9; width:30px; height:30px; border-radius:50%; font-weight:bold; cursor:pointer; z-index:10;">✕</button>${galleryHtml}<h3 style="margin:0; font-weight:900; color:#1e293b; font-size:18px;">${item.nama_barang}</h3><div style="font-size:10px; color:gray; margin-bottom:8px;">⏱️ Update: ${item.timestamp || '-'}</div><p style="margin:5px 0 10px 0; font-size:12px; color:#ea580c; font-weight:bold;">#${item.kode_barang || '-'} <br><br>${badgeWadahHtml}</p><div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:12px; text-align:left; background:#f8fafc; padding:10px; border-radius:8px; border:1px solid #e2e8f0;"><div><span style="color:gray;">Item Ini:</span> <br><b>${item.jumlah || 0} Pcs</b></div><div><span style="color:gray;">Kondisi:</span> <br><b>${item.kondisi || '-'}</b></div><div><span style="color:gray;">📍 Lokasi:</span> <br><b>${lok}</b></div><div><span style="color:gray;">🔌 Status:</span> <br><b>${stat}</b></div></div>${similarHtml}${isiWadahHtml}<div style="text-align:left; margin-top:10px; font-size:11px; color:#475569; background:#fff7ed; padding:8px; border-radius:6px; border:1px solid #fed7aa; margin-bottom:5px;"><b>📝 Ket:</b> ${item.keterangan_ref || 'Tidak ada catatan.'}</div><div style="text-align:left; font-size:11px; margin-bottom:15px; color:#3b82f6;"><b>🎯 Tujuan (Event):</b> ${item.tujuan || '-'}</div>${logHtml}${actionButtons}</div></div>`;
+    const modalHtml = `<div id="detailModal" class="modal-overlay active"><div class="modal-content" style="max-width:400px; max-height:90vh; overflow-y:auto; background:white; padding:20px; border-radius:15px; text-align:center; position:relative;"><button onclick="document.getElementById('detailModal').remove()" style="position:absolute; top:15px; right:15px; border:none; background:#f1f5f9; width:30px; height:30px; border-radius:50%; font-weight:bold; cursor:pointer; z-index:10;">✕</button>${galleryHtml}<h3 style="margin:0; font-weight:900; color:#1e293b; font-size:18px;">${item.nama_barang}</h3><div style="font-size:10px; color:gray; margin-bottom:8px;">⏱️ Update: ${item.timestamp || '-'}</div><p style="margin:5px 0 10px 0; font-size:12px; color:#ea580c; font-weight:bold;">#${item.kode_barang || '-'} <br><br>${badgeWadahHtml}</p><div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:12px; text-align:left; background:#f8fafc; padding:10px; border-radius:8px; border:1px solid #e2e8f0;"><div><span style="color:gray;">Item Ini:</span> <br><b>${item.jumlah || 0} Pcs</b></div><div><span style="color:gray;">Kondisi:</span> <br><b>${item.kondisi || '-'}</b></div><div><span style="color:gray;">📍 Lokasi:</span> <br><b>${lok}</b></div><div><span style="color:gray;">🔌 Status:</span> <br><b>${stat}</b></div></div>${similarHtml}${isiWadahHtml}<div style="text-align:left; margin-top:10px; font-size:11px; color:#475569; background:#fff7ed; padding:8px; border-radius:6px; border:1px solid #fed7aa; margin-bottom:5px;"><b>📝 Ket:</b> ${item.keterangan_ref || 'Tidak ada catatan.'}</div><div style="text-align:left; font-size:11px; margin-bottom:15px; color:#3b82f6;"><b>🎯 Tujuan (Event):</b> ${item.tujuan || '-'}</div>${logHtml}${actionButtons}</div></div>`; 
     document.body.insertAdjacentHTML('beforeend', modalHtml);
 }
 
@@ -407,7 +404,6 @@ function selectAllVisible() { getFilteredData().forEach(item => selectedRows.add
 
 function openBulkUpdateModal() { 
     if (selectedRows.size === 0) { alert("Pilih minimal 1 barang!"); return; } 
-    // TEXT SUDAH DIBERSIHKAN DARI KOLOM O DAN R
     const modalHtml = `
     <div id="bulkModal" class="modal-overlay active">
         <div class="modal-content" style="max-width:350px; padding:20px; background:white; border-radius:15px; position:relative;">
@@ -446,7 +442,15 @@ async function processBulkUpdate(btn) {
     if (newLokasi === "TETAP" && newStatus === "TETAP") { alert("Pilih minimal satu perubahan!"); return; } 
     btn.disabled = true; btn.innerText = "MEMPROSES... (JANGAN DITUTUP)"; 
     try { 
-        const payload = { action: "update_status_lokasi", pin: API_BACKEND_PIN, rows: Array.from(selectedRows), new_lokasi: newLokasi !== "TETAP" ? newLokasi : null, new_status: newStatus !== "TETAP" ? newStatus : null, new_tujuan: "TETAP" }; 
+        const payload = { 
+            action: "update_status_lokasi", 
+            pin: API_BACKEND_PIN, 
+            user_name: localStorage.getItem('av_session_nama') || "Kru Tanpa Nama", 
+            rows: Array.from(selectedRows), 
+            new_lokasi: newLokasi !== "TETAP" ? newLokasi : null, 
+            new_status: newStatus !== "TETAP" ? newStatus : null, 
+            new_tujuan: "TETAP" 
+        }; 
         const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) }); const data = await response.json(); 
         if(data.status === "success") { document.getElementById('bulkModal').remove(); toggleBulkMode(); loadData(); showToast("✅ Update massal berhasil!"); } else { alert("Gagal:\n" + data.message); } 
     } catch (e) { alert("Error Sistem:\n" + e.message); } finally { btn.disabled = false; btn.innerText = "PROSES UPDATE MASSAL"; } 
@@ -456,7 +460,15 @@ async function saveEditLokasiStatus(rowIndex) {
     const btn = event.target; const newLokasi = document.getElementById("editLokasi").value; const newStatus = document.getElementById("editStatus").value;
     btn.disabled = true; btn.innerText = "MENYIMPAN...";
     try {
-        const payload = { action: "update_status_lokasi", pin: API_BACKEND_PIN, rows: [rowIndex], new_lokasi: newLokasi, new_status: newStatus, new_tujuan: "TETAP" };
+        const payload = { 
+            action: "update_status_lokasi", 
+            pin: API_BACKEND_PIN, 
+            user_name: localStorage.getItem('av_session_nama') || "Kru Tanpa Nama", 
+            rows: [rowIndex], 
+            new_lokasi: newLokasi, 
+            new_status: newStatus, 
+            new_tujuan: "TETAP" 
+        };
         const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) }); const data = await response.json();
         if(data.status === "success") { document.getElementById('detailModal').remove(); loadData(); showToast("✅ Status & Lokasi Diperbarui!"); } else { alert("Gagal:\n" + data.message); }
     } catch (e) { alert("Error Sistem:\n" + e.message); } finally { btn.disabled = false; btn.innerText = "💾 SIMPAN STATUS"; }
@@ -464,7 +476,6 @@ async function saveEditLokasiStatus(rowIndex) {
 
 function openAssignMissionModal() { 
     if (selectedRows.size === 0) { alert("Pilih minimal 1 barang!"); return; } 
-    // TEXT SUDAH DIBERSIHKAN DARI KOLOM P
     const modalHtml = `
     <div id="assignModal" class="modal-overlay active">
         <div class="modal-content" style="max-width:350px; padding:20px; background:white; border-radius:15px; position:relative;">
@@ -498,7 +509,15 @@ async function processAssignMission(btn) {
 
     btn.disabled = true; btn.innerText = "MENGIRIM KE SERVER... 🚀"; 
     try { 
-        const payload = { action: "assign_to_mission", pin: API_BACKEND_PIN, id_misi: missionId, new_tujuan: eventName, rows: Array.from(selectedRows), kode_barang_array: selectedCodes }; 
+        const payload = { 
+            action: "assign_to_mission", 
+            pin: API_BACKEND_PIN, 
+            user_name: localStorage.getItem('av_session_nama') || "Kru Tanpa Nama", 
+            id_misi: missionId, 
+            new_tujuan: eventName, 
+            rows: Array.from(selectedRows), 
+            kode_barang_array: selectedCodes 
+        }; 
         const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) }); const data = await response.json(); 
         if(data.status === "success") { document.getElementById('assignModal').remove(); toggleBulkMode(); showToast(`✅ Data Misi / Event berhasil diupdate!`); loadData(); } else { alert("Gagal:\n" + data.message); } 
     } catch (e) { alert("Error Sistem:\n" + e.message); } finally { btn.disabled = false; btn.innerText = "KIRIM UPDATE 🚀"; }
@@ -510,14 +529,15 @@ function handleNewFotos(input) { if (!input.files || input.files.length === 0) r
 function removeAddFoto(index) { pendingAddFotos.splice(index, 1); renderPreviewAddFotos(); }
 function renderPreviewAddFotos() { const container = document.getElementById("previewAddFotos"); container.innerHTML = ""; if (pendingAddFotos.length === 0) { container.innerHTML = `<span style="font-size:11px; color:gray;">Belum ada foto terpilih.</span>`; return; } pendingAddFotos.forEach((file, index) => { const reader = new FileReader(); reader.onload = (e) => { container.innerHTML += `<div style="position:relative; width:70px; height:70px; border-radius:8px; overflow:hidden; border:1px solid #ccc;"><img src="${e.target.result}" style="width:100%; height:100%; object-fit:cover;"><button type="button" onclick="removeAddFoto(${index})" style="position:absolute; top:2px; right:2px; background:#ef4444; color:white; border:none; border-radius:50%; width:20px; height:20px; font-size:10px; font-weight:bold; cursor:pointer;">✕</button></div>`; }; reader.readAsDataURL(file); }); }
 function compressImage(file, maxWidth = 1000) { return new Promise((resolve) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = (event) => { const img = new Image(); img.src = event.target.result; img.onload = () => { const canvas = document.createElement('canvas'); const scaleSize = maxWidth / img.width; canvas.width = maxWidth; canvas.height = img.height * scaleSize; const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, canvas.width, canvas.height); resolve(canvas.toDataURL('image/jpeg', 0.6)); }; }; }); }
+
 async function submitNewItem(e) { 
     e.preventDefault(); const btn = document.getElementById("btnSubmitAdd"); btn.innerText = "MENGOMPRES & UPLOAD..."; btn.disabled = true; 
     try { 
         let base64Fotos = ["", "", ""]; let maxFiles = Math.min(pendingAddFotos.length, 3); for (let i = 0; i < maxFiles; i++) { base64Fotos[i] = await compressImage(pendingAddFotos[i]); } 
         const payload = { 
             action: "add_item", 
-            pin: API_BACKEND_PIN,
-            user_name: currentUserName, // <--- INI KUNCI PENTINGNYA
+            pin: API_BACKEND_PIN, 
+            user_name: localStorage.getItem('av_session_nama') || "Kru Tanpa Nama", 
             nama: document.getElementById("addNama").value, 
             kode_barang: document.getElementById("addKode").value, 
             kode_wadah: document.getElementById("addWadah").value, 
@@ -526,7 +546,7 @@ async function submitNewItem(e) {
             keterangan_ref: document.getElementById("addKet").value, 
             lokasi: document.getElementById("addLokasi") ? document.getElementById("addLokasi").value : "Gudang Kanguru", 
             fotos: base64Fotos 
-        };
+        }; 
         const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) }); const data = await response.json(); 
         if (data.status === "success") { showToast("✅ Alat Tersimpan!"); closeAddModal(); loadData(); } else { alert("Gagal:\n" + data.message); } 
     } catch (err) { alert("Error Sistem:\n" + err.message); } finally { btn.innerText = "💾 SIMPAN ALAT"; btn.disabled = false; } 
@@ -629,6 +649,7 @@ async function submitEditFull(e) {
         const payload = { 
             action: "full_edit_item", 
             pin: API_BACKEND_PIN, 
+            user_name: localStorage.getItem('av_session_nama') || "Kru Tanpa Nama", 
             row_index: document.getElementById("editRowIndex").value, 
             nama: document.getElementById("editNama").value, 
             kode_barang: document.getElementById("editKode").value, 
@@ -787,7 +808,7 @@ function exportToExcel() {
     });
 
     if(daftarGudang.size === 0) {
-        daftarGudang.add("Gudang KC (SMG)"); daftarGudang.add("Gudang KC (JKT)"); daftarGudang.add("Gedung UTC"); daftarGudang.add("Di Lokasi Event");
+        daftarGudang.add("Gudang Kanguru"); daftarGudang.add("Gudang Mrican"); daftarGudang.add("Gedung UTC"); daftarGudang.add("Di Lokasi Event");
     }
 
     daftarGudang.forEach(gudang => {

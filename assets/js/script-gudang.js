@@ -1,5 +1,5 @@
 // ==========================================
-// MESIN LOGIKA GUDANG (V.10 - GALLERY WADAH OVERLAY & NAMA KRU)
+// MESIN LOGIKA GUDANG (V.11 - GALLERY WADAH SELALU MUNCUL)
 // ==========================================
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec"; 
@@ -44,6 +44,7 @@ function injectGudangDarkModeCSS() {
         body.dark-mode span[style*="background:#fef2f2"] { background: #7f1d1d !important; color: #fca5a5 !important; border-color: #991b1b !important; }
         body.dark-mode span[style*="background:#fef3c7"] { background: #78350f !important; color: #fbbf24 !important; border-color: #92400e !important; }
         body.dark-mode .btn-scanner-action { background: #334155 !important; color: #f8fafc !important; border-color: #475569 !important; }
+        body.dark-mode .gallery-box { background: transparent !important; }
     `;
     document.head.appendChild(style);
 }
@@ -241,18 +242,17 @@ function openDetailModal(item) {
             let wFotos = wadahItem.file_ids || wadahItem.fotos || [];
             let firstWFoto = wFotos.find(id => id && id.toString().trim().length > 5);
             
-            if (firstWFoto) {
-                let thumbWUrl = firstWFoto.includes("http") ? firstWFoto : `https://drive.google.com/thumbnail?id=${firstWFoto}&sz=w400`;
-                let highResWUrl = firstWFoto.includes("http") ? firstWFoto.replace('sz=800', 'sz=s2000') : `https://drive.google.com/thumbnail?id=${firstWFoto}&sz=s2000`;
-                
-                // Masukkan foto wadah ke dalam galeri dengan badge OVERLAY
-                galleryHtml += `
-                <div style="position:relative; display:inline-block; vertical-align:top; flex-shrink:0;">
-                    <img src="${thumbWUrl}" class="gallery-img" style="border:3px solid #ea580c; box-sizing:border-box;" onclick="openZoomModal('${highResWUrl}')">
-                    <span style="position:absolute; bottom:8px; left:50%; transform:translateX(-50%); background:#ea580c; color:white; font-size:10px; font-weight:900; padding:2px 8px; border-radius:4px; letter-spacing:1px; border:1px solid white; box-shadow:0 2px 4px rgba(0,0,0,0.5); pointer-events:none;">WADAH</span>
-                </div>`;
-                adaFoto = true;
-            }
+            // LOGIKA BARU: Meskipun wadah tidak ada foto, tetapkan placeholder agar "kotak wadah" tetap muncul di galeri!
+            let thumbWUrl = firstWFoto ? (firstWFoto.includes("http") ? firstWFoto : `https://drive.google.com/thumbnail?id=${firstWFoto}&sz=w400`) : 'https://placehold.co/400x400/EEEEEE/999999?text=NO+FOTO+WADAH';
+            let highResWUrl = firstWFoto ? (firstWFoto.includes("http") ? firstWFoto.replace('sz=800', 'sz=s2000') : `https://drive.google.com/thumbnail?id=${firstWFoto}&sz=s2000`) : thumbWUrl;
+            
+            // Masukkan foto wadah (atau placeholdernya) ke dalam galeri dengan badge OVERLAY
+            galleryHtml += `
+            <div style="position:relative; display:inline-block; vertical-align:top; flex-shrink:0;">
+                <img src="${thumbWUrl}" class="gallery-img" style="border:3px solid #ea580c; box-sizing:border-box;" onclick="openZoomModal('${highResWUrl}')">
+                <span style="position:absolute; bottom:8px; left:50%; transform:translateX(-50%); background:#ea580c; color:white; font-size:10px; font-weight:900; padding:2px 8px; border-radius:4px; letter-spacing:1px; border:1px solid white; box-shadow:0 2px 4px rgba(0,0,0,0.5); pointer-events:none;">WADAH</span>
+            </div>`;
+            adaFoto = true;
             
             wadahHeaderHtml = `<span style="display:inline-block; margin-left:5px; background:#fef3c7; color:#d97706; padding:2px 8px; border-radius:4px; border:1px solid #fde68a; font-size:9px;">🧰 IN-BOX</span>`;
             badgeWadahHtml = `<div style="margin-top:10px; margin-bottom:10px; cursor:pointer;" onclick="document.getElementById('searchInput').value='${kodeWadah}'; applyFilters(); document.getElementById('detailModal').remove();"><span style="display:inline-block; background:#fffbeb; color:#d97706; padding:6px 12px; border-radius:8px; border:1px solid #fde68a; font-size:11px; font-weight:bold;">🧰 Disimpan di: ${wadahItem.nama_barang} (#${kodeWadah})</span></div>`;

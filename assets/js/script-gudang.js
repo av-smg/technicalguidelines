@@ -1,5 +1,5 @@
 // ==========================================
-// MESIN LOGIKA GUDANG (V.15 - RADAR TERTINGGAL & SURAT JALAN PINTAR)
+// MESIN LOGIKA GUDANG (V.16 - FIX AUTO-SORT & LIGHTBOX)
 // ==========================================
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec"; 
@@ -84,15 +84,19 @@ async function loadData() {
         const data = await res.json(); 
         let rawItems = (data.inventory || []).filter(item => item.nama_barang && item.nama_barang.toString().trim().toLowerCase() !== 'nama barang'); 
         
-        // --- SMART SORTING: A-Z by Nama, Lalu 1-10 by Kode Barang ---
+        // --- PERBAIKAN SMART SORTING (SPASI DIBERSIHKAN DENGAN .TRIM()) ---
         rawItems.sort((a, b) => {
-            let nameA = (a.nama_barang || "").toLowerCase(); let nameB = (b.nama_barang || "").toLowerCase();
-            if (nameA < nameB) return -1; if (nameA > nameB) return 1;
-            let kodeA = (a.kode_barang || "").toLowerCase(); let kodeB = (b.kode_barang || "").toLowerCase();
+            let nameA = String(a.nama_barang || "").trim().toLowerCase(); 
+            let nameB = String(b.nama_barang || "").trim().toLowerCase();
+            if (nameA < nameB) return -1; 
+            if (nameA > nameB) return 1;
+            let kodeA = String(a.kode_barang || "").trim().toLowerCase(); 
+            let kodeB = String(b.kode_barang || "").trim().toLowerCase();
             return kodeA.localeCompare(kodeB, undefined, {numeric: true, sensitivity: 'base'});
         });
+        
         allItems = rawItems;
-        allMissions = data.missions || []; // Simpan data misi global
+        allMissions = data.missions || []; 
         optionsData = data.dropdowns || { lokasi: [], tim: [] }; 
         
         populateFilterTim(); document.getElementById("loading").style.display = "none"; 
@@ -162,21 +166,15 @@ function render(data) {
     data.forEach(item => {
         const card = document.createElement("div"); const isSelected = selectedRows.has(item.row_index); let stat = item.status_digunakan || "Di Gudang"; if(stat === 'FALSE') stat = "Di Gudang"; let lok = item.lokasi_saat_ini || item.lokasi || item["Lokasi Saat Ini"] || "Gudang Kanguru";
         
-        // 🔥 RADAR BARANG TERTINGGAL
         let isNyangkut = false;
         if (lok === 'Di Lokasi Event') {
-             // Cek apakah ada misi aktif yang melibatkan alat ini (atau wadahnya)
              let targetKode = (item.kode_barang || "").toLowerCase();
              let targetWadah = (item.kode_wadah || "").toLowerCase();
-             
              let adaMisiAktif = allMissions.some(m => {
-                 if (m.status_misi === 'Selesai') return false; // Abaikan misi selesai
+                 if (m.status_misi === 'Selesai') return false;
                  let kodeMisi = (m.kode_barang || "").toLowerCase();
-                 let matchBarang = targetKode !== "" && kodeMisi.includes(targetKode);
-                 let matchWadah = targetWadah !== "" && kodeMisi.includes(targetWadah);
-                 return matchBarang || matchWadah;
+                 return (targetKode !== "" && kodeMisi.includes(targetKode)) || (targetWadah !== "" && kodeMisi.includes(targetWadah));
              });
-             // Jika ada di lokasi event TAPI tidak ada misi aktif yang mempertanggungjawabkannya = NYANGKUT!
              if (!adaMisiAktif) isNyangkut = true;
         }
 
@@ -207,14 +205,20 @@ function openDetailModal(item) {
     const oldModal = document.getElementById("detailModal"); if(oldModal) oldModal.remove();
     let stat = item.status_digunakan || "Di Gudang"; if(stat === 'FALSE') stat = "Di Gudang"; let lok = item.lokasi_saat_ini || item.lokasi || item["Lokasi Saat Ini"] || "Gudang Kanguru";
     
+    // --- PERBAIKAN LIGHTBOX (TANPA REGEX) ---
     let safeFileIds = item.file_ids || item.fotos || [];
-    let validHighResUrls = []; let galleryHtml = `<div class="detail-gallery">`; let adaFoto = false;
+    let validHighResUrls = []; 
+    let validThumbs = []; 
+    let adaFoto = false;
     
     safeFileIds.forEach((fileId, i) => { 
         if(fileId && fileId.length > 5) { 
-            let thumbUrl = fileId.includes("http") ? fileId : `https://drive.google.com/thumbnail?id=${fileId}&sz=w400`; let highResUrl = fileId.includes("http") ? fileId.replace('sz=800', 'sz=s2000') : `https://drive.google.com/thumbnail?id=${fileId}&sz=s2000`; 
-            validHighResUrls.push(highResUrl); let arrayStr = encodeURIComponent(JSON.stringify(validHighResUrls));
-            if(i < 3) { galleryHtml += `<img src="${thumbUrl}" class="gallery-img" onclick="openCustomLightbox(${validHighResUrls.length - 1}, '${arrayStr}')">`; } adaFoto = true; 
+            let thumbUrl = fileId.includes("http") ? fileId : `https://drive.google.com/thumbnail?id=${fileId}&sz=w400`; 
+            let highResUrl = fileId.includes("http") ? fileId.replace('sz=800', 'sz=s2000') : `https://drive.google.com/thumbnail?id=${fileId}&sz=s2000`; 
+            if(i < 3) { 
+                validHighResUrls.push(highResUrl); 
+                validThumbs.push({ url: thumbUrl, type: 'alat' }); 
+            } 
         } 
     });
 
@@ -227,13 +231,8 @@ function openDetailModal(item) {
             let thumbWUrl = firstWFoto ? (firstWFoto.includes("http") ? firstWFoto : `https://drive.google.com/thumbnail?id=${firstWFoto}&sz=w400`) : 'https://placehold.co/400x400/EEEEEE/999999?text=NO+FOTO+WADAH';
             let highResWUrl = firstWFoto ? (firstWFoto.includes("http") ? firstWFoto.replace('sz=800', 'sz=s2000') : `https://drive.google.com/thumbnail?id=${firstWFoto}&sz=s2000`) : thumbWUrl;
             
-            validHighResUrls.push(highResWUrl); let arrayStrUpdated = encodeURIComponent(JSON.stringify(validHighResUrls));
-            
-            galleryHtml += `
-            <div style="position:relative; display:inline-block; vertical-align:top; flex-shrink:0;">
-                <img src="${thumbWUrl}" class="gallery-img" style="border:3px solid #ea580c; box-sizing:border-box;" onclick="openCustomLightbox(${validHighResUrls.length - 1}, '${arrayStrUpdated}')">
-                <span style="position:absolute; bottom:8px; left:50%; transform:translateX(-50%); background:#ea580c; color:white; font-size:10px; font-weight:900; padding:2px 8px; border-radius:4px; letter-spacing:1px; border:1px solid white; box-shadow:0 2px 4px rgba(0,0,0,0.5); pointer-events:none;">WADAH</span>
-            </div>`; adaFoto = true;
+            validHighResUrls.push(highResWUrl); 
+            validThumbs.push({ url: thumbWUrl, type: 'wadah' });
             
             wadahHeaderHtml = `<span style="display:inline-block; margin-left:5px; background:#fef3c7; color:#d97706; padding:2px 8px; border-radius:4px; border:1px solid #fde68a; font-size:9px;">🧰 IN-BOX</span>`;
             badgeWadahHtml = `<div style="margin-top:10px; margin-bottom:10px; cursor:pointer;" onclick="document.getElementById('searchInput').value='${kodeWadah}'; applyFilters(); document.getElementById('detailModal').remove();"><span style="display:inline-block; background:#fffbeb; color:#d97706; padding:6px 12px; border-radius:8px; border:1px solid #fde68a; font-size:11px; font-weight:bold;">🧰 Disimpan di: ${wadahItem.nama_barang} (#${kodeWadah})</span></div>`;
@@ -244,9 +243,20 @@ function openDetailModal(item) {
     }
     
     let finalArrayStr = encodeURIComponent(JSON.stringify(validHighResUrls));
-    galleryHtml = galleryHtml.replace(/openCustomLightbox\(\d+,\s*'.*?'\)/g, function(match) { return match.replace(/'.*'/, `'${finalArrayStr}'`); });
-
-    if(!adaFoto) galleryHtml += `<img src="https://placehold.co/300x200/EEEEEE/999999?text=Tidak+Ada+Foto" class="gallery-img" style="width:100%;">`; 
+    let galleryHtml = `<div class="detail-gallery">`;
+    
+    if (validThumbs.length > 0) {
+        adaFoto = true;
+        validThumbs.forEach((tObj, index) => {
+            if (tObj.type === 'alat') {
+                galleryHtml += `<img src="${tObj.url}" class="gallery-img" onclick="openCustomLightbox(${index}, '${finalArrayStr}')">`;
+            } else {
+                galleryHtml += `<div style="position:relative; display:inline-block; vertical-align:top; flex-shrink:0;"><img src="${tObj.url}" class="gallery-img" style="border:3px solid #ea580c; box-sizing:border-box;" onclick="openCustomLightbox(${index}, '${finalArrayStr}')"><span style="position:absolute; bottom:8px; left:50%; transform:translateX(-50%); background:#ea580c; color:white; font-size:10px; font-weight:900; padding:2px 8px; border-radius:4px; letter-spacing:1px; border:1px solid white; box-shadow:0 2px 4px rgba(0,0,0,0.5); pointer-events:none;">WADAH</span></div>`;
+            }
+        });
+    } else {
+        galleryHtml += `<img src="https://placehold.co/300x200/EEEEEE/999999?text=Tidak+Ada+Foto" class="gallery-img" style="width:100%;">`;
+    }
     galleryHtml += `</div>`;
     
     let isiWadahHtml = ""; 
@@ -287,7 +297,6 @@ function openDetailModal(item) {
     document.body.insertAdjacentHTML('beforeend', modalHtml);
 }
 
-// 🖨️ CETAK SURAT JALAN PINTAR (PAGE BREAK PER GUDANG & CHECKBOX SMART)
 function printSuratJalan() { 
     let currentData = getFilteredData();
     let bawaData = currentData.filter(i => i.status_digunakan === 'Akan Dibawa'); 
@@ -297,7 +306,6 @@ function printSuratJalan() {
     let eventName = bawaData[0].tujuan || "____________________"; 
     bawaData.sort((a, b) => (a.nama_barang || "").localeCompare(b.nama_barang || ""));
     
-    // Kelompokkan Berdasarkan LOKASI GUDANG dulu!
     let lokasiGroups = {};
     bawaData.forEach(item => {
         let lok = item.lokasi_saat_ini || item.lokasi || item["Lokasi Saat Ini"] || "Gudang Tidak Diketahui";
@@ -311,7 +319,7 @@ function printSuratJalan() {
     let isFirstPage = true;
 
     for (let lok in lokasiGroups) {
-        if (!isFirstPage) { html += `<div class="page-break"></div>`; } // Pisah Halaman per Gudang!
+        if (!isFirstPage) { html += `<div class="page-break"></div>`; } 
         isFirstPage = false;
 
         html += `<div class="header"><h2 style="margin:0;">MANIFEST LOGISTIK / SURAT JALAN</h2><p style="margin:5px 0 0 0; color:#444; font-size:12px;">Daftar Pengeluaran - Sumber: <b style="font-size:14px; padding:2px 6px; background:#ddd;">📍 ${lok.toUpperCase()}</b></p></div>`;
@@ -331,10 +339,8 @@ function printSuratJalan() {
             for (let wadah in groupedWadah) { 
                 let boxItem = allItems.find(i => i.kode_barang && i.kode_barang.toUpperCase() === wadah); 
                 let boxName = boxItem ? boxItem.nama_barang.toUpperCase() : `WADAH #${wadah}`; 
-                // CHECKBOX HANYA UNTUK KOTAK BESAR (WADAH)
                 html += `<div class="box-group"><div class="box-header"><div class="checkbox"></div> 🧰 ${boxName}  <span style="margin-left:auto; font-weight:normal; font-size:11px; color:#333;">#${wadah}</span></div><ul class="item-list">`; 
                 groupedWadah[wadah].forEach(item => { 
-                    // ISINYA TANPA CHECKBOX (Hanya bullet point)
                     html += `<li class="item-row"><span>• ${item.nama_barang} ${item.kode_barang ? ` <i style="color:#555; font-size:10px;">(#${item.kode_barang})</i>` : ''}</span><span class="qty">${item.jumlah} Pcs</span></li>`; 
                 }); 
                 html += `</ul></div>`; 
@@ -344,7 +350,6 @@ function printSuratJalan() {
         if (lepasan.length > 0) {
             html += `<h4 style="margin-top:15px; margin-bottom:8px; border-bottom:2px solid #000; display:inline-block; font-size:14px;">📌 BARANG LEPASAN (TANPA BOX)</h4><div class="box-group"><ul class="item-list">`;
             lepasan.forEach(item => { 
-                // CHECKBOX UNTUK MASING-MASING BARANG LEPASAN
                 html += `<li class="item-row" style="padding:6px 12px; margin-left:0;"><div style="display:flex; align-items:flex-start;"><div class="checkbox"></div> <span><b>${item.nama_barang.toUpperCase()}</b> ${item.kode_barang ? ` <i style="color:#555; font-size:10px;">(#${item.kode_barang})</i>` : ''}</span></div><span class="qty">${item.jumlah} Pcs</span></li>`; 
             }); 
             html += `</ul></div>`;

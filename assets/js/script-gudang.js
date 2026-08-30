@@ -1,5 +1,5 @@
 // ==========================================
-// MESIN LOGIKA GUDANG (V.17 - FIX TOTAL GALERI & SORTING KODE)
+// MESIN LOGIKA GUDANG (V.18 - FIX NATIVE GALLERY & KODE SORTING)
 // ==========================================
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec"; 
@@ -11,7 +11,7 @@ let isAdminMode = false, isBulkMode = false, selectedRows = new Set(), lastScanT
 let pendingAddFotos = []; let pendingEditFotos = []; 
 let currentCameraFacing = "environment"; let isFlashlightOn = false;
 
-window.onload = () => { injectGudangDarkModeCSS(); checkAdminStatus(); injectLightbox(); loadData(); };
+window.onload = () => { injectGudangDarkModeCSS(); checkAdminStatus(); loadData(); };
 
 function injectGudangDarkModeCSS() {
     if(document.getElementById('gudangDarkModeCss')) return;
@@ -41,45 +41,56 @@ function injectGudangDarkModeCSS() {
         body.dark-mode span[style*="background:#f0fdf4"] { background: #064e3b !important; color: #34d399 !important; border-color: #047857 !important; }
         body.dark-mode span[style*="background:#fef2f2"] { background: #7f1d1d !important; color: #fca5a5 !important; border-color: #991b1b !important; }
         body.dark-mode span[style*="background:#fef3c7"] { background: #78350f !important; color: #fbbf24 !important; border-color: #92400e !important; }
-        body.dark-mode .gallery-box { background: transparent !important; }
     `;
     document.head.appendChild(style);
 }
 
 // ==========================================
-// FIX: SISTEM GALERI (MENGHAPUS REGEX)
+// FIX: SISTEM ZOOM MODAL PINTAR (MENDAUR ULANG ELEMEN LAMA)
 // ==========================================
-window.currentGalleryUrls = []; // Penyimpanan Global Anti-Bug
-let lbIndex = 0;
+window.currentZoomUrls = [];
+window.currentZoomIndex = 0;
 
-function injectLightbox() {
-    if(document.getElementById('customLightbox')) return;
-    document.body.insertAdjacentHTML('beforeend', `
-        <div id="customLightbox" class="modal-overlay" style="z-index:2147483647; display:none; flex-direction:column; align-items:center; justify-content:center; background:rgba(0,0,0,0.95); backdrop-filter:blur(5px);">
-            <button onclick="closeLightbox()" style="position:absolute; top:20px; right:20px; background:#ef4444; color:white; border:none; border-radius:50%; width:40px; height:40px; font-weight:bold; font-size:16px; cursor:pointer; z-index:99;">✕</button>
-            <div style="display:flex; align-items:center; justify-content:center; width:100%; max-width:800px; gap:15px; padding:0 10px; box-sizing:border-box;">
-                <button onclick="prevLightbox()" style="background:rgba(255,255,255,0.2); color:white; border:none; border-radius:50%; width:45px; height:45px; font-weight:bold; font-size:20px; cursor:pointer; flex-shrink:0;">❮</button>
-                <img id="lightboxImg" src="" style="max-width:100%; max-height:75vh; border-radius:12px; object-fit:contain; box-shadow:0 10px 30px rgba(0,0,0,0.5);">
-                <button onclick="nextLightbox()" style="background:rgba(255,255,255,0.2); color:white; border:none; border-radius:50%; width:45px; height:45px; font-weight:bold; font-size:20px; cursor:pointer; flex-shrink:0;">❯</button>
-            </div>
-            <div id="lightboxCounter" style="color:#cbd5e1; margin-top:15px; font-size:14px; font-weight:bold; background:rgba(0,0,0,0.5); padding:5px 15px; border-radius:20px;"></div>
-        </div>
-    `);
-}
-function openCustomLightbox(index) { 
-    lbIndex = index; 
-    updateLightboxUI(); 
-    document.getElementById('customLightbox').style.display = 'flex'; 
-}
-function closeLightbox() { document.getElementById('customLightbox').style.display = 'none'; }
-function nextLightbox() { lbIndex = (lbIndex + 1) % window.currentGalleryUrls.length; updateLightboxUI(); }
-function prevLightbox() { lbIndex = (lbIndex - 1 + window.currentGalleryUrls.length) % window.currentGalleryUrls.length; updateLightboxUI(); }
-function updateLightboxUI() { 
-    if(window.currentGalleryUrls.length > 0) {
-        document.getElementById('lightboxImg').src = window.currentGalleryUrls[lbIndex]; 
-        document.getElementById('lightboxCounter').innerText = `Foto ${lbIndex + 1} dari ${window.currentGalleryUrls.length}`; 
+function openZoomModalIndex(index) {
+    window.currentZoomIndex = index;
+    const zoomModal = document.getElementById("zoomModal");
+    const zoomImg = document.getElementById("zoomImgSrc");
+    
+    if (!document.getElementById("btnNextZoom")) {
+        zoomModal.insertAdjacentHTML('beforeend', `
+            <button id="btnPrevZoom" onclick="event.stopPropagation(); prevZoom()" style="position:absolute; left:15px; top:50%; transform:translateY(-50%); background:rgba(0,0,0,0.6); color:white; border:none; border-radius:50%; width:45px; height:45px; font-weight:bold; font-size:20px; cursor:pointer; z-index:1000001; backdrop-filter:blur(4px);">❮</button>
+            <button id="btnNextZoom" onclick="event.stopPropagation(); nextZoom()" style="position:absolute; right:15px; top:50%; transform:translateY(-50%); background:rgba(0,0,0,0.6); color:white; border:none; border-radius:50%; width:45px; height:45px; font-weight:bold; font-size:20px; cursor:pointer; z-index:1000001; backdrop-filter:blur(4px);">❯</button>
+            <div id="zoomCounter" style="position:absolute; bottom:25px; left:50%; transform:translateX(-50%); color:#f8fafc; font-size:14px; font-weight:bold; background:rgba(0,0,0,0.7); padding:6px 16px; border-radius:20px; z-index:1000001; backdrop-filter:blur(4px);"></div>
+        `);
     }
+    
+    zoomImg.src = window.currentZoomUrls[window.currentZoomIndex];
+    
+    if(window.currentZoomUrls.length > 1) {
+        document.getElementById("btnPrevZoom").style.display = "block";
+        document.getElementById("btnNextZoom").style.display = "block";
+        document.getElementById("zoomCounter").style.display = "block";
+        document.getElementById("zoomCounter").innerText = `Foto ${window.currentZoomIndex + 1} dari ${window.currentZoomUrls.length}`;
+    } else {
+        document.getElementById("btnPrevZoom").style.display = "none";
+        document.getElementById("btnNextZoom").style.display = "none";
+        document.getElementById("zoomCounter").style.display = "none";
+    }
+    
+    zoomModal.classList.add("active");
 }
+
+function nextZoom() { window.currentZoomIndex = (window.currentZoomIndex + 1) % window.currentZoomUrls.length; document.getElementById("zoomImgSrc").src = window.currentZoomUrls[window.currentZoomIndex]; document.getElementById("zoomCounter").innerText = `Foto ${window.currentZoomIndex + 1} dari ${window.currentZoomUrls.length}`; }
+function prevZoom() { window.currentZoomIndex = (window.currentZoomIndex - 1 + window.currentZoomUrls.length) % window.currentZoomUrls.length; document.getElementById("zoomImgSrc").src = window.currentZoomUrls[window.currentZoomIndex]; document.getElementById("zoomCounter").innerText = `Foto ${window.currentZoomIndex + 1} dari ${window.currentZoomUrls.length}`; }
+
+function closeZoomModal() { 
+    const m = document.getElementById("zoomModal");
+    if(m) m.classList.remove("active"); 
+    setTimeout(() => { const img = document.getElementById("zoomImgSrc"); if(img) img.src = ""; }, 300); 
+}
+
+// Backup untuk kompatibilitas script lama
+function openZoomModal(url) { window.currentZoomUrls = [url]; openZoomModalIndex(0); }
 
 function checkAdminStatus() { 
     const currentUserRole = localStorage.getItem('av_session_role');
@@ -99,13 +110,12 @@ async function loadData() {
         let rawItems = (data.inventory || []).filter(item => item.nama_barang && item.nama_barang.toString().trim().toLowerCase() !== 'nama barang'); 
         
         // ==========================================
-        // FIX: SMART SORTING (PRIORITAS KODE BARANG!)
+        // FIX: SMART SORTING (KODE BARANG NOMOR 1!)
         // ==========================================
         rawItems.sort((a, b) => {
             let kodeA = String(a.kode_barang || "").trim().toUpperCase(); 
             let kodeB = String(b.kode_barang || "").trim().toUpperCase();
             
-            // 1. Urutkan berdasarkan Kode Barang (A-Z, 1-100)
             if (kodeA && !kodeB) return -1;
             if (!kodeA && kodeB) return 1;
             if (kodeA && kodeB) {
@@ -113,7 +123,6 @@ async function loadData() {
                 if (cmpKode !== 0) return cmpKode;
             }
             
-            // 2. Jika kode barangnya sama atau kosong, baru urutkan berdasarkan Nama Alat
             let nameA = String(a.nama_barang || "").trim().toUpperCase(); 
             let nameB = String(b.nama_barang || "").trim().toUpperCase();
             return nameA.localeCompare(nameB, undefined, {numeric: true, sensitivity: 'base'});
@@ -229,9 +238,9 @@ function openDetailModal(item) {
     const oldModal = document.getElementById("detailModal"); if(oldModal) oldModal.remove();
     let stat = item.status_digunakan || "Di Gudang"; if(stat === 'FALSE') stat = "Di Gudang"; let lok = item.lokasi_saat_ini || item.lokasi || item["Lokasi Saat Ini"] || "Gudang Kanguru";
     
-    // --- PERBAIKAN GALERI (TANPA CSS SCROLL-SNAP AGAR TIDAK MACET) ---
+    // --- FIX NATIVE CSS GALLERY (TIDAK ADA LAGI INLINE STYLE YANG BIKIN STUCK) ---
     let safeFileIds = item.file_ids || item.fotos || [];
-    window.currentGalleryUrls = []; // Reset penampung global
+    window.currentZoomUrls = []; 
     let validThumbs = []; 
     let adaFoto = false;
     
@@ -240,7 +249,7 @@ function openDetailModal(item) {
             let thumbUrl = fileId.includes("http") ? fileId : `https://drive.google.com/thumbnail?id=${fileId}&sz=w400`; 
             let highResUrl = fileId.includes("http") ? fileId.replace('sz=800', 'sz=s2000') : `https://drive.google.com/thumbnail?id=${fileId}&sz=s2000`; 
             if(i < 3) { 
-                window.currentGalleryUrls.push(highResUrl); 
+                window.currentZoomUrls.push(highResUrl); 
                 validThumbs.push({ url: thumbUrl, type: 'alat' }); 
             } 
         } 
@@ -255,7 +264,7 @@ function openDetailModal(item) {
             let thumbWUrl = firstWFoto ? (firstWFoto.includes("http") ? firstWFoto : `https://drive.google.com/thumbnail?id=${firstWFoto}&sz=w400`) : 'https://placehold.co/400x400/EEEEEE/999999?text=NO+FOTO+WADAH';
             let highResWUrl = firstWFoto ? (firstWFoto.includes("http") ? firstWFoto.replace('sz=800', 'sz=s2000') : `https://drive.google.com/thumbnail?id=${firstWFoto}&sz=s2000`) : thumbWUrl;
             
-            window.currentGalleryUrls.push(highResWUrl); 
+            window.currentZoomUrls.push(highResWUrl); 
             validThumbs.push({ url: thumbWUrl, type: 'wadah' });
             
             wadahHeaderHtml = `<span style="display:inline-block; margin-left:5px; background:#fef3c7; color:#d97706; padding:2px 8px; border-radius:4px; border:1px solid #fde68a; font-size:9px;">🧰 IN-BOX</span>`;
@@ -266,20 +275,20 @@ function openDetailModal(item) {
         }
     }
     
-    // Inject CSS In-line Agar Scrolling Lancar (Timpa CSS Lama)
-    let galleryHtml = `<div style="display:flex; gap:10px; overflow-x:auto; padding-bottom:10px; scroll-snap-type:none; -webkit-overflow-scrolling:touch;">`;
+    // Murni Memakai CSS Asli index.html (.detail-gallery, .gallery-box, dll)
+    let galleryHtml = `<div class="detail-gallery">`;
     
     if (validThumbs.length > 0) {
         adaFoto = true;
         validThumbs.forEach((tObj, index) => {
             if (tObj.type === 'alat') {
-                galleryHtml += `<img src="${tObj.url}" style="height:160px; min-width:160px; max-width:160px; object-fit:cover; border-radius:10px; border:1px solid #e2e8f0; cursor:zoom-in; flex-shrink:0;" onclick="openCustomLightbox(${index})">`;
+                galleryHtml += `<img src="${tObj.url}" class="gallery-img" onclick="openZoomModalIndex(${index})">`;
             } else {
-                galleryHtml += `<div style="position:relative; display:inline-block; vertical-align:top; flex-shrink:0;"><img src="${tObj.url}" style="height:160px; min-width:160px; max-width:160px; object-fit:cover; border-radius:10px; border:3px solid #ea580c; box-sizing:border-box; cursor:zoom-in;" onclick="openCustomLightbox(${index})"><span style="position:absolute; bottom:8px; left:50%; transform:translateX(-50%); background:#ea580c; color:white; font-size:10px; font-weight:900; padding:2px 8px; border-radius:4px; letter-spacing:1px; border:1px solid white; box-shadow:0 2px 4px rgba(0,0,0,0.5); pointer-events:none;">WADAH</span></div>`;
+                galleryHtml += `<div class="gallery-box"><img src="${tObj.url}" class="gallery-img" style="border:3px solid #ea580c; box-sizing:border-box;" onclick="openZoomModalIndex(${index})"><span class="badge-wadah">WADAH</span></div>`;
             }
         });
     } else {
-        galleryHtml += `<img src="https://placehold.co/300x200/EEEEEE/999999?text=Tidak+Ada+Foto" style="height:160px; width:100%; object-fit:cover; border-radius:10px; border:1px solid #e2e8f0;">`;
+        galleryHtml += `<img src="https://placehold.co/300x200/EEEEEE/999999?text=Tidak+Ada+Foto" class="gallery-img" style="width:100%;">`;
     }
     galleryHtml += `</div>`;
     

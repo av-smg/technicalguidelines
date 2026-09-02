@@ -554,3 +554,179 @@ function executeCustomExport() {
     dataToExport.forEach(row => { let nama = `"${(row.nama_barang || "").replace(/"/g, '""')}"`; let kode = `"${row.kode_barang || "-"}"`; let wadah = `"${row.kode_wadah || "-"}"`; let kondisi = `"${row.kondisi || "Bagus"}"`; let lokasi = `"${row.lokasi_saat_ini || row.lokasi || row["Lokasi Saat Ini"] || "Gudang Kanguru"}"`; let status = `"${row.status_digunakan && row.status_digunakan !== 'FALSE' ? row.status_digunakan : 'Di Gudang'}"`; let qty = `"${row.jumlah || 1}"`; let tim = `"${row.tim || "-"}"`; csvContent += `${kode},${nama},${wadah},${kondisi},${lokasi},${status},${qty},${tim}\n`; });
     let encodedUri = encodeURI(csvContent); let link = document.createElement("a"); link.setAttribute("href", encodedUri); let dateStr = new Date().toISOString().slice(0,10); link.setAttribute("download", `Laporan_GudangAV_${dateStr}.csv`); document.body.appendChild(link); link.click(); document.body.removeChild(link); closeExportModal(); showToast(`✅ SUKSES: ${dataToExport.length} data diekspor!`);
 }
+// 🖨️ CETAK FORM CO-31 (PESANAN PENGIRIMAN REGIONAL)
+function printFormCO31() { 
+    let currentData = getFilteredData();
+    let bawaData = currentData.filter(i => i.status_digunakan === 'Akan Dibawa'); 
+    
+    if(bawaData.length === 0) return alert("Kosong! Belum ada barang dengan status '🛒 Akan Dibawa' pada filter lokasi saat ini."); 
+    
+    let eventName = bawaData[0].tujuan || "____________________"; 
+    bawaData.sort((a, b) => (a.nama_barang || "").localeCompare(b.nama_barang || ""));
+    
+    // Pemisahan Halaman Berdasarkan Gudang Asal
+    let lokasiGroups = {};
+    bawaData.forEach(item => {
+        let lok = item.lokasi_saat_ini || item.lokasi || item["Lokasi Saat Ini"] || "Gudang Tidak Diketahui";
+        if (!lokasiGroups[lok]) lokasiGroups[lok] = [];
+        lokasiGroups[lok].push(item);
+    });
+
+    let printWin = window.open('', '', 'width=900,height=800'); 
+    let html = `<html><head><title>Form CO-31 - ${eventName}</title><style>
+        @page { size: A4 portrait; margin: 10mm 15mm; } 
+        body { font-family: 'Arial', sans-serif; padding: 0; color: #000; margin: 0; font-size:12px; } 
+        .underline { border-bottom: 1px solid #000; display: inline-block; } 
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; margin-bottom: 20px; } 
+        th { border-top: 2px solid #000; border-bottom: 2px solid #000; padding: 6px; text-align: left; font-size:12px;} 
+        td { border-bottom: 1px solid #000; padding: 6px; vertical-align: top; font-size:12px; height: 25px;} 
+        .page-break { page-break-before: always; } 
+        @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+    </style></head><body onload="window.print()">`;
+
+    let isFirstPage = true;
+
+    for (let lok in lokasiGroups) {
+        if (!isFirstPage) { html += `<div class="page-break"></div>`; } 
+        isFirstPage = false;
+
+        // --- HEADER CO-31 ---
+        html += `
+        <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+            <div style="font-size:14px; font-weight:bold;">No.:<span class="underline" style="width:120px; margin-left:5px;"></span></div>
+            <div style="font-size:16px; font-weight:bold; text-align:center; flex:1;">PESANAN PENGIRIMAN UNTUK KEBAKTIAN REGIONAL</div>
+            <div style="font-size:12px;">Tanggal:<span class="underline" style="width:120px; margin-left:5px;"></span></div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; margin-top:20px; font-size:12px;">
+            <div style="width:48%;">
+                <div style="display:flex; align-items:flex-end; margin-bottom:10px;">
+                    <div style="width:30px;">Dari:</div>
+                    <div style="flex:1; border-bottom:1px solid black; height:18px;"></div>
+                </div>
+                <div style="border-bottom:1px solid black; height:18px; margin-bottom:10px;"></div>
+                <div style="display:flex; align-items:flex-end; margin-bottom:10px;">
+                    <div style="flex:1; border-bottom:1px solid black; height:18px;">Pengawas Audio/Video</div>
+                </div>
+            </div>
+            <div style="width:48%;">
+                <div style="display:flex; align-items:flex-end;">
+                    <div style="width:50px;">Kepada:</div>
+                    <div style="flex:1; border-bottom:1px solid black; height:18px;"></div>
+                </div>
+                <div style="font-size:9px; text-align:center; height:12px;">(Departemen)</div>
+                <div style="border-bottom:1px solid black; height:18px;"></div>
+                <div style="font-size:9px; text-align:center; height:12px;">(Lokasi)</div>
+                <div style="border-bottom:1px solid black; height:18px;"></div>
+            </div>
+        </div>
+
+        <div style="margin-top:15px; display:flex; justify-content:space-between; font-size:12px;">
+            <div>Tanggal Diperlukan: <span class="underline" style="width:150px;"></span></div>
+            <div>Waktu: Pagi <span class="underline" style="width:50px;"></span> Siang/Malam <span class="underline" style="width:50px;"></span></div>
+            <div>Biaya: <span class="underline" style="width:100px;"></span></div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:12%; text-align:center;">Jumlah</th>
+                    <th style="width:48%;">Uraian</th>
+                    <th style="width:25%;">Ukuran dan Berat</th>
+                    <th style="width:15%;">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+        `;
+
+        // --- PENGISIAN ITEM OTOMATIS ---
+        let itemsInLok = lokasiGroups[lok];
+        let groupedWadah = {}; let lepasan = [];
+        
+        itemsInLok.forEach(item => { 
+            let wadah = (item.kode_wadah || "").toUpperCase().trim(); 
+            if (wadah) { if (!groupedWadah[wadah]) groupedWadah[wadah] = []; groupedWadah[wadah].push(item); } 
+            else { lepasan.push(item); } 
+        });
+
+        // Loop untuk Hardcase/Wadah & Isinya
+        if (Object.keys(groupedWadah).length > 0) {
+            for (let wadah in groupedWadah) { 
+                let boxItem = allItems.find(i => i.kode_barang && i.kode_barang.toUpperCase() === wadah); 
+                let boxName = boxItem ? boxItem.nama_barang.toUpperCase() : `WADAH #${wadah}`; 
+                
+                // Baris Induk (Wadah)
+                html += `<tr>
+                    <td style="text-align:center; font-weight:bold;">1 Pcs</td>
+                    <td style="font-weight:bold;">🧰 ${boxName} (#${wadah})</td>
+                    <td></td>
+                    <td></td>
+                </tr>`; 
+                
+                // Baris Anak (Isi Kabel/Alat di dalamnya)
+                groupedWadah[wadah].forEach(item => { 
+                    html += `<tr>
+                        <td style="text-align:center;">${item.jumlah} Pcs</td>
+                        <td style="padding-left:15px; color:#333;">- ${item.nama_barang} ${item.kode_barang ? `(#${item.kode_barang})` : ''}</td>
+                        <td></td>
+                        <td></td>
+                    </tr>`; 
+                }); 
+            }
+        }
+
+        // Loop untuk Barang Lepasan
+        if (lepasan.length > 0) {
+            lepasan.forEach(item => { 
+                html += `<tr>
+                    <td style="text-align:center; font-weight:bold;">${item.jumlah} Pcs</td>
+                    <td style="font-weight:bold;">${item.nama_barang.toUpperCase()} ${item.kode_barang ? `(#${item.kode_barang})` : ''}</td>
+                    <td></td>
+                    <td></td>
+                </tr>`; 
+            }); 
+        }
+        
+        // --- FOOTER CO-31 ---
+        html += `
+            </tbody>
+        </table>
+
+        <div style="margin-top:20px; font-size:12px; page-break-inside: avoid;">
+            <div style="margin-bottom:15px; display:flex;">
+                <span style="white-space:nowrap; margin-right:5px;">Catatan:</span>
+                <span class="underline" style="flex:1;"></span>
+            </div>
+            <div style="margin-bottom:15px; display:flex;">
+                <span class="underline" style="flex:1;"></span>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; margin-top:30px;">
+                <div style="width:45%;">
+                    <div style="display:flex; align-items:flex-end; margin-bottom:15px;">
+                        <div style="width:80px;">Diterima oleh:</div>
+                        <div style="flex:1; border-bottom:1px solid black; height:18px;"></div>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <div>Tanggal: <span class="underline" style="width:80px;"></span></div>
+                        <div>Waktu: <span class="underline" style="width:80px;"></span></div>
+                    </div>
+                </div>
+                <div style="width:45%; text-align:center; display:flex; flex-direction:column; justify-content:flex-end;">
+                    <div style="font-size:13px; margin-bottom:2px;">[Bagian ini akan diisi oleh Kantor Cabang]</div>
+                    <div style="border-bottom:1px solid black; height:25px; margin:0 20px;"></div>
+                    <div style="font-size:10px;">(Disetujui oleh)</div>
+                </div>
+            </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; font-size:9px; margin-top:40px; color:#555; page-break-inside: avoid;">
+            <div>CO-31-IN 1/06</div>
+            <div>Dicetak di Indonesia</div>
+        </div>
+        `;
+    }
+    
+    html += `</body></html>`;
+    printWin.document.write(html); printWin.document.close(); 
+}

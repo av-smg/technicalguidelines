@@ -6,7 +6,7 @@ location: "MASTER"
 <head>
     {% include head.html %}
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-    <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/custom-gudang.css?v=28.0">
+    <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/custom-gudang.css?v=52.0">
     
     <style>
         .form-input { width: 100%; padding: 10px; margin-bottom: 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 12px; }
@@ -68,14 +68,17 @@ location: "MASTER"
                 <button onclick="openScannerModal()" style="padding:8px 12px; border-radius:6px; background:#1e293b; color:white; border:none; font-weight:bold; font-size:11px; display:flex; align-items:center; gap:4px;">📷 Scan QR</button>
             </div>
             
-            <!-- DITAMBAHKAN TOMBOL EXPORT EXCEL -->
             <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
                 <button onclick="openAddModal()" class="aksi-gudang" style="padding:6px 12px; border-radius:6px; background:#16a34a; color:white; border:none; font-weight:bold; font-size:11px;">➕ Tambah</button>
                 <button id="btnBulkMode" onclick="toggleBulkMode()" class="aksi-gudang" style="padding:6px 12px; border-radius:6px; background:#ea580c; color:white; border:none; font-weight:bold; font-size:11px;">🛒 Massal</button>
                 <button onclick="printSuratJalan()" class="aksi-gudang" style="padding:6px 12px; border-radius:6px; background:#3b82f6; color:white; border:none; font-weight:bold; font-size:11px;">📄 Cetak</button>
                 <button onclick="printFormCO31()" class="aksi-gudang" style="padding:6px 12px; border-radius:6px; background:#8b5cf6; color:white; border:none; font-weight:bold; font-size:11px;">📄 Cetak CO-31</button>
                 <button onclick="exportToExcel()" class="aksi-gudang" style="padding:6px 12px; border-radius:6px; background:#10b981; color:white; border:none; font-weight:bold; font-size:11px;">📥 Export Excel</button>
-                <button id="btnViewToggle" onclick="toggleViewMode()" style="padding:6px 12px; border-radius:6px; background:#f1f5f9; color:#334155; border:1px solid #ccc; font-weight:bold; font-size:11px; margin-left:auto;">📄 List View</button>
+                
+                <div style="margin-left:auto; display:flex; gap:6px;">
+                    <button id="btnWadahToggle" onclick="toggleWadahMode()" style="padding:6px 12px; border-radius:6px; background:#f1f5f9; color:#334155; border:1px solid #ccc; font-weight:bold; font-size:11px; transition:0.2s;">📦 Tampilkan Semua</button>
+                    <button id="btnViewToggle" onclick="toggleViewMode()" style="padding:6px 12px; border-radius:6px; background:#f1f5f9; color:#334155; border:1px solid #ccc; font-weight:bold; font-size:11px; transition:0.2s;">📄 List View</button>
+                </div>
             </div>
             
             <div class="filter-pills-wrapper" style="margin-top:8px; margin-bottom:8px;">
@@ -165,7 +168,7 @@ location: "MASTER"
         </div>
     </div>
 
-    <!-- MODAL EDIT DATA & FOTO (SUDAH DIPERBAIKI) -->
+    <!-- MODAL EDIT DATA & FOTO -->
     <div id="modalEditFull" class="modal-overlay">
         <div class="modal-content" style="max-width:400px; max-height:85vh; overflow-y:auto; background:white; padding:20px; border-radius:15px;">
             <h3 style="margin-top:0; color:#ea580c; margin-bottom:20px;">✏️ Edit Data & Foto Alat</h3>
@@ -221,22 +224,18 @@ location: "MASTER"
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- MODAL EXPORT EXCEL CUSTOM (FILTER)         -->
-    <!-- ========================================== -->
+    <!-- MODAL EXPORT EXCEL CUSTOM -->
     <div id="modalExport" class="modal-overlay">
         <div class="modal-content" style="max-width:350px; background:white; padding:25px; border-radius:15px; position:relative;">
             <button onclick="closeExportModal()" style="position:absolute; top:15px; right:15px; border:none; background:#f1f5f9; width:30px; height:30px; border-radius:50%; font-weight:bold; cursor:pointer; color:#334155;">✕</button>
             <h3 style="margin-top:0; color:#10b981; margin-bottom:5px; font-weight:900; text-align:center;">📥 Export Data Excel</h3>
             <p style="font-size:11px; color:#64748b; margin-bottom:20px; text-align:center;">Filter data spesifik yang ingin diunduh:</p>
             
-            <!-- Filter Lokasi (Akan diisi otomatis oleh JS) -->
             <label style="font-size:11px; font-weight:bold; color:#1e293b; margin-bottom:4px; display:block;">📍 Pilih Gudang / Lokasi:</label>
             <select id="exportLokasi" style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1; margin-bottom:15px; font-size:12px; font-weight:bold; color:#334155;">
                 <option value="ALL">📦 Semua Gudang / Lokasi</option>
             </select>
 
-            <!-- Filter Tim -->
             <label style="font-size:11px; font-weight:bold; color:#1e293b; margin-bottom:4px; display:block;">👥 Pilih Tim Terkait:</label>
             <select id="exportTim" style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1; margin-bottom:15px; font-size:12px; font-weight:bold; color:#334155;">
                 <option value="ALL">Semua Tim</option>
@@ -245,7 +244,6 @@ location: "MASTER"
                 <option value="booth">🎛️ Tim Booth</option>
             </select>
 
-            <!-- Filter Kondisi -->
             <label style="font-size:11px; font-weight:bold; color:#1e293b; margin-bottom:4px; display:block;">✨ Kondisi Barang:</label>
             <select id="exportKondisi" style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1; margin-bottom:25px; font-size:12px; font-weight:bold; color:#334155;">
                 <option value="ALL">Semua Kondisi</option>
@@ -259,13 +257,13 @@ location: "MASTER"
     </div>
     
     <div id="zoomModal" class="zoom-overlay" onclick="closeZoomModal()">
-    <button onclick="closeZoomModal()" style="position:absolute; top:20px; left:20px; padding:10px 16px; background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.4); border-radius:8px; color:white; font-weight:bold; cursor:pointer; backdrop-filter:blur(4px); z-index:1000000; box-shadow:0 4px 10px rgba(0,0,0,0.5);">⬅ Kembali</button>
-    <img id="zoomImgSrc" src="" onclick="event.stopPropagation()">
-</div>
+        <button onclick="closeZoomModal()" style="position:absolute; top:20px; left:20px; padding:10px 16px; background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.4); border-radius:8px; color:white; font-weight:bold; cursor:pointer; backdrop-filter:blur(4px); z-index:1000000; box-shadow:0 4px 10px rgba(0,0,0,0.5);">⬅ Kembali</button>
+        <img id="zoomImgSrc" src="" onclick="event.stopPropagation()">
+    </div>
     <div id="toastMsg" class="toast-msg">Notifikasi</div>
     
-    <!-- MENGGUNAKAN VERSI 51.0 UNTUK MENCEGAH CACHE -->
-    <script src="{{ site.baseurl }}/assets/js/script-gudang.js?v=51.0"></script>
+    <!-- MENGGUNAKAN VERSI 52.0 UNTUK MENCEGAH CACHE -->
+    <script src="{{ site.baseurl }}/assets/js/script-gudang.js?v=52.0"></script>
     
     <!-- SCRIPT KEAMANAN RBAC -->
     <script>

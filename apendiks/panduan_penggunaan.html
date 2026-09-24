@@ -20,19 +20,17 @@ location: "APENDIKS"
             --toc-text: #c2410c;
         }
 
-        /* 🌙 DARK MODE SAKTI (Otomatis Ikut HP / Sistem) */
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --primary: #f97316;
-                --dark: #f8fafc;
-                --light: #020617;
-                --card-bg: #0f172a;
-                --border: #1e293b;
-                --text: #cbd5e1;
-                --toc-bg: #151e2e;
-                --toc-border: #334155;
-                --toc-text: #fb923c;
-            }
+        /* 🌙 DARK MODE SAKTI (Sinkron dengan Navbar) */
+        body.dark-mode, [data-theme="dark"] {
+            --primary: #f97316;
+            --dark: #f8fafc;
+            --light: #020617;
+            --card-bg: #0f172a;
+            --border: #1e293b;
+            --text: #cbd5e1;
+            --toc-bg: #151e2e;
+            --toc-border: #334155;
+            --toc-text: #fb923c;
         }
 
         body {
@@ -46,12 +44,13 @@ location: "APENDIKS"
         }
         .container {
             max-width: 850px;
-            margin: 0 auto;
+            margin: 20px auto;
             background: var(--card-bg);
             padding: 30px;
             border-radius: 20px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.05);
             border: 2px solid var(--border);
+            transition: background 0.3s, border-color 0.3s;
         }
         .btn-back {
             display: inline-flex;
@@ -83,6 +82,7 @@ location: "APENDIKS"
             padding: 20px;
             border-radius: 16px;
             margin-bottom: 30px;
+            transition: background 0.3s, border-color 0.3s;
         }
         .toc h3 { margin-top: 0; color: var(--toc-text); font-size: 15px; }
         .toc ul { margin: 0; padding-left: 18px; }
@@ -124,128 +124,131 @@ location: "APENDIKS"
 </head>
 <body>
 
-<div class="container">
-    <!-- TOMBOL KEMBALI KE HOME -->
-    <a href="{{ site.baseurl }}/" class="btn-back">
-        ⬅ Kembali ke Beranda
-    </a>
+    <!-- NAVBAR UTAMA AGAR KONSISTEN -->
+    {% include navbar.html %}
 
-    <h1>📖 PANDUAN OPERASIONAL WEBSITE LOGISTIK A/V</h1>
-    <p>Halaman ini berisi panduan praktis penggunaan sistem inventaris gudang A/V lewat HP maupun laptop untuk seluruh kru di lapangan.</p>
+    <div class="container">
+        <!-- TOMBOL KEMBALI KE HOME -->
+        <a href="{{ site.baseurl }}/" class="btn-back">
+            ⬅ Kembali ke Beranda
+        </a>
 
-    <!-- DAFTAR ISI -->
-    <div class="toc">
-        <h3>🧭 Daftar Bahasan:</h3>
+        <h1>📖 PANDUAN OPERASIONAL WEBSITE LOGISTIK A/V</h1>
+        <p>Halaman ini berisi panduan praktis penggunaan sistem inventaris gudang A/V lewat HP maupun laptop untuk seluruh kru di lapangan.</p>
+
+        <!-- DAFTAR ISI -->
+        <div class="toc">
+            <h3>🧭 Daftar Bahasan:</h3>
+            <ul>
+                <li><a href="#akses">1. Status Masuk (Read-Only vs Edit Mode)</a></li>
+                <li><a href="#tampilan">2. Tampilan Kartu (Grid) vs List & Dark Mode</a></li>
+                <li><a href="#cari-filter">3. Cara Cari Alat, Filter Tim, & Tombol "Hanya Wadah"</a></li>
+                <li><a href="#scan">4. Cara Pakai Scan QR / Barcode & Mode Massal</a></li>
+                <li><a href="#detail-foto">5. Klik Detail Alat, Galeri Foto, & Zoom</a></li>
+                <li><a href="#tambah-edit-duplikat">6. Nambah Alat, Edit Data, & Fitur "Duplikat Alat"</a></li>
+                <li><a href="#misi-event">7. Pilih Massal (Bulk) & Kirim Misi (Semarang / Yogya)</a></li>
+                <li><a href="#cetak-laporan">8. Cetak Surat Jalan (Manifest), CO-31, & Export Excel</a></li>
+                <li><a href="#tanya">9. Tanya Jawab Cepat (Troubleshooting)</a></li>
+            </ul>
+        </div>
+
+        <!-- 1. AKSES -->
+        <h2 id="akses">1. Status Masuk (Read-Only vs Edit Mode)</h2>
+        <p>Sistem membagi akses menjadi dua mode untuk keamanan data:</p>
         <ul>
-            <li><a href="#akses">1. Status Masuk (Read-Only vs Edit Mode)</a></li>
-            <li><a href="#tampilan">2. Tampilan Kartu (Grid) vs List & Dark Mode</a></li>
-            <li><a href="#cari-filter">3. Cara Cari Alat, Filter Tim, & Tombol "Hanya Wadah"</a></li>
-            <li><a href="#scan">4. Cara Pakai Scan QR / Barcode & Mode Massal</a></li>
-            <li><a href="#detail-foto">5. Klik Detail Alat, Galeri Foto, & Zoom</a></li>
-            <li><a href="#tambah-edit-duplikat">6. Nambah Alat, Edit Data, & Fitur "Duplikat Alat"</a></li>
-            <li><a href="#misi-event">7. Pilih Massal (Bulk) & Kirim Misi (Semarang / Yogya)</a></li>
-            <li><a href="#cetak-laporan">8. Cetak Surat Jalan (Manifest), CO-31, & Export Excel</a></li>
-            <li><a href="#tanya">9. Tanya Jawab Cepat (Troubleshooting)</a></li>
+            <li><strong>🟢 Read-Only Mode:</strong> Mode bawaan saat pertama kali membuka web. Tombol tambah, edit, atau ubah status disembunyikan agar data tidak sengaja terubah.</li>
+            <li><strong>🔴 Edit Mode Aktif:</strong> Muncul saat sesi admin/kru berwenang aktif. Seluruh tombol aksi operasional terbuka penuh.</li>
         </ul>
+
+        <!-- 2. TAMPILAN -->
+        <h2 id="tampilan">2. Tampilan Kartu (Grid) vs List & Dark Mode</h2>
+        <ul>
+            <li><strong>Grid View vs List View:</strong> Tombol di kanan atas untuk beralih antara tampilan kartu besar (Grid) atau tampilan baris minimalis (List) guna mempercepat pemindaian data.</li>
+            <li><strong>Dark Mode:</strong> Menyesuaikan tampilan otomatis ke mode gelap untuk kenyamanan mata saat pengecekan di gudang minim cahaya.</li>
+        </ul>
+
+        <!-- 3. CARI & FILTER -->
+        <h2 id="cari-filter">3. Cara Cari Alat, Filter Tim, & Tombol "Hanya Wadah"</h2>
+        <ul>
+            <li><strong>Kolom Pencarian:</strong> Ketik nama, merk, atau kode barang (misal: <code>ADPT-JACK3.5</code> atau <code>HRCS-018</code>) untuk menyaring item secara instan.</li>
+            <li><strong>Pill Filter:</strong> Menyaring item berdasarkan status cepat seperti <em>Akan Dibawa, Dipakai, Di Gudang, Perbaikan</em>, atau lokasi gudang.</li>
+            <li><strong>Filter Tim:</strong> Tombol <span class="badge-key">⚙️ FILTER TIM</span> untuk menyaring barang berdasarkan kategori tim (Speaker, Kabel, Booth).</li>
+            <li><strong>🧰 Hanya Wadah:</strong> Tombol pintas untuk menyembunyikan barang eceran dan hanya menampilkan **Hardcase, Koper, atau Box utamanya saja**. Sangat membantu saat proses hitung bagasi truk.</li>
+        </ul>
+
+        <!-- 4. SCANNER -->
+        <h2 id="scan">4. Cara Pakai Scan QR / Barcode & Mode Massal</h2>
+        <p>Klik tombol <span class="badge-key">📷 Scan QR</span> di sebelah kolom pencarian:</p>
+        <ul>
+            <li><strong>Scan Biasa:</strong> Cukup klik Scan QR, arahkan kamera ke kode barang. Sistem otomatis mencari dan membuka detail barang tersebut di layar.</li>
+            <li><strong>Scan + Mode Massal (Pilih Banyak):</strong> Jika Anda mengaktifkan tombol <strong>Massal</strong> terlebih dahulu sebelum menekan Scan QR, kamera pemindai akan berfungsi untuk <strong>mencentang dan memilih banyak barang secara otomatis</strong> hanya dengan mengarahkan kamera ke satu persatu QR Code barang. Barang-barang yang di-scan akan langsung masuk ke daftar terpilih untuk di-update statusnya secara massal!</li>
+            <li>Tersedia juga tombol <strong>🔄 Kamera</strong> (putar depan/belakang) dan <strong>🔦 Senter</strong> di dalam layar scanner.</li>
+        </ul>
+
+        <!-- 5. DETAIL & FOTO -->
+        <h2 id="detail-foto">5. Klik Detail Alat, Galeri Foto, & Zoom</h2>
+        <p>Ketuk salah satu kartu barang untuk membuka jendela detail:</p>
+        <ul>
+            <li><strong>Galeri Foto:</strong> Menampilkan hingga 3 foto fisik barang. Ketuk foto untuk memperbesar (*Zoom Modal*) dengan tombol geser antar-foto.</li>
+            <li><strong>Badge IN-BOX:</strong> Menandakan item berada di dalam koper tertentu. Klik nama koper hijaunya untuk melompat langsung ke data koper induk.</li>
+            <li><strong>Cek Silang Stok:</strong> Menampilkan total jumlah item serupa di gudang beserta sebaran statusnya saat itu.</li>
+        </ul>
+
+        <!-- 6. TAMBAH & DUPLIKAT -->
+        <h2 id="tambah-edit-duplikat">6. Nambah Alat, Edit Data, & Fitur "Duplikat Alat"</h2>
+        <ul>
+            <li><strong>➕ Tambah Alat:</strong> Form untuk memasukkan item baru lengkap dengan unggah foto kamera, jumlah (*Qty*), kondisi, dan lokasi gudang.</li>
+            <li><strong>✏️ Edit Data / Foto:</strong> Memperbarui informasi teks, catatan, atau mengganti foto lama.</li>
+            <li><strong>📋 Duplikat Alat:</strong> Saat membeli barang baru yang jenis dan bentuknya persis sama dengan yang sudah ada, buka detail barang tersebut lalu klik <strong>Duplikat Alat</strong>. Sistem otomatis menyalin seluruh data, catatan, dan foto aslinya ke baris baru secara instan tanpa perlu repot upload ulang!</li>
+        </ul>
+
+        <!-- 7. MISI & EVENT -->
+        <h2 id="misi-event">7. Pilih Massal (Bulk) & Kirim Misi (Semarang / Yogya)</h2>
+        <ul>
+            <li><strong>Mode Pilih (Massal):</strong> Centang beberapa item sekaligus untuk memperbarui status secara bersamaan.</li>
+            <li><strong>Misi & Event Spesifik:</strong> Saat menyiapkan pengiriman, masukkan nama event dan tentukan destinasi spesifik:
+                <div class="tip-box">
+                    👉 <strong>"Akan Dibawa ke Gedung UTC Semarang"</strong><br>
+                    👉 <strong>"Akan Dibawa ke Gedung Pacific Yogya"</strong>
+                </div>
+            </li>
+            <li><strong>Efek Domino Wadah:</strong> Memilih koper utama untuk dibawa ke event akan membuat sistem secara otomatis menandai seluruh kabel atau alat di dalam koper tersebut ikut berstatus *Akan Dibawa*, mencegah ada item kecil yang tertinggal di gudang (*🚨 TERTINGGAL*).</li>
+        </ul>
+
+        <!-- 8. LAPORAN -->
+        <h2 id="cetak-laporan">8. Cetak Surat Jalan (Manifest), CO-31, & Export Excel</h2>
+        <ul>
+            <li><strong>📄 Cetak Surat Jalan:</strong> Mencetak daftar muatan yang dikelompokkan rapi per gudang asal dan per koper untuk kru/supir.</li>
+            <li><strong>📄 Cetak CO-31:</strong> Format cetak lampiran barang yang disesuaikan dengan form pesanan pengiriman resmi *CO-31-IN*.</li>
+            <li><strong>📥 Export Excel:</strong> Mengunduh data inventaris dalam format CSV dengan opsi filter sesuai kebutuhan.</li>
+        </ul>
+
+        <!-- 9. TROUBLESHOOTING -->
+        <h2 id="tanya">9. Tanya Jawab Cepat (Troubleshooting)</h2>
+        <table>
+            <tr>
+                <th>Kendala di Lapangan</th>
+                <th>Penyebab & Cara Mengatasinya</th>
+            </tr>
+            <tr>
+                <td>Tombol tambah/edit tidak muncul?</td>
+                <td>Perangkat berada dalam mode Read-Only. Pastikan sesi login admin/kru Anda aktif.</td>
+            </tr>
+            <tr>
+                <td>Data tidak berubah setelah disimpan?</td>
+                <td>Memori browser menyimpan *cache* lama. Lakukan *refresh* halaman dengan menarik layar ke bawah.</td>
+            </tr>
+            <tr>
+                <td>Kamera scanner gagal terbuka?</td>
+                <td>Izin browser untuk mengakses kamera belum diizinkan. Pilih "Allow/Izinkan" saat diminta akses.</td>
+            </tr>
+        </table>
+
+        <hr style="margin: 30px 0; border: none; border-top: 2px solid var(--border);">
+        <p style="text-align: center; font-size: 11px; color: #94a3b8; font-weight: 700;">
+            Sistem Logistik Departemen A/V • Dibuat oleh Kru, untuk Kru 🚀
+        </p>
     </div>
-
-    <!-- 1. AKSES -->
-    <h2 id="akses">1. Status Masuk (Read-Only vs Edit Mode)</h2>
-    <p>Sistem membagi akses menjadi dua mode untuk keamanan data:</p>
-    <ul>
-        <li><strong>🟢 Read-Only Mode:</strong> Mode bawaan saat pertama kali membuka web. Tombol tambah, edit, atau ubah status disembunyikan agar data tidak sengaja terubah.</li>
-        <li><strong>🔴 Edit Mode Aktif:</strong> Muncul saat sesi admin/kru berwenang aktif. Seluruh tombol aksi operasional terbuka penuh.</li>
-    </ul>
-
-    <!-- 2. TAMPILAN -->
-    <h2 id="tampilan">2. Tampilan Kartu (Grid) vs List & Dark Mode</h2>
-    <ul>
-        <li><strong>Grid View vs List View:</strong> Tombol di kanan atas untuk beralih antara tampilan kartu besar (Grid) atau tampilan baris minimalis (List) guna mempercepat pemindaian data.</li>
-        <li><strong>Dark Mode:</strong> Menyesuaikan tampilan otomatis ke mode gelap untuk kenyamanan mata saat pengecekan di gudang minim cahaya.</li>
-    </ul>
-
-    <!-- 3. CARI & FILTER -->
-    <h2 id="cari-filter">3. Cara Cari Alat, Filter Tim, & Tombol "Hanya Wadah"</h2>
-    <ul>
-        <li><strong>Kolom Pencarian:</strong> Ketik nama, merk, atau kode barang (misal: <code>ADPT-JACK3.5</code> atau <code>HRCS-018</code>) untuk menyaring item secara instan.</li>
-        <li><strong>Pill Filter:</strong> Menyaring item berdasarkan status cepat seperti <em>Akan Dibawa, Dipakai, Di Gudang, Perbaikan</em>, atau lokasi gudang.</li>
-        <li><strong>Filter Tim:</strong> Tombol <span class="badge-key">⚙️ FILTER TIM</span> untuk menyaring barang berdasarkan kategori tim (Speaker, Kabel, Booth).</li>
-        <li><strong>🧰 Hanya Wadah:</strong> Tombol pintas untuk menyembunyikan barang eceran dan hanya menampilkan **Hardcase, Koper, atau Box utamanya saja**. Sangat membantu saat proses hitung bagasi truk.</li>
-    </ul>
-
-    <!-- 4. SCANNER -->
-    <h2 id="scan">4. Cara Pakai Scan QR / Barcode & Mode Massal</h2>
-    <p>Klik tombol <span class="badge-key">📷 Scan QR</span> di sebelah kolom pencarian:</p>
-    <ul>
-        <li><strong>Scan Biasa:</strong> Cukup klik Scan QR, arahkan kamera ke kode barang. Sistem otomatis mencari dan membuka detail barang tersebut di layar.</li>
-        <li><strong>Scan + Mode Massal (Pilih Banyak):</strong> Jika Anda mengaktifkan tombol <strong>Massal</strong> terlebih dahulu sebelum menekan Scan QR, kamera pemindai akan berfungsi untuk <strong>mencentang dan memilih banyak barang secara otomatis</strong> hanya dengan mengarahkan kamera ke satu persatu QR Code barang. Barang-barang yang di-scan akan langsung masuk ke daftar terpilih untuk di-update statusnya secara massal!</li>
-        <li>Tersedia juga tombol <strong>🔄 Kamera</strong> (putar depan/belakang) dan <strong>🔦 Senter</strong> di dalam layar scanner.</li>
-    </ul>
-
-    <!-- 5. DETAIL & FOTO -->
-    <h2 id="detail-foto">5. Klik Detail Alat, Galeri Foto, & Zoom</h2>
-    <p>Ketuk salah satu kartu barang untuk membuka jendela detail:</p>
-    <ul>
-        <li><strong>Galeri Foto:</strong> Menampilkan hingga 3 foto fisik barang. Ketuk foto untuk memperbesar (*Zoom Modal*) dengan tombol geser antar-foto.</li>
-        <li><strong>Badge IN-BOX:</strong> Menandakan item berada di dalam koper tertentu. Klik nama koper hijaunya untuk melompat langsung ke data koper induk.</li>
-        <li><strong>Cek Silang Stok:</strong> Menampilkan total jumlah item serupa di gudang beserta sebaran statusnya saat itu.</li>
-    </ul>
-
-    <!-- 6. TAMBAH & DUPLIKAT -->
-    <h2 id="tambah-edit-duplikat">6. Nambah Alat, Edit Data, & Fitur "Duplikat Alat"</h2>
-    <ul>
-        <li><strong>➕ Tambah Alat:</strong> Form untuk memasukkan item baru lengkap dengan unggah foto kamera, jumlah (*Qty*), kondisi, dan lokasi gudang.</li>
-        <li><strong>✏️ Edit Data / Foto:</strong> Memperbarui informasi teks, catatan, atau mengganti foto lama.</li>
-        <li><strong>📋 Duplikat Alat:</strong> Saat membeli barang baru yang jenis dan bentuknya persis sama dengan yang sudah ada, buka detail barang tersebut lalu klik <strong>Duplikat Alat</strong>. Sistem otomatis menyalin seluruh data, catatan, dan foto aslinya ke baris baru secara instan tanpa perlu repot upload ulang!</li>
-    </ul>
-
-    <!-- 7. MISI & EVENT -->
-    <h2 id="misi-event">7. Pilih Massal (Bulk) & Kirim Misi (Semarang / Yogya)</h2>
-    <ul>
-        <li><strong>Mode Pilih (Massal):</strong> Centang beberapa item sekaligus untuk memperbarui status secara bersamaan.</li>
-        <li><strong>Misi & Event Spesifik:</strong> Saat menyiapkan pengiriman, masukkan nama event dan tentukan destinasi spesifik:
-            <div class="tip-box">
-                👉 <strong>"Akan Dibawa ke Gedung UTC Semarang"</strong><br>
-                👉 <strong>"Akan Dibawa ke Gedung Pacific Yogya"</strong>
-            </div>
-        </li>
-        <li><strong>Efek Domino Wadah:</strong> Memilih koper utama untuk dibawa ke event akan membuat sistem secara otomatis menandai seluruh kabel atau alat di dalam koper tersebut ikut berstatus *Akan Dibawa*, mencegah ada item kecil yang tertinggal di gudang (*🚨 TERTINGGAL*).</li>
-    </ul>
-
-    <!-- 8. LAPORAN -->
-    <h2 id="cetak-laporan">8. Cetak Surat Jalan (Manifest), CO-31, & Export Excel</h2>
-    <ul>
-        <li><strong>📄 Cetak Surat Jalan:</strong> Mencetak daftar muatan yang dikelompokkan rapi per gudang asal dan per koper untuk kru/supir.</li>
-        <li><strong>📄 Cetak CO-31:</strong> Format cetak lampiran barang yang disesuaikan dengan form pesanan pengiriman resmi *CO-31-IN*.</li>
-        <li><strong>📥 Export Excel:</strong> Mengunduh data inventaris dalam format CSV dengan opsi filter sesuai kebutuhan.</li>
-    </ul>
-
-    <!-- 9. TROUBLESHOOTING -->
-    <h2 id="tanya">9. Tanya Jawab Cepat (Troubleshooting)</h2>
-    <table>
-        <tr>
-            <th>Kendala di Lapangan</th>
-            <th>Penyebab & Cara Mengatasinya</th>
-        </tr>
-        <tr>
-            <td>Tombol tambah/edit tidak muncul?</td>
-            <td>Perangkat berada dalam mode Read-Only. Pastikan sesi login admin/kru Anda aktif.</td>
-        </tr>
-        <tr>
-            <td>Data tidak berubah setelah disimpan?</td>
-            <td>Memori browser menyimpan *cache* lama. Lakukan *refresh* halaman dengan menarik layar ke bawah.</td>
-        </tr>
-        <tr>
-            <td>Kamera scanner gagal terbuka?</td>
-            <td>Izin kamera di browser belum diaktifkan. Pilih "Allow/Izinkan" saat diminta akses kamera.</td>
-        </tr>
-    </table>
-
-    <hr style="margin: 30px 0; border: none; border-top: 2px solid var(--border);">
-    <p style="text-align: center; font-size: 11px; color: #94a3b8; font-weight: 700;">
-        Sistem Logistik Departemen A/V • Dibuat oleh Kru, untuk Kru 🚀
-    </p>
-</div>
 
 </body>
 </html>

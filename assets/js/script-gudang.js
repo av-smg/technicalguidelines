@@ -289,69 +289,112 @@ function render(data) {
 }
 
 function openDetailModal(item) {
-    const oldModal = document.getElementById("detailModal"); if(oldModal) oldModal.remove();
-    let stat = item.status_digunakan || "Di Gudang"; if(stat === 'FALSE') stat = "Di Gudang"; 
+    const oldModal = document.getElementById("detailModal"); 
+    if(oldModal) oldModal.remove();
+    
+    let stat = item.status_digunakan || "Di Gudang"; 
+    if(stat === 'FALSE') stat = "Di Gudang"; 
     let lok = item.lokasi_saat_ini || item.lokasi || item["Lokasi Saat Ini"] || "Gudang Kanguru";
     
-    let safeFileIds = item.file_ids || item.fotos || []; window.currentZoomUrls = []; let validThumbs = []; let adaFoto = false;
-    safeFileIds.forEach((fileId, i) => { if(fileId && fileId.length > 5) { let thumbUrl = fileId.includes("http") ? fileId : `https://drive.google.com/thumbnail?id=${fileId}&sz=w400`; let highResUrl = fileId.includes("http") ? fileId.replace('sz=800', 'sz=s2000') : `https://drive.google.com/thumbnail?id=${fileId}&sz=s2000`; if(i < 3) { window.currentZoomUrls.push(highResUrl); validThumbs.push({ url: thumbUrl, type: 'alat' }); } } });
+    let safeFileIds = item.file_ids || item.fotos || []; 
+    window.currentZoomUrls = []; 
+    let validThumbs = []; 
+    
+    safeFileIds.forEach((fileId, i) => { 
+        if(fileId && fileId.length > 5) { 
+            let thumbUrl = fileId.includes("http") ? fileId : `https://drive.google.com/thumbnail?id=${fileId}&sz=w400`; 
+            let highResUrl = fileId.includes("http") ? fileId.replace('sz=800', 'sz=s2000') : `https://drive.google.com/thumbnail?id=${fileId}&sz=s2000`; 
+            if(i < 3) { 
+                window.currentZoomUrls.push(highResUrl); 
+                validThumbs.push({ url: thumbUrl, type: 'alat' }); 
+            } 
+        } 
+    });
 
-    let badgeWadahHtml = ""; let wadahHeaderHtml = ""; let kodeWadah = item.kode_wadah ? item.kode_wadah.toString().trim() : "";
+    let badgeWadahHtml = ""; 
+    let wadahHeaderHtml = ""; 
+    let kodeWadah = item.kode_wadah ? item.kode_wadah.toString().trim() : "";
+    
     if (kodeWadah !== "") {
         let wadahItem = allItems.find(w => w.kode_barang && w.kode_barang.toString().trim().toLowerCase() === kodeWadah.toLowerCase());
         if (wadahItem) {
-            let wFotos = wadahItem.file_ids || wadahItem.fotos || []; let firstWFoto = wFotos.find(id => id && id.toString().trim().length > 5); let thumbWUrl = firstWFoto ? (firstWFoto.includes("http") ? firstWFoto : `https://drive.google.com/thumbnail?id=${firstWFoto}&sz=w400`) : 'https://placehold.co/400x400/EEEEEE/999999?text=NO+FOTO+WADAH'; let highResWUrl = firstWFoto ? (firstWFoto.includes("http") ? firstWFoto.replace('sz=800', 'sz=s2000') : `https://drive.google.com/thumbnail?id=${firstWFoto}&sz=s2000`) : thumbWUrl;
-            window.currentZoomUrls.push(highResWUrl); validThumbs.push({ url: thumbWUrl, type: 'wadah' });
-            wadahHeaderHtml = `<span style="display:inline-block; margin-left:5px; background:#fef3c7; color:#d97706; padding:2px 8px; border-radius:4px; border:1px solid #fde68a; font-size:9px;">🧰 IN-BOX</span>`; badgeWadahHtml = `<div style="margin-top:10px; margin-bottom:10px; cursor:pointer;" onclick="document.getElementById('searchInput').value='${kodeWadah}'; applyFilters(); document.getElementById('detailModal').remove();"><span style="display:inline-block; background:#fffbeb; color:#d97706; padding:6px 12px; border-radius:8px; border:1px solid #fde68a; font-size:11px; font-weight:bold;">🧰 Disimpan di: ${wadahItem.nama_barang} (#${kodeWadah})</span></div>`;
+            let wFotos = wadahItem.file_ids || wadahItem.fotos || []; 
+            let firstWFoto = wFotos.find(id => id && id.toString().trim().length > 5); 
+            let thumbWUrl = firstWFoto ? (firstWFoto.includes("http") ? firstWFoto : `https://drive.google.com/thumbnail?id=${firstWFoto}&sz=w400`) : 'https://placehold.co/400x400/EEEEEE/999999?text=NO+FOTO+WADAH'; 
+            let highResWUrl = firstWFoto ? (firstWFoto.includes("http") ? firstWFoto.replace('sz=800', 'sz=s2000') : `https://drive.google.com/thumbnail?id=${firstWFoto}&sz=s2000`) : thumbWUrl;
+            
+            window.currentZoomUrls.push(highResWUrl); 
+            validThumbs.push({ url: thumbWUrl, type: 'wadah' });
+            
+            wadahHeaderHtml = `<span style="display:inline-block; margin-left:5px; background:#fef3c7; color:#d97706; padding:2px 8px; border-radius:4px; border:1px solid #fde68a; font-size:9px;">🧰 IN-BOX</span>`; 
+            badgeWadahHtml = `<div style="margin-top:10px; margin-bottom:10px; cursor:pointer;" onclick="document.getElementById('searchInput').value='${kodeWadah}'; applyFilters(); document.getElementById('detailModal').remove();"><span style="display:inline-block; background:#fffbeb; color:#d97706; padding:6px 12px; border-radius:8px; border:1px solid #fde68a; font-size:11px; font-weight:bold;">🧰 Disimpan di: ${wadahItem.nama_barang} (#${kodeWadah})</span></div>`;
         } else {
-            wadahHeaderHtml = `<span style="display:inline-block; margin-left:5px; background:#f1f5f9; color:#64748b; padding:2px 8px; border-radius:4px; border:1px dashed #cbd5e1; font-size:9px;">🧰 Menunggu wadah: #${kodeWadah}</span>`; badgeWadahHtml = `<div style="margin-top:10px; margin-bottom:10px;"><span style="display:inline-block; background:#f1f5f9; color:#64748b; padding:6px 12px; border-radius:8px; border:1px dashed #cbd5e1; font-size:11px; font-weight:bold;">🧰 Menunggu data wadah: #${kodeWadah}</span></div>`;
+            wadahHeaderHtml = `<span style="display:inline-block; margin-left:5px; background:#f1f5f9; color:#64748b; padding:2px 8px; border-radius:4px; border:1px dashed #cbd5e1; font-size:9px;">🧰 Menunggu wadah: #${kodeWadah}</span>`; 
+            badgeWadahHtml = `<div style="margin-top:10px; margin-bottom:10px;"><span style="display:inline-block; background:#f1f5f9; color:#64748b; padding:6px 12px; border-radius:8px; border:1px dashed #cbd5e1; font-size:11px; font-weight:bold;">🧰 Menunggu data wadah: #${kodeWadah}</span></div>`;
         }
     }
     
     let galleryHtml = `<div class="detail-gallery">`;
     if (validThumbs.length > 0) {
-        adaFoto = true;
-        validThumbs.forEach((tObj, index) => { if (tObj.type === 'alat') { galleryHtml += `<img src="${tObj.url}" class="gallery-img" onclick="openZoomModalIndex(${index})">`; } else { galleryHtml += `<div class="gallery-box"><img src="${tObj.url}" class="gallery-img" style="border:3px solid #ea580c; box-sizing:border-box;" onclick="openZoomModalIndex(${index})"><span class="badge-wadah">WADAH</span></div>`; } });
-    } else { galleryHtml += `<img src="https://placehold.co/300x200/EEEEEE/999999?text=Tidak+Ada+Foto" class="gallery-img" style="width:100%;">`; }
+        validThumbs.forEach((tObj, index) => { 
+            if (tObj.type === 'alat') { 
+                galleryHtml += `<img src="${tObj.url}" class="gallery-img" onclick="openZoomModalIndex(${index})">`; 
+            } else { 
+                galleryHtml += `<div class="gallery-box"><img src="${tObj.url}" class="gallery-img" style="border:3px solid #ea580c; box-sizing:border-box;" onclick="openZoomModalIndex(${index})"><span class="badge-wadah">WADAH</span></div>`; 
+            } 
+        });
+    } else { 
+        galleryHtml += `<img src="https://placehold.co/300x200/EEEEEE/999999?text=Tidak+Ada+Foto" class="gallery-img" style="width:100%;">`; 
+    }
     galleryHtml += `</div>`;
     
     let isiWadahHtml = ""; 
     if (item.kode_barang) { 
         let isiWadah = allItems.filter(i => i.kode_wadah && i.kode_wadah.toLowerCase() === item.kode_barang.toLowerCase()); 
         if (isiWadah.length > 0) { 
-            let listHtml = isiWadah.map(w => { let safeFileIdsW = w.file_ids || w.fotos || []; let firstFileIdW = safeFileIdsW.find(id => id && id.length > 5); let thumbW = firstFileIdW ? (firstFileIdW.includes("http") ? firstFileIdW : `https://drive.google.com/thumbnail?id=${firstFileIdW}&sz=w100`) : 'https://placehold.co/100x100/EEEEEE/999999?text=NO+IMG'; return `<div style="display:flex; align-items:center; gap:10px; margin-bottom:6px; padding:6px; background:#fff; border:1px solid #dcfce7; border-radius:6px; cursor:pointer; box-shadow:0 1px 2px rgba(0,0,0,0.05);" onclick="document.getElementById('searchInput').value='${w.kode_barang}'; applyFilters(); document.getElementById('detailModal').remove();"><img src="${thumbW}" style="width:45px; height:45px; object-fit:cover; border-radius:6px; border:1px solid #e2e8f0;"><div style="flex:1; line-height:1.2;"><div style="font-size:11px; font-weight:bold; color:#1e293b;">${w.nama_barang}</div><div style="font-size:10px; color:#ea580c; font-weight:bold; margin-top:2px;">#${w.kode_barang || '-'} <span style="color:#64748b; font-weight:normal;">• Qty: ${w.jumlah||0}</span></div></div></div>`; }).join('');
+            let listHtml = isiWadah.map(w => { 
+                let safeFileIdsW = w.file_ids || w.fotos || []; 
+                let firstFileIdW = safeFileIdsW.find(id => id && id.length > 5); 
+                let thumbW = firstFileIdW ? (firstFileIdW.includes("http") ? firstFileIdW : `https://drive.google.com/thumbnail?id=${firstFileIdW}&sz=w100`) : 'https://placehold.co/100x100/EEEEEE/999999?text=NO+IMG'; 
+                return `<div style="display:flex; align-items:center; gap:10px; margin-bottom:6px; padding:6px; background:#fff; border:1px solid #dcfce7; border-radius:6px; cursor:pointer; box-shadow:0 1px 2px rgba(0,0,0,0.05);" onclick="document.getElementById('searchInput').value='${w.kode_barang}'; applyFilters(); document.getElementById('detailModal').remove();"><img src="${thumbW}" style="width:45px; height:45px; object-fit:cover; border-radius:6px; border:1px solid #e2e8f0;"><div style="flex:1; line-height:1.2;"><div style="font-size:11px; font-weight:bold; color:#1e293b;">${w.nama_barang}</div><div style="font-size:10px; color:#ea580c; font-weight:bold; margin-top:2px;">#${w.kode_barang || '-'} <span style="color:#64748b; font-weight:normal;">• Qty: ${w.jumlah||0}</span></div></div></div>`; 
+            }).join('');
             isiWadahHtml = `<div style="text-align:left; margin-top:10px; background:#f0fdf4; padding:10px; border-radius:8px; border:1px solid #bbf7d0;"><div style="font-size:11px; font-weight:bold; color:#16a34a; margin-bottom:8px;">🧰 Isi di dalam wadah ini (${isiWadah.length} jenis):</div>${listHtml}</div>`; 
         } 
     }
     
     let similarItems = allItems.filter(i => i.nama_barang.toLowerCase() === item.nama_barang.toLowerCase());
     let totalSimilarQty = similarItems.reduce((sum, curr) => sum + (parseInt(curr.jumlah) || 1), 0);
-    let statusCounts = {}; similarItems.forEach(i => { let s = (i.status_digunakan && i.status_digunakan !== 'FALSE') ? i.status_digunakan : "Di Gudang"; statusCounts[s] = (statusCounts[s] || 0) + (parseInt(i.jumlah) || 1); });
+    let statusCounts = {}; 
+    similarItems.forEach(i => { let s = (i.status_digunakan && i.status_digunakan !== 'FALSE') ? i.status_digunakan : "Di Gudang"; statusCounts[s] = (statusCounts[s] || 0) + (parseInt(i.jumlah) || 1); });
     
     let similarHtml = "";
     if (similarItems.length > 1 || totalSimilarQty > 1) {
-        let badgeHtml = Object.keys(statusCounts).map(status => { let bgCol = status.includes('Gudang') ? '#dcfce7' : (status.includes('Dipakai') || status.includes('Event') ? '#fef08a' : '#e2e8f0'); let txtCol = status.includes('Gudang') ? '#166534' : (status.includes('Dipakai') || status.includes('Event') ? '#854d0e' : '#334155'); return `<span style="display:inline-block; margin-right:4px; margin-bottom:4px; padding:4px 8px; border-radius:6px; font-size:10px; background:${bgCol}; color:${txtCol}; font-weight:bold; border:1px solid #cbd5e1;">${status}: ${statusCounts[status]}</span>`; }).join('');
+        let badgeHtml = Object.keys(statusCounts).map(status => { 
+            let bgCol = status.includes('Gudang') ? '#dcfce7' : (status.includes('Dipakai') || status.includes('Event') ? '#fef08a' : '#e2e8f0'); 
+            let txtCol = status.includes('Gudang') ? '#166534' : (status.includes('Dipakai') || status.includes('Event') ? '#854d0e' : '#334155'); 
+            return `<span style="display:inline-block; margin-right:4px; margin-bottom:4px; padding:4px 8px; border-radius:6px; font-size:10px; background:${bgCol}; color:${txtCol}; font-weight:bold; border:1px solid #cbd5e1;">${status}: ${statusCounts[status]}</span>`; 
+        }).join('');
         similarHtml = `<div style="text-align:left; margin-top:10px; background:#eff6ff; padding:12px; border-radius:8px; border:1px solid #bfdbfe;"><div style="font-size:12px; font-weight:900; color:#1d4ed8; margin-bottom:4px;">📊 Cek Silang Stok '${item.nama_barang}':</div><div style="font-size:11px; color:#1e293b; margin-bottom:8px;">Sistem mendeteksi total <b>${totalSimilarQty} Pcs</b> alat ini. Sebaran:</div><div style="display:flex; flex-wrap:wrap;">${badgeHtml}</div></div>`;
     }
 
     let logHtml = `<div style="text-align:left; margin-top:10px; background:#f1f5f9; padding:8px; border-radius:6px; font-size:10px; color:#475569; max-height:80px; overflow-y:auto; white-space:pre-wrap; border:1px solid #cbd5e1;"><b>📜 Histori Log:</b><br>${item.log || 'Belum ada histori.'}</div>`;
     let optionsLokasi = `<option value="Gudang Kanguru" ${lok.includes('Kanguru') ? 'selected':''}>🏢 Gudang Kanguru</option><option value="Gudang Mrican" ${lok.includes('Mrican') ? 'selected':''}>🏢 Gudang Mrican</option><option value="Dalam Perjalanan" ${lok === 'Dalam Perjalanan' ? 'selected':''}>🚚 Dalam Perjalanan</option><option value="Di Lokasi Event" ${lok === 'Di Lokasi Event' ? 'selected':''}>📍 Di Lokasi Event</option>`; 
     let optionsStatus = `<option value="Di Gudang" ${stat === 'Di Gudang' ? 'selected':''}>📦 Standby / Di Gudang</option><option value="Akan Dibawa" ${stat === 'Akan Dibawa' ? 'selected':''}>🛒 Akan Dibawa (Packing)</option><option value="Sedang Dipakai" ${stat === 'Sedang Dipakai' ? 'selected':''}>🔌 Sedang Dipakai / Aktivasi</option><option value="Sedang Diservis" ${stat === 'Sedang Diservis' ? 'selected':''}>🛠️ Sedang Diservis</option>`;
-    let actionButtons = isAdminMode ? `<button onclick='openEditFullModal(${JSON.stringify(item).replace(/'/g, "&#39;")})' style="width:100%; padding:10px; background:#f59e0b; color:white; border:none; border-radius:8px; font-weight:bold; margin-bottom:15px;">✏️ EDIT DATA / FOTO</button><div style="text-align:left; border-top:1px dashed #ccc; padding-top:15px;"><label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">📍 Update Lokasi:</label><select id="editLokasi" style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc; margin-bottom:12px;">${optionsLokasi}</select><label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">🔌 Update Status:</label><select id="editStatus" style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc; margin-bottom:12px; font-weight:bold;">${optionsStatus}</select><button onclick="saveEditLokasiStatus(${item.row_index})" style="width:100%; padding:12px; background:#ea580c; color:white; border:none; border-radius:8px; font-weight:bold;">💾 SIMPAN STATUS</button></div>` : `<div style="margin-top:15px; padding:10px; background:#f1f5f9; border-radius:8px; font-size:12px; color:#64748b;">🔒 Login Akses untuk mengubah status/lokasi.</div>`;
+    
+    // HANYA 1 DEKLARASI ACTIONBUTTONS DI SINI (DENGAN TOMBOL DUPLIKAT BARU)
+    let actionButtons = isAdminMode ? `
+        <button onclick="duplicateItem(${item.row_index})" style="width:100%; padding:10px; background:#8b5cf6; color:white; border:none; border-radius:8px; font-weight:bold; margin-bottom:8px; cursor:pointer;">📋 Duplikat Alat</button>
+        <button onclick='openEditFullModal(${JSON.stringify(item).replace(/'/g, "&#39;")})' style="width:100%; padding:10px; background:#f59e0b; color:white; border:none; border-radius:8px; font-weight:bold; margin-bottom:15px;">✏️ EDIT DATA / FOTO</button>
+        <div style="text-align:left; border-top:1px dashed #ccc; padding-top:15px;">
+            <label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">📍 Update Lokasi:</label>
+            <select id="editLokasi" style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc; margin-bottom:12px;">${optionsLokasi}</select>
+            <label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">🔌 Update Status:</label>
+            <select id="editStatus" style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc; margin-bottom:12px; font-weight:bold;">${optionsStatus}</select>
+            <button onclick="saveEditLokasiStatus(${item.row_index})" style="width:100%; padding:12px; background:#ea580c; color:white; border:none; border-radius:8px; font-weight:bold;">💾 SIMPAN STATUS</button>
+        </div>` : `<div style="margin-top:15px; padding:10px; background:#f1f5f9; border-radius:8px; font-size:12px; color:#64748b;">🔒 Login Akses untuk mengubah status/lokasi.</div>`;
     
     const modalHtml = `<div id="detailModal" class="modal-overlay active"><div class="modal-content" style="max-width:400px; max-height:90vh; overflow-y:auto; background:white; padding:20px; border-radius:15px; text-align:center; position:relative;"><button onclick="document.getElementById('detailModal').remove()" style="position:absolute; top:15px; right:15px; border:none; background:#f1f5f9; width:30px; height:30px; border-radius:50%; font-weight:bold; cursor:pointer; z-index:10;">✕</button>${galleryHtml}<h3 style="margin:0; font-weight:900; color:#1e293b; font-size:18px;">${item.nama_barang}</h3><div style="font-size:10px; color:gray; margin-bottom:8px;">⏱️ Update: ${item.timestamp || '-'}</div><p style="margin:5px 0 5px 0; font-size:12px; color:#ea580c; font-weight:bold;">#${item.kode_barang || '-'} ${wadahHeaderHtml}</p>${badgeWadahHtml}<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:12px; text-align:left; background:#f8fafc; padding:10px; border-radius:8px; border:1px solid #e2e8f0;"><div><span style="color:gray;">Item Ini:</span> <br><b>${item.jumlah || 0} Pcs</b></div><div><span style="color:gray;">Kondisi:</span> <br><b>${item.kondisi || '-'}</b></div><div><span style="color:gray;">📍 Lokasi:</span> <br><b>${lok}</b></div><div><span style="color:gray;">🔌 Status:</span> <br><b>${stat}</b></div></div>${similarHtml}${isiWadahHtml}<div style="text-align:left; margin-top:10px; font-size:11px; color:#475569; background:#fff7ed; padding:8px; border-radius:6px; border:1px solid #fed7aa; margin-bottom:5px;"><b>📝 Ket:</b> ${item.keterangan_ref || 'Tidak ada catatan.'}</div><div style="text-align:left; font-size:11px; margin-bottom:15px; color:#3b82f6;"><b>🎯 Tujuan (Event):</b> ${item.tujuan || '-'}</div>${logHtml}${actionButtons}</div></div>`; 
     document.body.insertAdjacentHTML('beforeend', modalHtml);
-    // 1. DI DALAM FUNGSI openDetailModal(item), TAMBAHKAN TOMBOL INI PADA AKSI ADMIN:
-    let actionButtons = isAdminMode ? `
-    <button onclick="duplicateItem(${item.row_index})" style="width:100%; padding:10px; background:#8b5cf6; color:white; border:none; border-radius:8px; font-weight:bold; margin-bottom:8px; cursor:pointer;">📋 Duplikat Alat</button>
-    <button onclick='openEditFullModal(${JSON.stringify(item).replace(/'/g, "&#39;")})' style="width:100%; padding:10px; background:#f59e0b; color:white; border:none; border-radius:8px; font-weight:bold; margin-bottom:15px;">✏️ EDIT DATA / FOTO</button>
-    <div style="text-align:left; border-top:1px dashed #ccc; padding-top:15px;">
-        <label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">📍 Update Lokasi:</label>
-        <select id="editLokasi" style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc; margin-bottom:12px;">${optionsLokasi}</select>
-        <label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">🔌 Update Status:</label>
-        <select id="editStatus" style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc; margin-bottom:12px; font-weight:bold;">${optionsStatus}</select>
-        <button onclick="saveEditLokasiStatus(${item.row_index})" style="width:100%; padding:12px; background:#ea580c; color:white; border:none; border-radius:8px; font-weight:bold;">💾 SIMPAN STATUS</button>
-    </div>` : `<div style="margin-top:15px; padding:10px; background:#f1f5f9; border-radius:8px; font-size:12px; color:#64748b;">🔒 Login Akses untuk mengubah status/lokasi.</div>`;
 }
 
 // ==========================================

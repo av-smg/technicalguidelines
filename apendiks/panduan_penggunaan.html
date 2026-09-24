@@ -9,13 +9,32 @@ location: "APENDIKS"
     <title>Panduan Operasional Website Logistik A/V</title>
     <style>
         :root {
-            --primary: #f97316;
-            --primary-dark: #ea580c;
+            --primary: #ea580c;
             --dark: #0f172a;
             --light: #f8fafc;
+            --card-bg: #ffffff;
             --border: #e2e8f0;
             --text: #334155;
+            --toc-bg: #f8fafc;
+            --toc-border: #cbd5e1;
+            --toc-text: #c2410c;
         }
+
+        /* 🌙 DARK MODE SAKTI (Otomatis Ikut HP / Sistem) */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary: #f97316;
+                --dark: #f8fafc;
+                --light: #020617;
+                --card-bg: #0f172a;
+                --border: #1e293b;
+                --text: #cbd5e1;
+                --toc-bg: #151e2e;
+                --toc-border: #334155;
+                --toc-text: #fb923c;
+            }
+        }
+
         body {
             font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
             line-height: 1.6;
@@ -23,11 +42,12 @@ location: "APENDIKS"
             background-color: var(--light);
             margin: 0;
             padding: 20px;
+            transition: background 0.3s, color 0.3s;
         }
         .container {
             max-width: 850px;
             margin: 0 auto;
-            background: white;
+            background: var(--card-bg);
             padding: 30px;
             border-radius: 20px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.05);
@@ -37,50 +57,50 @@ location: "APENDIKS"
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: #f1f5f9;
-            color: #0f172a;
+            background: var(--toc-bg);
+            color: var(--dark);
             padding: 10px 18px;
             border-radius: 12px;
             text-decoration: none;
             font-weight: 800;
             font-size: 13px;
-            border: 2px solid #cbd5e1;
+            border: 2px solid var(--toc-border);
             margin-bottom: 25px;
             transition: 0.2s;
         }
         .btn-back:hover {
-            background: #e2e8f0;
+            opacity: 0.8;
             transform: translateX(-3px);
         }
         h1 { color: var(--dark); font-size: 24px; font-weight: 900; margin-top: 0; letter-spacing: -0.5px; }
-        h2 { color: var(--primary-dark); font-size: 17px; font-weight: 900; margin-top: 35px; border-bottom: 2px solid #fed7aa; padding-bottom: 6px; }
+        h2 { color: var(--primary); font-size: 17px; font-weight: 900; margin-top: 35px; border-bottom: 2px solid var(--border); padding-bottom: 6px; }
         h3 { color: var(--dark); font-size: 14px; font-weight: 800; margin-top: 20px; }
-        p, li { font-size: 13px; font-weight: 600; color: #475569; }
+        p, li { font-size: 13px; font-weight: 600; color: var(--text); opacity: 0.9; }
         ul { padding-left: 18px; }
         .toc {
-            background: #fff7ed;
-            border: 2px solid #fed7aa;
+            background: var(--toc-bg);
+            border: 2px solid var(--toc-border);
             padding: 20px;
             border-radius: 16px;
             margin-bottom: 30px;
         }
-        .toc h3 { margin-top: 0; color: #c2410c; font-size: 15px; }
+        .toc h3 { margin-top: 0; color: var(--toc-text); font-size: 15px; }
         .toc ul { margin: 0; padding-left: 18px; }
         .toc li { margin-bottom: 6px; }
-        .toc a { color: #ea580c; text-decoration: none; font-weight: 800; }
+        .toc a { color: var(--primary); text-decoration: none; font-weight: 800; }
         .toc a:hover { text-decoration: underline; }
         .tip-box {
-            background: #f0fdf4;
+            background: rgba(22, 163, 74, 0.1);
             border-left: 4px solid #16a34a;
             padding: 12px 15px;
             margin: 15px 0;
             border-radius: 0 12px 12px 0;
             font-size: 12px;
-            color: #166534;
+            color: #16a34a;
         }
         .badge-key {
-            background: #f1f5f9;
-            border: 1px solid #cbd5e1;
+            background: var(--toc-bg);
+            border: 1px solid var(--toc-border);
             padding: 2px 6px;
             border-radius: 6px;
             font-family: monospace;
@@ -99,7 +119,7 @@ location: "APENDIKS"
             padding: 10px;
             text-align: left;
         }
-        th { background: #f8fafc; color: var(--dark); font-weight: 800; }
+        th { background: var(--toc-bg); color: var(--dark); font-weight: 800; }
     </style>
 </head>
 <body>

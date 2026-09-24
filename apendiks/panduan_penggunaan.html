@@ -134,7 +134,7 @@ location: "APENDIKS"
         </a>
 
         <h1>📖 PANDUAN OPERASIONAL WEBSITE LOGISTIK A/V</h1>
-        <p>Halaman ini berisi panduan praktis penggunaan sistem inventaris gudang A/V lewat HP maupun laptop untuk seluruh kru di lapangan.</p>
+        <p>Halaman ini berisi panduan praktis penggunaan sistem inventaris gudang & misi lapangan A/V lewat HP maupun laptop untuk seluruh kru.</p>
 
         <!-- DAFTAR ISI -->
         <div class="toc">
@@ -146,9 +146,10 @@ location: "APENDIKS"
                 <li><a href="#scan">4. Cara Pakai Scan QR / Barcode & Mode Massal</a></li>
                 <li><a href="#detail-foto">5. Klik Detail Alat, Galeri Foto, & Zoom</a></li>
                 <li><a href="#tambah-edit-duplikat">6. Nambah Alat, Edit Data, & Fitur "Duplikat Alat"</a></li>
-                <li><a href="#misi-event">7. Pilih Massal (Bulk) & Kirim Misi (Semarang / Yogya)</a></li>
-                <li><a href="#cetak-laporan">8. Cetak Surat Jalan (Manifest), CO-31, & Export Excel</a></li>
-                <li><a href="#tanya">9. Tanya Jawab Cepat (Troubleshooting)</a></li>
+                <li><a href="#misi-event">7. Kirim Misi (Semarang / Yogya) & Efek Domino Wadah</a></li>
+                <li><a href="#mission-control">8. Cara Pakai Mission Control (Misi Lapangan & Progress Tim)</a></li>
+                <li><a href="#cetak-laporan">9. Cetak Surat Jalan (Manifest), CO-31, & Export Excel</a></li>
+                <li><a href="#tanya">10. Tanya Jawab Cepat (Troubleshooting)</a></li>
             </ul>
         </div>
 
@@ -164,7 +165,7 @@ location: "APENDIKS"
         <h2 id="tampilan">2. Tampilan Kartu (Grid) vs List & Dark Mode</h2>
         <ul>
             <li><strong>Grid View vs List View:</strong> Tombol di kanan atas untuk beralih antara tampilan kartu besar (Grid) atau tampilan baris minimalis (List) guna mempercepat pemindaian data.</li>
-            <li><strong>Dark Mode:</strong> Menyesuaikan tampilan otomatis ke mode gelap untuk kenyamanan mata saat pengecekan di gudang minim cahaya.</li>
+            <li><strong>Dark Mode:</strong> Menyesuaikan tampilan otomatis ke mode gelap untuk kenyamanan mata saat pengecekan di gudang minim cahaya (bisa diatur lewat menu samping Navbar).</li>
         </ul>
 
         <!-- 3. CARI & FILTER -->
@@ -203,7 +204,7 @@ location: "APENDIKS"
         </ul>
 
         <!-- 7. MISI & EVENT -->
-        <h2 id="misi-event">7. Pilih Massal (Bulk) & Kirim Misi (Semarang / Yogya)</h2>
+        <h2 id="misi-event">7. Kirim Misi (Semarang / Yogya) & Efek Domino Wadah</h2>
         <ul>
             <li><strong>Mode Pilih (Massal):</strong> Centang beberapa item sekaligus untuk memperbarui status secara bersamaan.</li>
             <li><strong>Misi & Event Spesifik:</strong> Saat menyiapkan pengiriman, masukkan nama event dan tentukan destinasi spesifik:
@@ -215,16 +216,32 @@ location: "APENDIKS"
             <li><strong>Efek Domino Wadah:</strong> Memilih koper utama untuk dibawa ke event akan membuat sistem secara otomatis menandai seluruh kabel atau alat di dalam koper tersebut ikut berstatus *Akan Dibawa*, mencegah ada item kecil yang tertinggal di gudang (*🚨 TERTINGGAL*).</li>
         </ul>
 
-        <!-- 8. LAPORAN -->
-        <h2 id="cetak-laporan">8. Cetak Surat Jalan (Manifest), CO-31, & Export Excel</h2>
+        <!-- 8. MISSION CONTROL -->
+        <h2 id="mission-control">8. Cara Pakai Mission Control (Misi Lapangan & Progress Tim)</h2>
+        <p>Menu <strong>Mission Control</strong> (dapat diakses dari halaman Beranda atau Menu Samping) adalah pusat komando bagi kru di lokasi event untuk memantau tugas harian.</p>
+        <ul>
+            <li><strong>Memantau Tugas Tim:</strong> Di halaman ini, kru bisa melihat daftar tugas yang dibebankan ke masing-masing tim (*Speaker, Kabel, Booth, Inventaris*), lengkap dengan zona dan status misinya (*Pending* atau *Selesai*).</li>
+            <li><strong>🎯 Selesaikan Misi:</strong> Ketika alat sudah sampai di lokasi event dan siap digunakan, kru tinggal mengeklik tombol <strong>Selesaikan Misi</strong> pada kartu tugas tersebut. Sistem secara otomatis:
+                <ul>
+                    <li>Mengubah status barang di database utama menjadi <code>📍 Di Lokasi Event</code> dan <code>🔌 Sedang Dipakai</code>.</li>
+                    <li>Mencatat jam selesai dan nama kru yang menyelesaikan tugas.</li>
+                </ul>
+            </li>
+            <li><strong>⚠️ Override / Ganti Alat Darurat:</strong> Jika di tengah jalan ada alat utama yang rusak dan harus diganti dengan alat cadangan, kru dapat memasukkan kode alat pengganti yang baru beserta alasannya langsung di form misi.</li>
+            <li><strong>↩️ Batalkan (Undo) Misi:</strong> Jika ada kesalahan input atau misi batal, tombol *Undo* akan mereset status misi kembali ke *Pending* dan mengembalikan status barang ke gudang asal.</li>
+            <li><strong>📊 Progress Bar Otomatis:</strong> Setiap kali kru menyelesaikan misi di halaman Mission Control, grafik indikator (*progress bar*) di halaman Beranda akan otomatis terisi dan persentasenya naik secara *real-time*!</li>
+        </ul>
+
+        <!-- 9. LAPORAN -->
+        <h2 id="cetak-laporan">9. Cetak Surat Jalan (Manifest), CO-31, & Export Excel</h2>
         <ul>
             <li><strong>📄 Cetak Surat Jalan:</strong> Mencetak daftar muatan yang dikelompokkan rapi per gudang asal dan per koper untuk kru/supir.</li>
             <li><strong>📄 Cetak CO-31:</strong> Format cetak lampiran barang yang disesuaikan dengan form pesanan pengiriman resmi *CO-31-IN*.</li>
             <li><strong>📥 Export Excel:</strong> Mengunduh data inventaris dalam format CSV dengan opsi filter sesuai kebutuhan.</li>
         </ul>
 
-        <!-- 9. TROUBLESHOOTING -->
-        <h2 id="tanya">9. Tanya Jawab Cepat (Troubleshooting)</h2>
+        <!-- 10. TROUBLESHOOTING -->
+        <h2 id="tanya">10. Tanya Jawab Cepat (Troubleshooting)</h2>
         <table>
             <tr>
                 <th>Kendala di Lapangan</th>

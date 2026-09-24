@@ -341,6 +341,17 @@ function openDetailModal(item) {
     
     const modalHtml = `<div id="detailModal" class="modal-overlay active"><div class="modal-content" style="max-width:400px; max-height:90vh; overflow-y:auto; background:white; padding:20px; border-radius:15px; text-align:center; position:relative;"><button onclick="document.getElementById('detailModal').remove()" style="position:absolute; top:15px; right:15px; border:none; background:#f1f5f9; width:30px; height:30px; border-radius:50%; font-weight:bold; cursor:pointer; z-index:10;">✕</button>${galleryHtml}<h3 style="margin:0; font-weight:900; color:#1e293b; font-size:18px;">${item.nama_barang}</h3><div style="font-size:10px; color:gray; margin-bottom:8px;">⏱️ Update: ${item.timestamp || '-'}</div><p style="margin:5px 0 5px 0; font-size:12px; color:#ea580c; font-weight:bold;">#${item.kode_barang || '-'} ${wadahHeaderHtml}</p>${badgeWadahHtml}<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:12px; text-align:left; background:#f8fafc; padding:10px; border-radius:8px; border:1px solid #e2e8f0;"><div><span style="color:gray;">Item Ini:</span> <br><b>${item.jumlah || 0} Pcs</b></div><div><span style="color:gray;">Kondisi:</span> <br><b>${item.kondisi || '-'}</b></div><div><span style="color:gray;">📍 Lokasi:</span> <br><b>${lok}</b></div><div><span style="color:gray;">🔌 Status:</span> <br><b>${stat}</b></div></div>${similarHtml}${isiWadahHtml}<div style="text-align:left; margin-top:10px; font-size:11px; color:#475569; background:#fff7ed; padding:8px; border-radius:6px; border:1px solid #fed7aa; margin-bottom:5px;"><b>📝 Ket:</b> ${item.keterangan_ref || 'Tidak ada catatan.'}</div><div style="text-align:left; font-size:11px; margin-bottom:15px; color:#3b82f6;"><b>🎯 Tujuan (Event):</b> ${item.tujuan || '-'}</div>${logHtml}${actionButtons}</div></div>`; 
     document.body.insertAdjacentHTML('beforeend', modalHtml);
+    // 1. DI DALAM FUNGSI openDetailModal(item), TAMBAHKAN TOMBOL INI PADA AKSI ADMIN:
+    let actionButtons = isAdminMode ? `
+    <button onclick="duplicateItem(${item.row_index})" style="width:100%; padding:10px; background:#8b5cf6; color:white; border:none; border-radius:8px; font-weight:bold; margin-bottom:8px; cursor:pointer;">📋 Duplikat Alat</button>
+    <button onclick='openEditFullModal(${JSON.stringify(item).replace(/'/g, "&#39;")})' style="width:100%; padding:10px; background:#f59e0b; color:white; border:none; border-radius:8px; font-weight:bold; margin-bottom:15px;">✏️ EDIT DATA / FOTO</button>
+    <div style="text-align:left; border-top:1px dashed #ccc; padding-top:15px;">
+        <label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">📍 Update Lokasi:</label>
+        <select id="editLokasi" style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc; margin-bottom:12px;">${optionsLokasi}</select>
+        <label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">🔌 Update Status:</label>
+        <select id="editStatus" style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc; margin-bottom:12px; font-weight:bold;">${optionsStatus}</select>
+        <button onclick="saveEditLokasiStatus(${item.row_index})" style="width:100%; padding:12px; background:#ea580c; color:white; border:none; border-radius:8px; font-weight:bold;">💾 SIMPAN STATUS</button>
+    </div>` : `<div style="margin-top:15px; padding:10px; background:#f1f5f9; border-radius:8px; font-size:12px; color:#64748b;">🔒 Login Akses untuk mengubah status/lokasi.</div>`;
 }
 
 // ==========================================
@@ -427,3 +438,34 @@ if (btnBukaFilter && panelFilter) { btnBukaFilter.replaceWith(btnBukaFilter.clon
 function exportToExcel() { if (!allItems || allItems.length === 0) { alert("⚠️ Data inventaris belum selesai dimuat dari satelit!"); return; } const selectLokasi = document.getElementById('exportLokasi'); const selectTim = document.getElementById('exportTim'); selectLokasi.innerHTML = '<option value="ALL">📦 Semua Gudang / Lokasi</option>'; selectTim.innerHTML = '<option value="ALL">👥 Semua Tim</option>'; let daftarGudang = new Set(); let daftarTim = new Set(); allItems.forEach(item => { let lok = item.lokasi_saat_ini || item.lokasi || item["Lokasi Saat Ini"] || ""; if (lok && lok.trim() !== "") { daftarGudang.add(lok.trim()); } let tim = item.tim || item["Tim"] || ""; if (tim && tim.trim() !== "") { daftarTim.add(tim.trim()); } }); if(daftarGudang.size === 0) { daftarGudang.add("Gudang Kanguru"); daftarGudang.add("Gudang Mrican"); daftarGudang.add("Gedung UTC"); daftarGudang.add("Di Lokasi Event"); } daftarGudang.forEach(gudang => { let opt = document.createElement('option'); opt.value = gudang; opt.text = `📍 ${gudang}`; selectLokasi.appendChild(opt); }); daftarTim.forEach(tim => { let opt = document.createElement('option'); opt.value = tim; opt.text = `🏷️ ${tim}`; selectTim.appendChild(opt); }); const modal = document.getElementById('modalExport'); if(modal) { modal.style.display = 'flex'; modal.classList.add('active'); } }
 function closeExportModal() { const modal = document.getElementById('modalExport'); if(modal) { modal.style.display = 'none'; modal.classList.remove('active'); } }
 function executeCustomExport() { let dataToExport = getFilteredData(); if (dataToExport.length === 0) { alert("❌ Kosong! Tidak ada barang yang tampil di layar."); return; } let csvContent = "data:text/csv;charset=utf-8,Kode Barang,Nama Alat,Wadah,Kondisi,Lokasi Gudang,Status Pemakaian,Total Qty,Tim Terkait\n"; dataToExport.forEach(row => { let nama = `"${(row.nama_barang || "").replace(/"/g, '""')}"`; let kode = `"${row.kode_barang || "-"}"`; let wadah = `"${row.kode_wadah || "-"}"`; let kondisi = `"${row.kondisi || "Bagus"}"`; let lokasi = `"${row.lokasi_saat_ini || row.lokasi || row["Lokasi Saat Ini"] || "Gudang Kanguru"}"`; let status = `"${row.status_digunakan && row.status_digunakan !== 'FALSE' ? row.status_digunakan : 'Di Gudang'}"`; let qty = `"${row.jumlah || 1}"`; let tim = `"${row.tim || "-"}"`; csvContent += `${kode},${nama},${wadah},${kondisi},${lokasi},${status},${qty},${tim}\n`; }); let encodedUri = encodeURI(csvContent); let link = document.createElement("a"); link.setAttribute("href", encodedUri); let dateStr = new Date().toISOString().slice(0,10); link.setAttribute("download", `Laporan_GudangAV_${dateStr}.csv`); document.body.appendChild(link); link.click(); document.body.removeChild(link); closeExportModal(); showToast(`✅ SUKSES: ${dataToExport.length} data diekspor!`); }
+
+// 2. TAMBAHKAN FUNGSI EKSEKUSI DUPLIKASI INI DI SCRIPT-GUDANG.JS
+async function duplicateItem(rowIndex) {
+    if (!confirm("⚠️ Apakah Anda yakin ingin menduplikasi alat ini beserta foto dan detailnya?")) return;
+    
+    showToast("⏳ Sedang menduplikasi alat...");
+    try {
+        const payload = {
+            action: "duplicate_item",
+            pin: API_BACKEND_PIN,
+            user_name: localStorage.getItem('av_session_nama') || "Kru Tanpa Nama",
+            row_index: rowIndex
+        };
+        
+        const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
+        const data = await response.json();
+        
+        if (data.status === "success") {
+            // Tutup modal detail, muat ulang data, dan tampilkan notifikasi sukses
+            const modalDetail = document.getElementById('detailModal');
+            if (modalDetail) modalDetail.remove();
+            
+            loadData();
+            showToast("✅ Berhasil! Alat baru telah ditambahkan.");
+        } else {
+            alert("Gagal menduplikasi:\n" + data.message);
+        }
+    } catch (e) {
+        alert("Error Sistem:\n" + e.message);
+    }
+}

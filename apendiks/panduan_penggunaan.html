@@ -1,215 +1,229 @@
+---
+location: "APENDIKS"
+---
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panduan & Manual Operasional - Sistem Logistik A/V</title>
+    <title>Panduan Operasional Website Logistik A/V</title>
     <style>
         :root {
-            --primary: #2563eb;
-            --secondary: #ea580c;
-            --dark: #1e293b;
+            --primary: #f97316;
+            --primary-dark: #ea580c;
+            --dark: #0f172a;
             --light: #f8fafc;
             --border: #e2e8f0;
             --text: #334155;
         }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
             line-height: 1.6;
             color: var(--text);
             background-color: var(--light);
             margin: 0;
-            padding: 0;
+            padding: 20px;
         }
         .container {
-            max-width: 900px;
-            margin: 30px auto;
+            max-width: 850px;
+            margin: 0 auto;
             background: white;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            border: 2px solid var(--border);
         }
-        h1 { color: var(--dark); border-bottom: 3px solid var(--primary); padding-bottom: 10px; margin-top: 0; font-size: 24px; }
-        h2 { color: var(--primary); margin-top: 35px; border-bottom: 1px solid var(--border); padding-bottom: 6px; font-size: 18px; }
-        h3 { color: var(--dark); margin-top: 25px; font-size: 15px; }
-        p, li { font-size: 14px; }
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #f1f5f9;
+            color: #0f172a;
+            padding: 10px 18px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 13px;
+            border: 2px solid #cbd5e1;
+            margin-bottom: 25px;
+            transition: 0.2s;
+        }
+        .btn-back:hover {
+            background: #e2e8f0;
+            transform: translateX(-3px);
+        }
+        h1 { color: var(--dark); font-size: 24px; font-weight: 900; margin-top: 0; letter-spacing: -0.5px; }
+        h2 { color: var(--primary-dark); font-size: 17px; font-weight: 900; margin-top: 35px; border-bottom: 2px solid #fed7aa; padding-bottom: 6px; }
+        h3 { color: var(--dark); font-size: 14px; font-weight: 800; margin-top: 20px; }
+        p, li { font-size: 13px; font-weight: 600; color: #475569; }
+        ul { padding-left: 18px; }
         .toc {
-            background: #eff6ff;
-            border: 1px solid #bfdbfe;
-            padding: 20px 25px;
-            border-radius: 8px;
+            background: #fff7ed;
+            border: 2px solid #fed7aa;
+            padding: 20px;
+            border-radius: 16px;
             margin-bottom: 30px;
         }
-        .toc h3 { margin-top: 0; color: #1d4ed8; }
-        .toc ul { margin: 0; padding-left: 20px; }
+        .toc h3 { margin-top: 0; color: #c2410c; font-size: 15px; }
+        .toc ul { margin: 0; padding-left: 18px; }
         .toc li { margin-bottom: 6px; }
-        .toc a { color: #1e40af; text-decoration: none; font-weight: 600; }
+        .toc a { color: #ea580c; text-decoration: none; font-weight: 800; }
         .toc a:hover { text-decoration: underline; }
+        .tip-box {
+            background: #f0fdf4;
+            border-left: 4px solid #16a34a;
+            padding: 12px 15px;
+            margin: 15px 0;
+            border-radius: 0 12px 12px 0;
+            font-size: 12px;
+            color: #166534;
+        }
         .badge-key {
             background: #f1f5f9;
             border: 1px solid #cbd5e1;
             padding: 2px 6px;
-            border-radius: 4px;
+            border-radius: 6px;
             font-family: monospace;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: bold;
             color: var(--dark);
-        }
-        .tip-box {
-            background: #fff7ed;
-            border-left: 4px solid var(--secondary);
-            padding: 12px 15px;
-            margin: 15px 0;
-            border-radius: 0 8px 8px 0;
-            font-size: 13px;
         }
         table {
             width: 100%;
             border-collapse: collapse;
             margin: 15px 0;
-            font-size: 13px;
+            font-size: 12px;
         }
         th, td {
             border: 1px solid var(--border);
-            padding: 10px 12px;
+            padding: 10px;
             text-align: left;
         }
-        th { background: #f1f5f9; color: var(--dark); }
-        code { background: #f1f5f9; padding: 2px 5px; border-radius: 4px; font-size: 12px; color: #d97706; }
+        th { background: #f8fafc; color: var(--dark); font-weight: 800; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>📚 PANDUAN OPERASIONAL SISTEM LOGISTIK A/V</h1>
-    <p>Dokumen resmi ini disusun sebagai panduan lengkap bagi seluruh kru dan administrator dalam mengoperasikan <strong>Web Inventory Management A/V</strong> yang terintegrasi dengan Google Sheets dan GitHub Pages.</p>
+    <!-- TOMBOL KEMBALI KE HOME -->
+    <a href="{{ site.baseurl }}/" class="btn-back">
+        ⬅ Kembali ke Beranda
+    </a>
+
+    <h1>📖 PANDUAN OPERASIONAL WEBSITE LOGISTIK A/V</h1>
+    <p>Halaman ini berisi panduan praktis penggunaan sistem inventaris gudang A/V lewat HP maupun laptop untuk seluruh kru di lapangan.</p>
 
     <!-- DAFTAR ISI -->
     <div class="toc">
-        <h3>📋 Daftar Isi</h3>
+        <h3>🧭 Daftar Bahasan:</h3>
         <ul>
-            <li><a href="#arsitektur">1. Arsitektur & Konsep Dasar Sistem</a></li>
-            <li><a href="#akses">2. Hak Akses & Keamanan (Read-Only vs Admin Mode)</a></li>
-            <li><a href="#navigasi">3. Navigasi Utama, Tampilan, & Dark Mode</a></li>
-            <li><a href="#pencarian">4. Pencarian, Filter Cerdas, & Mode Wadah</a></li>
-            <li><a href="#scanner">5. Pemindaian Kode (Scan QR / Barcode)</a></li>
-            <li><a href="#detail">6. Detail Item, Galeri Multi-Foto, & Zoom</a></li>
-            <li><a href="#operasi">7. Operasi Data: Tambah, Edit, & Duplikat Alat</a></li>
-            <li><a href="#massal">8. Operasi Massal (Bulk Mode), Misi Event, & Efek Domino</a></li>
-            <li><a href="#laporan">9. Pelaporan: Cetak Manifest, CO-31, & Export Excel</a></li>
-            <li><a href="#faq">10. Tanya Jawab & Kendala Umum (Troubleshooting)</a></li>
+            <li><a href="#akses">1. Status Masuk (Read-Only vs Edit Mode)</a></li>
+            <li><a href="#tampilan">2. Tampilan Kartu (Grid) vs List & Dark Mode</a></li>
+            <li><a href="#cari-filter">3. Cara Cari Alat, Filter Tim, & Tombol "Hanya Wadah"</a></li>
+            <li><a href="#scan">4. Cara Pakai Scan QR / Barcode & Mode Massal</a></li>
+            <li><a href="#detail-foto">5. Klik Detail Alat, Galeri Foto, & Zoom</a></li>
+            <li><a href="#tambah-edit-duplikat">6. Nambah Alat, Edit Data, & Fitur "Duplikat Alat"</a></li>
+            <li><a href="#misi-event">7. Pilih Massal (Bulk) & Kirim Misi (Semarang / Yogya)</a></li>
+            <li><a href="#cetak-laporan">8. Cetak Surat Jalan (Manifest), CO-31, & Export Excel</a></li>
+            <li><a href="#tanya">9. Tanya Jawab Cepat (Troubleshooting)</a></li>
         </ul>
     </div>
 
-    <!-- 1. ARSITEKTUR -->
-    <h2 id="arsitektur">1. Arsitektur & Konsep Dasar Sistem</h2>
-    <p>Sistem ini menggunakan arsitektur <em>Serverless</em> yang memisahkan bagian antarmuka pengguna (Frontend) dan penyimpanan data (Backend):</p>
+    <!-- 1. AKSES -->
+    <h2 id="akses">1. Status Masuk (Read-Only vs Edit Mode)</h2>
+    <p>Sistem membagi akses menjadi dua mode untuk keamanan data:</p>
     <ul>
-        <li><strong>Frontend:</strong> Di-host di GitHub Pages menggunakan file statis (HTML, CSS, JavaScript) agar dapat diakses super cepat lewat HP maupun Laptop kru lapangan.</li>
-        <li><strong>Backend & Database:</strong> Menggunakan Google Sheets sebagai basis data utama dan Google Apps Script (GAS) sebagai API server untuk menangani perintah baca/tulis (*CRUD*).</li>
-        <li><strong>Penyimpanan Foto:</strong> Foto yang diambil langsung dari kamera HP akan dikompres secara otomatis oleh browser, lalu dikirim ke server untuk disimpan di Google Drive khusus inventaris.</li>
+        <li><strong>🟢 Read-Only Mode:</strong> Mode bawaan saat pertama kali membuka web. Tombol tambah, edit, atau ubah status disembunyikan agar data tidak sengaja terubah.</li>
+        <li><strong>🔴 Edit Mode Aktif:</strong> Muncul saat sesi admin/kru berwenang aktif. Seluruh tombol aksi operasional terbuka penuh.</li>
     </ul>
 
-    <!-- 2. HAK AKSES -->
-    <h2 id="akses">2. Hak Akses & Keamanan (Read-Only vs Admin Mode)</h2>
-    <p>Untuk menjaga keamanan data dari kesalahan input oleh pihak luar, sistem menerapkan pembatasan hak akses berbasis <code>LocalStorage</code>:</p>
+    <!-- 2. TAMPILAN -->
+    <h2 id="tampilan">2. Tampilan Kartu (Grid) vs List & Dark Mode</h2>
     <ul>
-        <li><strong>🟢 Read-Only Mode (Publik / Kru Umum):</strong> Saat pertama kali dibuka, tombol-tombol aksi berbahaya (Tambah, Massal, Edit, Hapus) disembunyikan secara otomatis. Pengguna hanya dapat melihat data, melacak status, dan mencetak laporan.</li>
-        <li><strong>🔴 Edit Mode Aktif (Admin / Kru Berwenang):</strong> Ditandai dengan indikator merah di sudut kiri atas web. Tombol aksi administratif akan terbuka penuh setelah sistem mendeteksi sesi login aktif.</li>
+        <li><strong>Grid View vs List View:</strong> Tombol di kanan atas untuk beralih antara tampilan kartu besar (Grid) atau tampilan baris minimalis (List) guna mempercepat pemindaian data.</li>
+        <li><strong>Dark Mode:</strong> Menyesuaikan tampilan otomatis ke mode gelap untuk kenyamanan mata saat pengecekan di gudang minim cahaya.</li>
     </ul>
 
-    <!-- 3. NAVIGASI -->
-    <h2 id="navigasi">3. Navigasi Utama, Tampilan, & Dark Mode</h2>
+    <!-- 3. CARI & FILTER -->
+    <h2 id="cari-filter">3. Cara Cari Alat, Filter Tim, & Tombol "Hanya Wadah"</h2>
     <ul>
-        <li><strong>Grid View vs List View:</strong> Tombol toggle di sebelah kanan atas memampukan kru beralih antara tampilan kartu besar (Grid) yang kaya visual atau tampilan baris minimalis (List) untuk pemindaian data cepat.</li>
-        <li><strong>Dark Mode Otomatis:</strong> Sistem mendukung mode gelap penuh yang ramah baterai dan nyaman digunakan saat pengecekan gudang di pencahayaan minim.</li>
+        <li><strong>Kolom Pencarian:</strong> Ketik nama, merk, atau kode barang (misal: <code>ADPT-JACK3.5</code> atau <code>HRCS-018</code>) untuk menyaring item secara instan.</li>
+        <li><strong>Pill Filter:</strong> Menyaring item berdasarkan status cepat seperti <em>Akan Dibawa, Dipakai, Di Gudang, Perbaikan</em>, atau lokasi gudang.</li>
+        <li><strong>Filter Tim:</strong> Tombol <span class="badge-key">⚙️ FILTER TIM</span> untuk menyaring barang berdasarkan kategori tim (Speaker, Kabel, Booth).</li>
+        <li><strong>🧰 Hanya Wadah:</strong> Tombol pintas untuk menyembunyikan barang eceran dan hanya menampilkan **Hardcase, Koper, atau Box utamanya saja**. Sangat membantu saat proses hitung bagasi truk.</li>
     </ul>
 
-    <!-- 4. PENCARIAN & FILTER -->
-    <h2 id="pencarian">4. Pencarian, Filter Cerdas, & Mode Wadah</h2>
+    <!-- 4. SCANNER -->
+    <h2 id="scan">4. Cara Pakai Scan QR / Barcode & Mode Massal</h2>
+    <p>Klik tombol <span class="badge-key">📷 Scan QR</span> di sebelah kolom pencarian:</p>
     <ul>
-        <li><strong>Kolom Pencarian Cepat:</strong> Ketik nama alat, merk, atau kode barang (misal: <code>ADPT-JACK3.5</code> atau <code>HRCS-018</code>) untuk memfilter item secara instan.</li>
-        <li><strong>Filter Pills (Tab Status/Lokasi):</strong> Menyaring item berdasarkan status cepat seperti <em>Semua Alat, Akan Dibawa, Dipakai, Di Gudang, Perbaikan</em>, hingga lokasi fisik (*Gudang Kanguru, Gudang Mrican, Event*).</li>
-        <li><strong>Filter Tim:</strong> Tombol <strong>⚙️ FILTER TIM</strong> membuka panel lanjutan untuk menyaring barang berdasarkan kategori tim (Speaker, Kabel, Booth, dll).</li>
-        <li><strong>📦 Tampilkan Semua vs 🧰 Hanya Wadah:</strong> Tombol khusus untuk menyembunyikan barang-barang eceran (kabel/adaptor kecil) dan hanya menampilkan wadah utamanya saja (Hardcase, Koper, Box). Sangat berguna saat proses hitung bagasi/bagasi truk.</li>
+        <li><strong>Scan Biasa:</strong> Cukup klik Scan QR, arahkan kamera ke kode barang. Sistem otomatis mencari dan membuka detail barang tersebut di layar.</li>
+        <li><strong>Scan + Mode Massal (Pilih Banyak):</strong> Jika Anda mengaktifkan tombol <strong>Massal</strong> terlebih dahulu sebelum menekan Scan QR, kamera pemindai akan berfungsi untuk <strong>mencentang dan memilih banyak barang secara otomatis</strong> hanya dengan mengarahkan kamera ke satu persatu QR Code barang. Barang-barang yang di-scan akan langsung masuk ke daftar terpilih untuk di-update statusnya secara massal!</li>
+        <li>Tersedia juga tombol <strong>🔄 Kamera</strong> (putar depan/belakang) dan <strong>🔦 Senter</strong> di dalam layar scanner.</li>
     </ul>
 
-    <!-- 5. SCANNER -->
-    <h2 id="scanner">5. Pemindaian Kode (Scan QR / Barcode)</h2>
-    <p>Tekan tombol <span class="badge-key">📷 Scan QR</span> di sebelah kotak pencarian untuk membuka kamera pemindai:</p>
+    <!-- 5. DETAIL & FOTO -->
+    <h2 id="detail-foto">5. Klik Detail Alat, Galeri Foto, & Zoom</h2>
+    <p>Ketuk salah satu kartu barang untuk membuka jendela detail:</p>
     <ul>
-        <li><strong>🔄 Tombol Kamera:</strong> Membalik orientasi kamera (kamera belakang/depan).</li>
-        <li><strong>🔦 Tombol Senter:</strong> Menyalakan lampu kilat (*flashlight*) perangkat untuk memindai kode di sudut gudang yang gelap.</li>
-        <li><strong>Mode Normal:</strong> Begitu QR/Barcode terbaca, sistem otomatis mengetik kodenya ke pencarian dan membuka detail barang tersebut.</li>
+        <li><strong>Galeri Foto:</strong> Menampilkan hingga 3 foto fisik barang. Ketuk foto untuk memperbesar (*Zoom Modal*) dengan tombol geser antar-foto.</li>
+        <li><strong>Badge IN-BOX:</strong> Menandakan item berada di dalam koper tertentu. Klik nama koper hijaunya untuk melompat langsung ke data koper induk.</li>
+        <li><strong>Cek Silang Stok:</strong> Menampilkan total jumlah item serupa di gudang beserta sebaran statusnya saat itu.</li>
     </ul>
 
-    <!-- 6. DETAIL & GALERI -->
-    <h2 id="detail">6. Detail Item, Galeri Multi-Foto, & Zoom</h2>
-    <p>Mengetuk salah satu kartu barang akan membuka jendela modal detail yang memuat:</p>
+    <!-- 6. TAMBAH & DUPLIKAT -->
+    <h2 id="tambah-edit-duplikat">6. Nambah Alat, Edit Data, & Fitur "Duplikat Alat"</h2>
     <ul>
-        <li><strong>Galeri Multi-Foto (Hingga 3 Foto):</strong> Foto fisik barang ditampilkan berdampingan. Mengetuk foto akan membuka penampil layar penuh (*Zoom Modal*) lengkap dengan tombol navigasi geser kiri-kanan.</li>
-        <li><strong>Indikator Wadah (IN-BOX):</strong> Menunjukkan apakah barang tersebut tersimpan di dalam koper tertentu. Klik nama wadahnya untuk langsung melompat melihat data koper induknya.</li>
-        <li><strong>Cek Silang Stok:</strong> Ringkasan otomatis jumlah total item serupa di seluruh gudang dan sebaran statusnya.</li>
-        <li><strong>Isi di Dalam Wadah:</strong> Jika item yang diklik adalah sebuah Hardcase/Koper, sistem akan menampilkan daftar seluruh kabel atau alat kecil yang menumpang di dalamnya.</li>
+        <li><strong>➕ Tambah Alat:</strong> Form untuk memasukkan item baru lengkap dengan unggah foto kamera, jumlah (*Qty*), kondisi, dan lokasi gudang.</li>
+        <li><strong>✏️ Edit Data / Foto:</strong> Memperbarui informasi teks, catatan, atau mengganti foto lama.</li>
+        <li><strong>📋 Duplikat Alat:</strong> Saat membeli barang baru yang jenis dan bentuknya persis sama dengan yang sudah ada, buka detail barang tersebut lalu klik <strong>Duplikat Alat</strong>. Sistem otomatis menyalin seluruh data, catatan, dan foto aslinya ke baris baru secara instan tanpa perlu repot upload ulang!</li>
     </ul>
 
-    <!-- 7. OPERASI DATA -->
-    <h2 id="operasi">7. Operasi Data: Tambah, Edit, & Duplikat Alat</h2>
+    <!-- 7. MISI & EVENT -->
+    <h2 id="misi-event">7. Pilih Massal (Bulk) & Kirim Misi (Semarang / Yogya)</h2>
     <ul>
-        <li><strong>➕ Tambah Alat:</strong> Membuka form input barang baru dengan fitur unggah hingga 3 foto, kompresi otomatis, pengaturan jumlah (*Qty*), kondisi, dan lokasi gudang awal.</li>
-        <li><strong>✏️ Edit Data / Foto:</strong> Memperbarui informasi teks, mengganti atau menghapus foto lama secara fleksibel.</li>
-        <li><strong>📋 Duplikat Alat (Fitur Baru):</strong> Berada di dalam menu detail item. Digunakan saat ada pembelian barang baru yang identik. Sistem akan menyalin seluruh detail, catatan, dan <strong>formula gambar/foto aslinya secara instan</strong> ke baris baru tanpa perlu repot *upload* ulang foto dari awal.</li>
-    </ul>
-
-    <!-- 8. OPERASI MASSAL & MISI -->
-    <h2 id="massal">8. Operasi Massal (Bulk Mode), Misi Event, & Efek Domino</h2>
-    <ul>
-        <li><strong>🛒 Mode Pilih (Massal):</strong> Mengaktifkan mode centang pada banyak item sekaligus untuk melakukan pembaruan status massal (misal: memindahkan puluhan barang sekaligus ke status *Akan Dibawa*).</li>
-        <li><strong>🎯 Misi & Event Spesifik:</strong> Memasukkan barang terpilih ke dalam daftar pengiriman event. Sistem mendukung destinasi spesifik seperti:
+        <li><strong>Mode Pilih (Massal):</strong> Centang beberapa item sekaligus untuk memperbarui status secara bersamaan.</li>
+        <li><strong>Misi & Event Spesifik:</strong> Saat menyiapkan pengiriman, masukkan nama event dan tentukan destinasi spesifik:
             <div class="tip-box">
                 👉 <strong>"Akan Dibawa ke Gedung UTC Semarang"</strong><br>
                 👉 <strong>"Akan Dibawa ke Gedung Pacific Yogya"</strong>
             </div>
         </li>
-        <li><strong>Efek Domino Wadah:</strong> Teknologi cerdas yang secara otomatis ikut menandai isi koper/hardcase ikut terbawa apabila koper utamanya dipilih untuk suatu misi, mencegah ada item printilan yang tertinggal di gudang (*🚨 TERTINGGAL Alert*).</li>
+        <li><strong>Efek Domino Wadah:</strong> Memilih koper utama untuk dibawa ke event akan membuat sistem secara otomatis menandai seluruh kabel atau alat di dalam koper tersebut ikut berstatus *Akan Dibawa*, mencegah ada item kecil yang tertinggal di gudang (*🚨 TERTINGGAL*).</li>
     </ul>
 
-    <!-- 9. PELAPORAN -->
-    <h2 id="laporan">9. Pelaporan: Cetak Manifest, CO-31, & Export Excel</h2>
+    <!-- 8. LAPORAN -->
+    <h2 id="cetak-laporan">8. Cetak Surat Jalan (Manifest), CO-31, & Export Excel</h2>
     <ul>
-        <li><strong>📄 Cetak Manifest / Surat Jalan:</strong> Mencetak daftar muatan resmi yang dikelompokkan rapi per gudang asal dan per koper/hardcase untuk ditaruh di kabin supir.</li>
-        <li><strong>📄 Cetak CO-31:</strong> Mencetak lampiran daftar barang resmi yang disesuaikan dengan format operasional form pengiriman *CO-31-IN*.</li>
-        <li><strong>📥 Export Excel (CSV):</strong> Mengunduh laporan inventaris dalam format CSV dengan opsi filter berdasarkan lokasi gudang, tim terkait, dan kondisi barang.</li>
+        <li><strong>📄 Cetak Surat Jalan:</strong> Mencetak daftar muatan yang dikelompokkan rapi per gudang asal dan per koper untuk kru/supir.</li>
+        <li><strong>📄 Cetak CO-31:</strong> Format cetak lampiran barang yang disesuaikan dengan form pesanan pengiriman resmi *CO-31-IN*.</li>
+        <li><strong>📥 Export Excel:</strong> Mengunduh data inventaris dalam format CSV dengan opsi filter sesuai kebutuhan.</li>
     </ul>
 
-    <!-- 10. TROUBLESHOOTING -->
-    <h2 id="faq">10. Tanya Jawab & Kendala Umum (Troubleshooting)</h2>
+    <!-- 9. TROUBLESHOOTING -->
+    <h2 id="tanya">9. Tanya Jawab Cepat (Troubleshooting)</h2>
     <table>
         <tr>
-            <th>Kendala</th>
-            <th>Penyebab Umum</th>
-            <th>Solusi</th>
+            <th>Kendala di Lapangan</th>
+            <th>Penyebab & Cara Mengatasinya</th>
         </tr>
         <tr>
-            <td>Tombol aksi tidak muncul</td>
-            <td>Sesi akses masih dalam mode Read-Only.</td>
-            <td>Pastikan perangkat Anda memiliki izin admin atau muat ulang sesi login Anda.</td>
+            <td>Tombol tambah/edit tidak muncul?</td>
+            <td>Perangkat berada dalam mode Read-Only. Pastikan sesi login admin/kru Anda aktif.</td>
         </tr>
         <tr>
-            <td>Foto gagal di-upload</td>
-            <td>Koneksi internet terputus atau ukuran file terlalu besar.</td>
-            <td>Sistem sudah mengompres otomatis, namun pastikan jaringan stabil saat menekan tombol Simpan.</td>
+            <td>Data tidak berubah setelah disimpan?</td>
+            <td>Memori browser menyimpan *cache* lama. Lakukan *refresh* halaman dengan menarik layar ke bawah.</td>
         </tr>
         <tr>
-            <td>Data di web tidak berubah</td>
-            <td>Memori *cache* browser masih menyimpan data lama.</td>
-            <td>Lakukan *Hard Refresh* pada browser Anda (Ctrl+F5 di PC atau tarik layar ke bawah di HP).</td>
+            <td>Kamera scanner gagal terbuka?</td>
+            <td>Izin kamera di browser belum diaktifkan. Pilih "Allow/Izinkan" saat diminta akses kamera.</td>
         </tr>
     </table>
 
-    <hr style="margin: 40px 0; border: none; border-top: 1px solid var(--border);">
-    <p style="text-align: center; font-size: 12px; color: #64748b;">
-        Sistem Logistik Departemen A/V • Dikelola Otomatis oleh Google Sheets & GitHub Pages
+    <hr style="margin: 30px 0; border: none; border-top: 2px solid var(--border);">
+    <p style="text-align: center; font-size: 11px; color: #94a3b8; font-weight: 700;">
+        Sistem Logistik Departemen A/V • Dibuat oleh Kru, untuk Kru 🚀
     </p>
 </div>
 

@@ -41,7 +41,7 @@ location: "LOGIN"
 
     <!-- KAMUS PIN & NAMA KRU -->
     <script>
-        // DI SINI TEMPAT KOMANDAN MENGEDIT NAMA KRU (Ubah teks di dalam tanda kutip)
+        // DI SINI TEMPAT KOMANDAN MENGEDIT NAMA KRU
         const databaseKru = {
             // 👑 MASTER KEY (Akses Penuh: Misi & Gudang)
             "M9X2A": { nama: "Evan", role: "Master" },
@@ -92,7 +92,14 @@ location: "LOGIN"
             "V9M3D": { nama: "Kru Gudang 22", role: "Kru" },
             "V6Z8W": { nama: "Kru Gudang 23", role: "Kru" },
             "V1L4P": { nama: "Kru Gudang 24", role: "Kru" },
-            "V5T2N": { nama: "Kru Gudang 25", role: "Kru" }
+            "V5T2N": { nama: "Kru Gudang 25", role: "Kru" },
+
+            // 👤 KRU PUBLIK / ABSEN NAMA (Hanya muncul nama, akses tetap Read-Only)
+            "P1R4A": { nama: "Radix", role: "Publik" },
+            "P3D2S": { nama: "Tamu 2", role: "Publik" },
+            "P5F8K": { nama: "Tamu 3", role: "Publik" },
+            "P7L3W": { nama: "Tamu 4", role: "Publik" },
+            "P9J6N": { nama: "Tamu 5", role: "Publik" }
         };
 
         function prosesLogin() {

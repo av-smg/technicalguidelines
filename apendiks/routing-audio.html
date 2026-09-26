@@ -118,9 +118,9 @@ location: "JA-01"
     /* MATRIX GRID */
     .diagram-wrapper .diagram-grid {
         display: grid;
-        grid-template-columns: 240px 200px 240px 240px 240px 260px 280px max-content;
+        grid-template-columns: 240px 200px 240px 240px 250px 280px 280px max-content;
         grid-auto-rows: minmax(70px, auto);
-        gap: 40px 380px;
+        gap: 40px 360px;
         padding: 100px 100px 160px 100px;
         position: relative; z-index: 20; width: max-content; align-items: center; margin: auto; 
     }
@@ -217,6 +217,9 @@ location: "JA-01"
 
     <div class="diagram-grid">
         
+        <!-- =======================
+             INPUTS
+             ======================= -->
         <div class="node style-input" id="in-mic1" style="grid-area: 1 / 1;">
             <div class="node-icon"><svg><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg></div>
             <div class="node-info"><h4>Mic 1 - Ketua</h4><p>Shure SM58 • CH 01</p></div>
@@ -252,6 +255,9 @@ location: "JA-01"
             <div class="tp tp-out" id="t-mb-R" style="top:65%;" data-label="OUT R"></div>
         </div>
 
+        <!-- =======================
+             PROCESSING
+             ======================= -->
         <div class="node style-rack" id="snake-box" style="grid-area: 1 / 2 / span 5 / 3; align-self: center; height: 350px; width: 300px;">
             <div class="node-icon" style="color:#10b981; align-self:flex-start; margin-top:5px;"><svg><rect x="4" y="4" width="16" height="16" rx="2"/></svg></div>
             <div class="node-info" style="align-self:flex-start; margin-top:5px;"><h4>PROEL Stagebox</h4><p>Snake Cable 8/4</p></div>
@@ -278,7 +284,6 @@ location: "JA-01"
                 <h4>Yamaha MG16XU</h4>
                 <p>Audio Console</p>
                 <p style="font-size: 10px; color: #d946ef; font-weight: bold;">» CH 1-4, 9-12 ➔ Stereo Out</p>
-                <p style="font-size: 10px; color: #f59e0b; margin-top: 6px; font-weight: bold;">» Group 1-2 ➔ Broadcast/FM</p>
             </div>
             
             <div class="tp tp-in" id="t-mix-i1" style="top:12%;" data-label="CH 1 IN"></div>
@@ -293,16 +298,8 @@ location: "JA-01"
             
             <div class="tp tp-out" id="t-mix-mainL" style="top:25%;" data-label="STEREO L"></div>
             <div class="tp tp-out" id="t-mix-mainR" style="top:35%;" data-label="STEREO R"></div>
-            <div class="tp tp-out" id="t-mix-grp1" style="top:75%; border-color:var(--c-tx);" data-label="GRP 1"></div>
-            <div class="tp tp-out" id="t-mix-grp2" style="top:85%; border-color:var(--c-tx);" data-label="GRP 2"></div>
         </div>
 
-        <div class="node style-rack" id="tx-fm" style="grid-area: 3 / 4; height: 100px;">
-            <div class="node-icon" style="color:#f59e0b;"><svg><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49"/></svg></div>
-            <div class="node-info"><h4>FM Transmitter</h4><p>Broadcast Radio</p></div>
-            <div class="tp tp-in" id="t-tx-in" style="top:50%;" data-label="IN"></div>
-        </div>
-        
         <div class="node style-rack" id="proc-geq" style="grid-area: 5 / 4; height: 100px; width: 230px;">
             <div class="node-icon" style="color:#10b981; align-self:flex-start; margin-top:5px;"><svg><rect x="2" y="4" width="20" height="16" rx="2"/></svg></div>
             <div class="node-info" style="align-self:flex-start; margin-top:5px;"><h4>GEQ DBX 231</h4><p>Graphic EQ 2 Channel</p></div>
@@ -312,6 +309,13 @@ location: "JA-01"
             <div class="tp tp-out" id="t-geq-outR" style="top:65%;" data-label="OUT R"></div>
         </div>
 
+        <!-- FM TRANSMITTER DIGESER KE ATAS & KANAN (KOLOM 5) AGAR JALUR DLMS BEBAS HAMBATAN -->
+        <div class="node style-rack" id="tx-fm" style="grid-area: 3 / 5; height: 100px; width: 260px;">
+            <div class="node-icon" style="color:#f59e0b;"><svg><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49"/></svg></div>
+            <div class="node-info"><h4>FM Transmitter</h4><p>Broadcast Radio</p></div>
+            <div class="tp tp-in" id="t-tx-in" style="top:50%; border-color:var(--c-tx);" data-label="IN"></div>
+        </div>
+
         <div class="node style-rack" id="proc-dlms" style="grid-area: 5 / 5; height: 160px; width: 300px;">
             <div class="node-icon" style="color:#3b82f6; align-self:flex-start; margin-top:5px;"><svg><rect x="2" y="4" width="20" height="16" rx="2"/></svg></div>
             <div class="node-info" style="align-self:flex-start; margin-top:5px;"><h4>DLMS Behringer DCX2496</h4><p>Manajemen Delay</p></div>
@@ -319,7 +323,6 @@ location: "JA-01"
             <div class="tp tp-in" id="t-dlms-inL" style="top:35%;" data-label="IN L"></div>
             <div class="tp tp-in" id="t-dlms-inR" style="top:65%;" data-label="IN R"></div>
             
-            <!-- DLMS Outputs (1 to 4 dipakai untuk semua Delay Zone) -->
             <div class="tp tp-out" id="t-dlms-o1" style="top:15%; border-color:#ef4444;" data-label="OUT 1 (DLY 3)"></div>
             <div class="tp tp-out" id="t-dlms-o2" style="top:30%; border-color:#ef4444;" data-label="OUT 2 (DLY 1)"></div>
             <div class="tp tp-out" id="t-dlms-o3" style="top:45%; border-color:#ef4444;" data-label="OUT 3 (DLY 2)"></div>
@@ -328,19 +331,24 @@ location: "JA-01"
             <div class="tp tp-out" id="t-dlms-o6" style="top:90%;" data-label="OUT 6 (FOH R)"></div>
         </div>
 
-        <div class="node style-rack" id="proc-split" style="grid-area: 4 / 6; height: 160px; width: 300px;">
+        <div class="node style-rack" id="proc-split" style="grid-area: 4 / 6; height: 200px; width: 300px;">
             <div class="node-icon" style="color:#ef4444; align-self:flex-start; margin-top:5px;"><svg><circle cx="8" cy="12" r="1"/><circle cx="12" cy="12" r="1"/></svg></div>
-            <div class="node-info" style="align-self:flex-start; margin-top:5px;"><h4>MX882 Splitter</h4><p>Distribusi Zona Utama</p></div>
+            <div class="node-info" style="align-self:flex-start; margin-top:5px;">
+                <h4>MX882 Splitter</h4>
+                <p>Distribusi Zona Utama</p>
+                <p style="font-size: 10px; color: #f59e0b; font-weight: bold; margin-top: 5px;">» OUT 5 ➔ Broadcast/FM</p>
+            </div>
             
             <div class="tp tp-in" id="t-split-inL" style="top:35%;" data-label="IN L"></div>
             <div class="tp tp-in" id="t-split-inR" style="top:65%;" data-label="IN R"></div>
             
             <div class="tp tp-out" id="t-split-retL" style="top:12%; border-color:#ef4444;" data-label="MAIN OUT L"></div>
-            <div class="tp tp-out" id="t-split-retR" style="top:26%; border-color:#ef4444;" data-label="MAIN OUT R"></div>
-            <div class="tp tp-out" id="t-split-o1" style="top:41%;" data-label="OUT 1 (ZONA A)"></div>
-            <div class="tp tp-out" id="t-split-o2" style="top:56%;" data-label="OUT 2 (ZONA B)"></div>
-            <div class="tp tp-out" id="t-split-o3" style="top:71%;" data-label="OUT 3 (Unused)"></div>
-            <div class="tp tp-out" id="t-split-o4" style="top:86%;" data-label="OUT 4 (Unused)"></div>
+            <div class="tp tp-out" id="t-split-retR" style="top:25%; border-color:#ef4444;" data-label="MAIN OUT R"></div>
+            <div class="tp tp-out" id="t-split-o1" style="top:38%;" data-label="OUT 1 (ZONA A)"></div>
+            <div class="tp tp-out" id="t-split-o2" style="top:51%;" data-label="OUT 2 (ZONA B)"></div>
+            <div class="tp tp-out" id="t-split-o3" style="top:64%;" data-label="OUT 3 (Unused)"></div>
+            <div class="tp tp-out" id="t-split-o4" style="top:77%;" data-label="OUT 4 (Unused)"></div>
+            <div class="tp tp-out" id="t-split-o5" style="top:90%; border-color:var(--c-tx);" data-label="OUT 5 (FM TX)"></div>
         </div>
 
         <!-- =======================
@@ -491,10 +499,6 @@ location: "JA-01"
         { from: 't-mu-R', to: 't-mix-i10', label: 'CH 10 R', color: 'var(--c-media)' },
         { from: 't-mb-L', to: 't-mix-i11', label: 'CH 11 L', color: 'var(--c-media)' },
         { from: 't-mb-R', to: 't-mix-i12', label: 'CH 12 R', color: 'var(--c-media)' },
-        
-        // Rute Group Mixer ke FM Transmitter
-        { from: 't-mix-grp1', to: 't-tx-in', label: 'Dual TRS 6,5mm to 3,5mm', color: 'var(--c-tx)', route: 'elbow', xOffset: 60, labelOffsetY: -15 },
-        { from: 't-mix-grp2', to: 't-tx-in', color: 'var(--c-tx)', route: 'elbow', xOffset: 80 },
 
         // Rute Main Stereo L/R ke GEQ
         { from: 't-mix-mainL', to: 't-geq-inL', label: 'Stereo Out L/R', color: 'var(--c-mix)' },
@@ -523,6 +527,9 @@ location: "JA-01"
         // Rute Splitter Out (Distribusi ke Ampli Zona Biasa: Zona A & B)
         { from: 't-split-o1', to: 't-az1-in', label: 'Out 1: XLR to RCA', color: 'var(--c-split)', route: 'elbow', xOffset: 50 },
         { from: 't-split-o2', to: 't-az2-in', label: 'Out 2: XLR to RCA', color: 'var(--c-split)' }, 
+
+        // Rute Baru: Splitter Out 5 ke FM Transmitter dengan custom Loop-Back agar rapi
+        { from: 't-split-o5', to: 't-tx-in', label: 'Out 5: XLR to TRS', color: 'var(--c-tx)', route: 'loop-back', yOffset: 35 },
         
         // Rute Output Amplifier ke Jaringan Speaker
         { from: 't-ap1-out', to: 't-spk-fl', label: 'SpeakON', color: 'var(--c-spk)', route: 'elbow', xOffset: 40, dual: true },
@@ -592,6 +599,23 @@ location: "JA-01"
             const routeY = gridH - (link.underOffset || 60); const r = 15;
             pathD = `M ${x1} ${y1} L ${dropX1 - r} ${y1} Q ${dropX1} ${y1} ${dropX1} ${y1 + r} L ${dropX1} ${routeY - r} Q ${dropX1} ${routeY} ${dropX1 + r} ${routeY} L ${dropX2 - r} ${routeY} Q ${dropX2} ${routeY} ${dropX2} ${routeY - r} L ${dropX2} ${y2 + r} Q ${dropX2} ${y2} ${dropX2 + r} ${y2} L ${x2} ${y2}`;
             labelX = (dropX1 + dropX2) / 2; labelY = routeY;
+        } else if (link.route === 'loop-back') {
+            const dropX1 = x1 + 40; 
+            const dropX2 = x2 - 40;
+            const routeY = Math.max(y1, y2) + (link.yOffset || 40); 
+            const r = 15;
+            
+            pathD = `M ${x1} ${y1} 
+                     L ${dropX1 - r} ${y1} 
+                     Q ${dropX1} ${y1} ${dropX1} ${y1 + r} 
+                     L ${dropX1} ${routeY - r} 
+                     Q ${dropX1} ${routeY} ${dropX1 - r} ${routeY} 
+                     L ${dropX2 + r} ${routeY} 
+                     Q ${dropX2} ${routeY} ${dropX2} ${routeY - r} 
+                     L ${dropX2} ${y2 + r} 
+                     Q ${dropX2} ${y2} ${dropX2 + r} ${y2} 
+                     L ${x2} ${y2}`;
+            labelX = dropX2 + ((dropX1 - dropX2) / 2); labelY = routeY;
         } else {
             const curveFactor = Math.max(Math.abs(x2 - x1) * 0.45, 40); 
             const cp1x = x1 < x2 ? x1 + curveFactor : x1 - curveFactor;

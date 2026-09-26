@@ -319,84 +319,97 @@ location: "JA-01"
             <div class="tp tp-in" id="t-dlms-inL" style="top:35%;" data-label="IN L"></div>
             <div class="tp tp-in" id="t-dlms-inR" style="top:65%;" data-label="IN R"></div>
             
-            <div class="tp tp-out" id="t-dlms-o1" style="top:15%;" data-label="OUT 1"></div>
-            <div class="tp tp-out" id="t-dlms-o2" style="top:30%; border-color:#ef4444;" data-label="OUT 2 (DLY)"></div>
-            <div class="tp tp-out" id="t-dlms-o3" style="top:45%; border-color:#ef4444;" data-label="OUT 3 (DLY)"></div>
-            <div class="tp tp-out" id="t-dlms-o4" style="top:60%;" data-label="OUT 4 (Backup)"></div>
-            <div class="tp tp-out" id="t-dlms-o5" style="top:75%;" data-label="OUT 5"></div>
-            <div class="tp tp-out" id="t-dlms-o6" style="top:90%;" data-label="OUT 6"></div>
+            <!-- DLMS Outputs (1 to 4 dipakai untuk semua Delay Zone) -->
+            <div class="tp tp-out" id="t-dlms-o1" style="top:15%; border-color:#ef4444;" data-label="OUT 1 (DLY 3)"></div>
+            <div class="tp tp-out" id="t-dlms-o2" style="top:30%; border-color:#ef4444;" data-label="OUT 2 (DLY 1)"></div>
+            <div class="tp tp-out" id="t-dlms-o3" style="top:45%; border-color:#ef4444;" data-label="OUT 3 (DLY 2)"></div>
+            <div class="tp tp-out" id="t-dlms-o4" style="top:60%; border-color:#ef4444;" data-label="OUT 4 (DLY 4)"></div>
+            <div class="tp tp-out" id="t-dlms-o5" style="top:75%;" data-label="OUT 5 (FOH L)"></div>
+            <div class="tp tp-out" id="t-dlms-o6" style="top:90%;" data-label="OUT 6 (FOH R)"></div>
         </div>
 
         <div class="node style-rack" id="proc-split" style="grid-area: 4 / 6; height: 160px; width: 300px;">
             <div class="node-icon" style="color:#ef4444; align-self:flex-start; margin-top:5px;"><svg><circle cx="8" cy="12" r="1"/><circle cx="12" cy="12" r="1"/></svg></div>
-            <div class="node-info" style="align-self:flex-start; margin-top:5px;"><h4>MX882 Splitter</h4><p>Distribusi Zona</p></div>
+            <div class="node-info" style="align-self:flex-start; margin-top:5px;"><h4>MX882 Splitter</h4><p>Distribusi Zona Utama</p></div>
             
             <div class="tp tp-in" id="t-split-inL" style="top:35%;" data-label="IN L"></div>
             <div class="tp tp-in" id="t-split-inR" style="top:65%;" data-label="IN R"></div>
             
             <div class="tp tp-out" id="t-split-retL" style="top:12%; border-color:#ef4444;" data-label="MAIN OUT L"></div>
             <div class="tp tp-out" id="t-split-retR" style="top:26%; border-color:#ef4444;" data-label="MAIN OUT R"></div>
-            <div class="tp tp-out" id="t-split-o1" style="top:41%;" data-label="OUT 1"></div>
-            <div class="tp tp-out" id="t-split-o2" style="top:56%;" data-label="OUT 2"></div>
-            <div class="tp tp-out" id="t-split-o3" style="top:71%;" data-label="OUT 3"></div>
+            <div class="tp tp-out" id="t-split-o1" style="top:41%;" data-label="OUT 1 (ZONA A)"></div>
+            <div class="tp tp-out" id="t-split-o2" style="top:56%;" data-label="OUT 2 (ZONA B)"></div>
+            <div class="tp tp-out" id="t-split-o3" style="top:71%;" data-label="OUT 3 (Unused)"></div>
             <div class="tp tp-out" id="t-split-o4" style="top:86%;" data-label="OUT 4 (Unused)"></div>
         </div>
 
+        <!-- =======================
+             RACK AMPLIFIER
+             ======================= -->
         <div class="node style-rack" id="amp-protea1" style="grid-area: 1 / 7;">
-            <div class="node-info"><h4>Ampli PROTEA 1</h4><p>FOH L (Link 1-2)</p></div>
+            <div class="node-info"><h4>Ampli PROTEA 1</h4><p>FOH L (ZONA C1)</p></div>
             <div class="tp tp-in" id="t-ap1-in" style="top:50%;" data-label="IN"></div>
             <div class="tp tp-out" id="t-ap1-out" style="top:50%;" data-label="OUT"></div>
         </div>
         <div class="node style-rack" id="amp-protea2" style="grid-area: 2 / 7;">
-            <div class="node-info"><h4>Ampli PROTEA 2</h4><p>FOH R (Link 1-2)</p></div>
+            <div class="node-info"><h4>Ampli PROTEA 2</h4><p>FOH R (ZONA C2)</p></div>
             <div class="tp tp-in" id="t-ap2-in" style="top:50%;" data-label="IN"></div>
             <div class="tp tp-out" id="t-ap2-out" style="top:50%;" data-label="OUT"></div>
         </div>
         
         <div class="node style-rack" id="amp-za1" style="grid-area: 3 / 7;">
-            <div class="node-info"><h4>TOA ZA 2240</h4><p>Belakang Panggung</p></div>
+            <div class="node-info"><h4>TOA ZA-2240</h4><p>Ruang Ketua & Partisipan</p></div>
             <div class="tp tp-in" id="t-az1-in" style="top:50%;" data-label="IN"></div>
             <div class="tp tp-out" id="t-az1-out" style="top:50%;" data-label="OUT"></div>
         </div>
+        
         <div class="node style-rack" id="amp-za2" style="grid-area: 4 / 7;">
-            <div class="node-info"><h4>TOA ZA 2240</h4><p>Samping Panggung</p></div>
+            <div class="node-info"><h4>TOA ZA-2120</h4><p>Monitor Panggung</p></div>
             <div class="tp tp-in" id="t-az2-in" style="top:50%;" data-label="IN"></div>
             <div class="tp tp-out" id="t-az2-out" style="top:50%;" data-label="OUT"></div>
         </div>
-        <div class="node style-rack" id="amp-za3" style="grid-area: 5 / 7;">
-            <div class="node-info"><h4>TOA ZA 2120</h4><p>Panggung Monitor</p></div>
-            <div class="tp tp-in" id="t-az3-in" style="top:50%;" data-label="IN"></div>
+        
+        <div class="node style-rack is-delayed" id="amp-za3" style="grid-area: 5 / 7;">
+            <div class="tag-delay">DELAY</div>
+            <div class="node-info"><h4>TOA ZA-2240</h4><p>Tower Delay 1</p></div>
+            <div class="tp tp-in" id="t-az3-in" style="top:50%; border-color:#ef4444;" data-label="IN"></div>
             <div class="tp tp-out" id="t-az3-out" style="top:50%;" data-label="OUT"></div>
         </div>
         
         <div class="node style-rack is-delayed" id="amp-za4" style="grid-area: 6 / 7;">
             <div class="tag-delay">DELAY</div>
-            <div class="node-info"><h4>TOA ZA 2240</h4><p>Tower Delay 1</p></div>
+            <div class="node-info"><h4>TOA ZA-2240</h4><p>Tower Delay 2</p></div>
             <div class="tp tp-in" id="t-az4-in" style="top:50%; border-color:#ef4444;" data-label="IN"></div>
             <div class="tp tp-out" id="t-az4-out" style="top:50%;" data-label="OUT"></div>
         </div>
+        
         <div class="node style-rack is-delayed" id="amp-za5" style="grid-area: 7 / 7;">
             <div class="tag-delay">DELAY</div>
-            <div class="node-info"><h4>TOA ZA 2240</h4><p>Tower Delay 2</p></div>
+            <div class="node-info"><h4>TOA ZA-2120</h4><p>Ruang P3K & Ibu Anak</p></div>
             <div class="tp tp-in" id="t-az5-in" style="top:50%; border-color:#ef4444;" data-label="IN"></div>
             <div class="tp tp-out" id="t-az5-out" style="top:50%;" data-label="OUT"></div>
         </div>
-        
-        <div class="node style-rack" id="amp-za6" style="grid-area: 8 / 7;">
-            <div class="node-info"><h4>TOA ZA 2240</h4><p>Ruang P3K</p></div>
-            <div class="tp tp-in" id="t-az6-in" style="top:50%;" data-label="IN"></div>
+
+        <div class="node style-rack is-delayed" id="amp-za6" style="grid-area: 8 / 7;">
+            <div class="tag-delay">DELAY</div>
+            <div class="node-info"><h4>TOA ZA-2120</h4><p>Meja Departemen</p></div>
+            <div class="tp tp-in" id="t-az6-in" style="top:50%; border-color:#ef4444;" data-label="IN"></div>
             <div class="tp tp-out" id="t-az6-out" style="top:50%;" data-label="OUT"></div>
         </div>
 
+        <!-- =======================
+             ZONA SPEAKER
+             ======================= -->
         <div class="zone-group" style="grid-area: 1 / 8; border-color: #be123c;">
-            <div class="zone-title" style="border-color: #be123c;">FOH Kiri (TOA HX-5) - ZONA D1</div>
+            <div class="zone-title" style="border-color: #be123c;">FOH Kiri (TOA HX-5) - ZONA C1</div>
             <div class="speaker-row">
                 <div class="foh-array-stack" id="foh-L1"><div class="tp tp-in" id="t-spk-fl" style="top:50%;" data-label="IN"></div><div class="array-module"></div><div class="array-module"></div></div>
                 <div class="foh-array-stack"><div class="array-module"></div><div class="array-module"></div></div>
             </div>
         </div>
+        
         <div class="zone-group" style="grid-area: 2 / 8; border-color: #be123c;">
-            <div class="zone-title" style="border-color: #be123c;">FOH Kanan (TOA HX-5) - ZONA D2</div>
+            <div class="zone-title" style="border-color: #be123c;">FOH Kanan (TOA HX-5) - ZONA C2</div>
             <div class="speaker-row">
                 <div class="foh-array-stack" id="foh-R1"><div class="tp tp-in" id="t-spk-fr" style="top:50%;" data-label="IN"></div><div class="array-module"></div><div class="array-module"></div></div>
                 <div class="foh-array-stack"><div class="array-module"></div><div class="array-module"></div></div>
@@ -404,16 +417,15 @@ location: "JA-01"
         </div>
         
         <div class="zone-group" style="grid-area: 3 / 8;">
-            <div class="zone-title">Belakang Panggung (TOA F-2000BM) - ZONA A</div>
+            <div class="zone-title">Ruang Ketua & Partisipan (TOA F-2000BM) - ZONA A</div>
             <div class="speaker-row">
                 <div class="spk-unit" id="z1-1"><div class="tp tp-in" id="t-spk-1" style="top:50%;"></div><span class="watt-label">60W</span></div>
                 <div class="spk-unit" id="z1-2"><span class="watt-label">60W</span></div>
-                <div class="spk-unit" id="z1-3"><span class="watt-label">60W</span></div>
             </div>
         </div>
         
         <div class="zone-group" style="grid-area: 4 / 8;">
-            <div class="zone-title">Samping Panggung (TOA F-2000BM) - ZONA B</div>
+            <div class="zone-title">Monitor Panggung (TOA ZA-1030W) - ZONA B</div>
             <div class="speaker-row">
                 <div class="spk-unit" id="z2-1"><div class="tp tp-in" id="t-spk-2" style="top:50%;"></div><span class="watt-label">30W</span></div>
                 <div class="spk-unit" id="z2-2"><span class="watt-label">30W</span></div>
@@ -422,39 +434,38 @@ location: "JA-01"
         </div>
         
         <div class="zone-group" style="grid-area: 5 / 8;">
-            <div class="zone-title">Panggung Monitor (TOA ZA-1030 W) - ZONA C</div>
+            <div class="zone-title">Tower Delay 1 (TOA F-2000BM) - ZONA D</div>
             <div class="speaker-row">
                 <div class="spk-unit" id="z3-1"><div class="tp tp-in" id="t-spk-3" style="top:50%;"></div><span class="watt-label">30W</span></div>
                 <div class="spk-unit" id="z3-2"><span class="watt-label">30W</span></div>
                 <div class="spk-unit" id="z3-3"><span class="watt-label">30W</span></div>
+                <div class="spk-unit" id="z3-4"><span class="watt-label">30W</span></div>
             </div>
         </div>
         
         <div class="zone-group" style="grid-area: 6 / 8;">
-            <div class="zone-title">Tower Delay 1 (TOA F-2000BM) - ZONA E</div>
+            <div class="zone-title">Tower Delay 2 (TOA F-2000BM) - ZONA E</div>
             <div class="speaker-row">
                 <div class="spk-unit" id="z4-1"><div class="tp tp-in" id="t-spk-4" style="top:50%;"></div><span class="watt-label">30W</span></div>
                 <div class="spk-unit" id="z4-2"><span class="watt-label">30W</span></div>
                 <div class="spk-unit" id="z4-3"><span class="watt-label">30W</span></div>
                 <div class="spk-unit" id="z4-4"><span class="watt-label">30W</span></div>
-                <div class="spk-unit" id="z4-5"><span class="watt-label">30W</span></div>
             </div>
         </div>
         
         <div class="zone-group" style="grid-area: 7 / 8;">
-            <div class="zone-title">Tower Delay 2 (TOA F-2000BM) - ZONA F</div>
+            <div class="zone-title">Ruang P3K & Ibu Anak (TOA F-2000BM) - ZONA F</div>
             <div class="speaker-row">
                 <div class="spk-unit" id="z5-1"><div class="tp tp-in" id="t-spk-5" style="top:50%;"></div><span class="watt-label">30W</span></div>
                 <div class="spk-unit" id="z5-2"><span class="watt-label">30W</span></div>
-                <div class="spk-unit" id="z5-3"><span class="watt-label">30W</span></div>
             </div>
         </div>
         
         <div class="zone-group" style="grid-area: 8 / 8;">
-            <div class="zone-title">Ruang P3K (TOA F-2000BM) - ZONA G</div>
+            <div class="zone-title">Meja Departemen (TOA F-2000BM) - ZONA G</div>
             <div class="speaker-row">
-                <div class="spk-unit" id="z6-1"><div class="tp tp-in" id="t-spk-6" style="top:50%;"></div><span class="watt-label">60W</span></div>
-                <div class="spk-unit" id="z6-2"><span class="watt-label">60W</span></div>
+                <div class="spk-unit" id="z6-1"><div class="tp tp-in" id="t-spk-6" style="top:50%;"></div><span class="watt-label">30W</span></div>
+                <div class="spk-unit" id="z6-2"><span class="watt-label">30W</span></div>
             </div>
         </div>
 
@@ -463,50 +474,57 @@ location: "JA-01"
 
 <script>
     const cables = [
+        // Rute Microphone ke Stagebox
         { from: 't-m1-out', to: 't-sb-m1', label: 'XLR', color: 'var(--c-mic)' },
         { from: 't-m2-out', to: 't-sb-m2', label: 'XLR', color: 'var(--c-mic)' },
         { from: 't-m3-out', to: 't-sb-m3', label: 'XLR', color: 'var(--c-mic)' },
         { from: 't-m4-out', to: 't-sb-m4', label: 'XLR', color: 'var(--c-mic)' },
         
+        // Rute Stagebox ke Mixer
         { from: 't-sb-o1', to: 't-mix-i1', label: 'CH 1', color: 'var(--c-mic)' },
         { from: 't-sb-o2', to: 't-mix-i2', label: 'CH 2', color: 'var(--c-mic)' },
         { from: 't-sb-o3', to: 't-mix-i3', label: 'CH 3', color: 'var(--c-mic)' },
         { from: 't-sb-o4', to: 't-mix-i4', label: 'CH 4', color: 'var(--c-mic)' },
         
+        // Rute Media (Laptop) ke Mixer
         { from: 't-mu-L', to: 't-mix-i9', label: 'CH 9 L', color: 'var(--c-media)' },
         { from: 't-mu-R', to: 't-mix-i10', label: 'CH 10 R', color: 'var(--c-media)' },
         { from: 't-mb-L', to: 't-mix-i11', label: 'CH 11 L', color: 'var(--c-media)' },
         { from: 't-mb-R', to: 't-mix-i12', label: 'CH 12 R', color: 'var(--c-media)' },
         
-        // --- Perubahan Rute Group Mixer Langsung ke Transmitter ---
+        // Rute Group Mixer ke FM Transmitter
         { from: 't-mix-grp1', to: 't-tx-in', label: 'Dual TRS 6,5mm to 3,5mm', color: 'var(--c-tx)', route: 'elbow', xOffset: 60, labelOffsetY: -15 },
         { from: 't-mix-grp2', to: 't-tx-in', color: 'var(--c-tx)', route: 'elbow', xOffset: 80 },
 
+        // Rute Main Stereo L/R ke GEQ
         { from: 't-mix-mainL', to: 't-geq-inL', label: 'Stereo Out L/R', color: 'var(--c-mix)' },
         { from: 't-mix-mainR', to: 't-geq-inR', color: 'var(--c-mix)' },
         
+        // Rute GEQ ke DLMS
         { from: 't-geq-outL', to: 't-dlms-inL', label: 'XLR L/R', color: 'var(--c-mix)' },
         { from: 't-geq-outR', to: 't-dlms-inR', color: 'var(--c-mix)' },
         
+        // Rute DLMS Out 5/6 ke Splitter (Untuk Distribusi Zona Utama/FOH)
         { from: 't-dlms-o5', to: 't-split-inL', label: 'Out 5/6: XLR', color: 'var(--c-dlms)', route: 'elbow', xOffset: 35 },
         { from: 't-dlms-o6', to: 't-split-inR', color: 'var(--c-dlms)', route: 'elbow', xOffset: 45 },
         
-        { from: 't-dlms-o1', to: 't-az3-in', label: 'Out 1: XLR to RCA', color: 'var(--c-dlms)' },
-        { from: 't-dlms-o2', to: 't-az4-in', label: 'Out 2: XLR to RCA', color: 'var(--c-dlms)', route: 'elbow', xOffset: 65 },
-        { from: 't-dlms-o3', to: 't-az5-in', label: 'Out 3: XLR to RCA', color: 'var(--c-dlms)', route: 'elbow', xOffset: 95 },
+        // Rute DLMS Delay (Langsung Tembak ke 4 Ampli Delay: Zona D, E, F, G)
+        { from: 't-dlms-o1', to: 't-az5-in', label: 'Out 1: XLR to RCA', color: 'var(--c-dlms)', route: 'elbow', xOffset: 50 },
+        { from: 't-dlms-o2', to: 't-az3-in', label: 'Out 2: XLR to RCA', color: 'var(--c-dlms)', route: 'elbow', xOffset: 65 },
+        { from: 't-dlms-o3', to: 't-az4-in', label: 'Out 3: XLR to RCA', color: 'var(--c-dlms)', route: 'elbow', xOffset: 80 },
+        { from: 't-dlms-o4', to: 't-az6-in', label: 'Out 4: XLR to RCA', color: 'var(--c-dlms)', route: 'elbow', xOffset: 95 },
 
+        // Rute Splitter Main L/R Bypass (Balik Lewat Snake Cable ke Ampli PROTEA FOH)
         { from: 't-split-retL', to: 't-sb-retL', label: 'Main Out L (Snake)', color: 'var(--c-split)', route: 'return-top', yOffset: 45 },
         { from: 't-split-retR', to: 't-sb-retR', label: 'Main Out R (Snake)', color: 'var(--c-split)', route: 'return-top', yOffset: 25 },
-        
         { from: 't-sb-protL', to: 't-ap1-in', label: 'XLR L', color: 'var(--c-split)', route: 'under', underOffset: 120 },
         { from: 't-sb-protR', to: 't-ap2-in', label: 'XLR R', color: 'var(--c-split)', route: 'under', underOffset: 95 },
 
+        // Rute Splitter Out (Distribusi ke Ampli Zona Biasa: Zona A & B)
         { from: 't-split-o1', to: 't-az1-in', label: 'Out 1: XLR to RCA', color: 'var(--c-split)', route: 'elbow', xOffset: 50 },
         { from: 't-split-o2', to: 't-az2-in', label: 'Out 2: XLR to RCA', color: 'var(--c-split)' }, 
-        { from: 't-split-o3', to: 't-az6-in', label: 'Out 3: XLR to RCA', color: 'var(--c-split)', route: 'elbow', xOffset: 80 },
         
-        // --- Out 4 XLR ke Video Switcher dihapus ---
-        
+        // Rute Output Amplifier ke Jaringan Speaker
         { from: 't-ap1-out', to: 't-spk-fl', label: 'SpeakON', color: 'var(--c-spk)', route: 'elbow', xOffset: 40, dual: true },
         { from: 't-ap2-out', to: 't-spk-fr', label: 'SpeakON', color: 'var(--c-spk)', route: 'elbow', xOffset: 80, dual: true },
         { from: 't-az1-out', to: 't-spk-1', label: '100V Line', color: 'var(--c-spk)', dual: true },
@@ -516,21 +534,21 @@ location: "JA-01"
         { from: 't-az5-out', to: 't-spk-5', label: '100V Line', color: 'var(--c-spk)', dual: true },
         { from: 't-az6-out', to: 't-spk-6', label: '100V Line', color: 'var(--c-spk)', dual: true },
 
+        // Kabel Jumper Paralel Antar Speaker di Lapangan
         { from: 'z1-1', to: 'z1-2', color: 'var(--c-spk)', dual: true, route: 'jumper' },
-        { from: 'z1-2', to: 'z1-3', color: 'var(--c-spk)', dual: true, route: 'jumper' },
         
         { from: 'z2-1', to: 'z2-2', color: 'var(--c-spk)', dual: true, route: 'jumper' },
         { from: 'z2-2', to: 'z2-3', color: 'var(--c-spk)', dual: true, route: 'jumper' },
         
         { from: 'z3-1', to: 'z3-2', color: 'var(--c-spk)', dual: true, route: 'jumper' },
         { from: 'z3-2', to: 'z3-3', color: 'var(--c-spk)', dual: true, route: 'jumper' },
+        { from: 'z3-3', to: 'z3-4', color: 'var(--c-spk)', dual: true, route: 'jumper' },
+        
         { from: 'z4-1', to: 'z4-2', color: 'var(--c-spk)', dual: true, route: 'jumper' },
         { from: 'z4-2', to: 'z4-3', color: 'var(--c-spk)', dual: true, route: 'jumper' },
         { from: 'z4-3', to: 'z4-4', color: 'var(--c-spk)', dual: true, route: 'jumper' },
-        { from: 'z4-4', to: 'z4-5', color: 'var(--c-spk)', dual: true, route: 'jumper' },
         
         { from: 'z5-1', to: 'z5-2', color: 'var(--c-spk)', dual: true, route: 'jumper' },
-        { from: 'z5-2', to: 'z5-3', color: 'var(--c-spk)', dual: true, route: 'jumper' },
         
         { from: 'z6-1', to: 'z6-2', color: 'var(--c-spk)', dual: true, route: 'jumper' }
     ];

@@ -18,6 +18,16 @@ location: "APENDIKS"
             background: #1e293b;
             border-color: #334155;
         }
+        .card-title {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 14px;
+            font-weight: 800;
+            color: #0f172a;
+        }
+        body.dark-mode .card-title {
+            color: #f8fafc;
+        }
         .layout-img {
             width: 100%;
             border-radius: 8px;
@@ -34,23 +44,38 @@ location: "APENDIKS"
     <main style="padding: 15px 10px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
             <div>
-                <h2 style="font-weight:900; margin:0; font-size:18px;">LAYOUT PERSIAPAN - JUMAT 2 OKTOBER</h2>
-                <p style="font-size:11px; color:gray; margin:0;">Denah penempatan alat & titik panggung</p>
+                <h2 style="font-weight:900; margin:0; font-size:18px;">LAYOUT & JALUR KABEL</h2>
+                <p style="font-size:11px; color:gray; margin:0;">Denah penempatan alat & skema tarikan kabel</p>
             </div>
             <a href="{{ site.baseurl }}/" style="padding:6px 12px; background:#f1f5f9; color:#334155; border-radius:6px; text-decoration:none; font-weight:bold; font-size:11px; border:1px solid #ccc;">⬅ Kembali</a>
         </div>
 
+        <!-- 1. KOTAK LAYOUT ALAT -->
         <div class="document-card">
-            <!-- ⚠️ GANTI 'layout-terbaru.jpg' DENGAN NAMA FILE GAMBAR KOMANDAN -->
+            <h3 class="card-title">📍 Denah Penempatan Alat</h3>
+            <!-- ⚠️ GANTI 'layout-terbaru.jpg' DENGAN NAMA FILE GAMBAR LAYOUT ALAT -->
             <img src="{{ site.baseurl }}/assets/img/layout-terbaru.jpg" class="layout-img" alt="Layout Area" onclick="window.open(this.src, '_blank')" title="Klik untuk memperbesar">
             
             <div style="margin-top:15px; text-align:center;">
-                <!-- ⚠️ GANTI JUGA 'layout-terbaru.jpg' DI SINI UNTUK LINK DOWNLOAD -->
                 <a href="{{ site.baseurl }}/assets/img/layout-terbaru.jpg" download style="display:inline-block; padding:10px 20px; background:#2563eb; color:white; font-weight:bold; text-decoration:none; border-radius:8px; font-size:12px; box-shadow:0 2px 4px rgba(37,99,235,0.3);">
-                    📥 Download Gambar High-Res
+                    📥 Download Layout Area
                 </a>
             </div>
         </div>
+
+        <!-- 2. KOTAK LAYOUT KABEL -->
+        <div class="document-card">
+            <h3 class="card-title">🔌 Denah Jalur Kabel Utama</h3>
+            <!-- ⚠️ GANTI 'layout-kabel.jpg' DENGAN NAMA FILE GAMBAR JALUR KABEL -->
+            <img src="{{ site.baseurl }}/assets/img/layout-kabel.jpg" class="layout-img" alt="Layout Kabel" onclick="window.open(this.src, '_blank')" title="Klik untuk memperbesar">
+            
+            <div style="margin-top:15px; text-align:center;">
+                <a href="{{ site.baseurl }}/assets/img/layout-kabel.jpg" download style="display:inline-block; padding:10px 20px; background:#ea580c; color:white; font-weight:bold; text-decoration:none; border-radius:8px; font-size:12px; box-shadow:0 2px 4px rgba(234,88,12,0.3);">
+                    📥 Download Jalur Kabel
+                </a>
+            </div>
+        </div>
+
     </main>
 </body>
 </html>

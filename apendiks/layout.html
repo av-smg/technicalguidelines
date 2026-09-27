@@ -34,8 +34,11 @@ location: "APENDIKS"
             border: 1px solid #cbd5e1;
             cursor: zoom-in;
             transition: transform 0.2s;
+            /* Tambahan: pastikan tinggi gambar menyesuaikan dan background abu agar loading tidak kosong */
+            height: auto;
+            background-color: #f1f5f9;
         }
-        body.dark-mode .layout-img { border-color: #475569; }
+        body.dark-mode .layout-img { border-color: #475569; background-color: #0f172a; }
         .layout-img:hover { opacity: 0.9; }
     </style>
 </head>
@@ -53,11 +56,11 @@ location: "APENDIKS"
         <!-- 1. KOTAK LAYOUT ALAT -->
         <div class="document-card">
             <h3 class="card-title">📍 Denah Penempatan Alat</h3>
-            <!-- ⚠️ GANTI 'layout-terbaru.jpg' DENGAN NAMA FILE GAMBAR LAYOUT ALAT -->
+            <!-- File: layout-terbaru.jpg -->
             <img src="{{ site.baseurl }}/assets/img/layout-terbaru.jpg" class="layout-img" alt="Layout Area" onclick="window.open(this.src, '_blank')" title="Klik untuk memperbesar">
             
             <div style="margin-top:15px; text-align:center;">
-                <a href="{{ site.baseurl }}/assets/img/layout-terbaru.jpg" download style="display:inline-block; padding:10px 20px; background:#2563eb; color:white; font-weight:bold; text-decoration:none; border-radius:8px; font-size:12px; box-shadow:0 2px 4px rgba(37,99,235,0.3);">
+                <a href="{{ site.baseurl }}/assets/img/layout-terbaru.jpg" download="Layout_Penempatan_Alat.jpg" style="display:inline-block; padding:10px 20px; background:#2563eb; color:white; font-weight:bold; text-decoration:none; border-radius:8px; font-size:12px; box-shadow:0 2px 4px rgba(37,99,235,0.3);">
                     📥 Download Layout Area
                 </a>
             </div>
@@ -66,11 +69,11 @@ location: "APENDIKS"
         <!-- 2. KOTAK LAYOUT KABEL -->
         <div class="document-card">
             <h3 class="card-title">🔌 Denah Jalur Kabel Utama</h3>
-            <!-- ⚠️ GANTI 'layout-kabel.jpg' DENGAN NAMA FILE GAMBAR JALUR KABEL -->
-            <img src="{{ site.baseurl }}/assets/img/layout-jalurkabel.jpg" class="layout-img" alt="Layout Kabel" onclick="window.open(this.src, '_blank')" title="Klik untuk memperbesar">
+            <!-- File: layout-jalurkabel.jpg (Ditambah parameter cache-busting ?v=1) -->
+            <img src="{{ site.baseurl }}/assets/img/layout-jalurkabel.jpg?v=1" class="layout-img" alt="Layout Kabel" onclick="window.open(this.src, '_blank')" title="Klik untuk memperbesar" onerror="this.onerror=null; this.src=''; this.alt='⚠️ Gagal memuat gambar. Pastikan file layout-jalurkabel.jpg sudah ter-upload di folder assets/img/'; this.style.padding='20px'; this.style.textAlign='center';">
             
             <div style="margin-top:15px; text-align:center;">
-                <a href="{{ site.baseurl }}/assets/img/layout-jalurkabel.jpg" download style="display:inline-block; padding:10px 20px; background:#ea580c; color:white; font-weight:bold; text-decoration:none; border-radius:8px; font-size:12px; box-shadow:0 2px 4px rgba(234,88,12,0.3);">
+                <a href="{{ site.baseurl }}/assets/img/layout-jalurkabel.jpg?v=1" download="Layout_Jalur_Kabel.jpg" style="display:inline-block; padding:10px 20px; background:#ea580c; color:white; font-weight:bold; text-decoration:none; border-radius:8px; font-size:12px; box-shadow:0 2px 4px rgba(234,88,12,0.3);">
                     📥 Download Jalur Kabel
                 </a>
             </div>

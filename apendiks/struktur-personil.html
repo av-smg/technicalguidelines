@@ -33,19 +33,6 @@ location: "Apendiks"
     .main-header h1 { font-size: 2.2rem; color: #0f172a; font-weight: 900; letter-spacing: -1px; margin-top: 5px; }
     .year-badge { display: inline-block; background: #f97316; color: white; padding: 6px 15px; border-radius: 20px; font-size: 0.9rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 10px rgba(249, 115, 22, 0.3); }
 
-    /* ========================================= */
-    /* THEOCRATIC HEAD (PALING ATAS)             */
-    /* ========================================= */
-    .theocratic-head { display: flex; flex-direction: column; align-items: center; margin-bottom: 30px; gap: 10px; }
-    .supreme-card { 
-        background: linear-gradient(135deg, #ffffff, #f1f5f9); 
-        border: 2px solid #cbd5e1; border-radius: 24px; padding: 15px 50px; 
-        box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; transition: 0.3s; 
-    }
-    .supreme-card:hover { transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.08); border-color: #94a3b8; }
-    .supreme-title { font-size: 1.8rem; font-weight: 900; color: #0f172a; letter-spacing: 2px; text-transform: uppercase; }
-    .supreme-arrow { font-size: 1.8rem; color: #cbd5e1; line-height: 1; margin: 5px 0; }
-
     /* CORE MANAGEMENT (TOP LEVEL) */
     .management-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin-bottom: 50px; }
     .management-grid .card { width: 100%; flex: 1 1 250px; max-width: 380px; }
@@ -65,22 +52,18 @@ location: "Apendiks"
     .dept-box:hover { box-shadow: 0 10px 25px rgba(0,0,0,0.06); }
     
     .dept-box.audio { border-color: #ef4444; }
-    .dept-box.video { border-color: #8b5cf6; }
-    .dept-box.it { border-color: #06b6d4; }
     .dept-box.podium { border-color: #10b981; }
+    .dept-box.jadwal { border-color: #3b82f6; }
 
     .dept-header { padding: 18px 20px; font-size: 1.3rem; font-weight: 900; color: #ffffff; display: flex; justify-content: center; align-items: center; letter-spacing: -0.5px;}
     
     .dept-box.audio .dept-header { background: #ef4444; }
-    .dept-box.video .dept-header { background: #8b5cf6; }
-    .dept-box.it .dept-header { background: #06b6d4; }
     .dept-box.podium .dept-header { background: #10b981; }
+    .dept-box.jadwal .dept-header { background: #3b82f6; }
     
     .dept-body { padding: 25px; display: flex; flex-direction: column; gap: 20px; }
 
-    /* ========================================= */
-    /* GRID LAYOUT TIM AUDIO                     */
-    /* ========================================= */
+    /* GRID LAYOUT TIM AUDIO */
     .audio-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
     
     @media (max-width: 768px) {
@@ -111,13 +94,10 @@ location: "Apendiks"
     
     .wide-col { grid-column: 1 / -1; }
 
-    /* ========================================= */
-    /* STYLE UNTUK TIM LAIN (VIDEO, IT, PODIUM)  */
-    /* ========================================= */
+    /* STYLE UNTUK TIM LAIN (PODIUM) */
     .supervisor-block { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 16px; padding: 20px; text-align: center; }
     .supervisor-block .role { font-size: 0.85rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
     .supervisor-block .names { font-size: 1.2rem; font-weight: 900; color: #0f172a; }
-    .supervisor-block a.names:hover { color: #f97316 !important; text-decoration: underline !important; }
     
     .hierarchy-arrow { text-align: center; color: #cbd5e1; font-size: 1.8rem; line-height: 1; margin: -5px 0; }
 
@@ -132,45 +112,55 @@ location: "Apendiks"
     }
     .personnel-tag.editable { border: 2px dashed #94a3b8; background: #f8fafc; color: #64748b; }
     .personnel-tag:hover { background: #f1f5f9; transform: scale(1.05); color: #0f172a; border-color: #cbd5e1; }
-    a.personnel-tag:hover { background: #f97316; color: white; border-color: #ea580c; cursor: pointer; }
+
+    /* TABLE JADWAL ACARA HARI H */
+    .jadwal-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 768px) {
+        .jadwal-grid { grid-template-columns: 1fr; }
+    }
+    .jadwal-card {
+      border-radius: 16px; border: 2px solid #e2e8f0; overflow: hidden;
+    }
+    .jadwal-head {
+      padding: 15px; font-size: 1.2rem; font-weight: 900; text-align: center;
+    }
+    .jadwal-head.pagi { background: #fef08a; color: #854d0e; }
+    .jadwal-head.siang { background: #fecaca; color: #991b1b; }
+    
+    .jadwal-table { width: 100%; border-collapse: collapse; }
+    .jadwal-table th, .jadwal-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 14px;}
+    .jadwal-table th { background: #f8fafc; color: #64748b; font-weight: 800; font-size: 12px; text-transform: uppercase; }
+    .jadwal-table td.nama { font-weight: 800; color: #0f172a; font-size: 15px; text-align: right; }
+    .jadwal-table td.tugas { color: #334155; font-weight: 600; }
+    .jadwal-table tr:last-child td { border-bottom: none; }
 
     /* FOOTER */
     .footer { text-align: center; margin-top: 60px; padding: 20px 0; color: #94a3b8; font-weight: 700; font-size: 0.85rem; border-top: 2px dashed #e2e8f0; }
 
-    /* ========================================= */
-    /* 🌙 DARK MODE INJECTION                    */
-    /* ========================================= */
+    /* 🌙 DARK MODE INJECTION */
     body.dark-mode, [data-theme="dark"] { background-color: #020617; color: #e2e8f0; }
     body.dark-mode .main-header h1 { color: #f8fafc; }
-    
     body.dark-mode .back-btn { background: #1e293b; color: #f8fafc; border-color: #334155; box-shadow: 0 4px 0 #0f172a; }
     body.dark-mode .back-btn:hover { border-color: #475569; background: #273549; box-shadow: 0 7px 0 #0f172a; }
-    body.dark-mode .back-btn:active { box-shadow: 0 2px 0 #0f172a; }
-
-    body.dark-mode .supreme-card { background: linear-gradient(135deg, #1e293b, #0f172a); border-color: #334155; }
-    body.dark-mode .supreme-card:hover { border-color: #475569; }
-    body.dark-mode .supreme-title { color: #f8fafc; }
-    body.dark-mode .supreme-arrow { color: #334155; }
-
     body.dark-mode .card { background: #0f172a; border-color: #1e293b; }
-    body.dark-mode .card:hover { border-color: #334155; background: #1e293b; }
     body.dark-mode .name-display { color: #f8fafc; }
-
     body.dark-mode .dept-box { background: #0f172a; border-color: #1e293b; }
-    
     body.dark-mode .sub-card { background: #020617; border-color: #1e293b; }
     body.dark-mode .captain-badge { background: #1e293b; color: #f8fafc; border-color: #334155; }
-    
     body.dark-mode .supervisor-block { background: #1e293b; border-color: #334155; }
     body.dark-mode .supervisor-block .names { color: #f8fafc; }
-    body.dark-mode .hierarchy-arrow { color: #334155; }
     body.dark-mode .personnel-block { background: #0f172a; border-color: #334155; }
-
     body.dark-mode .personnel-tag { background: #1e293b; color: #cbd5e1; border-color: #334155; }
     body.dark-mode .personnel-tag.editable { background: #0f172a; border-color: #475569; }
-    body.dark-mode .personnel-tag:hover { background: #334155; color: #f8fafc; }
-    body.dark-mode a.personnel-tag:hover { background: #f97316; color: white; border-color: #ea580c; }
-    
+    body.dark-mode .jadwal-card { border-color: #334155; background: #0f172a; }
+    body.dark-mode .jadwal-table th { background: #1e293b; color: #94a3b8; border-bottom-color: #334155; }
+    body.dark-mode .jadwal-table td { border-bottom-color: #334155; }
+    body.dark-mode .jadwal-table td.nama { color: #f8fafc; }
+    body.dark-mode .jadwal-table td.tugas { color: #cbd5e1; }
     body.dark-mode .footer { border-top-color: #1e293b; color: #64748b; }
 
   </style>
@@ -214,7 +204,6 @@ location: "Apendiks"
               <div class="sub-card">
                   <div class="sub-head kabel">🔌 Tim Kabel</div>
                   <div class="sub-body">
-                      <!-- Kapten dengan Topi 🧢 -->
                       <div class="captain-badge">🧢 Vina</div>
                       <div class="personnel-tag">Anggid</div>
                       <div class="personnel-tag">Sachi</div>
@@ -229,7 +218,7 @@ location: "Apendiks"
                   <div class="sub-head speaker">🔊 Tim Speaker</div>
                   <div class="sub-body">
                       <div class="captain-badge">🧢 Malkhiel</div>
-                      <div class="personnel-tag">Yoka</div>
+                      <div class="personnel-tag">Angga Kusuma</div>
                       <div class="personnel-tag">Jojo</div>
                       <div class="personnel-tag">Naela</div>
                       <div class="personnel-tag">Riyanti</div>
@@ -270,7 +259,7 @@ location: "Apendiks"
         </div>
       </div>
 
-      <!-- 🎤 TIM PODIUM (BISA DIEDIT) -->
+      <!-- 🎤 TIM PODIUM -->
       <div class="dept-box podium">
         <div class="dept-header">
           <span>🎤 TIM PODIUM</span>
@@ -289,6 +278,80 @@ location: "Apendiks"
               <div class="personnel-tag editable">Gideon Adhy</div>
               <div class="personnel-tag editable">Yosua Winatas</div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 📅 JADWAL OPERATOR HARI H -->
+      <div class="dept-box jadwal">
+        <div class="dept-header">
+          <span>📅 JADWAL OPERATOR ACARA (HARI H)</span>
+        </div>
+        <div class="dept-body">
+          <div class="jadwal-grid">
+            
+            <!-- SESI PAGI -->
+            <div class="jadwal-card">
+              <div class="jadwal-head pagi">☀️ SESI PAGI</div>
+              <table class="jadwal-table">
+                <thead>
+                  <tr>
+                    <th>Tugas</th>
+                    <th style="text-align: right;">Nama</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="tugas">Operator Utama (Media)</td>
+                    <td class="nama">Tian</td>
+                  </tr>
+                  <tr>
+                    <td class="tugas">Operator Backup (Media)</td>
+                    <td class="nama">Yoka</td>
+                  </tr>
+                  <tr>
+                    <td class="tugas">Operator Mixer</td>
+                    <td class="nama">Edo</td>
+                  </tr>
+                  <tr>
+                    <td class="tugas">Asisten Operator Mixer</td>
+                    <td class="nama">Truna</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- SESI SIANG -->
+            <div class="jadwal-card">
+              <div class="jadwal-head siang">🌤️ SESI SIANG</div>
+              <table class="jadwal-table">
+                <thead>
+                  <tr>
+                    <th>Tugas</th>
+                    <th style="text-align: right;">Nama</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="tugas">Operator Utama (Media)</td>
+                    <td class="nama">Dixcy</td>
+                  </tr>
+                  <tr>
+                    <td class="tugas">Operator Backup (Media)</td>
+                    <td class="nama">Yoka</td>
+                  </tr>
+                  <tr>
+                    <td class="tugas">Operator Mixer</td>
+                    <td class="nama">Malkhiel</td>
+                  </tr>
+                  <tr>
+                    <td class="tugas">Asisten Operator Mixer</td>
+                    <td class="nama">Evan</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
           </div>
         </div>
       </div>

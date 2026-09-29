@@ -398,43 +398,144 @@ function openDetailModal(item) {
 }
 
 // ==========================================
-// SISTEM CETAK SURAT JALAN & CO-31
+// SISTEM CETAK SURAT JALAN & CO-31 (FIX DOUBLE PRINT BUG)
 // ==========================================
 function printSuratJalan() { 
-    let currentData = getFilteredData(); let bawaData = currentData.filter(i => i.status_digunakan === 'Akan Dibawa'); 
+    let currentData = getFilteredData(); 
+    let bawaData = currentData.filter(i => i.status_digunakan === 'Akan Dibawa'); 
+    
     if(bawaData.length === 0) return alert("Kosong! Belum ada barang dengan status '🛒 Akan Dibawa' pada filter lokasi saat ini."); 
-    let eventName = bawaData[0].tujuan || "____________________"; bawaData.sort((a, b) => (a.nama_barang || "").localeCompare(b.nama_barang || ""));
-    let lokasiGroups = {}; bawaData.forEach(item => { let lok = item.lokasi_saat_ini || item.lokasi || item["Lokasi Saat Ini"] || "Gudang Tidak Diketahui"; if (!lokasiGroups[lok]) lokasiGroups[lok] = []; lokasiGroups[lok].push(item); });
+    
+    let eventName = bawaData[0].tujuan || "____________________"; 
+    bawaData.sort((a, b) => (a.nama_barang || "").localeCompare(b.nama_barang || ""));
+    let lokasiGroups = {}; 
+    
+    bawaData.forEach(item => { 
+        let lok = item.lokasi_saat_ini || item.lokasi || item["Lokasi Saat Ini"] || "Gudang Tidak Diketahui"; 
+        if (!lokasiGroups[lok]) lokasiGroups[lok] = []; 
+        lokasiGroups[lok].push(item); 
+    });
+    
     let printWin = window.open('', '', 'width=800,height=800'); 
     let html = `<html><head><title>Manifest - ${eventName}</title><style>@page { size: A4; margin: 15mm; } body { font-family: 'Arial', sans-serif; padding: 0; color: #000; margin: 0; } .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; } .event-info { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 20px; } .box-group { border: 1px solid #000; margin-bottom: 12px; page-break-inside: avoid; } .box-header { background: #f0f0f0; padding: 6px 12px; font-weight: bold; font-size: 13px; display: flex; align-items: center; border-bottom: 1px solid #000; } .checkbox { display: inline-block; width: 14px; height: 14px; border: 1px solid #000; margin-right: 8px; flex-shrink: 0; } .item-list { list-style: none; padding: 0; margin: 0; } .item-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 4px 12px; border-bottom: 1px dashed #ccc; font-size: 12px; margin-left: 10px;} .item-row:last-child { border-bottom: none; } .qty { font-weight: bold; font-size: 12px; flex-shrink:0; margin-left:10px; } .notes-area { margin-top: 30px; border: 1px solid #000; min-height: 150px; padding: 10px; font-size: 14px; } .page-break { page-break-before: always; } @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }</style></head><body onload="window.print()">`;
+    
     let isFirstPage = true;
     for (let lok in lokasiGroups) {
         if (!isFirstPage) { html += `<div class="page-break"></div>`; } isFirstPage = false;
         html += `<div class="header"><h2 style="margin:0;">MANIFEST LOGISTIK / SURAT JALAN</h2><p style="margin:5px 0 0 0; color:#444; font-size:12px;">Daftar Pengeluaran - Sumber: <b style="font-size:14px; padding:2px 6px; background:#ddd;">📍 ${lok.toUpperCase()}</b></p></div><div class="event-info"><div><b>Tujuan / Event:</b> <span style="font-size:15px;">${eventName.toUpperCase()}</span></div><div><b>Tanggal Cetak:</b> ${new Date().toLocaleString('id-ID')}</div></div>`;
-        let itemsInLok = lokasiGroups[lok]; let groupedWadah = {}; let lepasan = [];
-        itemsInLok.forEach(item => { let wadah = (item.kode_wadah || "").toUpperCase().trim(); if (wadah) { if (!groupedWadah[wadah]) groupedWadah[wadah] = []; groupedWadah[wadah].push(item); } else { lepasan.push(item); } });
-        if (Object.keys(groupedWadah).length > 0) { html += `<h4 style="margin-bottom:8px; border-bottom:2px solid #000; display:inline-block; font-size:14px;">📦 PAKET HARDCASE / BOX</h4>`; for (let wadah in groupedWadah) { let boxItem = allItems.find(i => i.kode_barang && i.kode_barang.toUpperCase() === wadah); let boxName = boxItem ? boxItem.nama_barang.toUpperCase() : `WADAH #${wadah}`; html += `<div class="box-group"><div class="box-header"><div class="checkbox"></div> 🧰 ${boxName}  <span style="margin-left:auto; font-weight:normal; font-size:11px; color:#333;">#${wadah}</span></div><ul class="item-list">`; groupedWadah[wadah].forEach(item => { html += `<li class="item-row"><span>• ${item.nama_barang} ${item.kode_barang ? ` <i style="color:#555; font-size:10px;">(#${item.kode_barang})</i>` : ''}</span><span class="qty">${item.jumlah} Pcs</span></li>`; }); html += `</ul></div>`; } }
-        if (lepasan.length > 0) { html += `<h4 style="margin-top:15px; margin-bottom:8px; border-bottom:2px solid #000; display:inline-block; font-size:14px;">📌 BARANG LEPASAN (TANPA BOX)</h4><div class="box-group"><ul class="item-list">`; lepasan.forEach(item => { html += `<li class="item-row" style="padding:6px 12px; margin-left:0;"><div style="display:flex; align-items:flex-start;"><div class="checkbox"></div> <span><b>${item.nama_barang.toUpperCase()}</b> ${item.kode_barang ? ` <i style="color:#555; font-size:10px;">(#${item.kode_barang})</i>` : ''}</span></div><span class="qty">${item.jumlah} Pcs</span></li>`; }); html += `</ul></div>`; }
+        
+        let itemsInLok = lokasiGroups[lok]; 
+        let groupedWadah = {}; 
+        let lepasan = [];
+        let printedContainers = new Set(); // 🚀 BUKU CATATAN WADAH YANG SUDAH DICETAK
+        
+        itemsInLok.forEach(item => { 
+            let wadah = (item.kode_wadah || "").toUpperCase().trim(); 
+            if (wadah) { 
+                if (!groupedWadah[wadah]) groupedWadah[wadah] = []; 
+                groupedWadah[wadah].push(item); 
+                printedContainers.add(wadah); // 🚀 Catat wadah ini agar tidak tercetak lagi di bagian lepasan
+            } else { 
+                lepasan.push(item); 
+            } 
+        });
+        
+        if (Object.keys(groupedWadah).length > 0) { 
+            html += `<h4 style="margin-bottom:8px; border-bottom:2px solid #000; display:inline-block; font-size:14px;">📦 PAKET HARDCASE / BOX</h4>`; 
+            for (let wadah in groupedWadah) { 
+                let boxItem = allItems.find(i => i.kode_barang && i.kode_barang.toUpperCase() === wadah); 
+                let boxName = boxItem ? boxItem.nama_barang.toUpperCase() : `WADAH #${wadah}`; 
+                html += `<div class="box-group"><div class="box-header"><div class="checkbox"></div> 🧰 ${boxName}  <span style="margin-left:auto; font-weight:normal; font-size:11px; color:#333;">#${wadah}</span></div><ul class="item-list">`; 
+                groupedWadah[wadah].forEach(item => { 
+                    html += `<li class="item-row"><span>• ${item.nama_barang} ${item.kode_barang ? ` <i style="color:#555; font-size:10px;">(#${item.kode_barang})</i>` : ''}</span><span class="qty">${item.jumlah} Pcs</span></li>`; 
+                }); 
+                html += `</ul></div>`; 
+            } 
+        }
+        
+        if (lepasan.length > 0) { 
+            let hasLepasan = false;
+            let lepasanHtml = `<h4 style="margin-top:15px; margin-bottom:8px; border-bottom:2px solid #000; display:inline-block; font-size:14px;">📌 BARANG LEPASAN (TANPA BOX)</h4><div class="box-group"><ul class="item-list">`; 
+            
+            lepasan.forEach(item => { 
+                let kodeBarang = (item.kode_barang || "").toUpperCase().trim();
+                // 🚀 Cek buku catatan: Kalau barang ini ternyata adalah sebuah wadah yang sudah dicetak di atas, JANGAN DICETAK LAGI!
+                if (!printedContainers.has(kodeBarang)) {
+                    lepasanHtml += `<li class="item-row" style="padding:6px 12px; margin-left:0;"><div style="display:flex; align-items:flex-start;"><div class="checkbox"></div> <span><b>${item.nama_barang.toUpperCase()}</b> ${item.kode_barang ? ` <i style="color:#555; font-size:10px;">(#${item.kode_barang})</i>` : ''}</span></div><span class="qty">${item.jumlah} Pcs</span></li>`; 
+                    hasLepasan = true;
+                }
+            }); 
+            
+            lepasanHtml += `</ul></div>`; 
+            if (hasLepasan) html += lepasanHtml;
+        }
+        
         html += `<div class="notes-area"><b>📝 Catatan Tambahan Lapangan (Supir/Kru):</b></div>`;
     }
     html += `</body></html>`; printWin.document.write(html); printWin.document.close(); 
 }
 
 function printFormCO31() { 
-    let currentData = getFilteredData(); let bawaData = currentData.filter(i => i.status_digunakan === 'Akan Dibawa'); 
+    let currentData = getFilteredData(); 
+    let bawaData = currentData.filter(i => i.status_digunakan === 'Akan Dibawa'); 
+    
     if(bawaData.length === 0) return alert("Kosong! Belum ada barang dengan status '🛒 Akan Dibawa' pada filter lokasi saat ini."); 
-    let eventName = bawaData[0].tujuan || "____________________"; bawaData.sort((a, b) => (a.nama_barang || "").localeCompare(b.nama_barang || ""));
-    let lokasiGroups = {}; bawaData.forEach(item => { let lok = item.lokasi_saat_ini || item.lokasi || item["Lokasi Saat Ini"] || "Gudang Tidak Diketahui"; if (!lokasiGroups[lok]) lokasiGroups[lok] = []; lokasiGroups[lok].push(item); });
+    
+    let eventName = bawaData[0].tujuan || "____________________"; 
+    bawaData.sort((a, b) => (a.nama_barang || "").localeCompare(b.nama_barang || ""));
+    let lokasiGroups = {}; 
+    
+    bawaData.forEach(item => { 
+        let lok = item.lokasi_saat_ini || item.lokasi || item["Lokasi Saat Ini"] || "Gudang Tidak Diketahui"; 
+        if (!lokasiGroups[lok]) lokasiGroups[lok] = []; 
+        lokasiGroups[lok].push(item); 
+    });
+    
     let printWin = window.open('', '', 'width=800,height=800'); 
     let html = `<html><head><title>Lampiran CO-31 - ${eventName}</title><style>@page { size: A4 portrait; margin: 15mm; } body { font-family: 'Arial', sans-serif; padding: 0; color: #000; margin: 0; font-size:12px; } table { width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 20px; } th { border-top: 2px solid #000; border-bottom: 2px solid #000; padding: 8px 6px; text-align: left; font-size:13px;} td { border-bottom: 1px dashed #ccc; padding: 6px; vertical-align: top; font-size:12px;} .page-break { page-break-before: always; } @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }</style></head><body onload="window.print()">`;
+    
     let isFirstPage = true;
     for (let lok in lokasiGroups) {
         if (!isFirstPage) { html += `<div class="page-break"></div>`; } isFirstPage = false;
         html += `<div style="text-align:center; margin-bottom:20px;"><h2 style="margin:0 0 5px 0; font-size:18px;">LAMPIRAN DAFTAR BARANG</h2><div style="font-size:12px; color:#555;">Digunakan sebagai lampiran pesanan pengiriman Form CO-31-IN</div></div><div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:13px; border-bottom:2px solid #000; padding-bottom:8px;"><div><b>Tujuan / Event:</b> ${eventName.toUpperCase()}</div><div><b>Sumber Gudang:</b> ${lok.toUpperCase()}</div></div><table><thead><tr><th style="width:12%; text-align:center;">Jumlah</th><th style="width:58%;">Uraian Barang</th><th style="width:30%;">Keterangan / Checklist</th></tr></thead><tbody>`;
-        let itemsInLok = lokasiGroups[lok]; let groupedWadah = {}; let lepasan = [];
-        itemsInLok.forEach(item => { let wadah = (item.kode_wadah || "").toUpperCase().trim(); if (wadah) { if (!groupedWadah[wadah]) groupedWadah[wadah] = []; groupedWadah[wadah].push(item); } else { lepasan.push(item); } });
-        if (Object.keys(groupedWadah).length > 0) { for (let wadah in groupedWadah) { let boxItem = allItems.find(i => i.kode_barang && i.kode_barang.toUpperCase() === wadah); let boxName = boxItem ? boxItem.nama_barang.toUpperCase() : `WADAH #${wadah}`; html += `<tr style="background-color:#f8fafc;"><td style="text-align:center; font-weight:bold; border-top:1px solid #000;">1 Pcs</td><td style="font-weight:bold; border-top:1px solid #000;">🧰 ${boxName} (#${wadah})</td><td style="border-top:1px solid #000;"></td></tr>`; groupedWadah[wadah].forEach(item => { html += `<tr><td style="text-align:center;">${item.jumlah} Pcs</td><td style="padding-left:15px; color:#333;">- ${item.nama_barang} ${item.kode_barang ? `(#${item.kode_barang})` : ''}</td><td>[ &nbsp;&nbsp; ]</td></tr>`; }); } }
-        if (lepasan.length > 0) { lepasan.forEach(item => { html += `<tr><td style="text-align:center; font-weight:bold;">${item.jumlah} Pcs</td><td style="font-weight:bold;">${item.nama_barang.toUpperCase()} ${item.kode_barang ? `(#${item.kode_barang})` : ''}</td><td>[ &nbsp;&nbsp; ]</td></tr>`; }); }
+        
+        let itemsInLok = lokasiGroups[lok]; 
+        let groupedWadah = {}; 
+        let lepasan = [];
+        let printedContainers = new Set(); // 🚀 BUKU CATATAN WADAH YANG SUDAH DICETAK
+        
+        itemsInLok.forEach(item => { 
+            let wadah = (item.kode_wadah || "").toUpperCase().trim(); 
+            if (wadah) { 
+                if (!groupedWadah[wadah]) groupedWadah[wadah] = []; 
+                groupedWadah[wadah].push(item); 
+                printedContainers.add(wadah); // 🚀 Catat wadah ini
+            } else { 
+                lepasan.push(item); 
+            } 
+        });
+        
+        if (Object.keys(groupedWadah).length > 0) { 
+            for (let wadah in groupedWadah) { 
+                let boxItem = allItems.find(i => i.kode_barang && i.kode_barang.toUpperCase() === wadah); 
+                let boxName = boxItem ? boxItem.nama_barang.toUpperCase() : `WADAH #${wadah}`; 
+                html += `<tr style="background-color:#f8fafc;"><td style="text-align:center; font-weight:bold; border-top:1px solid #000;">1 Pcs</td><td style="font-weight:bold; border-top:1px solid #000;">🧰 ${boxName} (#${wadah})</td><td style="border-top:1px solid #000;"></td></tr>`; 
+                groupedWadah[wadah].forEach(item => { 
+                    html += `<tr><td style="text-align:center;">${item.jumlah} Pcs</td><td style="padding-left:15px; color:#333;">- ${item.nama_barang} ${item.kode_barang ? `(#${item.kode_barang})` : ''}</td><td>[ &nbsp;&nbsp; ]</td></tr>`; 
+                }); 
+            } 
+        }
+        
+        if (lepasan.length > 0) { 
+            lepasan.forEach(item => { 
+                let kodeBarang = (item.kode_barang || "").toUpperCase().trim();
+                // 🚀 Cek buku catatan: Kalau ini adalah wadah yang isinya sudah dicetak di atas, abaikan.
+                if (!printedContainers.has(kodeBarang)) {
+                    html += `<tr><td style="text-align:center; font-weight:bold;">${item.jumlah} Pcs</td><td style="font-weight:bold;">${item.nama_barang.toUpperCase()} ${item.kode_barang ? `(#${item.kode_barang})` : ''}</td><td>[ &nbsp;&nbsp; ]</td></tr>`; 
+                }
+            }); 
+        }
+        
         html += `</tbody></table><div style="font-size:10px; color:#666; text-align:right;"><i>Dicetak otomatis dari Sistem Logistik AV pada: ${new Date().toLocaleString('id-ID')}</i></div>`;
     }
     html += `</body></html>`; printWin.document.write(html); printWin.document.close(); 

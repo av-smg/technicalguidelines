@@ -127,11 +127,10 @@ function renderMissions() {
         </div>
         <div class="mission-content priority-content" style="padding:8px 10px; font-size:10px; color:#334155; line-height:1.5;">
             <ol style="margin:0; padding-left:15px;">
-                <li><b>Area Hadirin</b> (Zona D1, D2, E, F)</li>
-                <li><b>Area Samping Panggung</b> (Zona B)</li>
-                <li><b>Area Ruang Belakang Panggung</b> (Zona A)</li>
-                <li><b>Area Ruang P3K</b> (Zona G)</li>
-                <li><b>Area Panggung</b> (Zona C)</li>
+                <li><b>Area Hadirin</b> (Zona C1, C2, D, E, G)</li>
+                <li><b>Area Samping Panggung & Belakang Panggung</b> (Zona A)</li>
+                <li><b>Area Ruang P3K</b> (Zona F)</li>
+                <li><b>Area Panggung</b> (Zona B)</li>
             </ol>
         </div>
     </div>`;

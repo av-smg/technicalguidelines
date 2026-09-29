@@ -1,0 +1,355 @@
+---
+location: "APENDIKS"
+---
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    {% include head.html %}
+    <title>Daftar Audio Testing - A/V Command Center</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --card-bg: #ffffff;
+            --border: #e2e8f0;
+            --text: #334155;
+            --item-bg: #f8fafc;
+            --badge-bg: #e0f2fe;
+            --badge-text: #0284c7;
+        }
+
+        /* 🌙 DARK MODE SAKTI */
+        body.dark-mode, [data-theme="dark"] {
+            --primary: #6366f1;
+            --dark: #f8fafc;
+            --light: #020617;
+            --card-bg: #0f172a;
+            --border: #1e293b;
+            --text: #cbd5e1;
+            --item-bg: #151e2e;
+            --badge-bg: #0c4a6e;
+            --badge-text: #38bdf8;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background-color: var(--light);
+            margin: 0;
+            padding: 15px 10px;
+            transition: background 0.3s, color 0.3s;
+        }
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+        }
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--item-bg);
+            color: var(--dark);
+            padding: 8px 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 11px;
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+            transition: 0.2s;
+        }
+        .btn-back:hover { opacity: 0.8; transform: translateX(-3px); }
+        
+        .header-title { font-weight: 900; margin: 0; font-size: 18px; color: var(--dark); }
+        .header-subtitle { font-size: 11px; color: #64748b; margin: 0 0 20px 0; }
+
+        .category-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            margin-bottom: 20px;
+            border: 2px solid var(--border);
+            transition: background 0.3s, border-color 0.3s;
+        }
+        .category-title {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 15px;
+            font-weight: 900;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        .song-list { display: flex; flex-direction: column; gap: 8px; }
+        .song-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 8px; }
+        
+        .song-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 15px;
+            background: var(--item-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+        
+        .song-info { display: flex; align-items: center; gap: 12px; }
+        
+        .song-code {
+            font-family: monospace;
+            font-size: 13px;
+            font-weight: 900;
+            color: var(--badge-text);
+            background: var(--badge-bg);
+            padding: 6px 10px;
+            border-radius: 6px;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: 0.2s;
+        }
+        .song-code:hover { border-color: var(--badge-text); transform: scale(1.05); }
+        .song-code:active { transform: scale(0.95); }
+        
+        .song-title { font-size: 13px; font-weight: 700; color: var(--text); }
+        .hint-text { font-size: 9px; color: #94a3b8; font-weight: bold; text-transform: uppercase; }
+
+        @media (max-width: 600px) {
+            .song-item { flex-direction: column; align-items: flex-start; gap: 8px; }
+            .song-code { width: 100%; text-align: center; }
+        }
+
+        /* Notifikasi Copy */
+        #copyToast {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px);
+            background: #10b981; color: white; padding: 10px 20px; border-radius: 30px;
+            font-weight: bold; font-size: 12px; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
+            opacity: 0; transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); z-index: 9999;
+        }
+        #copyToast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    </style>
+</head>
+<body id="apendiksBody">
+    {% include navbar.html %}
+    
+    <main class="container">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+                <h2 class="header-title">🎧 DAFTAR AUDIO TESTING (H-1)</h2>
+                <p class="header-subtitle">Ketuk/Klik kode file untuk menyalin langsung (Copy) ke clipboard.</p>
+            </div>
+        </div>
+
+        <a href="{{ site.baseurl }}/" class="btn-back">⬅ Kembali ke Beranda</a>
+
+        <!-- 1. DAFTAR ACARA (SJJM) -->
+        <div class="category-card">
+            <h3 class="category-title">🎼 Lagu Daftar Acara (Jawa)</h3>
+            <div class="song-list">
+                <div class="song-item">
+                    <div class="song-info">
+                        <div class="song-code" onclick="copyCode(this, 'sjjm_JA_007')">sjjm_JA_007</div>
+                        <div class="song-title">Lagu No. 7</div>
+                    </div>
+                </div>
+                <div class="song-item">
+                    <div class="song-info">
+                        <div class="song-code" onclick="copyCode(this, 'sjjm_JA_037')">sjjm_JA_037</div>
+                        <div class="song-title">Lagu No. 37</div>
+                    </div>
+                </div>
+                <div class="song-item">
+                    <div class="song-info">
+                        <div class="song-code" onclick="copyCode(this, 'sjjm_JA_038')">sjjm_JA_038</div>
+                        <div class="song-title">Lagu No. 38</div>
+                    </div>
+                </div>
+                <div class="song-item">
+                    <div class="song-info">
+                        <div class="song-code" onclick="copyCode(this, 'sjjm_JA_088')">sjjm_JA_088</div>
+                        <div class="song-title">Lagu No. 88</div>
+                    </div>
+                </div>
+                <div class="song-item">
+                    <div class="song-info">
+                        <div class="song-code" onclick="copyCode(this, 'sjjm_JA_111')">sjjm_JA_111</div>
+                        <div class="song-title">Lagu No. 111</div>
+                    </div>
+                </div>
+                <div class="song-item">
+                    <div class="song-info">
+                        <div class="song-code" onclick="copyCode(this, 'sjjm_JA_161')">sjjm_JA_161</div>
+                        <div class="song-title">Lagu No. 161</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. TES DELAY (IMC) -->
+        <div class="category-card">
+            <h3 class="category-title">⏱️ Lagu Tes Delay (Vokal Paduan Suara)</h3>
+            <div class="song-list">
+                <div class="song-item">
+                    <div class="song-info">
+                        <div class="song-code" onclick="copyCode(this, 'imc_JA')">imc_JA</div>
+                        <div class="song-title">Bareng-bareng Muji Yehuwah</div>
+                    </div>
+                </div>
+                <div class="song-item">
+                    <div class="song-info">
+                        <div class="song-code" onclick="copyCode(this, 'imc_JA')">imc_JA</div>
+                        <div class="song-title">Senenge Dadi Umate Yah</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. LAGU ANAK-ANAK -->
+        <div class="category-card">
+            <h3 class="category-title">🧒 Lagu Anak-Anak</h3>
+            <div class="song-list">
+                <div class="song-item">
+                    <div class="song-info">
+                        <div class="song-code" onclick="copyCode(this, 'anak_JA')">anak_JA</div>
+                        <div class="song-title">Yehuwah Ana Tenan</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. LAGU SJJC (INDONESIA LAMA) -->
+        <div class="category-card">
+            <h3 class="category-title">🇮🇩 Lagu SJJ Campuran (Indonesia)</h3>
+            <div class="song-list">
+                <div class="song-item">
+                    <div class="song-info">
+                        <div class="song-code" onclick="copyCode(this, 'sjjc_IN_007')">sjjc_IN_007</div>
+                        <div class="song-title">Yehuwah Kekuatanku</div>
+                    </div>
+                </div>
+                <div class="song-item">
+                    <div class="song-info">
+                        <div class="song-code" onclick="copyCode(this, 'sjjc_IN_076')">sjjc_IN_076</div>
+                        <div class="song-title">Betapa Bahagia</div>
+                    </div>
+                </div>
+                <div class="song-item">
+                    <div class="song-info">
+                        <div class="song-code" onclick="copyCode(this, 'sjjc_IN_140')">sjjc_IN_140</div>
+                        <div class="song-title">Hidup Kekal Tiba</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. LAGU SJJC BARU (JAWA) -->
+        <div class="category-card">
+            <h3 class="category-title">🎼 Kumpulan Lagu Baru (Jawa)</h3>
+            <div class="song-grid">
+                <div class="song-item"><div class="song-info"><div class="song-code" onclick="copyCode(this, 'sjjc_JA_153')">sjjc_JA_153</div></div></div>
+                <div class="song-item"><div class="song-info"><div class="song-code" onclick="copyCode(this, 'sjjc_JA_154')">sjjc_JA_154</div></div></div>
+                <div class="song-item"><div class="song-info"><div class="song-code" onclick="copyCode(this, 'sjjc_JA_155')">sjjc_JA_155</div></div></div>
+                <div class="song-item"><div class="song-info"><div class="song-code" onclick="copyCode(this, 'sjjc_JA_156')">sjjc_JA_156</div></div></div>
+                <div class="song-item"><div class="song-info"><div class="song-code" onclick="copyCode(this, 'sjjc_JA_157')">sjjc_JA_157</div></div></div>
+                <div class="song-item"><div class="song-info"><div class="song-code" onclick="copyCode(this, 'sjjc_JA_158')">sjjc_JA_158</div></div></div>
+                <div class="song-item"><div class="song-info"><div class="song-code" onclick="copyCode(this, 'sjjc_JA_159')">sjjc_JA_159</div></div></div>
+                <div class="song-item"><div class="song-info"><div class="song-code" onclick="copyCode(this, 'sjjc_JA_160')">sjjc_JA_160</div></div></div>
+                <div class="song-item"><div class="song-info"><div class="song-code" onclick="copyCode(this, 'sjjc_JA_161')">sjjc_JA_161</div></div></div>
+                <div class="song-item"><div class="song-info"><div class="song-code" onclick="copyCode(this, 'sjjc_JA_162')">sjjc_JA_162</div></div></div>
+                <div class="song-item"><div class="song-info"><div class="song-code" onclick="copyCode(this, 'sjjc_JA_163')">sjjc_JA_163</div></div></div>
+            </div>
+        </div>
+
+        <!-- 6. LAGU SJJC BARU (INDONESIA) -->
+        <div class="category-card">
+            <h3 class="category-title">🇮🇩 Kumpulan Lagu Baru (Indonesia)</h3>
+            <div class="song-grid">
+                <div class="song-item"><div class="song-info"><div class="song-code" onclick="copyCode(this, 'sjjc_IN_153')">sjjc_IN_153</div></div></div>
+                <div class="song-item"><div class="song-info"><div class="song-code" onclick="copyCode(this, 'sjjc_IN_154')">sjjc_IN_154</div></div></div>
+                <div class="song-item"><div class="song-info"><div class="song-code" onclick="copyCode(this, 'sjjc_IN_155')">sjjc_IN_155</div></div></div>
+                <div class="song-item"><div class="song-info"><div class="song-code" onclick="copyCode(this, 'sjjc_IN_156')">sjjc_IN_156</div></div></div>
+                <div class="song-item"><div class="song-info"><div class="song-code" onclick="copyCode(this, 'sjjc_IN_157')">sjjc_IN_157</div></div></div>
+                <div class="song-item"><div class="song-info"><div class="song-code" onclick="copyCode(this, 'sjjc_IN_158')">sjjc_IN_158</div></div></div>
+                <div class="song-item"><div class="song-info"><div class="song-code" onclick="copyCode(this, 'sjjc_IN_159')">sjjc_IN_159</div></div></div>
+                <div class="song-item"><div class="song-info"><div class="song-code" onclick="copyCode(this, 'sjjc_IN_160')">sjjc_IN_160</div></div></div>
+                <div class="song-item"><div class="song-info"><div class="song-code" onclick="copyCode(this, 'sjjc_IN_161')">sjjc_IN_161</div></div></div>
+                <div class="song-item"><div class="song-info"><div class="song-code" onclick="copyCode(this, 'sjjc_IN_162')">sjjc_IN_162</div></div></div>
+                <div class="song-item"><div class="song-info"><div class="song-code" onclick="copyCode(this, 'sjjc_IN_163')">sjjc_IN_163</div></div></div>
+            </div>
+        </div>
+
+        <!-- 7. ORIGINAL SONGS (OSG) -->
+        <div class="category-card">
+            <h3 class="category-title">🎸 Original Songs (Jawa)</h3>
+            <div class="song-list">
+                <div class="song-item">
+                    <div class="song-info">
+                        <div class="song-code" onclick="copyCode(this, 'osg_JA')">osg_JA</div>
+                        <div class="song-title">Aku Yakin lan Beriman</div>
+                    </div>
+                </div>
+                <div class="song-item">
+                    <div class="song-info">
+                        <div class="song-code" onclick="copyCode(this, 'osg_JA')">osg_JA</div>
+                        <div class="song-title">Luwih Berharga Timbang Emprit</div>
+                    </div>
+                </div>
+                <div class="song-item">
+                    <div class="song-info">
+                        <div class="song-code" onclick="copyCode(this, 'osg_JA')">osg_JA</div>
+                        <div class="song-title">Aku Kowe Ora Dhewe</div>
+                    </div>
+                </div>
+                <div class="song-item">
+                    <div class="song-info">
+                        <div class="song-code" onclick="copyCode(this, 'osg_JA')">osg_JA</div>
+                        <div class="song-title">Omongan sing Nguwatke</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Elemen Notifikasi Copy -->
+    <div id="copyToast">📋 Kode Berhasil Disalin!</div>
+
+    <!-- Script Copy to Clipboard -->
+    <script>
+        function copyCode(element, text) {
+            navigator.clipboard.writeText(text).then(() => {
+                // Ubah gaya tombol sementara
+                const originalBg = element.style.background;
+                const originalColor = element.style.color;
+                const originalText = element.innerText;
+                
+                element.style.background = '#10b981';
+                element.style.color = '#ffffff';
+                element.innerText = 'Tersalin!';
+                
+                // Tampilkan Toast
+                const toast = document.getElementById('copyToast');
+                toast.classList.add('show');
+
+                // Kembalikan seperti semula setelah 1.5 detik
+                setTimeout(() => {
+                    element.style.background = '';
+                    element.style.color = '';
+                    element.innerText = originalText;
+                    toast.classList.remove('show');
+                }, 1500);
+            }).catch(err => {
+                alert("Gagal menyalin teks: " + err);
+            });
+        }
+    </script>
+</body>
+</html>

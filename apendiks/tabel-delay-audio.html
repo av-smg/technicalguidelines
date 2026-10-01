@@ -62,7 +62,7 @@ location: "APENDIKS"
             margin-bottom: 24px;
         }
         
-        .sys-header h2 { margin: 0; font-size: 1.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+        .sys-header h2 { margin: 0; font-size: 1.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; }
         .sys-header p { margin: 8px 0 0 0; color: var(--sys-text-muted); font-size: 0.95rem; }
 
         .sys-section {
@@ -177,9 +177,9 @@ location: "APENDIKS"
             
             <div class="tech-flow-container">
                 <div class="tech-flow-box" style="border-color: var(--sys-accent);">
-                    <div class="icon">🎚️</div>
+                    <div class="icon">🎚️️</div>
                     <div class="title">Mixer Yamaha</div>
-                    <div class="sub">Output Matrix/Aux</div>
+                    <div class="sub">Output Main/Aux</div>
                 </div>
                 <div class="tech-flow-arrow">➔</div>
                 
@@ -200,7 +200,7 @@ location: "APENDIKS"
                 <div class="tech-flow-box" style="border-color: var(--sys-danger);">
                     <div class="icon">🔊</div>
                     <div class="title">Speaker Zone</div>
-                    <div class="sub">TOA F2000BM</div>
+                    <div class="sub">TOA F2000BM / HX-5</div>
                 </div>
             </div>
 
@@ -234,33 +234,33 @@ location: "APENDIKS"
                     <tbody>
                         <tr>
                             <td><span class="sys-tag tag-out">OUT 5 & 6</span></td>
-                            <td><strong>Zona Utama (FOH Depan)</strong></td>
+                            <td><strong>Zona A, B, C1, C2 (Area FOH)</strong><br><span style="font-size:0.85em; color:var(--sys-text-muted);">Didistribusikan via Splitter MX882</span></td>
                             <td>0 Meter</td>
                             <td><span class="sys-tag tag-delay" style="color: var(--sys-text-muted); border-color: var(--sys-border); background: var(--sys-bg);">0 ms (Bypass)</span></td>
                         </tr>
                         <tr>
                             <td><span class="sys-tag tag-out">OUT 2</span></td>
-                            <td><strong>Zona B / C (Delay 1)</strong></td>
-                            <td>± 12 Meter</td>
-                            <td><span class="sys-tag tag-delay">35 ms - 36 ms</span></td>
+                            <td><strong>Zona D (Tower Delay 1)</strong></td>
+                            <td>± 17 Meter</td>
+                            <td><span class="sys-tag tag-delay">50 ms</span></td>
                         </tr>
                         <tr>
                             <td><span class="sys-tag tag-out">OUT 3</span></td>
-                            <td><strong>Zona D (Delay 2)</strong></td>
-                            <td>± 24 Meter</td>
-                            <td><span class="sys-tag tag-delay">70 ms - 72 ms</span></td>
+                            <td><strong>Zona E (Tower Delay 2)</strong></td>
+                            <td>± 25 Meter</td>
+                            <td><span class="sys-tag tag-delay">75 ms</span></td>
                         </tr>
                         <tr>
                             <td><span class="sys-tag tag-out">OUT 1</span></td>
-                            <td><strong>Zona E (Delay 3)</strong></td>
-                            <td>± 36 Meter</td>
-                            <td><span class="sys-tag tag-delay">104 ms - 108 ms</span></td>
+                            <td><strong>Zona F (P3K & Ibu Anak)</strong></td>
+                            <td>± 34 Meter</td>
+                            <td><span class="sys-tag tag-delay">102 ms</span></td>
                         </tr>
                         <tr>
                             <td><span class="sys-tag tag-out">OUT 4</span></td>
-                            <td><strong>Zona Sayap / Area Luar</strong></td>
-                            <td>± 45 Meter</td>
-                            <td><span class="sys-tag tag-delay">130 ms - 135 ms</span></td>
+                            <td><strong>Zona G (Meja Departemen)</strong></td>
+                            <td>± 34 Meter</td>
+                            <td><span class="sys-tag tag-delay">102 ms</span></td>
                         </tr>
                     </tbody>
                 </table>
@@ -278,40 +278,52 @@ location: "APENDIKS"
                     <thead>
                         <tr>
                             <th>Sinyal Awal</th>
-                            <th>DSP Output (DCX2496)</th>
+                            <th>Jalur Pemrosesan (DSP/Splitter)</th>
                             <th>Perangkat Tujuan (Amplifier)</th>
                             <th>Target Area (Speaker)</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td><span class="sys-tag tag-in">IN A / B</span> Stereo</td>
-                            <td><span class="sys-tag tag-out">OUT 5 & 6</span> L/R Main</td>
-                            <td><strong>Splitter MX882</strong> (In L/R) ➔ Ampli PROTEA 1 & 2</td>
-                            <td>FOH Utama (Zona C1 & C2)</td>
+                            <td><span class="sys-tag tag-in">MIX MAIN L/R</span></td>
+                            <td><span class="sys-tag tag-out">DLMS 5 & 6</span> ➔ Splitter In L/R</td>
+                            <td><strong>PROTEA 1 & 2</strong></td>
+                            <td>FOH Kiri & Kanan (Zona C1 & C2)</td>
                         </tr>
                         <tr>
-                            <td><span class="sys-tag tag-in">SUM A+B</span> Mono</td>
-                            <td><span class="sys-tag tag-out">OUT 2</span> Delay 1</td>
-                            <td><strong>TOA ZA-2240</strong> (Via AUX In)</td>
+                            <td><span class="sys-tag tag-in">MIX MAIN L/R</span></td>
+                            <td><span class="sys-tag tag-out">DLMS 5 & 6</span> ➔ Splitter Out 1 & 2</td>
+                            <td><strong>TOA ZA-2240 & ZA-2120</strong></td>
+                            <td>Ruang Ketua (Zona A) & Monitor (Zona B)</td>
+                        </tr>
+                        <tr>
+                            <td><span class="sys-tag tag-in">MIX MAIN L/R</span></td>
+                            <td><span class="sys-tag tag-out">DLMS 5 & 6</span> ➔ Splitter Out 5</td>
+                            <td><strong>FM Transmitter</strong></td>
+                            <td>Siaran Radio Broadcast</td>
+                        </tr>
+                        <tr>
+                            <td><span class="sys-tag tag-in">MIX MAIN L/R</span></td>
+                            <td><span class="sys-tag tag-out">DLMS OUT 2</span> (Delay)</td>
+                            <td><strong>TOA ZA-2240</strong></td>
                             <td>Tower Delay 1 (Zona D)</td>
                         </tr>
                         <tr>
-                            <td><span class="sys-tag tag-in">SUM A+B</span> Mono</td>
-                            <td><span class="sys-tag tag-out">OUT 3</span> Delay 2</td>
-                            <td><strong>TOA ZA-2240</strong> (Via AUX In)</td>
+                            <td><span class="sys-tag tag-in">MIX MAIN L/R</span></td>
+                            <td><span class="sys-tag tag-out">DLMS OUT 3</span> (Delay)</td>
+                            <td><strong>TOA ZA-2240</strong></td>
                             <td>Tower Delay 2 (Zona E)</td>
                         </tr>
                         <tr>
-                            <td><span class="sys-tag tag-in">SUM A+B</span> Mono</td>
-                            <td><span class="sys-tag tag-out">OUT 1</span> Delay 3</td>
-                            <td><strong>TOA ZA-2120</strong> (Via AUX In)</td>
-                            <td>P3K & Ibu Anak (Zona F)</td>
+                            <td><span class="sys-tag tag-in">MIX MAIN L/R</span></td>
+                            <td><span class="sys-tag tag-out">DLMS OUT 1</span> (Delay)</td>
+                            <td><strong>TOA ZA-2120</strong></td>
+                            <td>Ruang P3K & Ibu Anak (Zona F)</td>
                         </tr>
                         <tr>
-                            <td><span class="sys-tag tag-in">SUM A+B</span> Mono</td>
-                            <td><span class="sys-tag tag-out">OUT 4</span> Delay 4</td>
-                            <td><strong>TOA ZA-2120</strong> (Via AUX In)</td>
+                            <td><span class="sys-tag tag-in">MIX MAIN L/R</span></td>
+                            <td><span class="sys-tag tag-out">DLMS OUT 4</span> (Delay)</td>
+                            <td><strong>TOA ZA-2120</strong></td>
                             <td>Meja Departemen (Zona G)</td>
                         </tr>
                     </tbody>

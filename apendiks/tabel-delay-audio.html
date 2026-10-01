@@ -5,202 +5,402 @@ location: "APENDIKS"
 <html lang="id">
 <head>
     {% include head.html %}
-    <title>Tabel Delay Audio - A/V Command Center</title>
+    <title>Konfigurasi Sistem Audio & DSP - A/V Command Center</title>
+    
     <style>
-        :root {
-            --primary: #4f46e5;
-            --dark: #0f172a;
-            --light: #f8fafc;
-            --card-bg: #ffffff;
-            --border: #e2e8f0;
-            --text: #334155;
-            --item-bg: #f8fafc;
-            --badge-bg: #e0f2fe;
-            --badge-text: #0284c7;
+        /* ====================================================
+           THEME & VARIABLES (Engineering Spec-Sheet Style)
+           ==================================================== */
+        .sys-container {
+            --sys-bg: var(--dw-node-bg, #ffffff);
+            --sys-border: var(--dw-border, #cbd5e1);
+            --sys-text: var(--dw-text, #0f172a);
+            --sys-text-muted: var(--dw-text-muted, #475569);
+            --sys-accent: #2563eb;
+            --sys-accent-light: rgba(37, 99, 235, 0.05);
+            --sys-danger: #ef4444;
+            --sys-danger-light: rgba(239, 68, 68, 0.05);
+            --sys-warn: #f59e0b;
+            --sys-success: #10b981;
+            --sys-head-bg: #f8fafc;
+            
+            width: 100%;
+            max-width: 1000px;
+            margin: 20px auto 40px auto;
+            padding: 0 10px;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            color: var(--sys-text);
+            line-height: 1.5;
         }
 
-        /* 🌙 DARK MODE SAKTI */
-        body.dark-mode, [data-theme="dark"] {
-            --primary: #6366f1;
-            --dark: #f8fafc;
-            --light: #020617;
-            --card-bg: #0f172a;
-            --border: #1e293b;
-            --text: #cbd5e1;
-            --item-bg: #151e2e;
-            --badge-bg: #0c4a6e;
-            --badge-text: #38bdf8;
+        html.dark .sys-container,
+        html[data-theme="dark"] .sys-container,
+        body.dark-mode .sys-container {
+            --sys-bg: var(--dw-node-bg, #0f172a);
+            --sys-border: var(--dw-border, #334155);
+            --sys-text: var(--dw-text, #f8fafc);
+            --sys-text-muted: var(--dw-text-muted, #94a3b8);
+            --sys-head-bg: #1e293b;
+            --sys-accent-light: rgba(37, 99, 235, 0.15);
+            --sys-danger-light: rgba(239, 68, 68, 0.15);
         }
 
-        body {
-            font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
-            line-height: 1.6;
-            color: var(--text);
-            background-color: var(--light);
-            margin: 0;
-            padding: 15px 10px;
-            transition: background 0.3s, color 0.3s;
-        }
-        .container { max-width: 850px; margin: 0 auto; }
-        
-        .btn-back {
+        /* Tombol Kembali */
+        .btn-back-tech {
             display: inline-flex; align-items: center; gap: 8px;
-            background: var(--item-bg); color: var(--dark);
+            background: var(--sys-bg); color: var(--sys-text);
             padding: 8px 14px; border-radius: 8px; text-decoration: none;
-            font-weight: 800; font-size: 11px; border: 1px solid var(--border);
-            margin-bottom: 20px; transition: 0.2s;
+            font-weight: 800; font-size: 11px; border: 1px solid var(--sys-border);
+            margin-bottom: 20px; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
-        .btn-back:hover { opacity: 0.8; transform: translateX(-3px); }
+        .btn-back-tech:hover { opacity: 0.8; transform: translateX(-3px); border-color: var(--sys-accent); }
+
+        /* Layout & Cards */
+        .sys-header {
+            border-bottom: 4px solid var(--sys-accent);
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+        }
         
-        .header-title { font-weight: 900; margin: 0; font-size: 18px; color: var(--dark); }
-        .header-subtitle { font-size: 11px; color: #64748b; margin: 0 0 20px 0; }
+        .sys-header h2 { margin: 0; font-size: 1.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+        .sys-header p { margin: 8px 0 0 0; color: var(--sys-text-muted); font-size: 0.95rem; }
 
-        .category-card {
-            background: var(--card-bg); border-radius: 12px; padding: 20px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.03); margin-bottom: 20px;
-            border: 2px solid var(--border); transition: background 0.3s, border-color 0.3s;
-        }
-        .category-title {
-            margin-top: 0; margin-bottom: 15px; font-size: 15px; font-weight: 900;
-            color: var(--dark); display: flex; align-items: center; gap: 8px;
-            border-bottom: 2px solid var(--border); padding-bottom: 10px;
+        .sys-section {
+            background: var(--sys-bg);
+            border: 1px solid var(--sys-border);
+            border-radius: 8px;
+            margin-bottom: 24px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
         }
 
-        /* TABEL DELAY */
-        .delay-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
-        .delay-table th, .delay-table td { 
-            padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); 
+        .sys-section-title {
+            background: var(--sys-head-bg);
+            padding: 12px 20px;
+            margin: 0;
+            font-size: 1.05rem;
+            font-weight: 700;
+            border-bottom: 1px solid var(--sys-border);
+            display: flex; align-items: center; gap: 10px;
         }
-        .delay-table th { background: var(--item-bg); color: var(--dark); font-weight: 900; }
-        .delay-table td { color: var(--text); font-weight: 600; }
-        .delay-table tr:last-child td { border-bottom: none; }
-        .delay-val { font-family: monospace; font-size: 13px; font-weight: 900; color: #ea580c; background: #fff7ed; padding: 4px 8px; border-radius: 6px; border: 1px solid #fed7aa; }
-        body.dark-mode .delay-val { background: rgba(234, 88, 12, 0.1); border-color: rgba(234, 88, 12, 0.2); }
 
-        /* DIAGRAM FLOW */
-        .flow-container { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; margin: 20px 0; }
-        .flow-box { 
-            background: var(--item-bg); border: 2px solid var(--border); padding: 12px 15px; 
-            border-radius: 12px; text-align: center; font-weight: 800; font-size: 12px; color: var(--dark);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02); min-width: 120px;
+        /* Flow Diagram Engineering Style */
+        .tech-flow-container {
+            display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px;
+            padding: 25px 20px; background: var(--sys-bg);
         }
-        .flow-arrow { font-size: 20px; color: #94a3b8; font-weight: 900; }
+        .tech-flow-box {
+            border: 2px solid var(--sys-border); border-radius: 8px; padding: 12px 20px;
+            text-align: center; background: var(--sys-head-bg); min-width: 140px;
+        }
+        .tech-flow-box .icon { font-size: 24px; margin-bottom: 5px; }
+        .tech-flow-box .title { font-size: 13px; font-weight: 800; color: var(--sys-text); }
+        .tech-flow-box .sub { font-size: 10px; color: var(--sys-text-muted); text-transform: uppercase; font-weight: 600; margin-top: 4px;}
+        .tech-flow-arrow { color: var(--sys-border); font-size: 24px; font-weight: 900; }
         
-        .flow-box.source { border-color: #3b82f6; background: #eff6ff; color: #1e3a8a; }
-        .flow-box.dsp { border-color: #f59e0b; background: #fffbeb; color: #78350f; }
-        .flow-box.amp { border-color: #10b981; background: #ecfdf5; color: #064e3b; }
-        .flow-box.spk { border-color: #ef4444; background: #fef2f2; color: #7f1d1d; }
+        /* Tables */
+        .sys-table-wrapper { overflow-x: auto; }
+        .sys-table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        .sys-table th, .sys-table td {
+            padding: 12px 20px;
+            text-align: left;
+            border-bottom: 1px solid var(--sys-border);
+            font-size: 0.9rem;
+        }
+        .sys-table th {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: var(--sys-text-muted);
+            letter-spacing: 0.5px;
+            font-weight: 700;
+            background: var(--sys-head-bg);
+        }
+        .sys-table tr:last-child td { border-bottom: none; }
+        .sys-table tbody tr:hover { background: rgba(0,0,0,0.02); }
+        body.dark-mode .sys-table tbody tr:hover { background: rgba(255,255,255,0.02); }
 
-        body.dark-mode .flow-box.source { background: rgba(59, 130, 246, 0.1); color: #93c5fd; }
-        body.dark-mode .flow-box.dsp { background: rgba(245, 158, 11, 0.1); color: #fcd34d; }
-        body.dark-mode .flow-box.amp { background: rgba(16, 185, 129, 0.1); color: #6ee7b7; }
-        body.dark-mode .flow-box.spk { background: rgba(239, 68, 68, 0.1); color: #fca5a5; }
+        /* Tags & Badges */
+        .sys-tag {
+            display: inline-flex; align-items: center;
+            padding: 3px 8px; border-radius: 4px;
+            font-size: 0.75rem; font-weight: 700; font-family: monospace;
+            border: 1px solid var(--sys-border);
+            background: var(--sys-bg);
+        }
+        .tag-in { border-color: var(--sys-success); color: var(--sys-success); }
+        .tag-out { border-color: var(--sys-accent); color: var(--sys-accent); }
+        .tag-eq { border-color: var(--sys-warn); color: var(--sys-warn); }
+        .tag-delay { border-color: var(--sys-danger); color: var(--sys-danger); background: var(--sys-danger-light); font-size: 14px;}
 
-        .note-box { background: #fffbeb; border: 1px solid #fde68a; padding: 12px; border-radius: 8px; font-size: 11px; color: #b45309; margin-top: 15px; font-weight: 600; }
-        body.dark-mode .note-box { background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.2); color: #fcd34d; }
+        /* Amp Knobs Visualization */
+        .knob-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px; padding: 20px; background: var(--sys-accent-light);
+        }
+        .knob-item {
+            background: var(--sys-bg); border: 1px solid var(--sys-border);
+            padding: 15px; border-radius: 6px; text-align: center;
+        }
+        .knob-title { font-size: 0.8rem; font-weight: 700; color: var(--sys-text-muted); margin-bottom: 8px; text-transform: uppercase; }
+        .knob-value { font-size: 1.1rem; font-weight: 800; color: var(--sys-text); }
+        .knob-desc { font-size: 0.75rem; color: var(--sys-text-muted); margin-top: 5px; }
+
+        /* Notes */
+        .sys-note {
+            padding: 16px 20px; background: var(--sys-danger-light);
+            border-left: 4px solid var(--sys-danger); font-size: 0.9rem;
+            color: var(--sys-text);
+        }
+        .sys-note.warn {
+            background: rgba(245, 158, 11, 0.1); border-left-color: var(--sys-warn);
+        }
     </style>
 </head>
 <body id="apendiksBody">
     {% include navbar.html %}
     
-    <main class="container">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div>
-                <h2 class="header-title">⏱️ TABEL DELAY AUDIO</h2>
-                <p class="header-subtitle">Acuan waktu delay sistem FOH & Topologi DSP Protea.</p>
-            </div>
+    <div class="sys-container">
+        
+        <a href="{{ site.baseurl }}/" class="btn-back-tech">⬅ Kembali ke Beranda</a>
+
+        <div class="sys-header">
+            <h2>Spesifikasi & Konfigurasi Sistem Audio</h2>
+            <p>Referensi integrasi patch bay, topologi DSP (DCX2496/Protea), kalkulator delay line, dan kalibrasi fisik Power Amplifier.</p>
         </div>
 
-        <a href="{{ site.baseurl }}/" class="btn-back">⬅ Kembali ke Beranda</a>
-
         <!-- 1. TOPOLOGI KONEKSI -->
-        <div class="category-card">
-            <h3 class="category-title">⛓️ Flow DSP Audio Utama</h3>
+        <div class="sys-section">
+            <h3 class="sys-section-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                1. Flow Routing Audio Utama (Topologi DSP)
+            </h3>
             
-            <div class="flow-container">
-                <div class="flow-box source">
-                    <div style="font-size:20px;">🎚️</div>
-                    Mixer Yamaha<br><span style="font-size:9px; font-weight:normal;">Output Matrix/Aux</span>
+            <div class="tech-flow-container">
+                <div class="tech-flow-box" style="border-color: var(--sys-accent);">
+                    <div class="icon">🎚️</div>
+                    <div class="title">Mixer Yamaha</div>
+                    <div class="sub">Output Matrix/Aux</div>
                 </div>
-                <div class="flow-arrow">➔</div>
+                <div class="tech-flow-arrow">➔</div>
                 
-                <div class="flow-box dsp">
-                    <div style="font-size:20px;">📟</div>
-                    DSP Protea<br><span style="font-size:9px; font-weight:normal;">EQ & Delay Processor</span>
+                <div class="tech-flow-box" style="border-color: var(--sys-warn);">
+                    <div class="icon">📟</div>
+                    <div class="title">DSP (DLMS)</div>
+                    <div class="sub">EQ & Delay Processor</div>
                 </div>
-                <div class="flow-arrow">➔</div>
+                <div class="tech-flow-arrow">➔</div>
 
-                <div class="flow-box amp">
-                    <div style="font-size:20px;">⚡</div>
-                    Amplifier TOA<br><span style="font-size:9px; font-weight:normal;">ZA-2120 / ZA-2240</span>
+                <div class="tech-flow-box" style="border-color: var(--sys-success);">
+                    <div class="icon">⚡</div>
+                    <div class="title">Ampli TOA / PROTEA</div>
+                    <div class="sub">Power Distribution</div>
                 </div>
-                <div class="flow-arrow">➔</div>
+                <div class="tech-flow-arrow">➔</div>
 
-                <div class="flow-box spk">
-                    <div style="font-size:20px;">🔊</div>
-                    Speaker Zone<br><span style="font-size:9px; font-weight:normal;">TOA F2000BM</span>
+                <div class="tech-flow-box" style="border-color: var(--sys-danger);">
+                    <div class="icon">🔊</div>
+                    <div class="title">Speaker Zone</div>
+                    <div class="sub">TOA F2000BM</div>
                 </div>
             </div>
 
-            <div class="note-box">
-                💡 <b>Aturan Baku:</b> Jangan membagi output langsung dari Mixer ke Amplifier jika zona tersebut butuh di-delay. Seluruh tarikan kabel ke zona belakang HARUS melewati DSP Protea untuk manajemen waktu tiba suara (Time Alignment).
+            <div class="sys-note warn" style="border-bottom: none; border-right: none; border-top: 1px solid var(--sys-border);">
+                <strong>Aturan Baku:</strong> Jangan membagi output langsung dari Mixer ke Amplifier jika zona tersebut butuh di-delay. Seluruh tarikan kabel ke zona belakang HARUS melewati DSP Protea/Behringer untuk manajemen waktu tiba suara (Time Alignment).
             </div>
         </div>
 
         <!-- 2. TABEL DELAY LINE -->
-        <div class="category-card">
-            <h3 class="category-title">⏱️ Tabel Acuan DSP Protea (Delay Line)</h3>
-            <p style="font-size: 11px; color: var(--text); margin-bottom: 10px;">
-                Tabel di bawah adalah acuan dasar (kasar) berdasarkan rumus kecepatan suara: <b>1 Meter ≈ 2.9 ms s/d 3.0 ms</b>. <br>
-                <i>*Wajib dilakukan penyesuaian (fine-tuning) dengan telinga operator di lokasi.</i>
-            </p>
+        <div class="sys-section">
+            <h3 class="sys-section-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                2. Tabel Estimasi Jarak & DSP Delay Line
+            </h3>
+            
+            <div style="padding: 15px 20px; font-size: 13px; color: var(--sys-text-muted); border-bottom: 1px solid var(--sys-border);">
+                Acuan dasar berdasarkan rumus kecepatan suara: <b>1 Meter ≈ 2.9 ms s/d 3.0 ms</b>.<br>
+                <i>*Wajib dilakukan penyesuaian (fine-tuning) akhir menggunakan insting telinga operator di lokasi.</i>
+            </div>
 
-            <div style="overflow-x: auto;">
-                <table class="delay-table">
+            <div class="sys-table-wrapper">
+                <table class="sys-table">
                     <thead>
                         <tr>
-                            <th>Output DSP Protea</th>
-                            <th>Zona Speaker Target</th>
-                            <th>Jarak dari Panggung</th>
-                            <th>Waktu Delay (Estimasi)</th>
+                            <th style="width: 20%;">Port DSP (Out)</th>
+                            <th style="width: 35%;">Zona Speaker Target</th>
+                            <th style="width: 20%;">Jarak (Estimasi)</th>
+                            <th style="width: 25%;">Waktu Delay Target</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>Out 1 & 2 (L/R)</td>
-                            <td>Zona Utama (FOH Depan)</td>
+                            <td><span class="sys-tag tag-out">OUT 5 & 6</span></td>
+                            <td><strong>Zona Utama (FOH Depan)</strong></td>
                             <td>0 Meter</td>
-                            <td><span class="delay-val">0 ms (Bypass)</span></td>
+                            <td><span class="sys-tag tag-delay" style="color: var(--sys-text-muted); border-color: var(--sys-border); background: var(--sys-bg);">0 ms (Bypass)</span></td>
                         </tr>
                         <tr>
-                            <td>Out 3</td>
-                            <td>Zona B / C (Delay 1)</td>
+                            <td><span class="sys-tag tag-out">OUT 2</span></td>
+                            <td><strong>Zona B / C (Delay 1)</strong></td>
                             <td>± 12 Meter</td>
-                            <td><span class="delay-val">35 ms - 36 ms</span></td>
+                            <td><span class="sys-tag tag-delay">35 ms - 36 ms</span></td>
                         </tr>
                         <tr>
-                            <td>Out 4</td>
-                            <td>Zona D (Delay 2)</td>
+                            <td><span class="sys-tag tag-out">OUT 3</span></td>
+                            <td><strong>Zona D (Delay 2)</strong></td>
                             <td>± 24 Meter</td>
-                            <td><span class="delay-val">70 ms - 72 ms</span></td>
+                            <td><span class="sys-tag tag-delay">70 ms - 72 ms</span></td>
                         </tr>
                         <tr>
-                            <td>Out 5</td>
-                            <td>Zona E (Delay 3)</td>
+                            <td><span class="sys-tag tag-out">OUT 1</span></td>
+                            <td><strong>Zona E (Delay 3)</strong></td>
                             <td>± 36 Meter</td>
-                            <td><span class="delay-val">104 ms - 108 ms</span></td>
+                            <td><span class="sys-tag tag-delay">104 ms - 108 ms</span></td>
                         </tr>
                         <tr>
-                            <td>Out 6</td>
-                            <td>Zona Sayap Luar / Area Makan</td>
+                            <td><span class="sys-tag tag-out">OUT 4</span></td>
+                            <td><strong>Zona Sayap / Area Luar</strong></td>
                             <td>± 45 Meter</td>
-                            <td><span class="delay-val">130 ms - 135 ms</span></td>
+                            <td><span class="sys-tag tag-delay">130 ms - 135 ms</span></td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
 
-    </main>
+        <!-- 3. I/O PATCHING LIST -->
+        <div class="sys-section">
+            <h3 class="sys-section-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"></rect><circle cx="8" cy="12" r="1"></circle></svg>
+                3. I/O Patching List (Routing Fisik Hardware)
+            </h3>
+            <div class="sys-table-wrapper">
+                <table class="sys-table">
+                    <thead>
+                        <tr>
+                            <th>Sinyal Awal</th>
+                            <th>DSP Output (DCX2496)</th>
+                            <th>Perangkat Tujuan (Amplifier)</th>
+                            <th>Target Area (Speaker)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="sys-tag tag-in">IN A / B</span> Stereo</td>
+                            <td><span class="sys-tag tag-out">OUT 5 & 6</span> L/R Main</td>
+                            <td><strong>Splitter MX882</strong> (In L/R) ➔ Ampli PROTEA 1 & 2</td>
+                            <td>FOH Utama (Zona C1 & C2)</td>
+                        </tr>
+                        <tr>
+                            <td><span class="sys-tag tag-in">SUM A+B</span> Mono</td>
+                            <td><span class="sys-tag tag-out">OUT 2</span> Delay 1</td>
+                            <td><strong>TOA ZA-2240</strong> (Via AUX In)</td>
+                            <td>Tower Delay 1 (Zona D)</td>
+                        </tr>
+                        <tr>
+                            <td><span class="sys-tag tag-in">SUM A+B</span> Mono</td>
+                            <td><span class="sys-tag tag-out">OUT 3</span> Delay 2</td>
+                            <td><strong>TOA ZA-2240</strong> (Via AUX In)</td>
+                            <td>Tower Delay 2 (Zona E)</td>
+                        </tr>
+                        <tr>
+                            <td><span class="sys-tag tag-in">SUM A+B</span> Mono</td>
+                            <td><span class="sys-tag tag-out">OUT 1</span> Delay 3</td>
+                            <td><strong>TOA ZA-2120</strong> (Via AUX In)</td>
+                            <td>P3K & Ibu Anak (Zona F)</td>
+                        </tr>
+                        <tr>
+                            <td><span class="sys-tag tag-in">SUM A+B</span> Mono</td>
+                            <td><span class="sys-tag tag-out">OUT 4</span> Delay 4</td>
+                            <td><strong>TOA ZA-2120</strong> (Via AUX In)</td>
+                            <td>Meja Departemen (Zona G)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 4. DSP PARAMETERS -->
+        <div class="sys-section">
+            <h3 class="sys-section-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                4. Parameter Manajemen DSP (Protea / DCX2496)
+            </h3>
+            <div class="sys-table-wrapper">
+                <table class="sys-table">
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>FOH Main (OUT 5-6)</th>
+                            <th>Semua Jalur Delay (OUT 1, 2, 3, 4)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Gain Output</strong></td>
+                            <td>0 dB</td>
+                            <td>-3 dB s/d -6 dB <span style="display:block; font-size: 0.8em; color: var(--sys-text-muted); margin-top:4px;">(Pastikan suara delay tidak mendominasi FOH)</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>X-Over (Low-Cut)</strong></td>
+                            <td>Butterworth 24dB @ <strong>85 Hz</strong></td>
+                            <td>Butterworth 24dB @ <strong>110 Hz</strong> <span style="display:block; font-size: 0.8em; color: var(--sys-text-muted); margin-top:4px;">(Wajib untuk lantai keramik agar tidak bergulung)</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Parametric EQ (PEQ)</strong></td>
+                            <td>Sesuai kalibrasi ruang (Flat)</td>
+                            <td>
+                                <span class="sys-tag tag-eq">Low-Mid</span> 300 Hz | Gain: -2.5 dB | Q: 1.5<br>
+                                <span class="sys-tag tag-eq" style="margin-top:4px;">High-Mid</span> 3.15 kHz | Gain: -1.5 dB | Q: 1.5
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Limiter (Dynamics)</strong></td>
+                            <td>Thresh: -2 dBFS | Rel: Mid</td>
+                            <td>Thresh: -4 dBFS | Rel: Mid</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 5. POWER AMPLIFIER SETTINGS -->
+        <div class="sys-section" style="border-color: var(--sys-accent);">
+            <h3 class="sys-section-title" style="background: var(--sys-accent-light); color: var(--sys-accent); border-bottom-color: var(--sys-accent);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"></rect><circle cx="12" cy="12" r="2"></circle></svg>
+                5. Kalibrasi Fisik Power Amplifier (TOA ZA-2120, ZA-2240, ZA-2128)
+            </h3>
+            
+            <div class="sys-note" style="border-left-color: var(--sys-accent); background: var(--sys-accent-light); border-bottom: 1px solid var(--sys-border); border-radius:0;">
+                <strong>Rasionalisasi Jalur AUX:</strong> Sinyal dari DSP adalah <em>Line Level</em> yang sudah diproses secara presisi (telah di-EQ dan dipotong frekuensi bawahnya). Oleh karena itu, sinyal wajib dimasukkan ke port <strong>AUX 1 / AUX 2</strong> pada ampli TOA, bukan ke input MIC.
+            </div>
+
+            <div class="knob-grid">
+                <div class="knob-item">
+                    <div class="knob-title">BASS EQ</div>
+                    <div class="knob-value">0 (Jam 12 / Flat)</div>
+                    <div class="knob-desc">Jangan ditambah. Bass sudah dipotong (HPF 110Hz) di DLMS agar suara tidak bergulung di keramik.</div>
+                </div>
+                <div class="knob-item">
+                    <div class="knob-title">TREBLE EQ</div>
+                    <div class="knob-value">0 (Jam 12 / Flat)</div>
+                    <div class="knob-desc">Biarkan netral. Koreksi ketajaman suara (High-Mid) dilakukan terpusat dari Parametric EQ DLMS.</div>
+                </div>
+                <div class="knob-item">
+                    <div class="knob-title">VOL AUX (1 / 2)</div>
+                    <div class="knob-value">Jam 2 (70%)</div>
+                    <div class="knob-desc">Buka pada level optimal. Volume akhir per zona dikontrol penuh dari Gain Output DLMS.</div>
+                </div>
+                <div class="knob-item">
+                    <div class="knob-title">VOL MIC (1-3)</div>
+                    <div class="knob-value">Nol / Mute</div>
+                    <div class="knob-desc">Tutup rapat (putar habis ke kiri) semua volume MIC di ampli untuk mencegah <em>white noise / hiss</em>.</div>
+                </div>
+            </div>
+            
+            <div class="sys-note" style="margin: 0; border-radius:0;">
+                <strong>⚠️ Aturan Emas <em>Gain Staging</em>:</strong> Begitu knob ampli TOA diatur sesuai konfigurasi di atas, <strong>jangan ubah lagi selama acara berlangsung</strong>. Semua penyesuaian volume spesifik per zona, pemotongan frekuensi darurat (feedback), atau penambahan delay <strong>wajib dilakukan dari laptop/panel depan DSP</strong> atau dari Fader Master Mixer Yamaha.
+            </div>
+        </div>
+    </div>
 </body>
 </html>

@@ -1,0 +1,206 @@
+---
+location: "APENDIKS"
+---
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    {% include head.html %}
+    <title>Tabel Delay Audio - A/V Command Center</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --card-bg: #ffffff;
+            --border: #e2e8f0;
+            --text: #334155;
+            --item-bg: #f8fafc;
+            --badge-bg: #e0f2fe;
+            --badge-text: #0284c7;
+        }
+
+        /* 🌙 DARK MODE SAKTI */
+        body.dark-mode, [data-theme="dark"] {
+            --primary: #6366f1;
+            --dark: #f8fafc;
+            --light: #020617;
+            --card-bg: #0f172a;
+            --border: #1e293b;
+            --text: #cbd5e1;
+            --item-bg: #151e2e;
+            --badge-bg: #0c4a6e;
+            --badge-text: #38bdf8;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background-color: var(--light);
+            margin: 0;
+            padding: 15px 10px;
+            transition: background 0.3s, color 0.3s;
+        }
+        .container { max-width: 850px; margin: 0 auto; }
+        
+        .btn-back {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: var(--item-bg); color: var(--dark);
+            padding: 8px 14px; border-radius: 8px; text-decoration: none;
+            font-weight: 800; font-size: 11px; border: 1px solid var(--border);
+            margin-bottom: 20px; transition: 0.2s;
+        }
+        .btn-back:hover { opacity: 0.8; transform: translateX(-3px); }
+        
+        .header-title { font-weight: 900; margin: 0; font-size: 18px; color: var(--dark); }
+        .header-subtitle { font-size: 11px; color: #64748b; margin: 0 0 20px 0; }
+
+        .category-card {
+            background: var(--card-bg); border-radius: 12px; padding: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03); margin-bottom: 20px;
+            border: 2px solid var(--border); transition: background 0.3s, border-color 0.3s;
+        }
+        .category-title {
+            margin-top: 0; margin-bottom: 15px; font-size: 15px; font-weight: 900;
+            color: var(--dark); display: flex; align-items: center; gap: 8px;
+            border-bottom: 2px solid var(--border); padding-bottom: 10px;
+        }
+
+        /* TABEL DELAY */
+        .delay-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+        .delay-table th, .delay-table td { 
+            padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); 
+        }
+        .delay-table th { background: var(--item-bg); color: var(--dark); font-weight: 900; }
+        .delay-table td { color: var(--text); font-weight: 600; }
+        .delay-table tr:last-child td { border-bottom: none; }
+        .delay-val { font-family: monospace; font-size: 13px; font-weight: 900; color: #ea580c; background: #fff7ed; padding: 4px 8px; border-radius: 6px; border: 1px solid #fed7aa; }
+        body.dark-mode .delay-val { background: rgba(234, 88, 12, 0.1); border-color: rgba(234, 88, 12, 0.2); }
+
+        /* DIAGRAM FLOW */
+        .flow-container { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; margin: 20px 0; }
+        .flow-box { 
+            background: var(--item-bg); border: 2px solid var(--border); padding: 12px 15px; 
+            border-radius: 12px; text-align: center; font-weight: 800; font-size: 12px; color: var(--dark);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02); min-width: 120px;
+        }
+        .flow-arrow { font-size: 20px; color: #94a3b8; font-weight: 900; }
+        
+        .flow-box.source { border-color: #3b82f6; background: #eff6ff; color: #1e3a8a; }
+        .flow-box.dsp { border-color: #f59e0b; background: #fffbeb; color: #78350f; }
+        .flow-box.amp { border-color: #10b981; background: #ecfdf5; color: #064e3b; }
+        .flow-box.spk { border-color: #ef4444; background: #fef2f2; color: #7f1d1d; }
+
+        body.dark-mode .flow-box.source { background: rgba(59, 130, 246, 0.1); color: #93c5fd; }
+        body.dark-mode .flow-box.dsp { background: rgba(245, 158, 11, 0.1); color: #fcd34d; }
+        body.dark-mode .flow-box.amp { background: rgba(16, 185, 129, 0.1); color: #6ee7b7; }
+        body.dark-mode .flow-box.spk { background: rgba(239, 68, 68, 0.1); color: #fca5a5; }
+
+        .note-box { background: #fffbeb; border: 1px solid #fde68a; padding: 12px; border-radius: 8px; font-size: 11px; color: #b45309; margin-top: 15px; font-weight: 600; }
+        body.dark-mode .note-box { background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.2); color: #fcd34d; }
+    </style>
+</head>
+<body id="apendiksBody">
+    {% include navbar.html %}
+    
+    <main class="container">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+                <h2 class="header-title">⏱️ TABEL DELAY AUDIO</h2>
+                <p class="header-subtitle">Acuan waktu delay sistem FOH & Topologi DSP Protea.</p>
+            </div>
+        </div>
+
+        <a href="{{ site.baseurl }}/" class="btn-back">⬅ Kembali ke Beranda</a>
+
+        <!-- 1. TOPOLOGI KONEKSI -->
+        <div class="category-card">
+            <h3 class="category-title">⛓️ Flow DSP Audio Utama</h3>
+            
+            <div class="flow-container">
+                <div class="flow-box source">
+                    <div style="font-size:20px;">🎚️</div>
+                    Mixer Yamaha<br><span style="font-size:9px; font-weight:normal;">Output Matrix/Aux</span>
+                </div>
+                <div class="flow-arrow">➔</div>
+                
+                <div class="flow-box dsp">
+                    <div style="font-size:20px;">📟</div>
+                    DSP Protea<br><span style="font-size:9px; font-weight:normal;">EQ & Delay Processor</span>
+                </div>
+                <div class="flow-arrow">➔</div>
+
+                <div class="flow-box amp">
+                    <div style="font-size:20px;">⚡</div>
+                    Amplifier TOA<br><span style="font-size:9px; font-weight:normal;">ZA-2120 / ZA-2240</span>
+                </div>
+                <div class="flow-arrow">➔</div>
+
+                <div class="flow-box spk">
+                    <div style="font-size:20px;">🔊</div>
+                    Speaker Zone<br><span style="font-size:9px; font-weight:normal;">TOA F2000BM</span>
+                </div>
+            </div>
+
+            <div class="note-box">
+                💡 <b>Aturan Baku:</b> Jangan membagi output langsung dari Mixer ke Amplifier jika zona tersebut butuh di-delay. Seluruh tarikan kabel ke zona belakang HARUS melewati DSP Protea untuk manajemen waktu tiba suara (Time Alignment).
+            </div>
+        </div>
+
+        <!-- 2. TABEL DELAY LINE -->
+        <div class="category-card">
+            <h3 class="category-title">⏱️ Tabel Acuan DSP Protea (Delay Line)</h3>
+            <p style="font-size: 11px; color: var(--text); margin-bottom: 10px;">
+                Tabel di bawah adalah acuan dasar (kasar) berdasarkan rumus kecepatan suara: <b>1 Meter ≈ 2.9 ms s/d 3.0 ms</b>. <br>
+                <i>*Wajib dilakukan penyesuaian (fine-tuning) dengan telinga operator di lokasi.</i>
+            </p>
+
+            <div style="overflow-x: auto;">
+                <table class="delay-table">
+                    <thead>
+                        <tr>
+                            <th>Output DSP Protea</th>
+                            <th>Zona Speaker Target</th>
+                            <th>Jarak dari Panggung</th>
+                            <th>Waktu Delay (Estimasi)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Out 1 & 2 (L/R)</td>
+                            <td>Zona Utama (FOH Depan)</td>
+                            <td>0 Meter</td>
+                            <td><span class="delay-val">0 ms (Bypass)</span></td>
+                        </tr>
+                        <tr>
+                            <td>Out 3</td>
+                            <td>Zona B / C (Delay 1)</td>
+                            <td>± 12 Meter</td>
+                            <td><span class="delay-val">35 ms - 36 ms</span></td>
+                        </tr>
+                        <tr>
+                            <td>Out 4</td>
+                            <td>Zona D (Delay 2)</td>
+                            <td>± 24 Meter</td>
+                            <td><span class="delay-val">70 ms - 72 ms</span></td>
+                        </tr>
+                        <tr>
+                            <td>Out 5</td>
+                            <td>Zona E (Delay 3)</td>
+                            <td>± 36 Meter</td>
+                            <td><span class="delay-val">104 ms - 108 ms</span></td>
+                        </tr>
+                        <tr>
+                            <td>Out 6</td>
+                            <td>Zona Sayap Luar / Area Makan</td>
+                            <td>± 45 Meter</td>
+                            <td><span class="delay-val">130 ms - 135 ms</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+</body>
+</html>

@@ -65,7 +65,10 @@
 <div id="gatekeeperOverlay" style="display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; z-index: 9999999; flex-direction: column; justify-content: center; align-items: center; color: white;">
     <h2 style="margin-bottom: 5px;">🔒 Akses Terbatas</h2>
     <p style="margin-bottom: 25px; font-size: 13px; color: #94a3b8;">Masukkan PIN untuk membuka</p>
-    <input type="password" id="guestPinInput" placeholder="PIN Akses..." style="padding: 15px; border-radius: 12px; border: none; outline: none; width: 250px; text-align: center; font-size: 18px; font-weight: bold; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+    
+    <!-- Modifikasi input untuk memungkinkan "Enter" -->
+    <input type="password" id="guestPinInput" placeholder="PIN Akses..." onkeypress="handlePinEnter(event)" style="padding: 15px; border-radius: 12px; border: none; outline: none; width: 250px; text-align: center; font-size: 18px; font-weight: bold; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+    
     <button onclick="cekGuestPin()" style="background: #f97316; color: white; border: none; padding: 15px; width: 250px; border-radius: 12px; font-weight: 900; font-size: 16px; cursor: pointer; box-shadow: 0 4px 10px rgba(249, 115, 22, 0.3);">BUKA AKSES</button>
     <p style="margin-top: 30px; font-size: 13px; color: #cbd5e1;">Kru internal? <a href="{{ site.baseurl }}/login.html" style="color: #f97316; font-weight: bold; text-decoration: none;">Login di sini</a></p>
 </div>
@@ -91,7 +94,6 @@
   <a href="{{ site.baseurl }}/" class="nav-item">🏠 Home</a>
   <a href="{{ site.baseurl }}/inventaris/" class="nav-item">📦 Inventaris Gudang</a>
   <a href="{{ site.baseurl }}/misi/" class="nav-item">🎯 Mission Control</a>
-  <!-- INI ADALAH PERUBAHAN RUTE BARUNYA: -->
   <a href="{{ site.baseurl }}/apendiks/" class="nav-item">📋 Apendiks</a>
   <a href="#" onclick="window.location.reload(true);" style="color: #10b981; font-weight: bold; margin-top: 15px; border-top: 1px dashed #cbd5e1; padding-top: 15px;">
     🔄 Update Aplikasi
@@ -110,9 +112,11 @@
 
   function toggleMenu() { document.getElementById('sideMenu').classList.toggle('active'); }
 
-  // Fungsi Cek PIN Gatekeeper
+  // Fungsi Cek PIN Gatekeeper dengan pembersihan string (trim/toUpperCase)
   function cekGuestPin() {
-      const input = document.getElementById('guestPinInput').value;
+      // Hilangkan spasi di awal/akhir dan jadikan huruf besar semua
+      const input = document.getElementById('guestPinInput').value.trim().toUpperCase();
+      
       if (input === 'AVSMGOKT26') {
           localStorage.setItem('av_guest_pin', 'AVSMGOKT26');
           document.getElementById('gatekeeperOverlay').style.display = 'none';
@@ -120,6 +124,13 @@
       } else {
           alert('❌ PIN Salah! Akses ditolak.');
           document.getElementById('guestPinInput').value = '';
+      }
+  }
+
+  // Izinkan tekan tombol "Enter" di keyboard
+  function handlePinEnter(event) {
+      if (event.key === "Enter") {
+          cekGuestPin();
       }
   }
 
@@ -138,7 +149,6 @@
     const currentUrl = window.location.pathname;
     document.querySelectorAll('.nav-item').forEach(link => {
       const linkHref = link.getAttribute('href');
-      // Perbaikan Highlight Navbar untuk Apendiks
       if (currentUrl === linkHref || (linkHref !== '/' && currentUrl.includes(linkHref))) {
         link.classList.add('active-link');
       }

@@ -1,4 +1,4 @@
-<!-- KODE NAVBAR FIXED (Header Native App, Login Dinamis, Radar 15s, & Gatekeeper Anti-Bypass) -->
+<!-- KODE NAVBAR FIXED (Header Native App, Login Dinamis, Radar 15s, Gatekeeper Anti-Bypass, & Rute Apendiks Baru) -->
 <style>
   /* Header Khas Aplikasi Native */
   .top-navbar-wrapper { 
@@ -91,7 +91,8 @@
   <a href="{{ site.baseurl }}/" class="nav-item">🏠 Home</a>
   <a href="{{ site.baseurl }}/inventaris/" class="nav-item">📦 Inventaris Gudang</a>
   <a href="{{ site.baseurl }}/misi/" class="nav-item">🎯 Mission Control</a>
-  <a href="{{ site.baseurl }}/apendiks/struktur-personil.html" class="nav-item">📋 Apendiks</a>
+  <!-- INI ADALAH PERUBAHAN RUTE BARUNYA: -->
+  <a href="{{ site.baseurl }}/apendiks/" class="nav-item">📋 Apendiks</a>
   <a href="#" onclick="window.location.reload(true);" style="color: #10b981; font-weight: bold; margin-top: 15px; border-top: 1px dashed #cbd5e1; padding-top: 15px;">
     🔄 Update Aplikasi
   </a>
@@ -137,6 +138,7 @@
     const currentUrl = window.location.pathname;
     document.querySelectorAll('.nav-item').forEach(link => {
       const linkHref = link.getAttribute('href');
+      // Perbaikan Highlight Navbar untuk Apendiks
       if (currentUrl === linkHref || (linkHref !== '/' && currentUrl.includes(linkHref))) {
         link.classList.add('active-link');
       }

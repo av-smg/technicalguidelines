@@ -2,345 +2,292 @@
 layout: default
 title: Daftar Apendiks
 ---
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    {% include head.html %}
+    <style>
+        /* ==========================================
+           MODERN UI STYLING UNTUK APENDIKS
+           ========================================== */
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800;900&display=swap');
 
-<link rel="stylesheet" href="style_apendiks.css">
+        body { font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif; background: #f8fafc; color: #0f172a; margin: 0; padding: 0; transition: 0.3s; }
+        
+        .content-container { max-width: 1000px; margin: 0 auto; padding: 20px 15px; }
 
-<style>
-    /* ==========================================
-       MODERN UI STYLING UNTUK APENDIKS
-       ========================================== */
-    
-    /* Grid System - Dibagi 2 Rata & Full Width */
-    .grid-cards {
-        display: grid;
-        grid-template-columns: 1fr 1fr; /* Membagi tepat 2 kolom */
-        gap: 25px;
-        margin-top: 20px;
-        width: 100%;
-    }
+        .hero { text-align: center; margin-bottom: 40px; padding-top: 20px; }
+        .hero h1 { font-size: 2.2rem; font-weight: 900; margin-bottom: 10px; letter-spacing: -1px; }
+        .hero h1 span { color: #f97316; }
+        .hero p { color: #64748b; font-size: 0.95rem; font-weight: 500; }
+        .badge-group { justify-content: center; }
 
-    /* Agar responsif di layar HP menjadi 1 kolom */
-    @media (max-width: 768px) {
+        /* Grid System - Dibagi 2 Rata & Full Width */
         .grid-cards {
-            grid-template-columns: 1fr;
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Membagi tepat 2 kolom */
+            gap: 20px;
+            margin-top: 15px;
+            width: 100%;
         }
-        
+
+        /* Agar responsif di layar HP menjadi 1 kolom */
+        @media (max-width: 768px) {
+            .grid-cards { grid-template-columns: 1fr; }
+            .mission-card.struktur-card { flex-direction: column !important; text-align: center; gap: 15px; }
+            .mission-card.struktur-card .struktur-title-wrapper { flex-direction: column !important; }
+            .mission-card.struktur-card .icon-box { margin-right: 0 !important; margin-bottom: 10px !important; }
+        }
+
+        /* Styling Kartu (Modern, Not Flat) */
+        .mission-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 25px;
+            border: 2px solid #e2e8f0;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .mission-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+            border-color: #cbd5e1; 
+        }
+
+        /* Kartu Khusus Struktur Departemen (Tipis & Memanjang) */
         .mission-card.struktur-card {
-            flex-direction: column !important;
-            text-align: center;
-            gap: 15px;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 25px;
         }
-        .mission-card.struktur-card .struktur-title-wrapper {
-            flex-direction: column !important;
+
+        .struktur-title-wrapper { display: flex; align-items: center; flex-grow: 1; }
+
+        /* Icon / Emoji Box */
+        .icon-box {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 50px; height: 50px;
+            background: #f1f5f9;
+            border-radius: 14px;
+            font-size: 1.6rem;
+            margin-bottom: 15px;
+            border: 1px solid #e2e8f0;
         }
-        .mission-card.struktur-card .icon-box {
-            margin-right: 0 !important;
-            margin-bottom: 10px !important;
-        }
-    }
-
-    /* Styling Kartu (Modern, Not Flat) */
-    .mission-card {
-        background: var(--card-bg, #ffffff);
-        border-radius: 24px;
-        padding: 30px;
-        border: 1px solid var(--border-color, rgba(125, 125, 125, 0.1));
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-    }
-
-    .mission-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
-        border-color: #60a5fa; /* Highlight biru saat di-hover */
-    }
-
-    /* Kartu Khusus Struktur Departemen (Tipis & Memanjang) */
-    .mission-card.struktur-card {
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-        padding: 20px 30px;
-    }
-
-    .struktur-title-wrapper {
-        display: flex;
-        align-items: center;
-        flex-grow: 1;
-    }
-
-    /* Icon / Emoji Box */
-    .icon-box {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 55px;
-        height: 55px;
-        background: linear-gradient(135deg, rgba(96, 165, 250, 0.15), rgba(59, 130, 246, 0.05));
-        border-radius: 16px;
-        font-size: 1.8rem;
-        margin-bottom: 15px;
-        border: 1px solid rgba(96, 165, 250, 0.2);
-    }
-    
-    .mission-card.struktur-card .icon-box {
-        margin-bottom: 0;
-        margin-right: 20px;
-        width: 45px;
-        height: 45px;
-        font-size: 1.5rem;
-    }
-
-    /* Typography dalam Kartu */
-    .mission-card h3 {
-        font-size: 1.3rem;
-        font-weight: 800;
-        margin: 0 0 10px 0;
-        letter-spacing: -0.5px;
-        color: var(--text-dark, inherit);
-    }
-    
-    .mission-card.struktur-card h3 {
-        margin: 0; /* Menghilangkan margin bawah karena posisinya sejajar */
-    }
-
-    .mission-card p {
-        font-size: 0.9rem;
-        line-height: 1.6;
-        font-weight: 500;
-        color: var(--text-gray, #64748b);
-        margin-bottom: 25px;
-        flex-grow: 1; /* Mendorong tombol ke bawah jika teks pendek */
-    }
-
-    /* Tombol Toggle Buka/Tutup Modern */
-    .btn-go {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        padding: 14px;
-        background: linear-gradient(135deg, #f97316, #ea580c);
-        color: #ffffff !important;
-        border-radius: 14px;
-        font-weight: 700;
-        font-size: 0.95rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(234, 88, 12, 0.25);
-        user-select: none;
-        text-decoration: none;
-    }
-
-    .mission-card.struktur-card .btn-go {
-        width: auto;
-        padding: 12px 30px;
-        white-space: nowrap;
-    }
-
-    .btn-go:hover {
-        transform: scale(1.02);
-        box-shadow: 0 8px 20px rgba(234, 88, 12, 0.4);
-        background: linear-gradient(135deg, #ea580c, #c2410c);
-    }
-
-    /* Area Dropdown */
-    .dropdown-menu {
-        display: none;
-        margin-top: 20px;
-        padding-top: 15px;
-        border-top: 2px dashed var(--border-color, rgba(125, 125, 125, 0.2));
-        animation: slideDownFade 0.3s ease forwards;
-    }
-
-    @keyframes slideDownFade {
-        from { opacity: 0; transform: translateY(-10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    .dropdown-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        display: flex;
-        flex-direction: column;
-        gap: 8px; /* Jarak antar list */
-    }
-
-    /* Item List Apendiks (Bisa di-klik) */
-    .dropdown-list a {
-        display: flex;
-        align-items: center;
-        padding: 12px 16px;
-        text-decoration: none;
-        background: rgba(125, 125, 125, 0.05); /* Soft background */
-        border-radius: 12px;
-        font-size: 0.9rem;
-        font-weight: 600;
-        color: var(--text-dark, inherit);
-        transition: all 0.2s ease;
-        border-left: 4px solid transparent;
-    }
-
-    .dropdown-list a:hover {
-        background: rgba(59, 130, 246, 0.1); /* Biru transparan saat dihover */
-        color: #2563eb; /* Warna teks biru */
-        border-left: 4px solid #3b82f6; /* Aksen garis di kiri */
-        transform: translateX(5px); /* Efek geser ke kanan */
-    }
-
-    /* Jarak tambahan antar section agar visualnya rapi */
-    .team-section {
-        margin-bottom: 50px;
-    }
-</style>
-
-<div class="content-container">
-    <section class="hero">
-        <div class="badge-group" style="display: flex; gap: 10px; margin-bottom: 15px;">
-            <span class="team-badge badge-it" style="border-radius: 8px; padding: 5px 12px; font-weight: 800;">REFERENSI</span>
-            <span class="team-badge" style="background: #4b5563; color: white; border-radius: 8px; padding: 5px 12px; font-weight: 800;">DOKUMEN</span>
-        </div>
-        <h1>Daftar <span>Apendiks</span> 📜 </h1>
-        <p>Kumpulan dokumen pendukung, aset visual, dan referensi teknis proyek AV-SMG.</p>
-    </section>
-
-    <section class="team-section">
-        <div class="team-header" style="margin-bottom: 15px;">
-            <span class="team-badge badge-audio" style="border-radius: 8px; font-weight: 800; font-size: 0.85rem;">A. DOKUMEN TEKNIS - JW-08 (INDONESIA)</span>
-        </div>
-        <div class="grid-cards">
-            <div class="card-link audio-link">
-                <div class="mission-card">
-                    <div class="icon-box">📢</div>
-                    <h3>Tim Audio (Indonesia)</h3>
-                    <p>Panduan teknis, diagram utama, dan standar operasional audio.</p>
-                    
-                    <div class="btn-go" onclick="toggleDropdown('toaDropdownIndo', 'toaBtnTextIndo')">
-                        <span id="toaBtnTextIndo">Buka &darr;</span>
-                    </div>
-                    
-                    <div id="toaDropdownIndo" class="dropdown-menu">
-                        <ul class="dropdown-list">
-                            <li><a href="a1-in-diagram-routing-audio.html">📄 Diagram Routing Audio</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card-link audio-link">
-                <div class="mission-card">
-                    <div class="icon-box">🎥</div>
-                    <h3>Tim Video (Indonesia)</h3>
-                    <p>Panduan kalibrasi kamera, tata letak, dan operasional alat video.</p>
-                    
-                    <div class="btn-go" onclick="toggleDropdown('canonDropdownIndo', 'canonBtnTextIndo')">
-                        <span id="canonBtnTextIndo">Buka &darr;</span>
-                    </div>
-                    
-                    <div id="canonDropdownIndo" class="dropdown-menu">
-                        <ul class="dropdown-list">
-                            <li><a href="v1-in-routing-booth.html">📺 Apendiks V1 -Diagram Routing Video</a></li>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="team-section">
-        <div class="team-header" style="margin-bottom: 15px;">
-            <span class="team-badge badge-audio" style="background-color: #059669 !important; border-radius: 8px; font-weight: 800; font-size: 0.85rem;">B. DOKUMEN TEKNIS - JW-08 (JAWA)</span>
-        </div>
         
-        <div class="grid-cards">
-            
-            <div class="card-link struktur-link" style="grid-column: 1 / -1; width: 100%;">
-                <div class="mission-card struktur-card">
-                    <div class="struktur-title-wrapper">
-                        <div class="icon-box">🏢</div>
-                        <h3>Struktur Departemen</h3>
-                    </div>
-                    <a href="struktur-departemen-av-ja-2026.html" class="btn-go">
-                        <span>Lihat Struktur &rarr;</span>
-                    </a>
-                </div>
-            </div>
-            
-            <div class="card-link audio-link">
-                <div class="mission-card">
-                    <div class="icon-box">📢</div>
-                    <h3>Tim Audio (Jawa)</h3>
-                    <p>Diagram routing booth, penempatan speaker, dan jadwal tim.</p>
-                    
-                    <div class="btn-go" onclick="toggleDropdown('toaDropdownJawa', 'toaBtnTextJawa')">
-                        <span id="toaBtnTextJawa">Buka &darr;</span>
-                    </div>
-                    
-                    <div id="toaDropdownJawa" class="dropdown-menu">
-                        <ul class="dropdown-list">
-                            <li><a href="a1-ja-diagram-routing-audio.html">📄 A1 - Diagram Routing Audio System</a></li>
-                            <li><a href="a2-ja-knop speaker F2000BM.html">📄 A2 - Petunjuk Knop Speaker F2000BM (berdasarkan jumlah speaker)</a></li>
-                            <li><a href="a3-ja-layout av.html">📄 A3 - Layout Audio Video & Tata Kursi PGW 2026</a></li>
-                            <li><a href="a4-ja-layout-meja-booth.html">📄 A4 - Layout Booth Audio Video IT</a></li>
-                            <li><a href="av1-diagram-routing-av.html">📺 A5 -Diagram Routing Audio Video</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
+        .mission-card.struktur-card .icon-box { margin-bottom: 0; margin-right: 15px; width: 45px; height: 45px; font-size: 1.4rem; }
 
-            <div class="card-link audio-link">
-                <div class="mission-card">
-                    <div class="icon-box">🎥</div>
-                    <h3>Tim Video (Jawa)</h3>
-                    <p>Acuan kalibrasi visual, manajemen switching, dan fungsi alat.</p>
-                    
-                    <div class="btn-go" onclick="toggleDropdown('canonDropdownJawa', 'canonBtnTextJawa')">
-                        <span id="canonBtnTextJawa">Buka &darr;</span>
+        /* Typography dalam Kartu */
+        .mission-card h3 { font-size: 1.2rem; font-weight: 800; margin: 0 0 8px 0; letter-spacing: -0.5px; color: #0f172a; }
+        .mission-card.struktur-card h3 { margin: 0; }
+        .mission-card p { font-size: 0.85rem; line-height: 1.5; font-weight: 600; color: #64748b; margin-bottom: 20px; flex-grow: 1; }
+
+        /* Tombol Toggle Buka/Tutup Modern */
+        .btn-go {
+            display: flex; align-items: center; justify-content: center;
+            width: 100%; padding: 12px;
+            background: #f1f5f9; color: #334155;
+            border-radius: 12px; font-weight: 800; font-size: 0.9rem;
+            cursor: pointer; transition: all 0.2s ease;
+            text-decoration: none; border: 2px solid #e2e8f0;
+        }
+
+        .mission-card.struktur-card .btn-go { width: auto; padding: 10px 20px; white-space: nowrap; }
+
+        .btn-go:hover { background: #e2e8f0; color: #0f172a; border-color: #cbd5e1; }
+
+        /* Area Dropdown */
+        .dropdown-menu {
+            display: none; margin-top: 15px; padding-top: 15px;
+            border-top: 2px dashed #e2e8f0;
+            animation: slideDownFade 0.2s ease forwards;
+        }
+
+        @keyframes slideDownFade { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .dropdown-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+
+        /* Item List Apendiks (Bisa di-klik) */
+        .dropdown-list a {
+            display: flex; align-items: center; padding: 10px 15px;
+            text-decoration: none; background: #f8fafc;
+            border-radius: 10px; font-size: 0.85rem; font-weight: 700;
+            color: #334155; transition: all 0.2s ease; border: 1px solid #e2e8f0;
+        }
+
+        .dropdown-list a:hover {
+            background: #eff6ff; color: #2563eb;
+            border-color: #bfdbfe; transform: translateX(3px);
+        }
+
+        /* Jarak tambahan antar section agar visualnya rapi */
+        .team-section { margin-bottom: 40px; }
+        
+        .team-badge { padding: 6px 14px; border-radius: 20px; font-weight: 800; font-size: 0.8rem; display: inline-block; letter-spacing: 0.5px; }
+
+        /* 🌙 DARK MODE SAKTI */
+        body.dark-mode, [data-theme="dark"] { background-color: #020617; color: #e2e8f0; }
+        body.dark-mode .hero h1 { color: #f8fafc; }
+        body.dark-mode .hero p { color: #94a3b8; }
+        
+        body.dark-mode .mission-card { background: #0f172a; border-color: #1e293b; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        body.dark-mode .mission-card:hover { border-color: #334155; }
+        
+        body.dark-mode .icon-box { background: #1e293b; border-color: #334155; }
+        body.dark-mode .mission-card h3 { color: #f8fafc; }
+        body.dark-mode .mission-card p { color: #94a3b8; }
+        
+        body.dark-mode .btn-go { background: #1e293b; color: #cbd5e1; border-color: #334155; }
+        body.dark-mode .btn-go:hover { background: #334155; color: #f8fafc; }
+        
+        body.dark-mode .dropdown-menu { border-top-color: #1e293b; }
+        body.dark-mode .dropdown-list a { background: #1e293b; color: #cbd5e1; border-color: #334155; }
+        body.dark-mode .dropdown-list a:hover { background: #151e2e; border-color: #475569; color: #60a5fa; }
+    </style>
+</head>
+<body id="apendiksListBody">
+    {% include navbar.html %}
+
+    <div class="content-container">
+        <section class="hero">
+            <div class="badge-group" style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <span class="team-badge" style="background: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd;">REFERENSI TEKNIS</span>
+                <span class="team-badge" style="background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1;">DOKUMEN JW-08</span>
+            </div>
+            <h1>Daftar <span>Apendiks</span> 📜</h1>
+            <p>Kumpulan diagram instalasi, layout teknis, dan standar operasional alat AV-SMG.</p>
+        </section>
+
+        <!-- A. DOKUMEN TEKNIS INDONESIA -->
+        <section class="team-section">
+            <div class="team-header" style="margin-bottom: 15px;">
+                <span class="team-badge" style="background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca;">A. DOKUMEN TEKNIS - JW-08 (INDONESIA)</span>
+            </div>
+            <div class="grid-cards">
+                <div class="card-link audio-link">
+                    <div class="mission-card">
+                        <div class="icon-box">📢</div>
+                        <h3>Tim Audio (Indonesia)</h3>
+                        <p>Panduan teknis, diagram utama, dan standar operasional audio.</p>
+                        
+                        <div class="btn-go" onclick="toggleDropdown('toaDropdownIndo', 'toaBtnTextIndo')">
+                            <span id="toaBtnTextIndo">Buka Daftar &darr;</span>
+                        </div>
+                        
+                        <div id="toaDropdownIndo" class="dropdown-menu">
+                            <ul class="dropdown-list">
+                                <li><a href="{{ site.baseurl }}/apendiks/a1-in-diagram-routing-audio.html">📄 Diagram Routing Audio</a></li>
+                            </ul>
+                        </div>
                     </div>
-                    
-                    <div id="canonDropdownJawa" class="dropdown-menu">
-                        <ul class="dropdown-list">
-                            <li><a href="a3-ja-layout av.html">📺 V1 - Layout Audio Video & Tata Kursi PGW 2026</a></li>
-                            <li><a href="a4-ja-layout-meja-booth.html">🗺️ V2 - Layout Booth Audio Video IT</a></li>
-                            <li><a href="v1-in-routing-booth.html">📺 V3 -Diagram Routing Video</a></li>
-                            <li><a href="av1-diagram-routing-av.html">📺 V4 -Diagram Routing Audio Video</a></li>
-                        </ul>
+                </div>
+
+                <div class="card-link audio-link">
+                    <div class="mission-card">
+                        <div class="icon-box">🎥</div>
+                        <h3>Tim Video (Indonesia)</h3>
+                        <p>Panduan kalibrasi kamera, tata letak, dan operasional alat video.</p>
+                        
+                        <div class="btn-go" onclick="toggleDropdown('canonDropdownIndo', 'canonBtnTextIndo')">
+                            <span id="canonBtnTextIndo">Buka Daftar &darr;</span>
+                        </div>
+                        
+                        <div id="canonDropdownIndo" class="dropdown-menu">
+                            <ul class="dropdown-list">
+                                <li><a href="{{ site.baseurl }}/apendiks/v1-in-routing-booth.html">📺 Apendiks V1 - Diagram Routing Video</a></li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
+        </section>
 
+        <!-- B. DOKUMEN TEKNIS JAWA -->
+        <section class="team-section">
+            <div class="team-header" style="margin-bottom: 15px;">
+                <span class="team-badge" style="background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0;">B. DOKUMEN TEKNIS - JW-08 (JAWA)</span>
+            </div>
+            
+            <div class="grid-cards">
+                
+                <div class="card-link struktur-link" style="grid-column: 1 / -1; width: 100%;">
+                    <div class="mission-card struktur-card">
+                        <div class="struktur-title-wrapper">
+                            <div class="icon-box">🏢</div>
+                            <h3>Struktur Departemen</h3>
+                        </div>
+                        <a href="{{ site.baseurl }}/apendiks/struktur-departemen-av-ja-2026.html" class="btn-go">
+                            <span>Lihat Diagram &rarr;</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="card-link audio-link">
+                    <div class="mission-card">
+                        <div class="icon-box">📢</div>
+                        <h3>Tim Audio (Jawa)</h3>
+                        <p>Diagram routing booth, penempatan speaker, dan jadwal tim.</p>
+                        
+                        <div class="btn-go" onclick="toggleDropdown('toaDropdownJawa', 'toaBtnTextJawa')">
+                            <span id="toaBtnTextJawa">Buka Daftar &darr;</span>
+                        </div>
+                        
+                        <div id="toaDropdownJawa" class="dropdown-menu">
+                            <ul class="dropdown-list">
+                                <li><a href="{{ site.baseurl }}/apendiks/a1-ja-diagram-routing-audio.html">📄 A1 - Diagram Routing Audio System</a></li>
+                                <li><a href="{{ site.baseurl }}/apendiks/a2-ja-knop-speaker-f2000bm.html">📄 A2 - Petunjuk Knop Speaker F2000BM</a></li>
+                                <li><a href="{{ site.baseurl }}/apendiks/a3-ja-layout-av.html">📄 A3 - Layout Audio Video & Tata Kursi PGW</a></li>
+                                <li><a href="{{ site.baseurl }}/apendiks/a4-ja-layout-meja-booth.html">📄 A4 - Layout Booth Audio Video IT</a></li>
+                                <li><a href="{{ site.baseurl }}/apendiks/av1-diagram-routing-av.html">📺 A5 - Diagram Routing Audio Video</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-link audio-link">
+                    <div class="mission-card">
+                        <div class="icon-box">🎥</div>
+                        <h3>Tim Video (Jawa)</h3>
+                        <p>Acuan kalibrasi visual, manajemen switching, dan fungsi alat.</p>
+                        
+                        <div class="btn-go" onclick="toggleDropdown('canonDropdownJawa', 'canonBtnTextJawa')">
+                            <span id="canonBtnTextJawa">Buka Daftar &darr;</span>
+                        </div>
+                        
+                        <div id="canonDropdownJawa" class="dropdown-menu">
+                            <ul class="dropdown-list">
+                                <li><a href="{{ site.baseurl }}/apendiks/a3-ja-layout-av.html">📺 V1 - Layout Audio Video & Tata Kursi PGW</a></li>
+                                <li><a href="{{ site.baseurl }}/apendiks/a4-ja-layout-meja-booth.html">🗺️ V2 - Layout Booth Audio Video IT</a></li>
+                                <li><a href="{{ site.baseurl }}/apendiks/v1-in-routing-booth.html">📺 V3 - Diagram Routing Video</a></li>
+                                <li><a href="{{ site.baseurl }}/apendiks/av1-diagram-routing-av.html">📺 V4 - Diagram Routing Audio Video</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <div style="margin-top: 30px; padding-bottom: 50px; text-align: center;">
+            <a href="{{ site.baseurl }}/" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: #1e293b; color: white; text-decoration: none; border-radius: 12px; font-weight: 800; font-size: 0.9rem; transition: 0.2s;">⬅ Kembali ke Beranda</a>
         </div>
-    </section>
-
-    <div style="margin-top: 50px; padding-bottom: 50px; text-align: center;">
-        <a href="{{ '/' | relative_url }}" style="color: #60a5fa; text-decoration: none; font-weight: 800; font-size: 1.1rem; transition: color 0.2s;">← Kembali ke Beranda</a>
     </div>
-</div>
 
-<script>
-    // Fungsi untuk Mengontrol Dropdown
-    function toggleDropdown(dropdownId, textId) {
-        const dropdown = document.getElementById(dropdownId);
-        const btnText = document.getElementById(textId);
-        const isHidden = dropdown.style.display === "none" || dropdown.style.display === "";
-        
-        dropdown.style.display = isHidden ? "block" : "none";
-        btnText.innerHTML = isHidden ? "Tutup &uarr;" : "Buka &darr;";
-    }
-
-    // Fungsi Search bawaan tetap dipertahankan
-    const searchInput = document.getElementById('appendixSearch');
-    const cards = document.querySelectorAll('.card-link');
-    if(searchInput) {
-        searchInput.addEventListener('input', function() {
-            const filter = searchInput.value.toLowerCase();
-            cards.forEach(card => {
-                card.style.display = card.innerText.toLowerCase().includes(filter) ? 'block' : 'none';
-            });
-        });
-    }
-</script>
+    <script>
+        // Fungsi untuk Mengontrol Dropdown
+        function toggleDropdown(dropdownId, textId) {
+            const dropdown = document.getElementById(dropdownId);
+            const btnText = document.getElementById(textId);
+            const isHidden = dropdown.style.display === "none" || dropdown.style.display === "";
+            
+            dropdown.style.display = isHidden ? "block" : "none";
+            btnText.innerHTML = isHidden ? "Tutup Daftar &uarr;" : "Buka Daftar &darr;";
+        }
+    </script>
+</body>
+</html>

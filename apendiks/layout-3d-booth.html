@@ -1,0 +1,149 @@
+---
+location: "APENDIKS"
+---
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    {% include head.html %}
+    <title>Visualisasi 3D Booth A/V - Command Center</title>
+    
+    <style>
+        /* ====================================================
+           THEME & VARIABLES (Engineering Spec-Sheet Style)
+           ==================================================== */
+        .sys-container {
+            --sys-bg: #ffffff;
+            --sys-border: #cbd5e1;
+            --sys-text: #0f172a;
+            --sys-text-muted: #475569;
+            --sys-accent: #2563eb;
+            --sys-head-bg: #f8fafc;
+            
+            width: 100%;
+            max-width: 1000px;
+            margin: 20px auto 40px auto;
+            padding: 0 10px;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            color: var(--sys-text);
+            line-height: 1.5;
+        }
+
+        html.dark .sys-container,
+        html[data-theme="dark"] .sys-container,
+        body.dark-mode .sys-container {
+            --sys-bg: #0f172a;
+            --sys-border: #334155;
+            --sys-text: #f8fafc;
+            --sys-text-muted: #94a3b8;
+            --sys-head-bg: #1e293b;
+            --sys-accent: #3b82f6;
+        }
+
+        /* Tombol Kembali */
+        .btn-back-tech {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: var(--sys-bg); color: var(--sys-text);
+            padding: 8px 14px; border-radius: 8px; text-decoration: none;
+            font-weight: 800; font-size: 11px; border: 1px solid var(--sys-border);
+            margin-bottom: 20px; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .btn-back-tech:hover { opacity: 0.8; transform: translateX(-3px); border-color: var(--sys-accent); }
+
+        /* Layout & Cards */
+        .sys-header {
+            border-bottom: 4px solid var(--sys-accent);
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+        }
+        .sys-header h2 { margin: 0; font-size: 1.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+        .sys-header p { margin: 8px 0 0 0; color: var(--sys-text-muted); font-size: 0.95rem; }
+
+        .sys-section {
+            background: var(--sys-bg); border: 1px solid var(--sys-border);
+            border-radius: 12px; margin-bottom: 24px; overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        }
+        .sys-section-title {
+            background: var(--sys-head-bg); padding: 15px 20px; margin: 0;
+            font-size: 1.1rem; font-weight: 800; border-bottom: 1px solid var(--sys-border);
+            display: flex; align-items: center; gap: 10px; color: var(--sys-accent);
+        }
+
+        /* Tampilan Gambar 3D */
+        .image-viewer {
+            padding: 30px 20px;
+            text-align: center;
+            background: var(--sys-bg);
+            background-image: 
+                radial-gradient(var(--sys-border) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .img-3d {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            border: 4px solid var(--sys-head-bg);
+            cursor: zoom-in;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .img-3d:hover {
+            transform: scale(1.02);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        /* Tombol Download */
+        .btn-download {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: var(--sys-accent); color: white;
+            padding: 12px 24px; border-radius: 8px; text-decoration: none;
+            font-weight: 800; font-size: 13px; margin-top: 25px;
+            transition: 0.2s; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+        }
+        .btn-download:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(37, 99, 235, 0.4); }
+        .btn-download:active { transform: translateY(2px); }
+
+    </style>
+</head>
+<body id="apendiksBody">
+    {% include navbar.html %}
+    
+    <div class="sys-container">
+        
+        <a href="{{ site.baseurl }}/apendiks/" class="btn-back-tech">⬅ Kembali ke Daftar Apendiks</a>
+
+        <div class="sys-header">
+            <h2>✨ Visualisasi 3D Booth A/V</h2>
+            <p>Render realistis penempatan alat dan meja kerja operator dari sudut pandang atas.</p>
+        </div>
+
+        <div class="sys-section">
+            <h3 class="sys-section-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                Maket 3D Isometric
+            </h3>
+            
+            <div class="image-viewer">
+                
+                <!-- GAMBAR 3D RENDER AI -->
+                <a href="{{ site.baseurl }}/assets/img/layout-booth-3d.jpg" target="_blank" title="Klik untuk membuka ukuran penuh">
+                    <img src="{{ site.baseurl }}/assets/img/layout-booth-3d.jpg" alt="Visualisasi 3D Layout Booth A/V" class="img-3d" onerror="this.onerror=null; this.src='https://placehold.co/1200x800/1e293b/f8fafc?text=Gambar+3D+Belum+Diunggah';">
+                </a>
+
+                <p style="font-size: 12px; color: var(--sys-text-muted); margin-top: 15px; font-weight: 600;">
+                    *Klik gambar untuk melihat resolusi penuh.
+                </p>
+
+                <a href="{{ site.baseurl }}/assets/img/layout-booth-3d.jpg" download="Layout_3D_Booth_AV.jpg" class="btn-download">
+                    📥 Download Gambar High-Res
+                </a>
+
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

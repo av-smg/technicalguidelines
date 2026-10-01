@@ -33,7 +33,7 @@ location: "HOME"
         .greeting-box p { font-size: 13px; font-weight: 700; color: #f8fafc; margin: 0; background: #1e293b; display: inline-block; padding: 6px 15px; border-radius: 20px; border: 2px solid #334155; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         
         /* ⚡ AKSES CEPAT (KOTAK BESAR) */
-        .quick-access-wrapper { position: relative; z-index: 10; margin-bottom: 15px; }
+        .quick-access-wrapper { position: relative; z-index: 10; margin-bottom: 25px; }
         .quick-access-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         
         .btn-quick { 
@@ -55,14 +55,14 @@ location: "HOME"
         .btn-quick.misi-btn:hover { border-color: #c2410c; box-shadow: 0 11px 0 #c2410c; background: #f97316; }
         .btn-quick.misi-btn:active { box-shadow: 0 3px 0 #c2410c; }
 
-        /* 📑 APendIKS MEMANJANG (PILL/WIDE CARDS) */
-        .apendiks-section { margin-bottom: 40px; }
-        .section-title { font-size: 18px; font-weight: 900; color: #0f172a; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px;}
+        /* 📑 APENDIKS MEMANJANG (PILL/WIDE CARDS) */
+        .apendiks-section { margin-bottom: 30px; }
+        .section-title { font-size: 16px; font-weight: 900; color: #0f172a; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;}
         
-        .apendiks-list { display: flex; flex-direction: column; gap: 12px; }
+        .apendiks-list { display: flex; flex-direction: column; gap: 10px; }
         .apendiks-card { 
             display: flex; align-items: center; justify-content: space-between; 
-            background: white; padding: 15px 20px; border-radius: 20px; 
+            background: white; padding: 15px 20px; border-radius: 16px; 
             border: 2px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.02);
             text-decoration: none; transition: 0.2s;
         }
@@ -70,7 +70,7 @@ location: "HOME"
         .apendiks-card:active { transform: translateX(2px); }
         
         .apendiks-info { display: flex; align-items: center; gap: 15px; }
-        .apendiks-icon { font-size: 28px; background: #f1f5f9; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 14px; }
+        .apendiks-icon { font-size: 24px; background: #f1f5f9; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 12px; }
         .apendiks-text h3 { margin: 0; font-size: 14px; font-weight: 900; color: #0f172a; }
         .apendiks-text p { margin: 2px 0 0 0; font-size: 11px; font-weight: 700; color: #64748b; }
         
@@ -85,7 +85,7 @@ location: "HOME"
         /* 📊 STATISTIK GUDANG */
         .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; margin-bottom: 40px; }
         .stat-card { 
-            background: white; padding: 25px 15px; border-radius: 30px; 
+            background: white; padding: 25px 15px; border-radius: 24px; 
             border: 2px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.03); 
             display: flex; flex-direction: column; align-items: center; text-align: center; transition: 0.3s; 
             position: relative; overflow: hidden;
@@ -103,15 +103,15 @@ location: "HOME"
         .stat-card:hover::after { height: 100%; opacity: 0.05; }
 
         /* 🎯 PROGRESS MISI PER TIM */
-        .team-progress-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-        .progress-box { background: white; padding: 22px; border-radius: 24px; border: 2px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.03); transition: 0.3s; }
+        .team-progress-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; }
+        .progress-box { background: white; padding: 20px; border-radius: 20px; border: 2px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.03); transition: 0.3s; }
         .progress-box:hover { border-color: #cbd5e1; transform: scale(1.02); box-shadow: 0 10px 25px rgba(0,0,0,0.06); }
         
         .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .progress-title { font-weight: 900; font-size: 15px; color: #0f172a; margin: 0; display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px;}
-        .dash-txt { font-weight: 900; font-size: 12px; padding: 6px 12px; border-radius: 20px; }
+        .progress-title { font-weight: 900; font-size: 14px; color: #0f172a; margin: 0; display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px;}
+        .dash-txt { font-weight: 900; font-size: 11px; padding: 4px 10px; border-radius: 12px; }
         
-        .progress-bar-bg { width: 100%; height: 14px; background: #f1f5f9; border-radius: 20px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);}
+        .progress-bar-bg { width: 100%; height: 12px; background: #f1f5f9; border-radius: 20px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);}
         .progress-bar-fill { height: 100%; width: 0%; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 20px; position: relative;}
         
         .progress-bar-fill::after {
@@ -151,7 +151,7 @@ location: "HOME"
         body.dark-mode .btn-quick.misi-btn:hover { background: #f97316; border-color: #ea580c; box-shadow: 0 11px 0 #7c2d12; }
         body.dark-mode .btn-quick.misi-btn:active { box-shadow: 0 3px 0 #7c2d12; }
         
-        body.dark-mode .section-title { color: #f8fafc; }
+        body.dark-mode .section-title { color: #f8fafc; border-bottom-color: #334155;}
         
         body.dark-mode .apendiks-card { background: #0f172a; border-color: #1e293b; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
         body.dark-mode .apendiks-card:hover { border-color: #334155; background: #151e2e; }
@@ -206,72 +206,90 @@ location: "HOME"
             </div>
         </div>
 
-        <!-- STRUKTUR MENU SEKUNDER (TOMBOL MEMANJANG) -->
-        <div class="apendiks-list" style="margin-bottom: 25px; position: relative; z-index: 10;">
-            <a href="{{ site.baseurl }}/apendiks/struktur-personil.html" class="apendiks-card">
-                <div class="apendiks-info">
-                    <div class="apendiks-icon" style="width:40px; height:40px; font-size:20px;">👥</div>
-                    <div class="apendiks-text">
-                        <h3 style="font-size:14px;">Struktur Personil & Daftar Tugas</h3>
-                    </div>
-                </div>
-                <div class="apendiks-arrow">➔</div>
-            </a>
-            <a href="{{ site.baseurl }}/apendiks/layout.html" class="apendiks-card">
-                <div class="apendiks-info">
-                    <div class="apendiks-icon" style="width:40px; height:40px; font-size:20px;">🗺️</div>
-                    <div class="apendiks-text">
-                        <h3 style="font-size:14px;">Layout Area H-1</h3>
-                    </div>
-                </div>
-                <div class="apendiks-arrow">➔</div>
-            </a>
-            <!-- TOMBOL AUDIO TESTING (BARU) -->
-            <a href="{{ site.baseurl }}/apendiks/playlist-audio.html" class="apendiks-card">
-                <div class="apendiks-info">
-                    <div class="apendiks-icon" style="width:40px; height:40px; font-size:20px;">🎧</div>
-                    <div class="apendiks-text">
-                        <h3 style="font-size:14px;">Daftar Audio Testing H-1</h3>
-                    </div>
-                </div>
-                <div class="apendiks-arrow">➔</div>
-            </a>
-            <!-- TOMBOL TABEL DELAY AUDIO (BARU) -->
-            <a href="{{ site.baseurl }}/apendiks/tabel-delay-audio.html" class="apendiks-card">
-                <div class="apendiks-info">
-                    <div class="apendiks-icon" style="width:40px; height:40px; font-size:20px;">⏱️</div>
-                    <div class="apendiks-text">
-                        <h3 style="font-size:14px;">Tabel Delay DSP Audio</h3>
-                    </div>
-                </div>
-                <div class="apendiks-arrow">➔</div>
-            </a>
-        </div>
-
-        <!-- 📑 APENDIKS MEMANJANG (DOKUMEN TAMBAHAN) -->
+        <!-- 📌 KELOMPOK 1: PERSONIL & TATA LETAK -->
         <div class="apendiks-section">
-            <h2 class="section-title">📑 Apendiks & Dokumen Tambahan</h2>
+            <h2 class="section-title">👥 Personil & Tata Letak</h2>
             <div class="apendiks-list">
-                
-                <!-- TOMBOL PANDUAN PENGGUNAAN -->
-                <a href="{{ site.baseurl }}/apendiks/panduan_penggunaan.html" class="apendiks-card">
+                <a href="{{ site.baseurl }}/apendiks/struktur-personil.html" class="apendiks-card">
                     <div class="apendiks-info">
-                        <div class="apendiks-icon">📖</div>
+                        <div class="apendiks-icon">📋</div>
                         <div class="apendiks-text">
-                            <h3>Panduan & Manual Operasional</h3>
-                            <p>Panduan lengkap fitur, tombol, filter, scan QR, & sistem A/V.</p>
+                            <h3>Struktur Personil & Jadwal</h3>
+                            <p>Daftar tugas, regu tim, dan jadwal pergantian shift H-1.</p>
                         </div>
                     </div>
                     <div class="apendiks-arrow">➔</div>
                 </a>
+                <a href="{{ site.baseurl }}/apendiks/layout.html" class="apendiks-card">
+                    <div class="apendiks-info">
+                        <div class="apendiks-icon">🗺️</div>
+                        <div class="apendiks-text">
+                            <h3>Layout Area & Denah PGW</h3>
+                            <p>Peta lokasi acara, penempatan kursi, dan jalur kabel.</p>
+                        </div>
+                    </div>
+                    <div class="apendiks-arrow">➔</div>
+                </a>
+                <a href="{{ site.baseurl }}/apendiks/layout-3d-booth.html" class="apendiks-card">
+                    <div class="apendiks-info">
+                        <div class="apendiks-icon">✨</div>
+                        <div class="apendiks-text">
+                            <h3>Visualisasi 3D Booth A/V</h3>
+                            <p>Render maket 3D posisi meja, alat, dan kursi operator.</p>
+                        </div>
+                    </div>
+                    <div class="apendiks-arrow">➔</div>
+                </a>
+            </div>
+        </div>
 
-                <!-- TOMBOL ROUTING AUDIO -->
+        <!-- 📌 KELOMPOK 2: KONFIGURASI & TEKNIS AUDIO -->
+        <div class="apendiks-section">
+            <h2 class="section-title">🎛️ Konfigurasi & Teknis Audio</h2>
+            <div class="apendiks-list">
                 <a href="{{ site.baseurl }}/apendiks/routing-audio.html" class="apendiks-card">
                     <div class="apendiks-info">
-                        <div class="apendiks-icon">🎛️</div>
+                        <div class="apendiks-icon">🔌</div>
                         <div class="apendiks-text">
-                            <h3>Routing Audio A/V</h3>
-                            <p>Skema jalur instalasi dan routing sistem audio.</p>
+                            <h3>Routing Kabel & I/O Audio</h3>
+                            <p>Skema interaktif jalur instalasi kabel dari FOH ke Speaker.</p>
+                        </div>
+                    </div>
+                    <div class="apendiks-arrow">➔</div>
+                </a>
+                <a href="{{ site.baseurl }}/apendiks/tabel-delay-audio.html" class="apendiks-card">
+                    <div class="apendiks-info">
+                        <div class="apendiks-icon">⏱️</div>
+                        <div class="apendiks-text">
+                            <h3>Tabel Delay & Parameter DSP</h3>
+                            <p>Acuan angka delay Protea dan setting fisik ampli TOA.</p>
+                        </div>
+                    </div>
+                    <div class="apendiks-arrow">➔</div>
+                </a>
+                <a href="{{ site.baseurl }}/apendiks/playlist-audio.html" class="apendiks-card">
+                    <div class="apendiks-info">
+                        <div class="apendiks-icon">🎧</div>
+                        <div class="apendiks-text">
+                            <h3>Daftar Audio Testing (H-1)</h3>
+                            <p>Mnemonic list lagu SJJM & OSG untuk kebutuhan cek sound.</p>
+                        </div>
+                    </div>
+                    <div class="apendiks-arrow">➔</div>
+                </a>
+            </div>
+        </div>
+
+        <!-- 📌 KELOMPOK 3: DOKUMEN & PANDUAN -->
+        <div class="apendiks-section">
+            <h2 class="section-title">📖 Panduan Sistem</h2>
+            <div class="apendiks-list">
+                <a href="{{ site.baseurl }}/apendiks/panduan_penggunaan.html" class="apendiks-card">
+                    <div class="apendiks-info">
+                        <div class="apendiks-icon">📘</div>
+                        <div class="apendiks-text">
+                            <h3>Buku Manual Operasional</h3>
+                            <p>Panduan lengkap fitur, filter, scan QR, & sistem web A/V.</p>
                         </div>
                     </div>
                     <div class="apendiks-arrow">➔</div>
@@ -288,7 +306,7 @@ location: "HOME"
         <!-- 📊 DATA DASHBOARD (MUNCUL SETELAH LOADING) -->
         <div id="dashContent" class="hidden">
             
-            <h2 class="section-title">📦 Status Logistik Gudang</h2>
+            <h2 class="section-title" style="margin-top: 50px;">📦 Status Logistik Gudang</h2>
             <div class="grid-stats">
                 <div class="stat-card blue">
                     <div class="stat-icon">🗂️</div>

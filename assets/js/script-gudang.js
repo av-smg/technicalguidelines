@@ -1,5 +1,5 @@
 // ==========================================
-// MESIN LOGIKA GUDANG (V.56.0 - FIX TOGGLE WADAH, KODE RAPI, & QR SCANNER STABIL)
+// MESIN LOGIKA GUDANG (V.57.0 - HAPUS TERTINGGAL & TAMBAH FITUR LAPOR DEV)
 // ==========================================
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec"; 
@@ -15,13 +15,12 @@ let showOnlyWadah = false;
 let pendingAddFotos = []; let pendingEditFotos = []; 
 let currentCameraFacing = "environment"; let isFlashlightOn = false;
 
-window.onload = () => { injectGudangDarkModeCSS(); checkAdminStatus(); loadData(); };
+window.onload = () => { injectGudangDarkModeCSS(); checkAdminStatus(); injectFeedbackUI(); loadData(); };
 
 function injectGudangDarkModeCSS() {
     if(document.getElementById('gudangDarkModeCss')) return;
     const style = document.createElement('style'); style.id = 'gudangDarkModeCss';
     style.innerHTML = `
-        @keyframes pulseAlert { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
         body.dark-mode, [data-theme="dark"] { background-color: #0f172a !important; color: #e2e8f0 !important; }
         body.dark-mode .toolbar-card { background: #1e293b !important; border-color: #334155 !important; }
         body.dark-mode .pill-btn { background: #334155 !important; color: #94a3b8 !important; border-color: #475569 !important; }
@@ -34,7 +33,7 @@ function injectGudangDarkModeCSS() {
         body.dark-mode div[style*="color:#1e293b"] { color: #f8fafc !important; }
         body.dark-mode div[style*="color:#1d4ed8"], body.dark-mode div[style*="color:#16a34a"] { color: #60a5fa !important; }
         body.dark-mode span[style*="color:gray"], body.dark-mode label[style*="color:gray"], body.dark-mode div[style*="color:gray"], body.dark-mode p[style*="color:gray"] { color: #94a3b8 !important; }
-        body.dark-mode select, body.dark-mode input { background: #1e293b !important; color: #f8fafc !important; border-color: #475569 !important; }
+        body.dark-mode select, body.dark-mode input, body.dark-mode textarea { background: #1e293b !important; color: #f8fafc !important; border-color: #475569 !important; }
         body.dark-mode .bulk-bar { background: #0f172a !important; border-top: 1px solid #334155 !important; }
         body.dark-mode .bulk-info { color: #f8fafc !important; }
     `;
@@ -156,7 +155,7 @@ function setupStickyHeader() {
 }
 
 // ==============================================================
-// LOGIKA TOMBOL WADAH & VIEW (SUDAH DIPERBAIKI)
+// LOGIKA TOMBOL WADAH & VIEW 
 // ==============================================================
 function toggleViewMode() { 
     const btn = document.getElementById("btnViewToggle"); 
@@ -169,17 +168,15 @@ function toggleViewMode() {
 }
 
 function toggleWadahMode() { 
-    showOnlyWadah = !showOnlyWadah; // Toggle True/False
+    showOnlyWadah = !showOnlyWadah; 
     const btn = document.getElementById("btnWadahToggle"); 
     
     if (showOnlyWadah) { 
-        // Jika sedang filter wadah, tombol nawarin "Tampilkan Semua"
         btn.innerHTML = '📦 Tampilkan Semua'; 
         btn.style.background = '#ea580c'; 
         btn.style.color = 'white'; 
         btn.style.border = '1px solid #ea580c'; 
     } else { 
-        // Jika sedang tampil semua, tombol nawarin filter "Hanya Wadah"
         btn.innerHTML = '🧰 Hanya Wadah'; 
         btn.style.background = '#f1f5f9'; 
         btn.style.color = '#334155'; 
@@ -215,7 +212,7 @@ function getFilteredData() {
         let itemTim = String(i.tim || i["Tim"] || "").toLowerCase();
         let matchAdvanced = timAktif.length === 0 || timAktif.some(t => itemTim === t || itemTim.includes(t));
         
-        // LOGIKA FILTER HANYA WADAH (KOPER)
+        // LOGIKA FILTER HANYA WADAH
         let matchWadah = true;
         if (showOnlyWadah) {
             let isWadah = false;
@@ -237,7 +234,7 @@ function applyFilters() { render(getFilteredData()); }
 function getStatusClass(status, lokasi) { if(lokasi === 'Di Lokasi Event') return 'badge-status status-lokasi'; if(status === 'Akan Dibawa') return 'badge-status status-keranjang'; if(status === 'Sedang Dipakai') return 'badge-status status-dipakai'; if(status.includes('Perjalanan')) return 'badge-status status-perjalanan'; return 'badge-status status-gudang'; }
 
 // ==========================================
-// RENDER TAMPILAN KARTU
+// RENDER TAMPILAN KARTU (NO MORE RED ALERT)
 // ==========================================
 function render(data) {
     const container = document.getElementById("dataContainer"); container.innerHTML = "";
@@ -247,21 +244,8 @@ function render(data) {
         let stat = item.status_digunakan || "Di Gudang"; if(stat === 'FALSE') stat = "Di Gudang"; 
         let lok = item.lokasi_saat_ini || item.lokasi || item["Lokasi Saat Ini"] || "Gudang Kanguru";
         
-        let isNyangkut = false;
-        if (lok === 'Di Lokasi Event') {
-             let targetKode = (item.kode_barang || "").toLowerCase(); 
-             let targetWadah = (item.kode_wadah || "").toLowerCase();
-             let adaMisiAktif = allMissions.some(m => { 
-                 if (m.status_misi === 'Selesai') return false; 
-                 let kodeMisi = (m.kode_barang || "").toLowerCase(); 
-                 return (targetKode !== "" && kodeMisi.includes(targetKode)) || (targetWadah !== "" && kodeMisi.includes(targetWadah)); 
-             });
-             if (!adaMisiAktif) isNyangkut = true;
-        }
-
         let badgeLokasiHtml = (lok.toLowerCase().includes("gudang") && stat === "Di Gudang") ? `<span class="badge-status status-gudang">🏢 ${lok}</span>` : `<span class="badge-status status-lokasi">📍 ${lok}</span><span class="${getStatusClass(stat, lok)}">${stat}</span>`;
-        let alertBadge = isNyangkut ? `<span style="background:#ef4444; color:white; font-size:9px; font-weight:900; padding:3px 6px; border-radius:4px; border:1px solid #7f1d1d; animation: pulseAlert 1.5s infinite; letter-spacing:0.5px;">🚨 TERTINGGAL</span>` : "";
-
+        
         let safeFileIds = item.file_ids || item.fotos || []; 
         let firstFileId = safeFileIds.find(id => id && id.length > 5); 
         let imageSrc = 'https://placehold.co/300x300/EEEEEE/999999?text=NO+IMAGE'; 
@@ -275,13 +259,11 @@ function render(data) {
         const boxBadge = item.kode_wadah ? `<span style="font-size:9px; color:#d97706; background:#fef3c7; border-radius:4px; padding:2px 4px; border:1px solid #fde68a;">🧰 IN-BOX</span>` : "";
 
         if (currentViewMode === 'grid') { 
-            card.className = "mission-card " + (isSelected ? "selected " : "") + (stat === 'Akan Dibawa' ? "card-siap-dibawa " : "") + (isNyangkut ? "nyangkut-alert" : ""); 
-            if (isNyangkut) card.style.border = "2px solid #ef4444";
-            card.innerHTML = `${isSelected ? '<div class="card-check">✓</div>' : ''}<div style="position:relative;"><img src="${imageSrc}" class="card-img" loading="lazy"><div style="position:absolute; bottom:12px; right:4px;"><span class="badge-qty">Qty: ${item.jumlah || 0}</span></div></div><h4 class="card-title">${item.nama_barang}</h4><div style="display:flex; align-items:center; flex-wrap:wrap; gap:4px; margin-bottom:4px;">${kodeBadge} ${kondisiBadge} ${boxBadge} ${alertBadge}</div><div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:auto;">${badgeLokasiHtml}</div>`;
+            card.className = "mission-card " + (isSelected ? "selected " : "") + (stat === 'Akan Dibawa' ? "card-siap-dibawa " : ""); 
+            card.innerHTML = `${isSelected ? '<div class="card-check">✓</div>' : ''}<div style="position:relative;"><img src="${imageSrc}" class="card-img" loading="lazy"><div style="position:absolute; bottom:12px; right:4px;"><span class="badge-qty">Qty: ${item.jumlah || 0}</span></div></div><h4 class="card-title">${item.nama_barang}</h4><div style="display:flex; align-items:center; flex-wrap:wrap; gap:4px; margin-bottom:4px;">${kodeBadge} ${kondisiBadge} ${boxBadge}</div><div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:auto;">${badgeLokasiHtml}</div>`;
         } else { 
-            card.className = "list-item " + (isSelected ? "selected " : "") + (stat === 'Akan Dibawa' ? "card-siap-dibawa " : "") + (isNyangkut ? "nyangkut-alert" : ""); 
-            if (isNyangkut) card.style.borderLeft = "4px solid #ef4444";
-            card.innerHTML = `${isSelected ? '<div class="card-check" style="top:50%; transform:translateY(-50%); right:10px;">✓</div>' : ''}<img src="${imageSrc}" class="list-img" loading="lazy"><div class="list-info"><div style="display:flex; justify-content:space-between; align-items:flex-start;"><h4 class="list-title" style="flex:1;">${item.nama_barang}</h4><span class="badge-qty" style="margin-left:4px;">Qty: ${item.jumlah || 0}</span></div>${timeBadge}<div style="display:flex; gap:4px; flex-wrap:wrap; align-items:center; margin-top:3px;">${kodeBadge} ${kondisiBadge} ${boxBadge} ${alertBadge}</div><div style="display:flex; gap:4px; flex-wrap:wrap; align-items:center; margin-top:3px;">${badgeLokasiHtml}</div></div>`; 
+            card.className = "list-item " + (isSelected ? "selected " : "") + (stat === 'Akan Dibawa' ? "card-siap-dibawa " : ""); 
+            card.innerHTML = `${isSelected ? '<div class="card-check" style="top:50%; transform:translateY(-50%); right:10px;">✓</div>' : ''}<img src="${imageSrc}" class="list-img" loading="lazy"><div class="list-info"><div style="display:flex; justify-content:space-between; align-items:flex-start;"><h4 class="list-title" style="flex:1;">${item.nama_barang}</h4><span class="badge-qty" style="margin-left:4px;">Qty: ${item.jumlah || 0}</span></div>${timeBadge}<div style="display:flex; gap:4px; flex-wrap:wrap; align-items:center; margin-top:3px;">${kodeBadge} ${kondisiBadge} ${boxBadge}</div><div style="display:flex; gap:4px; flex-wrap:wrap; align-items:center; margin-top:3px;">${badgeLokasiHtml}</div></div>`; 
         }
         card.onclick = () => { if (isBulkMode) toggleSelection(item.row_index); else openDetailModal(item); }; 
         container.appendChild(card);
@@ -381,7 +363,6 @@ function openDetailModal(item) {
     let optionsLokasi = `<option value="Gudang Kanguru" ${lok.includes('Kanguru') ? 'selected':''}>🏢 Gudang Kanguru</option><option value="Gudang Mrican" ${lok.includes('Mrican') ? 'selected':''}>🏢 Gudang Mrican</option><option value="Dalam Perjalanan" ${lok === 'Dalam Perjalanan' ? 'selected':''}>🚚 Dalam Perjalanan</option><option value="Di Lokasi Event" ${lok === 'Di Lokasi Event' ? 'selected':''}>📍 Di Lokasi Event</option>`; 
     let optionsStatus = `<option value="Di Gudang" ${stat === 'Di Gudang' ? 'selected':''}>📦 Standby / Di Gudang</option><option value="Akan Dibawa" ${stat === 'Akan Dibawa' ? 'selected':''}>🛒 Akan Dibawa (Packing)</option><option value="Sedang Dipakai" ${stat === 'Sedang Dipakai' ? 'selected':''}>🔌 Sedang Dipakai / Aktivasi</option><option value="Sedang Diservis" ${stat === 'Sedang Diservis' ? 'selected':''}>🛠️ Sedang Diservis</option>`;
     
-    // HANYA 1 DEKLARASI ACTIONBUTTONS DI SINI (DENGAN TOMBOL DUPLIKAT BARU)
     let actionButtons = isAdminMode ? `
         <button onclick="duplicateItem(${item.row_index})" style="width:100%; padding:10px; background:#8b5cf6; color:white; border:none; border-radius:8px; font-weight:bold; margin-bottom:8px; cursor:pointer;">📋 Duplikat Alat</button>
         <button onclick='openEditFullModal(${JSON.stringify(item).replace(/'/g, "&#39;")})' style="width:100%; padding:10px; background:#f59e0b; color:white; border:none; border-radius:8px; font-weight:bold; margin-bottom:15px;">✏️ EDIT DATA / FOTO</button>
@@ -427,14 +408,14 @@ function printSuratJalan() {
         let itemsInLok = lokasiGroups[lok]; 
         let groupedWadah = {}; 
         let lepasan = [];
-        let printedContainers = new Set(); // 🚀 BUKU CATATAN WADAH YANG SUDAH DICETAK
+        let printedContainers = new Set(); 
         
         itemsInLok.forEach(item => { 
             let wadah = (item.kode_wadah || "").toUpperCase().trim(); 
             if (wadah) { 
                 if (!groupedWadah[wadah]) groupedWadah[wadah] = []; 
                 groupedWadah[wadah].push(item); 
-                printedContainers.add(wadah); // 🚀 Catat wadah ini agar tidak tercetak lagi di bagian lepasan
+                printedContainers.add(wadah); 
             } else { 
                 lepasan.push(item); 
             } 
@@ -459,7 +440,6 @@ function printSuratJalan() {
             
             lepasan.forEach(item => { 
                 let kodeBarang = (item.kode_barang || "").toUpperCase().trim();
-                // 🚀 Cek buku catatan: Kalau barang ini ternyata adalah sebuah wadah yang sudah dicetak di atas, JANGAN DICETAK LAGI!
                 if (!printedContainers.has(kodeBarang)) {
                     lepasanHtml += `<li class="item-row" style="padding:6px 12px; margin-left:0;"><div style="display:flex; align-items:flex-start;"><div class="checkbox"></div> <span><b>${item.nama_barang.toUpperCase()}</b> ${item.kode_barang ? ` <i style="color:#555; font-size:10px;">(#${item.kode_barang})</i>` : ''}</span></div><span class="qty">${item.jumlah} Pcs</span></li>`; 
                     hasLepasan = true;
@@ -502,14 +482,14 @@ function printFormCO31() {
         let itemsInLok = lokasiGroups[lok]; 
         let groupedWadah = {}; 
         let lepasan = [];
-        let printedContainers = new Set(); // 🚀 BUKU CATATAN WADAH YANG SUDAH DICETAK
+        let printedContainers = new Set();
         
         itemsInLok.forEach(item => { 
             let wadah = (item.kode_wadah || "").toUpperCase().trim(); 
             if (wadah) { 
                 if (!groupedWadah[wadah]) groupedWadah[wadah] = []; 
                 groupedWadah[wadah].push(item); 
-                printedContainers.add(wadah); // 🚀 Catat wadah ini
+                printedContainers.add(wadah); 
             } else { 
                 lepasan.push(item); 
             } 
@@ -529,7 +509,6 @@ function printFormCO31() {
         if (lepasan.length > 0) { 
             lepasan.forEach(item => { 
                 let kodeBarang = (item.kode_barang || "").toUpperCase().trim();
-                // 🚀 Cek buku catatan: Kalau ini adalah wadah yang isinya sudah dicetak di atas, abaikan.
                 if (!printedContainers.has(kodeBarang)) {
                     html += `<tr><td style="text-align:center; font-weight:bold;">${item.jumlah} Pcs</td><td style="font-weight:bold;">${item.nama_barang.toUpperCase()} ${item.kode_barang ? `(#${item.kode_barang})` : ''}</td><td>[ &nbsp;&nbsp; ]</td></tr>`; 
                 }
@@ -570,9 +549,6 @@ function handleNewEditFotos(input) { if (!input.files || input.files.length === 
 function removeEditFoto(index) { pendingEditFotos.splice(index, 1); renderPreviewEditFotos(); }
 async function submitEditFull(e) { e.preventDefault(); const btn = document.getElementById("btnSubmitEditFull"); btn.innerHTML = "⏳ MENGOMPRES FOTO... MOHON TUNGGU"; btn.style.background = "#94a3b8"; btn.disabled = true; await new Promise(r => setTimeout(r, 100)); try { let finalFotos = ["", "", ""]; for(let i = 0; i < 3; i++) { let photoItem = pendingEditFotos[i]; if (photoItem) { if (photoItem.status === 'new') { finalFotos[i] = await compressImage(photoItem.file); } else if (photoItem.status === 'existing') { finalFotos[i] = photoItem.originalId; } } else { finalFotos[i] = ""; } } btn.innerHTML = "🚀 MENGIRIM KE SATELIT..."; const payload = { action: "full_edit_item", pin: API_BACKEND_PIN, user_name: localStorage.getItem('av_session_nama') || "Kru Tanpa Nama", row_index: document.getElementById("editRowIndex").value, nama: document.getElementById("editNama").value, kode_barang: document.getElementById("editKode").value, kode_wadah: document.getElementById("editWadah").value, jumlah: document.getElementById("editJumlah").value, kondisi: document.getElementById("editKondisi").value, keterangan_ref: document.getElementById("editKet").value, lokasi: document.getElementById("editLokasi") ? document.getElementById("editLokasi").value : "", fotos: finalFotos }; const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) }); const data = await response.json(); if (data.status === "success") { showToast("✅ Data Diperbarui!"); closeEditFullModal(); loadData(); } else { alert("Gagal:\n" + data.message); } } catch (err) { alert("Error Sistem:\n" + err.message); } finally { btn.innerHTML = "💾 UPDATE DATA & FOTO"; btn.style.background = "#ea580c"; btn.disabled = false; } }
 
-// ==========================================
-// SISTEM SCANNER QR (FIXED & RESPONSIVE)
-// ==========================================
 function openScannerModal() { 
     const oldModal = document.getElementById("tempScannerModal");
     if(oldModal) oldModal.remove();
@@ -695,7 +671,6 @@ function exportToExcel() { if (!allItems || allItems.length === 0) { alert("⚠�
 function closeExportModal() { const modal = document.getElementById('modalExport'); if(modal) { modal.style.display = 'none'; modal.classList.remove('active'); } }
 function executeCustomExport() { let dataToExport = getFilteredData(); if (dataToExport.length === 0) { alert("❌ Kosong! Tidak ada barang yang tampil di layar."); return; } let csvContent = "data:text/csv;charset=utf-8,Kode Barang,Nama Alat,Wadah,Kondisi,Lokasi Gudang,Status Pemakaian,Total Qty,Tim Terkait\n"; dataToExport.forEach(row => { let nama = `"${(row.nama_barang || "").replace(/"/g, '""')}"`; let kode = `"${row.kode_barang || "-"}"`; let wadah = `"${row.kode_wadah || "-"}"`; let kondisi = `"${row.kondisi || "Bagus"}"`; let lokasi = `"${row.lokasi_saat_ini || row.lokasi || row["Lokasi Saat Ini"] || "Gudang Kanguru"}"`; let status = `"${row.status_digunakan && row.status_digunakan !== 'FALSE' ? row.status_digunakan : 'Di Gudang'}"`; let qty = `"${row.jumlah || 1}"`; let tim = `"${row.tim || "-"}"`; csvContent += `${kode},${nama},${wadah},${kondisi},${lokasi},${status},${qty},${tim}\n`; }); let encodedUri = encodeURI(csvContent); let link = document.createElement("a"); link.setAttribute("href", encodedUri); let dateStr = new Date().toISOString().slice(0,10); link.setAttribute("download", `Laporan_GudangAV_${dateStr}.csv`); document.body.appendChild(link); link.click(); document.body.removeChild(link); closeExportModal(); showToast(`✅ SUKSES: ${dataToExport.length} data diekspor!`); }
 
-// 2. TAMBAHKAN FUNGSI EKSEKUSI DUPLIKASI INI DI SCRIPT-GUDANG.JS
 async function duplicateItem(rowIndex) {
     if (!confirm("⚠️ Apakah Anda yakin ingin menduplikasi alat ini beserta foto dan detailnya?")) return;
     
@@ -712,7 +687,6 @@ async function duplicateItem(rowIndex) {
         const data = await response.json();
         
         if (data.status === "success") {
-            // Tutup modal detail, muat ulang data, dan tampilkan notifikasi sukses
             const modalDetail = document.getElementById('detailModal');
             if (modalDetail) modalDetail.remove();
             
@@ -724,4 +698,67 @@ async function duplicateItem(rowIndex) {
     } catch (e) {
         alert("Error Sistem:\n" + e.message);
     }
+}
+
+// ==========================================
+// FITUR LAPOR DEVELOPER (UI)
+// ==========================================
+function injectFeedbackUI() {
+    if (document.getElementById("btnFeedbackFloat")) return;
+    const fabHtml = `
+        <button id="btnFeedbackFloat" onclick="openFeedbackModal()" style="position:fixed; bottom:20px; right:20px; width:50px; height:50px; border-radius:50%; background:#ea580c; color:white; font-size:24px; border:none; box-shadow:0 4px 15px rgba(234,88,12,0.4); cursor:pointer; z-index:8000; display:flex; justify-content:center; align-items:center; transition:0.2s;">🐞</button>
+    `;
+    const modalHtml = `
+        <div id="feedbackModal" class="modal-overlay">
+            <div class="modal-content" style="max-width:400px; background:white; padding:20px; border-radius:15px; text-align:left; position:relative;">
+                <button type="button" onclick="closeFeedbackModal()" style="position:absolute; top:15px; right:15px; border:none; background:#f1f5f9; width:30px; height:30px; border-radius:50%; font-weight:bold; cursor:pointer;">✕</button>
+                <h3 style="margin:0 0 5px 0; color:#0f172a;">Form Laporan & Ide 💡</h3>
+                <p style="font-size:11px; color:#64748b; margin-bottom:15px;">Pesan Anda akan langsung dikirim ke meja Developer.</p>
+
+                <form id="formFeedback" onsubmit="submitFeedback(event)">
+                    <label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">Tipe Pesan:</label>
+                    <select id="fbTipe" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; margin-bottom:12px; font-size:12px;" required>
+                        <option value="Bug">🐞 Lapor Error / Bug Sistem</option>
+                        <option value="Ide">💡 Saran Fitur Baru</option>
+                        <option value="Data">📦 Lapor Kendala Data Barang</option>
+                    </select>
+
+                    <label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">Detail Pesan:</label>
+                    <textarea id="fbPesan" rows="4" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; margin-bottom:12px; font-size:12px; font-family:inherit; resize:vertical; box-sizing:border-box;" placeholder="Ceritakan detail kendala atau ide Komandan di sini..." required></textarea>
+
+                    <label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">Nama Pelapor:</label>
+                    <input type="text" id="fbNama" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; margin-bottom:15px; font-size:12px; box-sizing:border-box;" placeholder="Nama Anda" required>
+
+                    <button type="submit" id="btnSubmitFb" style="width:100%; padding:12px; background:#10b981; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer; font-size:13px;">🚀 KIRIM PESAN KE DEV</button>
+                </form>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', fabHtml + modalHtml);
+}
+
+function openFeedbackModal() {
+    const currentUser = localStorage.getItem('av_session_nama');
+    if(currentUser) document.getElementById('fbNama').value = currentUser;
+    document.getElementById('feedbackModal').classList.add('active');
+}
+
+function closeFeedbackModal() {
+    document.getElementById('feedbackModal').classList.remove('active');
+}
+
+async function submitFeedback(e) {
+    e.preventDefault();
+    const btn = document.getElementById("btnSubmitFb");
+    btn.disabled = true;
+    btn.innerHTML = "⏳ MENGIRIM...";
+
+    // Simulasi pengiriman untuk Fase 1 (sebelum ada GAS backend)
+    setTimeout(() => {
+        showToast("✅ Laporan Berhasil Direkam! (Simulasi Fase 1)");
+        document.getElementById("formFeedback").reset();
+        closeFeedbackModal();
+        btn.disabled = false;
+        btn.innerHTML = "🚀 KIRIM PESAN KE DEV";
+    }, 1000);
 }

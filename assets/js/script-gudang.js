@@ -1,5 +1,5 @@
 // ==========================================
-// MESIN LOGIKA GUDANG (V.59.0 - REVISI PRINT ENGINE CO-31)
+// MESIN LOGIKA GUDANG (V.60.0 - SMART DUPLICATOR & PAKET ZONA)
 // ==========================================
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec"; 
@@ -94,7 +94,7 @@ function getFilteredData() {
        const matchQ = (i.nama_barang||"").toLowerCase().includes(q) || 
                        (i.kode_barang||"").toLowerCase().includes(q) || 
                        (i.kode_wadah||"").toLowerCase().includes(q) ||
-                       (i.paket_zona||"").toLowerCase().includes(q); // <--- BARU: Bisa dicari dari kolom pencarian
+                       (i.paket_zona||"").toLowerCase().includes(q); // <--- LOGIKA PENCARIAN PAKET ZONA
         let stat = i.status_digunakan || 'Di Gudang'; if(stat === 'FALSE') stat = 'Di Gudang'; 
         let lok = i.lokasi_saat_ini || i.lokasi || i["Lokasi Saat Ini"] || '';
         let matchPill = false;
@@ -140,13 +140,16 @@ function render(data) {
         let colorKondisi = item.kondisi && item.kondisi.toLowerCase() === 'bagus' ? '#16a34a' : '#dc2626'; let bgKondisi = item.kondisi && item.kondisi.toLowerCase() === 'bagus' ? '#f0fdf4' : '#fef2f2'; 
         const kondisiBadge = `<span style="font-size:9px; padding:2px 4px; border-radius:4px; border:1px solid ${colorKondisi}; background:${bgKondisi}; color:${colorKondisi}; font-weight:bold;">${item.kondisi || 'Bagus'}</span>`;
         const boxBadge = item.kode_wadah ? `<span style="font-size:9px; color:#d97706; background:#fef3c7; border-radius:4px; padding:2px 4px; border:1px solid #fde68a;">🧰 IN-BOX</span>` : "";
-
+        
+        // --- BADGE PAKET ZONA ---
+        const zonaBadge = item.paket_zona ? `<span style="font-size:9px; color:#4338ca; background:#e0e7ff; border-radius:4px; padding:2px 4px; border:1px solid #c7d2fe; font-weight:bold;">📦 ${item.paket_zona}</span>` : "";
+        
         if (currentViewMode === 'grid') { 
             card.className = "mission-card " + (isSelected ? "selected " : "") + (stat === 'Akan Dibawa' ? "card-siap-dibawa " : ""); 
-            card.innerHTML = `${isSelected ? '<div class="card-check">✓</div>' : ''}<div style="position:relative;"><img src="${imageSrc}" class="card-img" loading="lazy"><div style="position:absolute; bottom:12px; right:4px;"><span class="badge-qty">Qty: ${item.jumlah || 0}</span></div></div><h4 class="card-title">${item.nama_barang}</h4><div style="display:flex; align-items:center; flex-wrap:wrap; gap:4px; margin-bottom:4px;">${kodeBadge} ${kondisiBadge} ${boxBadge}</div><div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:auto;">${badgeLokasiHtml}</div>`;
+            card.innerHTML = `${isSelected ? '<div class="card-check">✓</div>' : ''}<div style="position:relative;"><img src="${imageSrc}" class="card-img" loading="lazy"><div style="position:absolute; bottom:12px; right:4px;"><span class="badge-qty">Qty: ${item.jumlah || 0}</span></div></div><h4 class="card-title">${item.nama_barang}</h4><div style="display:flex; align-items:center; flex-wrap:wrap; gap:4px; margin-bottom:4px;">${kodeBadge} ${kondisiBadge} ${boxBadge} ${zonaBadge}</div><div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:auto;">${badgeLokasiHtml}</div>`;
         } else { 
             card.className = "list-item " + (isSelected ? "selected " : "") + (stat === 'Akan Dibawa' ? "card-siap-dibawa " : ""); 
-            card.innerHTML = `${isSelected ? '<div class="card-check" style="top:50%; transform:translateY(-50%); right:10px;">✓</div>' : ''}<img src="${imageSrc}" class="list-img" loading="lazy"><div class="list-info"><div style="display:flex; justify-content:space-between; align-items:flex-start;"><h4 class="list-title" style="flex:1;">${item.nama_barang}</h4><span class="badge-qty" style="margin-left:4px;">Qty: ${item.jumlah || 0}</span></div>${timeBadge}<div style="display:flex; gap:4px; flex-wrap:wrap; align-items:center; margin-top:3px;">${kodeBadge} ${kondisiBadge} ${boxBadge}</div><div style="display:flex; gap:4px; flex-wrap:wrap; align-items:center; margin-top:3px;">${badgeLokasiHtml}</div></div>`; 
+            card.innerHTML = `${isSelected ? '<div class="card-check" style="top:50%; transform:translateY(-50%); right:10px;">✓</div>' : ''}<img src="${imageSrc}" class="list-img" loading="lazy"><div class="list-info"><div style="display:flex; justify-content:space-between; align-items:flex-start;"><h4 class="list-title" style="flex:1;">${item.nama_barang}</h4><span class="badge-qty" style="margin-left:4px;">Qty: ${item.jumlah || 0}</span></div>${timeBadge}<div style="display:flex; gap:4px; flex-wrap:wrap; align-items:center; margin-top:3px;">${kodeBadge} ${kondisiBadge} ${boxBadge} ${zonaBadge}</div><div style="display:flex; gap:4px; flex-wrap:wrap; align-items:center; margin-top:3px;">${badgeLokasiHtml}</div></div>`; 
         }
         card.onclick = () => { if (isBulkMode) toggleSelection(item.row_index); else openDetailModal(item); }; 
         container.appendChild(card);
@@ -175,6 +178,9 @@ function openDetailModal(item) {
         }
     }
     
+    // --- LABEL PAKET ZONA DI KARTU DETAIL ---
+    let detailZonaBadgeHtml = item.paket_zona ? `<p style="margin:5px 0 5px 0; font-size:11px; color:#4338ca; font-weight:bold;">📦 Masuk dalam ${item.paket_zona}</p>` : "";
+
     let galleryHtml = `<div class="detail-gallery">`;
     if (validThumbs.length > 0) { validThumbs.forEach((tObj, index) => { if (tObj.type === 'alat') { galleryHtml += `<img src="${tObj.url}" class="gallery-img" onclick="openZoomModalIndex(${index})">`; } else { galleryHtml += `<div class="gallery-box"><img src="${tObj.url}" class="gallery-img" style="border:3px solid #ea580c; box-sizing:border-box;" onclick="openZoomModalIndex(${index})"><span class="badge-wadah">WADAH</span></div>`; } }); } else { galleryHtml += `<img src="https://placehold.co/300x200/EEEEEE/999999?text=Tidak+Ada+Foto" class="gallery-img" style="width:100%;">`; } galleryHtml += `</div>`;
     
@@ -212,7 +218,7 @@ function openDetailModal(item) {
             <button onclick="saveEditLokasiStatus(${item.row_index})" style="width:100%; padding:12px; background:#ea580c; color:white; border:none; border-radius:8px; font-weight:bold;">💾 SIMPAN STATUS</button>
         </div>` : `<div style="margin-top:15px; padding:10px; background:#f1f5f9; border-radius:8px; font-size:12px; color:#64748b;">🔒 Login Akses untuk mengubah status/lokasi.</div>`;
     
-    const modalHtml = `<div id="detailModal" class="modal-overlay active"><div class="modal-content" style="max-width:400px; max-height:90vh; overflow-y:auto; background:white; padding:20px; border-radius:15px; text-align:center; position:relative;"><button onclick="document.getElementById('detailModal').remove()" style="position:absolute; top:15px; right:15px; border:none; background:#f1f5f9; width:30px; height:30px; border-radius:50%; font-weight:bold; cursor:pointer; z-index:10;">✕</button>${galleryHtml}<h3 style="margin:0; font-weight:900; color:#1e293b; font-size:18px;">${item.nama_barang}</h3><div style="font-size:10px; color:gray; margin-bottom:8px;">⏱️ Update: ${item.timestamp || '-'}</div><p style="margin:5px 0 5px 0; font-size:12px; color:#ea580c; font-weight:bold;">#${item.kode_barang || '-'} ${wadahHeaderHtml}</p>${badgeWadahHtml}<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:12px; text-align:left; background:#f8fafc; padding:10px; border-radius:8px; border:1px solid #e2e8f0;"><div><span style="color:gray;">Item Ini:</span> <br><b>${item.jumlah || 0} Pcs</b></div><div><span style="color:gray;">Kondisi:</span> <br><b>${item.kondisi || '-'}</b></div><div><span style="color:gray;">📍 Lokasi:</span> <br><b>${lok}</b></div><div><span style="color:gray;">🔌 Status:</span> <br><b>${stat}</b></div></div>${similarHtml}${isiWadahHtml}<div style="text-align:left; margin-top:10px; font-size:11px; color:#475569; background:#fff7ed; padding:8px; border-radius:6px; border:1px solid #fed7aa; margin-bottom:5px;"><b>📝 Ket:</b> ${item.keterangan_ref || 'Tidak ada catatan.'}</div><div style="text-align:left; font-size:11px; margin-bottom:15px; color:#3b82f6;"><b>🎯 Tujuan (Event):</b> ${item.tujuan || '-'}</div>${logHtml}${actionButtons}</div></div>`; 
+    const modalHtml = `<div id="detailModal" class="modal-overlay active"><div class="modal-content" style="max-width:400px; max-height:90vh; overflow-y:auto; background:white; padding:20px; border-radius:15px; text-align:center; position:relative;"><button onclick="document.getElementById('detailModal').remove()" style="position:absolute; top:15px; right:15px; border:none; background:#f1f5f9; width:30px; height:30px; border-radius:50%; font-weight:bold; cursor:pointer; z-index:10;">✕</button>${galleryHtml}<h3 style="margin:0; font-weight:900; color:#1e293b; font-size:18px;">${item.nama_barang}</h3><div style="font-size:10px; color:gray; margin-bottom:8px;">⏱️ Update: ${item.timestamp || '-'}</div><p style="margin:5px 0 0 0; font-size:12px; color:#ea580c; font-weight:bold;">#${item.kode_barang || '-'} ${wadahHeaderHtml}</p>${detailZonaBadgeHtml}${badgeWadahHtml}<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:12px; text-align:left; background:#f8fafc; padding:10px; border-radius:8px; border:1px solid #e2e8f0;"><div><span style="color:gray;">Item Ini:</span> <br><b>${item.jumlah || 0} Pcs</b></div><div><span style="color:gray;">Kondisi:</span> <br><b>${item.kondisi || '-'}</b></div><div><span style="color:gray;">📍 Lokasi:</span> <br><b>${lok}</b></div><div><span style="color:gray;">🔌 Status:</span> <br><b>${stat}</b></div></div>${similarHtml}${isiWadahHtml}<div style="text-align:left; margin-top:10px; font-size:11px; color:#475569; background:#fff7ed; padding:8px; border-radius:6px; border:1px solid #fed7aa; margin-bottom:5px;"><b>📝 Ket:</b> ${item.keterangan_ref || 'Tidak ada catatan.'}</div><div style="text-align:left; font-size:11px; margin-bottom:15px; color:#3b82f6;"><b>🎯 Tujuan (Event):</b> ${item.tujuan || '-'}</div>${logHtml}${actionButtons}</div></div>`; 
     document.body.insertAdjacentHTML('beforeend', modalHtml);
 }
 

@@ -91,7 +91,10 @@ function getFilteredData() {
     const q = document.getElementById("searchInput").value.toLowerCase(); 
     let timAktif = Array.from(document.querySelectorAll('.cek-tim:checked')).map(cb => cb.value.toLowerCase());
     return allItems.filter(i => { 
-        const matchQ = (i.nama_barang||"").toLowerCase().includes(q) || (i.kode_barang||"").toLowerCase().includes(q) || (i.kode_wadah||"").toLowerCase().includes(q); 
+       const matchQ = (i.nama_barang||"").toLowerCase().includes(q) || 
+                       (i.kode_barang||"").toLowerCase().includes(q) || 
+                       (i.kode_wadah||"").toLowerCase().includes(q) ||
+                       (i.paket_zona||"").toLowerCase().includes(q); // <--- BARU: Bisa dicari dari kolom pencarian
         let stat = i.status_digunakan || 'Di Gudang'; if(stat === 'FALSE') stat = 'Di Gudang'; 
         let lok = i.lokasi_saat_ini || i.lokasi || i["Lokasi Saat Ini"] || '';
         let matchPill = false;

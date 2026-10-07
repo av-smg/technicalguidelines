@@ -496,6 +496,62 @@ function executePrint() {
     printWin.document.write(html); printWin.document.close(); closePrintModal(); 
 }
 
+// ==========================================
+// AKSI: DUPLIKAT BARANG DARI KARTU DETAIL
+// ==========================================
+async function duplicateItem(rowIndex) {
+    // 1. Munculkan pop-up tanya jumlah
+    let qtyInput = prompt("📦 Berapa banyak duplikat yang ingin dibuat?\n(Ketik angka, maksimal 50. Contoh: 5)", "1");
+    
+    // Jika kru menekan Cancel atau input kosong
+    if (qtyInput === null || qtyInput.trim() === "") return;
+
+    let qty = parseInt(qtyInput);
+    if (isNaN(qty) || qty <= 0 || qty > 50) {
+        alert("⚠️ Jumlah tidak valid! Masukkan angka antara 1 hingga 50.");
+        return;
+    }
+
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = `⏳ MEMPROSES ${qty} DUPLIKAT...`;
+    btn.disabled = true;
+    btn.style.background = "#94a3b8";
+
+    try {
+        const payload = {
+            action: "duplicate_item",
+            pin: API_BACKEND_PIN,
+            user_name: localStorage.getItem('av_session_nama') || "Kru Tanpa Nama",
+            row_index: rowIndex,
+            qty: qty // Kirim data jumlah ke server
+        };
+
+        const response = await fetch(SCRIPT_URL, {
+            method: "POST",
+            body: JSON.stringify(payload)
+        });
+        const data = await response.json();
+
+        if (data.status === "success") {
+            document.getElementById('detailModal').remove();
+            showToast(`✅ Sukses! ${qty} alat berhasil diduplikat.`);
+            loadData(); // Refresh tampilan web otomatis
+        } else {
+            alert("Gagal:\n" + data.message);
+        }
+    } catch (err) {
+        alert("Error Sistem:\n" + err.message);
+    } finally {
+        // Kembalikan tombol ke keadaan semula jika modal belum tertutup
+        if (document.body.contains(btn)) {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            btn.style.background = "#8b5cf6";
+        }
+    }
+}
+
 // === SCANNER QR ===
 function openScannerModal() { const oldModal = document.getElementById("tempScannerModal"); if(oldModal) oldModal.remove(); let modal = document.createElement("div"); modal.id = "tempScannerModal"; modal.className = "modal-overlay active"; modal.style.cssText = "position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.9); z-index: 999999; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(5px);"; modal.innerHTML = `<div class="modal-content" style="width: 90%; max-width: 400px; background: white; padding: 25px 20px; border-radius: 20px; text-align: center; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5);"><button onclick="closeScannerModal()" style="position: absolute; top: 15px; right: 15px; border: none; background: #fef2f2; color: #dc2626; width: 35px; height: 35px; border-radius: 50%; font-weight: bold; cursor: pointer; z-index: 9999; font-size: 16px;">✕</button><h3 style="margin: 0 0 5px 0; font-size: 18px; color: #0f172a; font-weight: 800;">📸 Scan Barcode</h3><p style="font-size: 12px; color: #64748b; margin-bottom: 15px;">Arahkan kamera ke QR/Barcode alat.</p><div id="qr-reader" style="width: 100%; border-radius: 12px; overflow: hidden; border: 2px solid #e2e8f0; min-height: 250px; background: #1e293b;"></div><div class="scanner-controls" style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;"><button class="btn-scanner-action" style="padding: 12px; border-radius: 12px; border: none; background: #f1f5f9; color:#0f172a; font-weight: bold; cursor: pointer; flex: 1; transition:0.2s;" onclick="toggleCameraFacing()">🔄 Balik Kamera</button><button class="btn-scanner-action" id="btnFlashlight" style="padding: 12px; border-radius: 12px; border: none; background: #f1f5f9; color:#0f172a; font-weight: bold; cursor: pointer; flex: 1; transition:0.2s;" onclick="toggleFlashlight()">🔦 Senter</button></div></div>`; document.body.appendChild(modal); isFlashlightOn = false; startScanner(); }
 function startScanner() { if(html5QrCode) { html5QrCode.stop().catch(e=>console.log(e)); html5QrCode = null; } html5QrCode = new Html5Qrcode("qr-reader"); let config = { fps: 10, qrbox: { width: 220, height: 220 } }; html5QrCode.start({ facingMode: currentCameraFacing }, config, (decodedText) => { const now = Date.now(); if (now - lastScanTime < 1500) return; lastScanTime = now; let scanResult = decodedText.trim(); try { if ("vibrate" in navigator) navigator.vibrate([200]); } catch(e){} if (isBulkMode) { const foundItem = allItems.find(i => (i.kode_barang||"").toString().toLowerCase() === scanResult.toLowerCase() || (i.kode_wadah||"").toString().toLowerCase() === scanResult.toLowerCase()); if (foundItem) { if (!selectedRows.has(foundItem.row_index)) { selectedRows.add(foundItem.row_index); document.getElementById("bulkCount").innerText = `${selectedRows.size} Terpilih`; applyFilters(); showToast(`✅ ${foundItem.nama_barang} ditambahkan!`); } else { showToast(`⚠️ ${foundItem.nama_barang} sudah terpilih!`); } } else { try { if ("vibrate" in navigator) navigator.vibrate([300, 100, 300]); } catch(e){} showToast(`❌ Kode [${scanResult}] tidak ada di database!`, false); } } else { closeScannerModal(); const searchBox = document.getElementById('searchInput'); if(searchBox) { searchBox.value = scanResult; setFilterPill('all', document.querySelector('.pill-btn[data-filter="all"]')); applyFilters(); const foundItem = allItems.find(i => (i.kode_barang||"").toString().toLowerCase() === scanResult.toLowerCase() || (i.kode_wadah||"").toString().toLowerCase() === scanResult.toLowerCase()); if (foundItem) { setTimeout(() => openDetailModal(foundItem), 300); } else { showToast(`❌ Barang [${scanResult}] tidak ditemukan!`, false); } } } }, (errorMessage) => { } ).catch(err => { alert("Gagal membuka kamera: " + err); closeScannerModal(); }); }

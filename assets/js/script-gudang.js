@@ -1,5 +1,5 @@
 // ==========================================
-// MESIN LOGIKA GUDANG (V.61.0 - MISSION PLANNER & PAKET ZONA)
+// MESIN LOGIKA GUDANG (V.62.0 - FULL ENTERPRISE: MISSION BUILDER & RADAR BENTROK)
 // ==========================================
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec"; 
@@ -12,11 +12,17 @@ let isAdminMode = false, isBulkMode = false, selectedRows = new Set(), lastScanT
 // Status toggle wadah
 let showOnlyWadah = false; 
 
+// Mission Builder Cart
+let builderCart = []; 
+
 let pendingAddFotos = []; let pendingEditFotos = []; 
 let currentCameraFacing = "environment"; let isFlashlightOn = false;
 
 window.onload = () => { injectGudangDarkModeCSS(); checkAdminStatus(); injectFeedbackUI(); injectPrintModalUI(); loadData(); };
 
+// ==========================================
+// TEMA & CSS
+// ==========================================
 function injectGudangDarkModeCSS() {
     if(document.getElementById('gudangDarkModeCss')) return;
     const style = document.createElement('style'); style.id = 'gudangDarkModeCss';
@@ -78,10 +84,20 @@ async function loadData() {
 }
 
 function populateFilterTim() { const container = document.querySelector('#panelFilterLanjutan div'); if(!container) return; let daftarTim = new Set(); allItems.forEach(item => { let tim = item.tim || item["Tim"] || ""; if (tim && tim.trim() !== "") daftarTim.add(tim.trim()); }); if(daftarTim.size > 0) { container.innerHTML = ""; daftarTim.forEach(tim => { let val = tim.toLowerCase(); container.innerHTML += `<label><input type="checkbox" class="cek-tim" value="${val}" onchange="applyFilters()"> ${tim}</label>`; }); } }
-function setupStickyHeader() { let toolbar = document.querySelector(".toolbar-card"); if(toolbar) { toolbar.style.position = "sticky"; toolbar.style.top = "0px"; toolbar.style.zIndex = "99"; let pillsWrapper = document.querySelector(".filter-pills-wrapper"); if(pillsWrapper && !pillsWrapper.innerHTML.includes("Di Lokasi Event")) { pillsWrapper.insertAdjacentHTML('beforeend', `<button class="pill-btn" data-filter="Di Lokasi Event" onclick="setFilterPill('Di Lokasi Event', this)">⚠️ Event</button><button class="pill-btn" data-filter="Gudang Kanguru" onclick="setFilterPill('Gudang Kanguru', this)" style="border-left: 2px solid #cbd5e1; margin-left:5px;">🏢 Kanguru</button><button class="pill-btn" data-filter="Gudang Mrican" onclick="setFilterPill('Gudang Mrican', this)">🏢 Mrican</button>`); } } }
+
+function setupStickyHeader() { 
+    let toolbar = document.querySelector(".toolbar-card"); 
+    if(toolbar) { 
+        toolbar.style.position = "sticky"; toolbar.style.top = "0px"; toolbar.style.zIndex = "99"; 
+        let pillsWrapper = document.querySelector(".filter-pills-wrapper"); 
+        if(pillsWrapper && !pillsWrapper.innerHTML.includes("Di Lokasi Event")) { 
+            pillsWrapper.insertAdjacentHTML('beforeend', `<button class="pill-btn" data-filter="Di Lokasi Event" onclick="setFilterPill('Di Lokasi Event', this)">⚠️ Event</button><button class="pill-btn" data-filter="Gudang Kanguru" onclick="setFilterPill('Gudang Kanguru', this)" style="border-left: 2px solid #cbd5e1; margin-left:5px;">🏢 Kanguru</button><button class="pill-btn" data-filter="Gudang Mrican" onclick="setFilterPill('Gudang Mrican', this)">🏢 Mrican</button><button class="pill-btn" onclick="openMissionBuilder()" style="background:#4f46e5; color:white; border:none; margin-left:15px; font-weight:bold; box-shadow:0 2px 4px rgba(0,0,0,0.2);">🛠️ MISSION BUILDER</button>`); 
+        } 
+    } 
+}
 
 // ==============================================================
-// LOGIKA TOMBOL WADAH & VIEW 
+// LOGIKA TOMBOL WADAH, FILTER & VIEW 
 // ==============================================================
 function toggleViewMode() { const btn = document.getElementById("btnViewToggle"); if (currentViewMode === 'grid') { currentViewMode = 'list'; btn.innerHTML = '🖼️ Grid View'; document.getElementById("dataContainer").className = "list-view-container"; } else { currentViewMode = 'grid'; btn.innerHTML = '📄 List View'; document.getElementById("dataContainer").className = "grid-cards"; } applyFilters(); }
 function toggleWadahMode() { showOnlyWadah = !showOnlyWadah; const btn = document.getElementById("btnWadahToggle"); if (showOnlyWadah) { btn.innerHTML = '📦 Tampilkan Semua'; btn.style.background = '#ea580c'; btn.style.color = 'white'; btn.style.border = '1px solid #ea580c'; } else { btn.innerHTML = '🧰 Hanya Wadah'; btn.style.background = '#f1f5f9'; btn.style.color = '#334155'; btn.style.border = '1px solid #ccc'; } applyFilters(); }
@@ -92,9 +108,9 @@ function getFilteredData() {
     let timAktif = Array.from(document.querySelectorAll('.cek-tim:checked')).map(cb => cb.value.toLowerCase());
     return allItems.filter(i => { 
        const matchQ = (i.nama_barang||"").toLowerCase().includes(q) || 
-                       (i.kode_barang||"").toLowerCase().includes(q) || 
-                       (i.kode_wadah||"").toLowerCase().includes(q) ||
-                       (i.paket_zona||"").toLowerCase().includes(q); 
+                      (i.kode_barang||"").toLowerCase().includes(q) || 
+                      (i.kode_wadah||"").toLowerCase().includes(q) || 
+                      (i.paket_zona||"").toLowerCase().includes(q); 
         let stat = i.status_digunakan || 'Di Gudang'; if(stat === 'FALSE') stat = 'Di Gudang'; 
         let lok = i.lokasi_saat_ini || i.lokasi || i["Lokasi Saat Ini"] || '';
         let matchPill = false;
@@ -132,7 +148,6 @@ function render(data) {
         let stat = item.status_digunakan || "Di Gudang"; if(stat === 'FALSE') stat = "Di Gudang"; 
         let lok = item.lokasi_saat_ini || item.lokasi || item["Lokasi Saat Ini"] || "Gudang Kanguru";
         let badgeLokasiHtml = (lok.toLowerCase().includes("gudang") && stat === "Di Gudang") ? `<span class="badge-status status-gudang">🏢 ${lok}</span>` : `<span class="badge-status status-lokasi">📍 ${lok}</span><span class="${getStatusClass(stat, lok)}">${stat}</span>`;
-        
         let safeFileIds = item.file_ids || item.fotos || []; let firstFileId = safeFileIds.find(id => id && id.length > 5); 
         let imageSrc = 'https://placehold.co/300x300/EEEEEE/999999?text=NO+IMAGE'; if (firstFileId) { imageSrc = firstFileId.includes("http") ? firstFileId : `https://drive.google.com/thumbnail?id=${firstFileId}&sz=w400`; }
         const kodeBadge = item.kode_barang ? `<span style="color:#ea580c; font-weight:900; font-size:9px;">#${item.kode_barang}</span>` : ""; 
@@ -140,8 +155,6 @@ function render(data) {
         let colorKondisi = item.kondisi && item.kondisi.toLowerCase() === 'bagus' ? '#16a34a' : '#dc2626'; let bgKondisi = item.kondisi && item.kondisi.toLowerCase() === 'bagus' ? '#f0fdf4' : '#fef2f2'; 
         const kondisiBadge = `<span style="font-size:9px; padding:2px 4px; border-radius:4px; border:1px solid ${colorKondisi}; background:${bgKondisi}; color:${colorKondisi}; font-weight:bold;">${item.kondisi || 'Bagus'}</span>`;
         const boxBadge = item.kode_wadah ? `<span style="font-size:9px; color:#d97706; background:#fef3c7; border-radius:4px; padding:2px 4px; border:1px solid #fde68a;">🧰 IN-BOX</span>` : "";
-        
-        // --- BADGE PAKET ZONA ---
         const zonaBadge = item.paket_zona ? `<span style="font-size:9px; color:#4338ca; background:#e0e7ff; border-radius:4px; padding:2px 4px; border:1px solid #c7d2fe; font-weight:bold;">📦 ${item.paket_zona}</span>` : "";
         
         if (currentViewMode === 'grid') { 
@@ -178,7 +191,6 @@ function openDetailModal(item) {
         }
     }
     
-    // --- LABEL PAKET ZONA DI KARTU DETAIL ---
     let detailZonaBadgeHtml = item.paket_zona ? `<p style="margin:5px 0 5px 0; font-size:11px; color:#4338ca; font-weight:bold;">📦 Masuk dalam ${item.paket_zona}</p>` : "";
 
     let galleryHtml = `<div class="detail-gallery">`;
@@ -223,9 +235,178 @@ function openDetailModal(item) {
 }
 
 // ==========================================
+// 🚀 MISSION BUILDER (ZONA-FIRST + RADAR BENTROK)
+// ==========================================
+function openMissionBuilder() {
+    builderCart = [];
+    const modalHtml = `
+    <div id="builderModal" class="modal-overlay active" style="align-items:flex-start; padding-top:2vh;">
+        <div class="modal-content" style="max-width:900px; width:95%; max-height:96vh; overflow-y:auto; background:#f8fafc; padding:20px; border-radius:15px; position:relative; text-align:left;">
+            <button onclick="document.getElementById('builderModal').remove()" style="position:absolute; top:15px; right:15px; border:none; background:#fef2f2; color:#dc2626; width:35px; height:35px; border-radius:50%; font-weight:bold; cursor:pointer; font-size:16px;">✕</button>
+            <h3 style="margin:0 0 5px 0; color:#4f46e5; font-size:22px; font-weight:900;">🛠️ MISSION BUILDER</h3>
+            <p style="font-size:12px; color:#64748b; margin-bottom:20px; padding-bottom:10px; border-bottom:2px solid #e2e8f0;">Rancang keranjang zona dan amankan dari bentrok jadwal.</p>
+            
+            <div style="display:flex; flex-wrap:wrap; gap:20px;">
+                <!-- PANEL KIRI: INFO MISI -->
+                <div style="flex:1; min-width:280px; background:white; padding:15px; border-radius:12px; border:1px solid #e2e8f0;">
+                    <h4 style="margin:0 0 10px 0; color:#1e293b;">1. Tentukan Jadwal & Lokasi</h4>
+                    <label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">📍 Pilih Kota:</label>
+                    <select id="bmDbKota" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; font-weight:bold; margin-bottom:12px; background:#eff6ff;">
+                        <option value="Database_Misi_Semarang">Event Semarang (Otomatis Buat DB)</option>
+                        <option value="Database_Misi_Yogya">Event Yogyakarta (Otomatis Buat DB)</option>
+                    </select>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+                        <div><label style="font-size:11px; font-weight:bold; color:gray; display:block;">📅 Tgl Mulai:</label><input type="date" id="bmTglMulai" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; box-sizing:border-box; font-size:12px;" onchange="renderBuilderSearch()"></div>
+                        <div><label style="font-size:11px; font-weight:bold; color:gray; display:block;">📅 Tgl Selesai:</label><input type="date" id="bmTglSelesai" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; box-sizing:border-box; font-size:12px;" onchange="renderBuilderSearch()"></div>
+                    </div>
+
+                    <label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">🏷️ ID Misi & Paket Zona:</label>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+                        <input type="text" id="bmMissionId" placeholder="M-SMG-01" style="width:100%; padding:10px; border-radius:8px; border:1px solid #93c5fd; font-weight:bold; text-transform:uppercase; box-sizing:border-box;">
+                        <input type="text" id="bmZona" placeholder="Zona VVIP" style="width:100%; padding:10px; border-radius:8px; border:1px solid #93c5fd; font-weight:bold; box-sizing:border-box;">
+                    </div>
+                </div>
+
+                <!-- PANEL KANAN: KERANJANG & PENCARIAN -->
+                <div style="flex:1; min-width:320px;">
+                    <div style="background:white; padding:15px; border-radius:12px; border:1px solid #e2e8f0; margin-bottom:15px;">
+                        <h4 style="margin:0 0 10px 0; color:#ea580c;">2. Keranjang Zona Ini</h4>
+                        <div id="bmCartContainer" style="max-height:150px; overflow-y:auto; background:#f8fafc; border:1px dashed #cbd5e1; border-radius:8px; padding:10px; font-size:12px; color:gray;">Keranjang masih kosong. Cari barang di bawah.</div>
+                    </div>
+
+                    <div style="background:white; padding:15px; border-radius:12px; border:1px solid #e2e8f0;">
+                        <h4 style="margin:0 0 10px 0; color:#16a34a;">3. Cari & Tambah Barang</h4>
+                        <div style="font-size:10px; color:#ef4444; margin-bottom:8px;">*Wajib isi Tanggal Mulai & Selesai di panel kiri sebelum mencari agar Radar Aktif.</div>
+                        <input type="text" id="bmSearchInput" placeholder="Ketik nama / kode alat (Contoh: Kabel RCA)" onkeyup="renderBuilderSearch()" style="width:100%; padding:10px; border-radius:8px; border:2px solid #16a34a; font-weight:bold; margin-bottom:10px; box-sizing:border-box;">
+                        <div id="bmSearchResult" style="max-height:200px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px; padding:5px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top:20px; text-align:right;">
+                <button onclick="submitMissionBuilder(this)" style="padding:15px 30px; background:#4f46e5; color:white; border:none; border-radius:10px; font-weight:900; cursor:pointer; font-size:16px; box-shadow:0 4px 6px rgba(79, 70, 229, 0.3);">🚀 SIMPAN & TERBITKAN MISI</button>
+            </div>
+        </div>
+    </div>`;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    renderBuilderSearch();
+}
+
+function checkBentrokJadwal(itemKode, tglMulaiWeb, tglSelesaiWeb) {
+    if(!itemKode || !tglMulaiWeb || !tglSelesaiWeb) return false;
+    let startA = new Date(tglMulaiWeb).getTime();
+    let endA = new Date(tglSelesaiWeb).getTime();
+    if(isNaN(startA) || isNaN(endA)) return false;
+
+    for (let m of allMissions) {
+        if(!m.tgl_mulai || !m.tgl_selesai) continue;
+        let startB = new Date(m.tgl_mulai).getTime();
+        let endB = new Date(m.tgl_selesai).getTime();
+        
+        let kodes = (m.kode_barang || "").toLowerCase().split(',').map(k=>k.trim());
+        if(kodes.includes(itemKode.toLowerCase())) {
+            // Logika Overlap Kalender (Saling menimpa)
+            if (startA <= endB && endA >= startB) return m.id_misi; 
+        }
+    }
+    return false; // Tidak bentrok, lampu hijau!
+}
+
+function renderBuilderSearch() {
+    const q = document.getElementById("bmSearchInput").value.toLowerCase();
+    const tglM = document.getElementById("bmTglMulai").value;
+    const tglS = document.getElementById("bmTglSelesai").value;
+    const container = document.getElementById("bmSearchResult");
+    
+    if(!tglM || !tglS) { container.innerHTML = `<div style="padding:10px; text-align:center; color:#ef4444; font-size:11px; font-weight:bold;">Isi Tanggal Mulai dan Selesai dulu di sebelah kiri!</div>`; return; }
+    if(q.length < 2) { container.innerHTML = `<div style="padding:10px; text-align:center; color:#94a3b8; font-size:11px;">Ketik minimal 2 huruf untuk mencari barang gudang.</div>`; return; }
+    
+    let results = allItems.filter(i => (i.nama_barang||"").toLowerCase().includes(q) || (i.kode_barang||"").toLowerCase().includes(q) || (i.kode_wadah||"").toLowerCase().includes(q));
+    
+    if(results.length === 0) { container.innerHTML = `<div style="padding:10px; text-align:center; color:#ef4444; font-size:11px;">Barang tidak ditemukan.</div>`; return; }
+
+    let html = "";
+    results.forEach(i => {
+        let kode = i.kode_barang || "-";
+        let wadahText = i.kode_wadah ? `[Wadah: ${i.kode_wadah}]` : "";
+        let inCart = builderCart.some(c => c.kode === kode);
+        
+        let bentrokMisi = checkBentrokJadwal(kode, tglM, tglS);
+        
+        if (bentrokMisi) {
+            html += `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px; margin-bottom:5px; background:#fef2f2; border:1px solid #fecaca; border-radius:8px; opacity:0.7;">
+                <div><div style="font-weight:bold; font-size:12px; color:#991b1b;">${i.nama_barang}</div><div style="font-size:10px; color:#dc2626;">#${kode} ${wadahText} <br>🔒 BENTROK (Misi: ${bentrokMisi})</div></div>
+                <button disabled style="background:#fca5a5; color:white; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; font-size:11px;">Terkunci</button>
+            </div>`;
+        } else if (inCart) {
+            html += `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px; margin-bottom:5px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px;">
+                <div><div style="font-weight:bold; font-size:12px; color:#166534;">${i.nama_barang}</div><div style="font-size:10px; color:#16a34a;">#${kode} ${wadahText}</div></div>
+                <button onclick="removeFromCart('${kode}')" style="background:#ef4444; color:white; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; font-size:11px; cursor:pointer;">Batal</button>
+            </div>`;
+        } else {
+            html += `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px; margin-bottom:5px; background:white; border:1px solid #cbd5e1; border-radius:8px;">
+                <div><div style="font-weight:bold; font-size:12px; color:#1e293b;">${i.nama_barang}</div><div style="font-size:10px; color:#64748b;">#${kode} ${wadahText}</div></div>
+                <button onclick="addToCart('${kode}', '${i.nama_barang.replace(/'/g, "\\'")}')" style="background:#16a34a; color:white; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; font-size:11px; cursor:pointer;">+ Tambah</button>
+            </div>`;
+        }
+    });
+    container.innerHTML = html;
+}
+
+function addToCart(kode, nama) { 
+    if(kode === "-") { alert("Barang tidak memiliki kode unik!"); return; }
+    builderCart.push({kode: kode, nama: nama}); 
+    renderBuilderCart(); renderBuilderSearch(); 
+}
+function removeFromCart(kode) { 
+    builderCart = builderCart.filter(c => c.kode !== kode); 
+    renderBuilderCart(); renderBuilderSearch(); 
+}
+function renderBuilderCart() {
+    const container = document.getElementById("bmCartContainer");
+    if(builderCart.length === 0) { container.innerHTML = "Keranjang masih kosong. Cari barang di bawah."; return; }
+    let html = "";
+    builderCart.forEach(c => {
+        html += `<div style="display:inline-block; background:#ea580c; color:white; padding:4px 8px; border-radius:6px; margin:2px; font-size:10px; font-weight:bold;">${c.nama} (#${c.kode}) <span onclick="removeFromCart('${c.kode}')" style="margin-left:5px; cursor:pointer; color:#fef08a;">✖</span></div>`;
+    });
+    container.innerHTML = html;
+}
+
+async function submitMissionBuilder(btn) {
+    const dbKota = document.getElementById("bmDbKota").value;
+    const tglMulai = document.getElementById("bmTglMulai").value;
+    const tglSelesai = document.getElementById("bmTglSelesai").value;
+    const idMisi = document.getElementById("bmMissionId").value.trim().toUpperCase();
+    const zona = document.getElementById("bmZona").value.trim();
+
+    if(!tglMulai || !tglSelesai) { alert("⚠️ Tanggal Mulai dan Selesai wajib diisi!"); return; }
+    if(!idMisi || !zona) { alert("⚠️ ID Misi dan Zona wajib diisi!"); return; }
+    if(builderCart.length === 0) { alert("⚠️ Keranjang Zona masih kosong!"); return; }
+
+    let selectedCodes = builderCart.map(c => c.kode);
+
+    btn.disabled = true; btn.innerText = "MENGIRIM KE SERVER... 🚀";
+    try {
+        const payload = { 
+            action: "build_mission", pin: API_BACKEND_PIN, user_name: localStorage.getItem('av_session_nama') || "Kru Tanpa Nama", 
+            id_misi: idMisi, db_kota: dbKota, tgl_mulai: tglMulai, tgl_selesai: tglSelesai, zona_misi: zona, 
+            kodes: selectedCodes 
+        }; 
+        const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) }); 
+        const data = await response.json(); 
+        if(data.status === "success") { 
+            document.getElementById('builderModal').remove(); 
+            showToast(`✅ ${data.message}`); 
+            loadData(); 
+        } else { alert("Gagal:\n" + data.message); } 
+    } catch (e) { alert("Error Sistem:\n" + e.message); } finally { if(document.body.contains(btn)) { btn.disabled = false; btn.innerText = "🚀 SIMPAN & TERBITKAN MISI"; } }
+}
+
+// ==========================================
 // FUNGSI GUDANG MASSAL (BULK UPDATE)
 // ==========================================
-function toggleBulkMode() { isBulkMode = !isBulkMode; let bar = document.getElementById("bulkBar"); if(!bar) { document.body.insertAdjacentHTML('beforeend', `<div id="bulkBar" class="bulk-bar" style="position:fixed; bottom:0; left:0; right:0; background:#1e293b; color:white; padding:12px 15px; z-index:9000; display:none; justify-content:space-between; align-items:center;"><span id="bulkCount" class="bulk-info" style="font-weight:bold; font-size:12px;">0 Terpilih</span><div style="display:flex; gap:6px;"><button onclick="selectAllVisible()" style="background:#e2e8f0; color:#334155; border:none; padding:8px 10px; border-radius:6px; font-weight:bold; font-size:11px;">☑️</button><button onclick="openAssignMissionModal()" style="padding:8px 10px; font-size:11px; background:#2563eb; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">🎯 Misi/Event</button><button onclick="openBulkUpdateModal()" class="btn-bulk-process" style="padding:8px 10px; font-size:11px; background:#ea580c; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">⚙️ Status/Lokasi</button></div></div>`); bar = document.getElementById("bulkBar"); } const btnMode = document.getElementById("btnBulkMode"); if (isBulkMode) { if(btnMode) { btnMode.innerHTML = `❌ Batal Pilih`; btnMode.style.background = "#ef4444"; } bar.style.display = "flex"; } else { if(btnMode) { btnMode.innerHTML = `☑️ Mode Pilih`; btnMode.style.background = "#ea580c"; } bar.style.display = "none"; selectedRows.clear(); document.getElementById("bulkCount").innerText = `0 Terpilih`; } applyFilters(); }
+function toggleBulkMode() { isBulkMode = !isBulkMode; let bar = document.getElementById("bulkBar"); if(!bar) { document.body.insertAdjacentHTML('beforeend', `<div id="bulkBar" class="bulk-bar" style="position:fixed; bottom:0; left:0; right:0; background:#1e293b; color:white; padding:12px 15px; z-index:9000; display:none; justify-content:space-between; align-items:center;"><span id="bulkCount" class="bulk-info" style="font-weight:bold; font-size:12px;">0 Terpilih</span><div style="display:flex; gap:6px;"><button onclick="selectAllVisible()" style="background:#e2e8f0; color:#334155; border:none; padding:8px 10px; border-radius:6px; font-weight:bold; font-size:11px;">☑️</button><button onclick="openAssignMissionModal()" style="padding:8px 10px; font-size:11px; background:#2563eb; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">🎯 Misi Cepat</button><button onclick="openBulkUpdateModal()" class="btn-bulk-process" style="padding:8px 10px; font-size:11px; background:#ea580c; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">⚙️ Ubah Status/Lokasi</button></div></div>`); bar = document.getElementById("bulkBar"); } const btnMode = document.getElementById("btnBulkMode"); if (isBulkMode) { if(btnMode) { btnMode.innerHTML = `❌ Batal Pilih`; btnMode.style.background = "#ef4444"; } bar.style.display = "flex"; } else { if(btnMode) { btnMode.innerHTML = `☑️ Mode Pilih`; btnMode.style.background = "#ea580c"; } bar.style.display = "none"; selectedRows.clear(); document.getElementById("bulkCount").innerText = `0 Terpilih`; } applyFilters(); }
 function toggleSelection(rowIndex) { if (selectedRows.has(rowIndex)) selectedRows.delete(rowIndex); else selectedRows.add(rowIndex); document.getElementById("bulkCount").innerText = `${selectedRows.size} Terpilih`; applyFilters(); }
 function selectAllVisible() { getFilteredData().forEach(item => selectedRows.add(item.row_index)); document.getElementById("bulkCount").innerText = `${selectedRows.size} Terpilih`; applyFilters(); }
 
@@ -249,9 +430,7 @@ async function processBulkUpdate(btn) {
 }
 
 async function saveEditLokasiStatus(rowIndex) { 
-    const btn = event.target; 
-    const newLokasi = document.getElementById("editLokasi").value; 
-    const newStatus = document.getElementById("editStatus").value; 
+    const btn = event.target; const newLokasi = document.getElementById("editLokasi").value; const newStatus = document.getElementById("editStatus").value; 
     btn.disabled = true; btn.innerText = "MENYIMPAN..."; 
     try { 
         const payload = { action: "update_status_lokasi", pin: API_BACKEND_PIN, user_name: localStorage.getItem('av_session_nama') || "Kru Tanpa Nama", rows: [rowIndex], new_lokasi: newLokasi, new_status: newStatus, new_tujuan: "TETAP" }; 
@@ -267,14 +446,13 @@ function openAssignMissionModal() {
     <div id="assignModal" class="modal-overlay active">
         <div class="modal-content" style="max-width:400px; padding:25px; background:white; border-radius:15px; position:relative; text-align:left;">
             <button onclick="document.getElementById('assignModal').remove()" style="position:absolute; top:15px; right:15px; border:none; background:#fef2f2; color:#dc2626; width:30px; height:30px; border-radius:50%; font-weight:bold; cursor:pointer;">✕</button>
-            <h3 style="margin:0 0 10px 0; color:#2563eb; font-size:18px; font-weight:900;">🎯 Mission Planner</h3>
-            <div style="font-size:11px; color:#64748b; margin-bottom:15px; padding-bottom:10px; border-bottom:1px solid #e2e8f0;">Menugaskan <b>${selectedRows.size} Alat</b> ke lapangan.</div>
+            <h3 style="margin:0 0 10px 0; color:#2563eb; font-size:18px; font-weight:900;">🎯 Misi Cepat Lapangan</h3>
+            <div style="font-size:11px; color:#64748b; margin-bottom:15px; padding-bottom:10px; border-bottom:1px solid #e2e8f0;">(Legacy) Menugaskan <b>${selectedRows.size} Alat</b> secara massal.</div>
             
-            <label style="font-size:11px; font-weight:bold; color:#1e293b; display:block; margin-bottom:4px;">📍 Pilih Database Kota / Event:</label>
+            <label style="font-size:11px; font-weight:bold; color:#1e293b; display:block; margin-bottom:4px;">📍 Pilih Database Kota:</label>
             <select id="assignDbKota" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; font-weight:bold; margin-bottom:12px; background:#f8fafc;">
-                <option value="Database_Misi_Semarang">Event Semarang (Sheet: Database_Misi_Semarang)</option>
-                <option value="Database_Misi_Yogya">Event Yogyakarta (Sheet: Database_Misi_Yogya)</option>
-                <option value="Database_Misi_Jakarta">Event Jakarta (Sheet: Database_Misi_Jakarta)</option>
+                <option value="Database_Misi_Semarang">Event Semarang</option>
+                <option value="Database_Misi_Yogya">Event Yogyakarta</option>
             </select>
 
             <label style="font-size:11px; font-weight:bold; color:#1e293b; display:block; margin-bottom:4px;">🏷️ ID Misi Lapangan:</label>
@@ -291,9 +469,6 @@ function openAssignMissionModal() {
                 </div>
             </div>
 
-            <label style="font-size:11px; font-weight:bold; color:#1e293b; display:block; margin-bottom:4px;">📝 Instruksi / Tugas:</label>
-            <textarea id="assignTugasMisi" placeholder="Tarik kabel 25m ke titik panggung..." rows="2" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; margin-bottom:15px; font-size:12px; box-sizing:border-box; font-family:inherit;"></textarea>
-
             <button onclick="processAssignMission(this)" style="width:100%; padding:14px; background:#2563eb; color:white; border:none; border-radius:10px; font-weight:900; cursor:pointer; box-shadow:0 4px 6px rgba(37, 99, 235, 0.2);">🚀 TERBITKAN MISI</button>
         </div>
     </div>`; 
@@ -305,7 +480,6 @@ async function processAssignMission(btn) {
     const dbKota = document.getElementById("assignDbKota").value; 
     const zonaMisi = document.getElementById("assignZonaMisi").value.trim(); 
     const timMisi = document.getElementById("assignTimMisi").value.trim(); 
-    const tugasMisi = document.getElementById("assignTugasMisi").value.trim(); 
     
     if (!missionId) { alert("⚠️ ID Misi Wajib Diisi!"); return; } 
     
@@ -318,7 +492,7 @@ async function processAssignMission(btn) {
     try { 
         const payload = { 
             action: "assign_to_mission", pin: API_BACKEND_PIN, user_name: localStorage.getItem('av_session_nama') || "Kru Tanpa Nama", 
-            id_misi: missionId, db_kota: dbKota, zona_misi: zonaMisi, tim_misi: timMisi, tugas_misi: tugasMisi, 
+            id_misi: missionId, db_kota: dbKota, zona_misi: zonaMisi, tim_misi: timMisi, 
             new_tujuan: "Misi: " + missionId, rows: Array.from(selectedRows), kode_barang_array: selectedCodes 
         }; 
         const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) }); 
@@ -329,7 +503,7 @@ async function processAssignMission(btn) {
             showToast(`✅ ${data.message}`); 
             loadData(); 
         } else { alert("Gagal:\n" + data.message); } 
-    } catch (e) { alert("Error Sistem:\n" + e.message); } finally { btn.disabled = false; btn.innerText = "🚀 TERBITKAN MISI"; } 
+    } catch (e) { alert("Error Sistem:\n" + e.message); } finally { if(document.body.contains(btn)) { btn.disabled = false; btn.innerText = "🚀 TERBITKAN MISI"; } }
 }
 
 // ==========================================
@@ -350,7 +524,7 @@ function compressImage(file, maxWidth = 800) {
 }
 
 async function submitNewItem(e) { 
-    e.preventDefault(); const btn = document.getElementById("btnSubmitAdd"); btn.innerHTML = "⏳ MENGOMPRES FOTO... MOHON TUNGGU"; btn.style.background = "#94a3b8"; btn.disabled = true; await new Promise(r => setTimeout(r, 100)); 
+    e.preventDefault(); const btn = document.getElementById("btnSubmitAdd"); btn.innerHTML = "⏳ MENGOMPRES FOTO..."; btn.style.background = "#94a3b8"; btn.disabled = true; await new Promise(r => setTimeout(r, 100)); 
     try { 
         let base64Fotos = ["", "", ""]; let maxFiles = Math.min(pendingAddFotos.length, 3); 
         for (let i = 0; i < maxFiles; i++) { base64Fotos[i] = await compressImage(pendingAddFotos[i]); } 
@@ -388,7 +562,7 @@ function handleNewEditFotos(input) { if (!input.files || input.files.length === 
 function removeEditFoto(index) { pendingEditFotos.splice(index, 1); renderPreviewEditFotos(); }
 
 async function submitEditFull(e) { 
-    e.preventDefault(); const btn = document.getElementById("btnSubmitEditFull"); btn.innerHTML = "⏳ MENGOMPRES FOTO... MOHON TUNGGU"; btn.style.background = "#94a3b8"; btn.disabled = true; await new Promise(r => setTimeout(r, 100)); 
+    e.preventDefault(); const btn = document.getElementById("btnSubmitEditFull"); btn.innerHTML = "⏳ MENGOMPRES FOTO..."; btn.style.background = "#94a3b8"; btn.disabled = true; await new Promise(r => setTimeout(r, 100)); 
     try { 
         let finalFotos = ["", "", ""]; 
         for(let i = 0; i < 3; i++) { let photoItem = pendingEditFotos[i]; if (photoItem) { if (photoItem.status === 'new') { finalFotos[i] = await compressImage(photoItem.file); } else if (photoItem.status === 'existing') { finalFotos[i] = photoItem.originalId; } } else { finalFotos[i] = ""; } } 
@@ -400,161 +574,7 @@ async function submitEditFull(e) {
 }
 
 // ==========================================
-// FITUR LAPOR DEVELOPER (UI)
-// ==========================================
-function injectFeedbackUI() {
-    if (document.getElementById("btnFeedbackFloat")) return;
-    const fabHtml = `
-        <button id="btnFeedbackFloat" onclick="openFeedbackModal()" style="position:fixed; bottom:20px; right:20px; width:50px; height:50px; border-radius:50%; background:#ea580c; color:white; font-size:24px; border:none; box-shadow:0 4px 15px rgba(234,88,12,0.4); cursor:pointer; z-index:8000; display:flex; justify-content:center; align-items:center; transition:0.2s;">🐞</button>
-    `;
-    const modalHtml = `
-        <div id="feedbackModal" class="modal-overlay">
-            <div class="modal-content" style="max-width:400px; background:white; padding:20px; border-radius:15px; text-align:left; position:relative;">
-                <button type="button" onclick="closeFeedbackModal()" style="position:absolute; top:15px; right:15px; border:none; background:#f1f5f9; width:30px; height:30px; border-radius:50%; font-weight:bold; cursor:pointer;">✕</button>
-                <h3 style="margin:0 0 5px 0; color:#0f172a;">Form Laporan & Ide 💡</h3>
-                <p style="font-size:11px; color:#64748b; margin-bottom:15px;">Pesan Anda akan langsung dikirim ke meja Developer.</p>
-                <form id="formFeedback" onsubmit="submitFeedback(event)">
-                    <label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">Tipe Pesan:</label>
-                    <select id="fbTipe" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; margin-bottom:12px; font-size:12px;" required>
-                        <option value="Bug">🐞 Lapor Error / Bug Sistem</option>
-                        <option value="Ide">💡 Saran Fitur Baru</option>
-                        <option value="Data">📦 Lapor Kendala Data Barang</option>
-                    </select>
-                    <label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">Detail Pesan:</label>
-                    <textarea id="fbPesan" rows="4" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; margin-bottom:12px; font-size:12px; font-family:inherit; resize:vertical; box-sizing:border-box;" placeholder="Ceritakan detail kendala atau ide di sini..." required></textarea>
-                    <label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">Nama Pelapor:</label>
-                    <input type="text" id="fbNama" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; margin-bottom:15px; font-size:12px; box-sizing:border-box;" placeholder="Nama Anda" required>
-                    <button type="submit" id="btnSubmitFb" style="width:100%; padding:12px; background:#10b981; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer; font-size:13px;">🚀 KIRIM PESAN KE DEV</button>
-                </form>
-            </div>
-        </div>
-    `;
-    document.body.insertAdjacentHTML('beforeend', fabHtml + modalHtml);
-}
-
-function openFeedbackModal() { const currentUser = localStorage.getItem('av_session_nama'); if(currentUser) document.getElementById('fbNama').value = currentUser; document.getElementById('feedbackModal').classList.add('active'); }
-function closeFeedbackModal() { document.getElementById('feedbackModal').classList.remove('active'); }
-async function submitFeedback(e) { e.preventDefault(); const btn = document.getElementById("btnSubmitFb"); btn.disabled = true; btn.innerHTML = "⏳ MENGIRIM..."; setTimeout(() => { showToast("✅ Laporan Berhasil Direkam! (Simulasi Fase 1)"); document.getElementById("formFeedback").reset(); closeFeedbackModal(); btn.disabled = false; btn.innerHTML = "🚀 KIRIM PESAN KE DEV"; }, 1000); }
-
-
-// ==========================================
-// FASE 2: REVOLUSI MESIN CETAK (PRINT ENGINE) - VERSI 59.0
-// ==========================================
-function printSuratJalan() { openPrintModal('co31'); }
-function printFormCO31() { openPrintModal('co31'); }
-
-function injectPrintModalUI() {
-    if (document.getElementById("modalPrintSettings")) return;
-    const modalHtml = `
-        <div id="modalPrintSettings" class="modal-overlay">
-            <div class="modal-content" style="max-width:400px; background:white; padding:25px; border-radius:15px; text-align:left; position:relative;">
-                <button type="button" onclick="closePrintModal()" style="position:absolute; top:15px; right:15px; border:none; background:#f1f5f9; width:30px; height:30px; border-radius:50%; font-weight:bold; cursor:pointer; color:#334155;">✕</button>
-                <h3 style="margin:0 0 5px 0; color:#2563eb; font-weight:900; font-size:18px;">🖨️ Pengaturan Cetak</h3>
-                <p style="font-size:11px; color:#64748b; margin-bottom:20px;">Pilih lokasi data dan format laporan yang akan dicetak.</p>
-
-                <input type="hidden" id="printType" value="co31"> <!-- Hanya CO-31 Sesuai Permintaan -->
-
-                <label style="font-size:11px; font-weight:bold; color:#1e293b; display:block; margin-bottom:6px;">📍 Pilih Sumber Data (Gudang/Event):</label>
-                <select id="printSource" style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1; margin-bottom:15px; font-size:12px; font-weight:bold; color:#334155; background:#f8fafc;">
-                    <option value="bawa">🛒 Fase Loading (Status: Akan Dibawa)</option>
-                    <option value="semua_gudang">🏢 Semua Alat Di Gudang (Status: Di Gudang)</option>
-                    <option value="semua_event">📍 Semua Event Aktif (Status: Sedang Dipakai/Event)</option>
-                </select>
-
-                <label style="font-size:11px; font-weight:bold; color:#1e293b; display:block; margin-bottom:6px;">📊 Pilih Format Dokumen:</label>
-                <select id="printFormat" style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1; margin-bottom:25px; font-size:12px; font-weight:bold; color:#334155; background:#f8fafc;">
-                    <option value="detail">Format Data Detail (Per Nomor & Koper)</option>
-                    <option value="kompak">Format Data Gabungan (Laporan Cabang)</option>
-                </select>
-
-                <button onclick="executePrint()" style="width:100%; padding:14px; background:#3b82f6; color:white; border:none; border-radius:10px; font-weight:900; cursor:pointer; font-size:13px; box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2); transition:0.2s;">🚀 CETAK DOKUMEN</button>
-            </div>
-        </div>
-    `;
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
-}
-
-function openPrintModal(defaultType) {
-    if(allItems.length === 0) return alert("Satelit belum selesai memuat data!");
-    document.getElementById("modalPrintSettings").classList.add("active");
-}
-
-function closePrintModal() { document.getElementById("modalPrintSettings").classList.remove("active"); }
-
-function executePrint() {
-    const type = document.getElementById("printType").value;
-    const source = document.getElementById("printSource").value;
-    const format = document.getElementById("printFormat").value;
-
-    let targetData = []; let titleContext = "";
-
-    // 1. FILTERING DATA BERDASARKAN STATUS FISIK (Lokasi Saat Ini)
-    if (source === "bawa") {
-        targetData = allItems.filter(i => i.status_digunakan === 'Akan Dibawa'); 
-        titleContext = "Fase Loading (Akan Dibawa)";
-    } else if (source === "semua_gudang") {
-        targetData = allItems.filter(i => i.status_digunakan === 'Di Gudang' || i.status_digunakan === 'FALSE'); 
-        titleContext = "Sisa Alat Di Gudang (Standby)";
-    } else {
-        targetData = allItems.filter(i => i.lokasi_saat_ini === 'Di Lokasi Event' || i.status_digunakan === 'Sedang Dipakai'); 
-        titleContext = "Semua Event Lapangan Aktif";
-    }
-
-    if (targetData.length === 0) { alert(`❌ Kosong! Tidak ditemukan barang untuk kategori: ${titleContext}`); return; }
-    targetData.sort((a, b) => (a.nama_barang || "").localeCompare(b.nama_barang || ""));
-
-    let printWin = window.open('', '', 'width=900,height=800');
-    let html = `<html><head><title>Print - ${titleContext}</title><style>@page { size: A4 portrait; margin: 15mm; } body { font-family: 'Arial', sans-serif; font-size:12px; color:#000; } table { width: 100%; border-collapse: collapse; margin-top: 15px; } th, td { border: 1px solid #000; padding: 6px 8px; text-align: left; vertical-align: top;} th { background: #f0f0f0; } .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; } .page-break { page-break-before: always; }</style></head><body onload="window.print()">`;
-
-    html += `<div class="header"><h2 style="margin:0;">LAMPIRAN DAFTAR BARANG (CO-31)</h2><p style="margin:5px 0 0 0; color:#444; font-size:13px;">Sumber Data Target: <b>${titleContext.toUpperCase()}</b></p></div>`;
-
-    // 2. PEMROSESAN FORMAT CETAK
-    if (format === "kompak") {
-        // --- FORMAT GABUNGAN (LAPORAN CABANG) ---
-        let grouped = {};
-        targetData.forEach(i => { let nama = (i.nama_barang || "Tanpa Nama").toUpperCase(); if(!grouped[nama]) grouped[nama] = 0; grouped[nama] += parseInt(i.jumlah || 1); });
-        let sortedNames = Object.keys(grouped).sort();
-
-        html += `<table><thead><tr><th style="width:8%; text-align:center;">No</th><th style="width:72%;">Nama Alat (Data Gabungan)</th><th style="width:20%; text-align:center;">Total (Qty)</th></tr></thead><tbody>`;
-        sortedNames.forEach((nama, idx) => { html += `<tr><td style="text-align:center;">${idx+1}</td><td>${nama}</td><td style="text-align:center; font-weight:bold;">${grouped[nama]} Pcs</td></tr>`; });
-        html += `</tbody></table><div style="margin-top:20px; font-size:11px; color:#555;"><i>*Format Gabungan: Barang dengan nama yang sama digabungkan otomatis untuk memudahkan pelaporan rekapitulasi ke kantor cabang.</i></div>`;
-    } 
-    else {
-        // --- FORMAT DETAIL (LAPORAN GUDANG - DESAIN BARU) ---
-        let groupedWadah = {}; let lepasan = []; let printedContainers = new Set();
-        targetData.forEach(item => { let wadah = (item.kode_wadah || "").toUpperCase().trim(); if (wadah) { if (!groupedWadah[wadah]) groupedWadah[wadah] = []; groupedWadah[wadah].push(item); printedContainers.add(wadah); } else { lepasan.push(item); } });
-
-        html += `<table><thead><tr><th style="width:12%; text-align:center;">Jumlah</th><th style="width:58%;">Uraian Detail Barang</th><th style="width:30%;">Checklist Pengecekan</th></tr></thead><tbody>`;
-        
-        // Render Isi Wadah
-        for (let wadah in groupedWadah) {
-            let boxItem = allItems.find(i => i.kode_barang && i.kode_barang.toUpperCase() === wadah); let boxName = boxItem ? boxItem.nama_barang.toUpperCase() : `WADAH #${wadah}`;
-            // Baris Hardcase: Font normal 12px, cetak tebal, ada Checklist.
-            html += `<tr style="background-color:#f8fafc;"><td style="text-align:center; font-weight:bold; font-size:12px; border-bottom:1px solid #ccc;">1 Pcs</td><td style="font-weight:bold; font-size:12px; border-bottom:1px solid #ccc;">🧰 ${boxName} (#${wadah})</td><td style="border-bottom:1px solid #ccc;">[ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ]</td></tr>`;
-            
-            // Baris Isi Hardcase: Font 10px, miring, tidak ada Checklist (dikosongkan).
-            groupedWadah[wadah].forEach(item => { html += `<tr><td style="text-align:center; font-size:10px; color:#555; border-bottom:1px dashed #e2e8f0;">${item.jumlah} Pcs</td><td style="padding-left:15px; color:#555; font-size:10px; font-style:italic; border-bottom:1px dashed #e2e8f0;">- ${item.nama_barang} ${item.kode_barang ? `(#${item.kode_barang})` : ''}</td><td style="border-bottom:1px dashed #e2e8f0;"></td></tr>`; });
-        }
-        
-        // Render Barang Lepasan
-        lepasan.forEach(item => { 
-            let kb = (item.kode_barang || "").toUpperCase().trim(); 
-            // Cek jika barang ini tidak bertindak sebagai wadah yang sudah dicetak di atas
-            if (!printedContainers.has(kb)) { 
-                // Baris Lepasan: Font normal 12px, cetak tebal, ada Checklist.
-                html += `<tr><td style="text-align:center; font-weight:bold; font-size:12px;">${item.jumlah} Pcs</td><td style="font-weight:bold; font-size:12px;">${item.nama_barang.toUpperCase()} ${item.kode_barang ? `(#${item.kode_barang})` : ''}</td><td>[ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ]</td></tr>`; 
-            } 
-        });
-        html += `</tbody></table>`;
-    }
-    
-    html += `<div style="margin-top: 20px; font-size:10px; color:#555; text-align:right;"><i>Dicetak oleh Modul Cetak Pintar AV pada: ${new Date().toLocaleString('id-ID')}</i></div></body></html>`;
-    
-    printWin.document.write(html); printWin.document.close(); closePrintModal(); 
-}
-
-// ==========================================
-// AKSI: DUPLIKAT BARANG DARI KARTU DETAIL
+// DUPLIKAT MASSAL DARI KARTU (SMART DUPLICATOR)
 // ==========================================
 async function duplicateItem(rowIndex) {
     let qtyInput = prompt("📦 Berapa banyak duplikat yang ingin dibuat?\n(Ketik angka, maksimal 50. Contoh: 5)", "1");
@@ -605,15 +625,76 @@ async function duplicateItem(rowIndex) {
     }
 }
 
-// === SCANNER QR ===
-function openScannerModal() { const oldModal = document.getElementById("tempScannerModal"); if(oldModal) oldModal.remove(); let modal = document.createElement("div"); modal.id = "tempScannerModal"; modal.className = "modal-overlay active"; modal.style.cssText = "position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.9); z-index: 999999; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(5px);"; modal.innerHTML = `<div class="modal-content" style="width: 90%; max-width: 400px; background: white; padding: 25px 20px; border-radius: 20px; text-align: center; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5);"><button onclick="closeScannerModal()" style="position: absolute; top: 15px; right: 15px; border: none; background: #fef2f2; color: #dc2626; width: 35px; height: 35px; border-radius: 50%; font-weight: bold; cursor: pointer; z-index: 9999; font-size: 16px;">✕</button><h3 style="margin: 0 0 5px 0; font-size: 18px; color: #0f172a; font-weight: 800;">📸 Scan Barcode</h3><p style="font-size: 12px; color: #64748b; margin-bottom: 15px;">Arahkan kamera ke QR/Barcode alat.</p><div id="qr-reader" style="width: 100%; border-radius: 12px; overflow: hidden; border: 2px solid #e2e8f0; min-height: 250px; background: #1e293b;"></div><div class="scanner-controls" style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;"><button class="btn-scanner-action" style="padding: 12px; border-radius: 12px; border: none; background: #f1f5f9; color:#0f172a; font-weight: bold; cursor: pointer; flex: 1; transition:0.2s;" onclick="toggleCameraFacing()">🔄 Balik Kamera</button><button class="btn-scanner-action" id="btnFlashlight" style="padding: 12px; border-radius: 12px; border: none; background: #f1f5f9; color:#0f172a; font-weight: bold; cursor: pointer; flex: 1; transition:0.2s;" onclick="toggleFlashlight()">🔦 Senter</button></div></div>`; document.body.appendChild(modal); isFlashlightOn = false; startScanner(); }
-function startScanner() { if(html5QrCode) { html5QrCode.stop().catch(e=>console.log(e)); html5QrCode = null; } html5QrCode = new Html5Qrcode("qr-reader"); let config = { fps: 10, qrbox: { width: 220, height: 220 } }; html5QrCode.start({ facingMode: currentCameraFacing }, config, (decodedText) => { const now = Date.now(); if (now - lastScanTime < 1500) return; lastScanTime = now; let scanResult = decodedText.trim(); try { if ("vibrate" in navigator) navigator.vibrate([200]); } catch(e){} if (isBulkMode) { const foundItem = allItems.find(i => (i.kode_barang||"").toString().toLowerCase() === scanResult.toLowerCase() || (i.kode_wadah||"").toString().toLowerCase() === scanResult.toLowerCase()); if (foundItem) { if (!selectedRows.has(foundItem.row_index)) { selectedRows.add(foundItem.row_index); document.getElementById("bulkCount").innerText = `${selectedRows.size} Terpilih`; applyFilters(); showToast(`✅ ${foundItem.nama_barang} ditambahkan!`); } else { showToast(`⚠️ ${foundItem.nama_barang} sudah terpilih!`); } } else { try { if ("vibrate" in navigator) navigator.vibrate([300, 100, 300]); } catch(e){} showToast(`❌ Kode [${scanResult}] tidak ada di database!`, false); } } else { closeScannerModal(); const searchBox = document.getElementById('searchInput'); if(searchBox) { searchBox.value = scanResult; setFilterPill('all', document.querySelector('.pill-btn[data-filter="all"]')); applyFilters(); const foundItem = allItems.find(i => (i.kode_barang||"").toString().toLowerCase() === scanResult.toLowerCase() || (i.kode_wadah||"").toString().toLowerCase() === scanResult.toLowerCase()); if (foundItem) { setTimeout(() => openDetailModal(foundItem), 300); } else { showToast(`❌ Barang [${scanResult}] tidak ditemukan!`, false); } } } }, (errorMessage) => { } ).catch(err => { alert("Gagal membuka kamera: " + err); closeScannerModal(); }); }
-function toggleCameraFacing() { currentCameraFacing = currentCameraFacing === "environment" ? "user" : "environment"; showToast("Mengganti kamera...", true); if (html5QrCode) { html5QrCode.stop().then(() => { setTimeout(startScanner, 300); }).catch(err => console.log(err)); } }
-function toggleFlashlight() { if (!html5QrCode) return; isFlashlightOn = !isFlashlightOn; html5QrCode.applyVideoConstraints({ advanced: [{ torch: isFlashlightOn }] }).then(() => { document.getElementById("btnFlashlight").style.background = isFlashlightOn ? "#fef08a" : "#f1f5f9"; }).catch(err => { showToast("Senter tidak didukung atau kamera depan aktif.", false); isFlashlightOn = false; document.getElementById("btnFlashlight").style.background = "#f1f5f9"; }); }
-function closeScannerModal() { if (html5QrCode) { html5QrCode.stop().catch(e=>console.log(e)); html5QrCode = null; } const m = document.getElementById("tempScannerModal"); if(m) m.remove(); }
+// ==========================================
+// FITUR LAPOR DEVELOPER (UI) & PRINT ENGINE
+// ==========================================
+function injectFeedbackUI() {
+    if (document.getElementById("btnFeedbackFloat")) return;
+    const fabHtml = `<button id="btnFeedbackFloat" onclick="openFeedbackModal()" style="position:fixed; bottom:20px; right:20px; width:50px; height:50px; border-radius:50%; background:#ea580c; color:white; font-size:24px; border:none; box-shadow:0 4px 15px rgba(234,88,12,0.4); cursor:pointer; z-index:8000;">🐞</button>`;
+    const modalHtml = `<div id="feedbackModal" class="modal-overlay"><div class="modal-content" style="max-width:400px; background:white; padding:20px; border-radius:15px; text-align:left; position:relative;"><button type="button" onclick="closeFeedbackModal()" style="position:absolute; top:15px; right:15px; border:none; background:#f1f5f9; width:30px; height:30px; border-radius:50%; font-weight:bold; cursor:pointer;">✕</button><h3 style="margin:0 0 5px 0; color:#0f172a;">Form Laporan 💡</h3><p style="font-size:11px; color:#64748b; margin-bottom:15px;">Kirim pesan ke meja Developer.</p><form id="formFeedback" onsubmit="submitFeedback(event)"><select id="fbTipe" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; margin-bottom:12px; font-size:12px;" required><option value="Bug">🐞 Lapor Error</option></select><textarea id="fbPesan" rows="4" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; margin-bottom:12px; font-size:12px; box-sizing:border-box;" required></textarea><input type="text" id="fbNama" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; margin-bottom:15px; font-size:12px; box-sizing:border-box;" required><button type="submit" id="btnSubmitFb" style="width:100%; padding:12px; background:#10b981; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">🚀 KIRIM</button></form></div></div>`;
+    document.body.insertAdjacentHTML('beforeend', fabHtml + modalHtml);
+}
+function openFeedbackModal() { const currentUser = localStorage.getItem('av_session_nama'); if(currentUser) document.getElementById('fbNama').value = currentUser; document.getElementById('feedbackModal').classList.add('active'); }
+function closeFeedbackModal() { document.getElementById('feedbackModal').classList.remove('active'); }
+async function submitFeedback(e) { e.preventDefault(); const btn = document.getElementById("btnSubmitFb"); btn.disabled = true; btn.innerHTML = "⏳ MENGIRIM..."; setTimeout(() => { showToast("✅ Laporan Terekam!"); document.getElementById("formFeedback").reset(); closeFeedbackModal(); btn.disabled = false; btn.innerHTML = "🚀 KIRIM"; }, 1000); }
+
+function printSuratJalan() { openPrintModal('co31'); }
+function printFormCO31() { openPrintModal('co31'); }
+function injectPrintModalUI() {
+    if (document.getElementById("modalPrintSettings")) return;
+    const modalHtml = `<div id="modalPrintSettings" class="modal-overlay"><div class="modal-content" style="max-width:400px; background:white; padding:25px; border-radius:15px; text-align:left; position:relative;"><button type="button" onclick="closePrintModal()" style="position:absolute; top:15px; right:15px; border:none; background:#f1f5f9; width:30px; height:30px; border-radius:50%; font-weight:bold; cursor:pointer;">✕</button><h3 style="margin:0 0 5px 0; color:#2563eb; font-weight:900; font-size:18px;">🖨️ Pengaturan Cetak</h3><input type="hidden" id="printType" value="co31"><label style="font-size:11px; font-weight:bold; color:#1e293b; display:block; margin-bottom:6px;">📍 Sumber Data:</label><select id="printSource" style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1; margin-bottom:15px; font-size:12px; font-weight:bold; background:#f8fafc;"><option value="bawa">🛒 Fase Loading (Akan Dibawa)</option><option value="semua_gudang">🏢 Semua Alat Di Gudang</option><option value="semua_event">📍 Semua Event Aktif</option></select><label style="font-size:11px; font-weight:bold; color:#1e293b; display:block; margin-bottom:6px;">📊 Format Cetak:</label><select id="printFormat" style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1; margin-bottom:25px; font-size:12px; font-weight:bold; background:#f8fafc;"><option value="detail">Format Data Detail</option><option value="kompak">Format Gabungan</option></select><button onclick="executePrint()" style="width:100%; padding:14px; background:#3b82f6; color:white; border:none; border-radius:10px; font-weight:900; cursor:pointer;">🚀 CETAK DOKUMEN</button></div></div>`;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+function openPrintModal() { if(allItems.length === 0) return alert("Satelit memuat data!"); document.getElementById("modalPrintSettings").classList.add("active"); }
+function closePrintModal() { document.getElementById("modalPrintSettings").classList.remove("active"); }
+function executePrint() {
+    const source = document.getElementById("printSource").value; const format = document.getElementById("printFormat").value;
+    let targetData = []; let titleContext = "";
+    if (source === "bawa") { targetData = allItems.filter(i => i.status_digunakan === 'Akan Dibawa'); titleContext = "Fase Loading (Akan Dibawa)"; } 
+    else if (source === "semua_gudang") { targetData = allItems.filter(i => i.status_digunakan === 'Di Gudang' || i.status_digunakan === 'FALSE'); titleContext = "Sisa Alat Di Gudang (Standby)"; } 
+    else { targetData = allItems.filter(i => i.lokasi_saat_ini === 'Di Lokasi Event' || i.status_digunakan === 'Sedang Dipakai'); titleContext = "Semua Event Lapangan Aktif"; }
+
+    if (targetData.length === 0) { alert(`❌ Kosong! Tidak ditemukan barang untuk kategori: ${titleContext}`); return; }
+    targetData.sort((a, b) => (a.nama_barang || "").localeCompare(b.nama_barang || ""));
+
+    let printWin = window.open('', '', 'width=900,height=800');
+    let html = `<html><head><title>Print - ${titleContext}</title><style>@page { size: A4 portrait; margin: 15mm; } body { font-family: 'Arial', sans-serif; font-size:12px; color:#000; } table { width: 100%; border-collapse: collapse; margin-top: 15px; } th, td { border: 1px solid #000; padding: 6px 8px; text-align: left; vertical-align: top;} th { background: #f0f0f0; } .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; }</style></head><body onload="window.print()">`;
+    html += `<div class="header"><h2 style="margin:0;">LAMPIRAN DAFTAR BARANG (CO-31)</h2><p style="margin:5px 0 0 0; color:#444; font-size:13px;">Sumber Data Target: <b>${titleContext.toUpperCase()}</b></p></div>`;
+
+    if (format === "kompak") {
+        let grouped = {}; targetData.forEach(i => { let nama = (i.nama_barang || "Tanpa Nama").toUpperCase(); if(!grouped[nama]) grouped[nama] = 0; grouped[nama] += parseInt(i.jumlah || 1); });
+        let sortedNames = Object.keys(grouped).sort();
+        html += `<table><thead><tr><th style="width:8%; text-align:center;">No</th><th style="width:72%;">Nama Alat (Data Gabungan)</th><th style="width:20%; text-align:center;">Total (Qty)</th></tr></thead><tbody>`;
+        sortedNames.forEach((nama, idx) => { html += `<tr><td style="text-align:center;">${idx+1}</td><td>${nama}</td><td style="text-align:center; font-weight:bold;">${grouped[nama]} Pcs</td></tr>`; });
+        html += `</tbody></table><div style="margin-top:20px; font-size:11px; color:#555;"><i>*Format Gabungan otomatis untuk merekap barang sejenis.</i></div>`;
+    } else {
+        let groupedWadah = {}; let lepasan = []; let printedContainers = new Set();
+        targetData.forEach(item => { let wadah = (item.kode_wadah || "").toUpperCase().trim(); if (wadah) { if (!groupedWadah[wadah]) groupedWadah[wadah] = []; groupedWadah[wadah].push(item); printedContainers.add(wadah); } else { lepasan.push(item); } });
+        html += `<table><thead><tr><th style="width:12%; text-align:center;">Jumlah</th><th style="width:58%;">Uraian Detail Barang</th><th style="width:30%;">Checklist Pengecekan</th></tr></thead><tbody>`;
+        for (let wadah in groupedWadah) {
+            let boxItem = allItems.find(i => i.kode_barang && i.kode_barang.toUpperCase() === wadah); let boxName = boxItem ? boxItem.nama_barang.toUpperCase() : `WADAH #${wadah}`;
+            html += `<tr style="background-color:#f8fafc;"><td style="text-align:center; font-weight:bold; font-size:12px; border-bottom:1px solid #ccc;">1 Pcs</td><td style="font-weight:bold; font-size:12px; border-bottom:1px solid #ccc;">🧰 ${boxName} (#${wadah})</td><td style="border-bottom:1px solid #ccc;">[ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ]</td></tr>`;
+            groupedWadah[wadah].forEach(item => { html += `<tr><td style="text-align:center; font-size:10px; color:#555; border-bottom:1px dashed #e2e8f0;">${item.jumlah} Pcs</td><td style="padding-left:15px; color:#555; font-size:10px; font-style:italic; border-bottom:1px dashed #e2e8f0;">- ${item.nama_barang} ${item.kode_barang ? `(#${item.kode_barang})` : ''}</td><td style="border-bottom:1px dashed #e2e8f0;"></td></tr>`; });
+        }
+        lepasan.forEach(item => { 
+            let kb = (item.kode_barang || "").toUpperCase().trim(); 
+            if (!printedContainers.has(kb)) html += `<tr><td style="text-align:center; font-weight:bold; font-size:12px;">${item.jumlah} Pcs</td><td style="font-weight:bold; font-size:12px;">${item.nama_barang.toUpperCase()} ${item.kode_barang ? `(#${item.kode_barang})` : ''}</td><td>[ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ]</td></tr>`; 
+        });
+        html += `</tbody></table>`;
+    }
+    html += `<div style="margin-top: 20px; font-size:10px; color:#555; text-align:right;"><i>Dicetak pada: ${new Date().toLocaleString('id-ID')}</i></div></body></html>`;
+    printWin.document.write(html); printWin.document.close(); closePrintModal(); 
+}
 
 // === EXCEL EXPORT ===
 const btnBukaFilter = document.getElementById('btnBukaFilter'); const panelFilter = document.getElementById('panelFilterLanjutan'); if (btnBukaFilter && panelFilter) { btnBukaFilter.replaceWith(btnBukaFilter.cloneNode(true)); const newBtnBukaFilter = document.getElementById('btnBukaFilter'); newBtnBukaFilter.addEventListener('click', () => { if (panelFilter.style.display === 'none') { panelFilter.style.display = 'block'; newBtnBukaFilter.innerHTML = '❌ TUTUP FILTER'; newBtnBukaFilter.style.background = '#ef4444'; } else { panelFilter.style.display = 'none'; newBtnBukaFilter.innerHTML = '⚙️ FILTER TIM'; newBtnBukaFilter.style.background = '#334155'; } }); }
 function exportToExcel() { if (!allItems || allItems.length === 0) { alert("⚠️ Data inventaris belum selesai dimuat dari satelit!"); return; } const selectLokasi = document.getElementById('exportLokasi'); const selectTim = document.getElementById('exportTim'); selectLokasi.innerHTML = '<option value="ALL">📦 Semua Gudang / Lokasi</option>'; selectTim.innerHTML = '<option value="ALL">👥 Semua Tim</option>'; let daftarGudang = new Set(); let daftarTim = new Set(); allItems.forEach(item => { let lok = item.lokasi_saat_ini || item.lokasi || item["Lokasi Saat Ini"] || ""; if (lok && lok.trim() !== "") { daftarGudang.add(lok.trim()); } let tim = item.tim || item["Tim"] || ""; if (tim && tim.trim() !== "") { daftarTim.add(tim.trim()); } }); if(daftarGudang.size === 0) { daftarGudang.add("Gudang Kanguru"); daftarGudang.add("Gudang Mrican"); daftarGudang.add("Gedung UTC"); daftarGudang.add("Di Lokasi Event"); } daftarGudang.forEach(gudang => { let opt = document.createElement('option'); opt.value = gudang; opt.text = `📍 ${gudang}`; selectLokasi.appendChild(opt); }); daftarTim.forEach(tim => { let opt = document.createElement('option'); opt.value = tim; opt.text = `🏷️ ${tim}`; selectTim.appendChild(opt); }); const modal = document.getElementById('modalExport'); if(modal) { modal.style.display = 'flex'; modal.classList.add('active'); } }
 function closeExportModal() { const modal = document.getElementById('modalExport'); if(modal) { modal.style.display = 'none'; modal.classList.remove('active'); } }
 function executeCustomExport() { let dataToExport = getFilteredData(); if (dataToExport.length === 0) { alert("❌ Kosong! Tidak ada barang yang tampil di layar."); return; } let csvContent = "data:text/csv;charset=utf-8,Kode Barang,Nama Alat,Wadah,Kondisi,Lokasi Gudang,Status Pemakaian,Total Qty,Tim Terkait\n"; dataToExport.forEach(row => { let nama = `"${(row.nama_barang || "").replace(/"/g, '""')}"`; let kode = `"${row.kode_barang || "-"}"`; let wadah = `"${row.kode_wadah || "-"}"`; let kondisi = `"${row.kondisi || "Bagus"}"`; let lokasi = `"${row.lokasi_saat_ini || row.lokasi || row["Lokasi Saat Ini"] || "Gudang Kanguru"}"`; let status = `"${row.status_digunakan && row.status_digunakan !== 'FALSE' ? row.status_digunakan : 'Di Gudang'}"`; let qty = `"${row.jumlah || 1}"`; let tim = `"${row.tim || "-"}"`; csvContent += `${kode},${nama},${wadah},${kondisi},${lokasi},${status},${qty},${tim}\n`; }); let encodedUri = encodeURI(csvContent); let link = document.createElement("a"); link.setAttribute("href", encodedUri); let dateStr = new Date().toISOString().slice(0,10); link.setAttribute("download", `Laporan_GudangAV_${dateStr}.csv`); document.body.appendChild(link); link.click(); document.body.removeChild(link); closeExportModal(); showToast(`✅ SUKSES: ${dataToExport.length} data diekspor!`); }
+
+// === SCANNER QR ===
+function openScannerModal() { const oldModal = document.getElementById("tempScannerModal"); if(oldModal) oldModal.remove(); let modal = document.createElement("div"); modal.id = "tempScannerModal"; modal.className = "modal-overlay active"; modal.style.cssText = "position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.9); z-index: 999999; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(5px);"; modal.innerHTML = `<div class="modal-content" style="width: 90%; max-width: 400px; background: white; padding: 25px 20px; border-radius: 20px; text-align: center; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5);"><button onclick="closeScannerModal()" style="position: absolute; top: 15px; right: 15px; border: none; background: #fef2f2; color: #dc2626; width: 35px; height: 35px; border-radius: 50%; font-weight: bold; cursor: pointer; z-index: 9999; font-size: 16px;">✕</button><h3 style="margin: 0 0 5px 0; font-size: 18px; color: #0f172a; font-weight: 800;">📸 Scan Barcode</h3><div id="qr-reader" style="width: 100%; border-radius: 12px; overflow: hidden; border: 2px solid #e2e8f0; min-height: 250px; background: #1e293b;"></div><div class="scanner-controls" style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;"><button class="btn-scanner-action" style="padding: 12px; border-radius: 12px; border: none; background: #f1f5f9; color:#0f172a; font-weight: bold; cursor: pointer; flex: 1;" onclick="toggleCameraFacing()">🔄 Balik Kamera</button><button class="btn-scanner-action" id="btnFlashlight" style="padding: 12px; border-radius: 12px; border: none; background: #f1f5f9; color:#0f172a; font-weight: bold; cursor: pointer; flex: 1;" onclick="toggleFlashlight()">🔦 Senter</button></div></div>`; document.body.appendChild(modal); isFlashlightOn = false; startScanner(); }
+function startScanner() { if(html5QrCode) { html5QrCode.stop().catch(e=>console.log(e)); html5QrCode = null; } html5QrCode = new Html5Qrcode("qr-reader"); let config = { fps: 10, qrbox: { width: 220, height: 220 } }; html5QrCode.start({ facingMode: currentCameraFacing }, config, (decodedText) => { const now = Date.now(); if (now - lastScanTime < 1500) return; lastScanTime = now; let scanResult = decodedText.trim(); try { if ("vibrate" in navigator) navigator.vibrate([200]); } catch(e){} if (isBulkMode) { const foundItem = allItems.find(i => (i.kode_barang||"").toString().toLowerCase() === scanResult.toLowerCase() || (i.kode_wadah||"").toString().toLowerCase() === scanResult.toLowerCase()); if (foundItem) { if (!selectedRows.has(foundItem.row_index)) { selectedRows.add(foundItem.row_index); document.getElementById("bulkCount").innerText = `${selectedRows.size} Terpilih`; applyFilters(); showToast(`✅ ${foundItem.nama_barang} ditambahkan!`); } else { showToast(`⚠️ ${foundItem.nama_barang} sudah terpilih!`); } } else { try { if ("vibrate" in navigator) navigator.vibrate([300, 100, 300]); } catch(e){} showToast(`❌ Kode [${scanResult}] tidak ada di database!`, false); } } else { closeScannerModal(); const searchBox = document.getElementById('searchInput'); if(searchBox) { searchBox.value = scanResult; setFilterPill('all', document.querySelector('.pill-btn[data-filter="all"]')); applyFilters(); const foundItem = allItems.find(i => (i.kode_barang||"").toString().toLowerCase() === scanResult.toLowerCase() || (i.kode_wadah||"").toString().toLowerCase() === scanResult.toLowerCase()); if (foundItem) { setTimeout(() => openDetailModal(foundItem), 300); } else { showToast(`❌ Barang [${scanResult}] tidak ditemukan!`, false); } } } }, (errorMessage) => { } ).catch(err => { alert("Gagal membuka kamera: " + err); closeScannerModal(); }); }
+function toggleCameraFacing() { currentCameraFacing = currentCameraFacing === "environment" ? "user" : "environment"; showToast("Mengganti kamera...", true); if (html5QrCode) { html5QrCode.stop().then(() => { setTimeout(startScanner, 300); }).catch(err => console.log(err)); } }
+function toggleFlashlight() { if (!html5QrCode) return; isFlashlightOn = !isFlashlightOn; html5QrCode.applyVideoConstraints({ advanced: [{ torch: isFlashlightOn }] }).then(() => { document.getElementById("btnFlashlight").style.background = isFlashlightOn ? "#fef08a" : "#f1f5f9"; }).catch(err => { showToast("Senter tidak didukung.", false); isFlashlightOn = false; document.getElementById("btnFlashlight").style.background = "#f1f5f9"; }); }
+function closeScannerModal() { if (html5QrCode) { html5QrCode.stop().catch(e=>console.log(e)); html5QrCode = null; } const m = document.getElementById("tempScannerModal"); if(m) m.remove(); }

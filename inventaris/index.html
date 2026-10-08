@@ -6,7 +6,7 @@ location: "MASTER"
 <head>
     {% include head.html %}
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-    <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/custom-gudang.css?v=62.0">
+    <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/custom-gudang.css?v=62.5">
     
     <style>
         .form-input { width: 100%; padding: 10px; margin-bottom: 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 12px; }
@@ -24,7 +24,6 @@ location: "MASTER"
         .zoom-overlay.active { opacity: 1; pointer-events: auto; }
         .zoom-overlay img { max-width: 95vw; max-height: 90vh; object-fit: contain; border-radius: 8px; }
         
-        /* PERBAIKAN SPACING LIST VIEW MINIMALIS */
         .list-view-container { display: flex; flex-direction: column; gap: 6px; max-width: 1200px; margin: 0 auto; padding-bottom: 80px; }
         .list-item { display: flex; align-items: flex-start; gap: 10px; background: white; padding: 8px 10px; border-radius: 8px; border: 1px solid #e2e8f0; cursor: pointer; position: relative; }
         .list-item.selected { border-color: #3b82f6; background: #eff6ff; border-width: 2px; padding: 7px 9px; }
@@ -33,23 +32,16 @@ location: "MASTER"
         .list-title { font-weight: 800; font-size: 12px; margin: 0 0 2px 0; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
         .toast-msg { z-index: 9999999 !important; }
         
-        /* FIX OVERLAP SAAT SCROLL (TEMBOK PENAHAN FULL WIDTH) */
-        .toolbar-card {
-            position: sticky;
-            top: 0;
-            z-index: 95;
-            background: #ffffff;
-            margin: 0 -10px 10px -10px;
-            padding: 15px 10px 15px 10px;
-            border-bottom: 1px solid #e2e8f0;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-        }
+        .toolbar-card { position: sticky; top: 0; z-index: 95; background: #ffffff; margin: 0 -10px 10px -10px; padding: 15px 10px 15px 10px; border-bottom: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
         body.dark-mode .toolbar-card { background: #0f172a; border-bottom: 1px solid #1e293b; }
 
-        /* GEMBOK KEAMANAN: Tombol disembunyikan dari Publik secara baku */
-        .aksi-misi, .aksi-gudang { 
-            display: none !important; 
-        }
+        /* Menyembunyikan tombol dari publik */
+        .aksi-misi, .aksi-gudang { display: none !important; }
+        
+        /* Desain Dropdown Filter yang lebih elegan */
+        .modern-select { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px 12px; font-size: 11px; font-weight: bold; color: #334155; cursor: pointer; outline: none; transition: 0.2s; }
+        .modern-select:hover { border-color: #94a3b8; }
+        body.dark-mode .modern-select { background: #1e293b; color: #f8fafc; border-color: #475569; }
     </style>
 </head>
 <body id="inventoryBody">
@@ -63,37 +55,61 @@ location: "MASTER"
         </div>
 
         <div class="toolbar-card">
-            <div style="display:flex; gap:6px; margin-bottom:8px;">
-                <input type="text" id="searchInput" class="search-input-modern" placeholder="Cari alat, merk, atau kode..." oninput="applyFilters()" style="flex:1; padding:8px 10px; border-radius:6px; border:1px solid #ccc; font-size:12px;">
-                <button onclick="openScannerModal()" style="padding:8px 12px; border-radius:6px; background:#1e293b; color:white; border:none; font-weight:bold; font-size:11px; display:flex; align-items:center; gap:4px;">📷 Scan QR</button>
+            <!-- BARIS 1: PENCARIAN & QR -->
+            <div style="display:flex; gap:6px; margin-bottom:12px;">
+                <input type="text" id="searchInput" class="search-input-modern" placeholder="Cari alat, merk, atau kode..." oninput="applyFilters()" style="flex:1; padding:8px 10px; border-radius:8px; border:1px solid #ccc; font-size:12px; box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);">
+                <button onclick="openScannerModal()" style="padding:8px 12px; border-radius:8px; background:#1e293b; color:white; border:none; font-weight:bold; font-size:11px; display:flex; align-items:center; gap:4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">📷 Scan QR</button>
             </div>
             
-            <div class="top-actions-wrapper" style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
-                <button onclick="openAddModal()" class="aksi-gudang" style="padding:6px 12px; border-radius:6px; background:#16a34a; color:white; border:none; font-weight:bold; font-size:11px;">➕ Tambah</button>
-                <button id="btnBulkMode" onclick="toggleBulkMode()" class="aksi-gudang" style="padding:6px 12px; border-radius:6px; background:#ea580c; color:white; border:none; font-weight:bold; font-size:11px;">🛒 Massal</button>
-                <button onclick="exportToExcel()" class="aksi-gudang" style="padding:6px 12px; border-radius:6px; background:#10b981; color:white; border:none; font-weight:bold; font-size:11px;">📥 Export Excel</button>
+            <!-- BARIS 2: FILTER STATUS & FILTER LOKASI (CLEAN UI) -->
+            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; align-items:center;">
+                <!-- Filter Status Menggantikan Tombol Pills -->
+                <select id="filterStatusDropdown" class="modern-select" onchange="setFilterPill(this.value)" style="flex:1; min-width:140px;">
+                    <option value="all">🔸 Tampilkan Semua Status</option>
+                    <option value="Di Gudang">📦 Di Gudang (Standby)</option>
+                    <!-- Pembagian "Akan Dibawa" menjadi per Kota -->
+                    <option value="Akan Dibawa (Semarang)">🛒 Akan Dibawa (Ke Semarang)</option>
+                    <option value="Akan Dibawa (Yogya)">🛒 Akan Dibawa (Ke Yogya)</option>
+                    <option value="Sedang Dipakai">🔌 Sedang Dipakai (Di Event)</option>
+                    <option value="Rusak">⚠️ Perbaikan / Rusak</option>
+                </select>
                 
-                <div style="margin-left:auto; display:flex; gap:6px;">
-                    <button id="btnViewToggle" onclick="toggleViewMode()" style="padding:6px 12px; border-radius:6px; background:#f1f5f9; color:#334155; border:1px solid #ccc; font-weight:bold; font-size:11px;">📋 List View</button>
-                    <button id="btnWadahToggle" onclick="toggleWadahMode()" style="padding:6px 12px; border-radius:6px; background:#f1f5f9; color:#334155; border:1px solid #ccc; font-weight:bold; font-size:11px; transition:0.2s;">🧰 Hanya Wadah</button>
-                </div>
-            </div>
-            
-            <div class="filter-pills-wrapper" style="margin-top:8px; margin-bottom:8px;">
-                <!-- Dikosongkan agar diisi otomatis oleh setupStickyHeader di script-gudang.js -->
-            </div>
-
-            <div style="margin-bottom: 2px;">
-                <button id="btnBukaFilter" style="background:#334155; color:white; border:none; padding:6px 12px; border-radius:6px; font-size:10px; font-weight:bold; cursor:pointer;">
-                    ⚙️ FILTER TIM
-                </button>
+                <select id="filterLokasiDropdown" class="modern-select" onchange="setFilterPill('trigger_lokasi')" style="flex:1; min-width:140px;">
+                    <option value="all">📍 Semua Lokasi</option>
+                    <option value="Gudang Kanguru">🏢 Gudang Kanguru</option>
+                    <option value="Gudang Mrican">🏢 Gudang Mrican</option>
+                    <option value="Di Lokasi Event">🚩 Di Lokasi Event</option>
+                </select>
+                
+                <button id="btnBukaFilter" style="background:#334155; color:white; border:none; padding:8px 12px; border-radius:8px; font-size:11px; font-weight:bold; cursor:pointer;">⚙️ TIM</button>
             </div>
 
-            <div id="panelFilterLanjutan" style="display:none; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:10px; margin-top: 6px;">
+            <!-- PANEL FILTER TIM (Tersembunyi) -->
+            <div id="panelFilterLanjutan" style="display:none; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:10px; margin-bottom: 12px;">
                 <div style="display:flex; flex-wrap:wrap; gap:10px; font-size:11px; font-weight:bold;">
                     <label><input type="checkbox" class="cek-tim" value="Speaker"> Speaker</label>
                     <label><input type="checkbox" class="cek-tim" value="Kabel"> Kabel</label>
                     <label><input type="checkbox" class="cek-tim" value="Booth"> Booth</label>
+                </div>
+            </div>
+
+            <!-- BARIS 3: TOMBOL AKSI & TAMPILAN -->
+            <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px;">
+                <!-- Kiri: Aksi Data -->
+                <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                    <button onclick="openAddModal()" class="aksi-gudang" style="padding:6px 12px; border-radius:6px; background:#16a34a; color:white; border:none; font-weight:bold; font-size:11px;">➕ Tambah</button>
+                    <button id="btnBulkMode" onclick="toggleBulkMode()" class="aksi-gudang" style="padding:6px 12px; border-radius:6px; background:#ea580c; color:white; border:none; font-weight:bold; font-size:11px;">☑️ Mode Pilih</button>
+                    <button onclick="printFormCO31()" class="aksi-gudang" style="padding:6px 12px; border-radius:6px; background:#8b5cf6; color:white; border:none; font-weight:bold; font-size:11px;">📄 Cetak CO-31</button>
+                    <button onclick="exportToExcel()" class="aksi-gudang" style="padding:6px 12px; border-radius:6px; background:#10b981; color:white; border:none; font-weight:bold; font-size:11px;">📥 Excel</button>
+                </div>
+                
+                <!-- Kanan: Tampilan & Mission Builder -->
+                <div style="display:flex; gap:6px;">
+                    <button id="btnWadahToggle" onclick="toggleWadahMode()" style="padding:6px 10px; border-radius:6px; background:#f1f5f9; color:#334155; border:1px solid #ccc; font-weight:bold; font-size:10px; transition:0.2s;">🧰 Wadah</button>
+                    <button id="btnViewToggle" onclick="toggleViewMode()" style="padding:6px 10px; border-radius:6px; background:#f1f5f9; color:#334155; border:1px solid #ccc; font-weight:bold; font-size:10px;">📋 List</button>
+                    
+                    <!-- Tempat Mission Builder akan disuntikkan secara dinamis -->
+                    <div id="missionBuilderContainer"></div>
                 </div>
             </div>
         </div>
@@ -256,8 +272,7 @@ location: "MASTER"
     </div>
     <div id="toastMsg" class="toast-msg">Notifikasi</div>
     
-    <!-- MENGGUNAKAN VERSI 62.0 -->
-    <script src="{{ site.baseurl }}/assets/js/script-gudang.js?v=62.0"></script>
+    <script src="{{ site.baseurl }}/assets/js/script-gudang.js?v=62.5"></script>
     
     <!-- SCRIPT KEAMANAN RBAC -->
     <script>

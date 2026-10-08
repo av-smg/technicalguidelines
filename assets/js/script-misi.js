@@ -1,9 +1,9 @@
 // ==========================================
-// MESIN LOGIKA MISSION CONTROL (V.17.0 - GLOBAL LOGIN & AUDIT TRAIL)
+// MESIN LOGIKA MISSION CONTROL (V.20.0 - DUAL CITY & KALENDER)
 // ==========================================
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec"; 
-const API_BACKEND_PIN = "AV-SERVER-2026"; // Ghost PIN untuk menembus server GAS lama
+const API_BACKEND_PIN = "a1b2c3"; // Pastikan PIN ini cocok dengan yang ada di Code.gs
 
 // Ambil Sesi Login Global dari Navbar
 const currentUserRole = localStorage.getItem('av_session_role');
@@ -15,6 +15,9 @@ let isHideCompleted = false;
 let currentCameraFacing = "environment"; 
 let isFlashlightOn = false;
 
+// Default Kota Target
+let activeDbKota = "Database_Misi_Semarang";
+
 const teamRoster = {
     "speaker": { kapten: "Malkhiel", asisten: "Yoka" },
     "kabel": { kapten: "Vina", asisten: "Anggid" },
@@ -22,7 +25,12 @@ const teamRoster = {
     "inventaris": { kapten: "Emma", asisten: "Peni" }
 };
 
-window.onload = () => { checkAdminStatus(); loadMissions(); };
+window.onload = () => { 
+    checkAdminStatus(); 
+    // Setel dropdown awal sesuai variabel
+    document.getElementById("dbKotaSelector").value = activeDbKota;
+    loadMissions(); 
+};
 
 function checkAdminStatus() {
     if (currentUserRole === "Master" || currentUserRole === "Kapten") {
@@ -73,14 +81,35 @@ function getThumbUrl(item) {
 }
 
 async function loadMissions() {
+    document.getElementById("loading").style.display = "block";
+    document.getElementById("missionsContainer").innerHTML = "";
     try {
         const res = await fetch(SCRIPT_URL + "?action=api&nocache=" + new Date().getTime()); const data = await res.json();
-        if(data.status === "success") { allMissions = data.missions || []; allInventory = data.inventory || []; isDataLoaded = true; document.getElementById("loading").style.display = "none"; renderMissions(); } 
+        if(data.status === "success") { 
+            allMissions = data.missions || []; 
+            allInventory = data.inventory || []; 
+            isDataLoaded = true; 
+            document.getElementById("loading").style.display = "none"; 
+            renderMissions(); 
+        } 
         else { document.getElementById("loading").innerText = "Gagal memuat data dari server."; }
     } catch (e) { document.getElementById("loading").innerText = "Error Jaringan. Periksa koneksi Anda."; }
 }
 
-function setTeamFilter(teamName) { activeTeam = teamName; document.querySelectorAll('.btn-team').forEach(btn => { btn.classList.remove('active'); if(btn.innerText.includes(teamName)) btn.classList.add('active'); }); if (isDataLoaded) renderMissions(); }
+function changeKota() {
+    activeDbKota = document.getElementById("dbKotaSelector").value;
+    renderMissions(); // Langsung render ulang tanpa harus load dari internet lagi
+}
+
+function setTeamFilter(teamName) { 
+    activeTeam = teamName; 
+    document.querySelectorAll('.btn-team').forEach(btn => { 
+        btn.classList.remove('active'); 
+        if(btn.innerText.includes(teamName)) btn.classList.add('active'); 
+    }); 
+    if (isDataLoaded) renderMissions(); 
+}
+
 function toggleHideCompleted() { isHideCompleted = !isHideCompleted; renderMissions(); }
 
 function toggleMissionContent(element) { 
@@ -93,14 +122,25 @@ function toggleMissionContent(element) {
 
 function renderMissions() {
     if (!isDataLoaded) return; const container = document.getElementById("missionsContainer"); container.innerHTML = "";
+    
     if (activeTeam === '') { container.innerHTML = `<div style="text-align:center; padding:30px 15px; color:#64748b; font-size:12px; grid-column: 1 / -1;"><h3 style="margin-bottom:5px;">Pilih Divisi Tim 👆</h3></div>`; return; }
     
-    let filtered = allMissions.filter(m => String(m.tim || "").toLowerCase().includes(activeTeam.toLowerCase()));
-    if(filtered.length === 0) { container.innerHTML = `<div style="text-align:center; padding:30px 15px; color:#64748b; font-size:12px; grid-column: 1 / -1;">✅ Belum ada tugas untuk tim ini.</div>`; return; }
+    // FILTER BERDASARKAN KOTA YANG DIPILIH & TIM
+    let filtered = allMissions.filter(m => {
+        let isTeamMatch = String(m.tim || "").toLowerCase().includes(activeTeam.toLowerCase());
+        let isKotaMatch = (m.sheet_asal === activeDbKota);
+        return isTeamMatch && isKotaMatch;
+    });
+
+    if(filtered.length === 0) { 
+        let namaKota = activeDbKota === "Database_Misi_Semarang" ? "Semarang" : "Yogyakarta";
+        container.innerHTML = `<div style="text-align:center; padding:30px 15px; color:#64748b; font-size:12px; grid-column: 1 / -1;">✅ Belum ada tugas untuk tim ini di wilayah <b>${namaKota}</b>.</div>`; 
+        return; 
+    }
 
     let totalMisi = filtered.length;
     let selesaiMisi = filtered.filter(m => String(m.status_misi || "").toLowerCase() === 'selesai').length;
-    let persentase = Math.round((selesaiMisi / totalMisi) * 100);
+    let persentase = Math.round((selesaiMisi / totalMisi) * 100) || 0;
     let teamLower = activeTeam.toLowerCase();
 
     // 1. BANNER CONTACT PERSON
@@ -118,7 +158,7 @@ function renderMissions() {
         </div>`;
     }
 
-    // 2. KOTAK PRIORITAS PEMASANGAN (DIPERBARUI)
+    // 2. KOTAK PRIORITAS PEMASANGAN
     let prioritasHtml = `
     <div class="priority-box" style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:6px; margin-bottom:8px; grid-column: 1 / -1; overflow:hidden;">
         <div class="priority-header" onclick="this.nextElementSibling.classList.toggle('open')" style="cursor:pointer; padding:6px 10px; font-size:9px; font-weight:bold; color:#1e293b; background:#e2e8f0; display:flex; justify-content:space-between; align-items:center;">
@@ -135,14 +175,11 @@ function renderMissions() {
         </div>
     </div>`;
 
-    // 3. BANNER APD (DITAMBAHKAN ROMPI UNTUK SEMUA ROLE) 
+    // 3. BANNER APD 
     let apdText = "🥾 Sepatu | 🦺 Rompi | 🧤 Sarung Tangan"; 
     if (teamLower.includes("speaker")) { 
         apdText = "🪖 Helm | 🥾 Sepatu | 🦺 Rompi | 🧤 Sarung Tangan"; 
-    } else {
-        apdText = "🥾 Sepatu | 🦺 Rompi | 🧤 Sarung Tangan";
     }
-
     let apdHtml = `<div style="background:#fffbeb; border:1px solid #fde68a; color:#b45309; padding:5px 8px; border-radius:6px; margin-bottom:6px; font-size:9px; font-weight:bold; display:flex; align-items:center; gap:4px;"><span style="font-size:12px;">⚠️</span> <span><b>APD:</b> ${apdText}</span></div>`;
 
     // 4. PROGRESS BAR
@@ -161,7 +198,6 @@ function renderMissions() {
         ${apdHtml} ${progressHtml}
     </div>`;
 
-    // INJECT SEMUANYA
     container.innerHTML = rosterHtml + prioritasHtml + stickyHeaderHtml;
 
     filtered.sort((a, b) => {
@@ -196,7 +232,6 @@ function renderMissions() {
             detailTugas.split("\n").forEach(line => {
                 let text = line.trim();
                 let lower = text.toLowerCase();
-                
                 if (lower.startsWith("panjang:")) {
                     txtPanjang = text.substring(8).trim();
                 } else if (lower.startsWith("denah:")) {
@@ -209,6 +244,14 @@ function renderMissions() {
             });
 
             let finalDetailText = cleanDetail.join("<br>");
+
+            // Tampilkan Tanggal Misi (Fitur Fase 4)
+            let badgeTanggalHtml = "";
+            if(misi.tgl_mulai && misi.tgl_selesai) {
+                let dMulai = new Date(misi.tgl_mulai).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+                let dSelesai = new Date(misi.tgl_selesai).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+                badgeTanggalHtml = `<span style="font-size:9px; color:#166534; background:#dcfce7; padding:2px 6px; border-radius:4px; font-weight:bold; border:1px solid #bbf7d0;">📅 ${dMulai} - ${dSelesai}</span>`;
+            }
 
             let extraUI = "";
             if (txtPanjang) extraUI += `<div class="tag-panjang" style="background:#fffbeb; color:#b45309; padding:4px 8px; border-radius:6px; font-size:9px; font-weight:bold; display:inline-flex; align-items:center; margin-right:5px; margin-bottom:5px; border:1px solid #fde68a;">📏 Kebutuhan Panjang: ${txtPanjang}</div>`;
@@ -276,7 +319,7 @@ function renderMissions() {
                 }
                 notFoundCodes.forEach(code => { packageHtml += `<div class="package-item"><div class="pkg-info"><div class="pkg-code" style="color:#ef4444;">#${code} (Tidak Ada)</div></div></div>`; });
             } else {
-                packageHtml += `<div style="font-size:9px; color:#ef4444; font-style:italic;">⚠️ Data barang belum di-input kapten.</div>`;
+                packageHtml += `<div style="font-size:9px; color:#ef4444; font-style:italic;">⚠️ Keranjang alat masih kosong.</div>`;
             }
             packageHtml += `</div>`;
             
@@ -305,7 +348,7 @@ function renderMissions() {
                     if (teamLower.includes("booth") || teamLower.includes("kabel") || teamLower.includes("speaker") || teamLower.includes("inventaris")) {
                         buttonHtml = `<div style="display:flex; gap:6px; align-items:stretch; width:100%;">
                             ${scanBtn}
-                            <button class="btn-complete aksi-misi" style="background:#10b981; margin:0;" onclick="executeCompleteMission('${misi.row_index}', '${misi.id_misi}', '${safeKodeBarang}')">✅ SELESAI</button>
+                            <button class="btn-complete aksi-misi" style="background:#10b981; margin:0;" onclick="executeCompleteMission(this, '${misi.row_index}', '${misi.id_misi}', '${safeKodeBarang}')">✅ SELESAI</button>
                         </div>`;
                     } else {
                         buttonHtml = `<div style="width:100%; display:flex;">${scanBtn}</div>`;
@@ -325,6 +368,7 @@ function renderMissions() {
                         <span class="badge-zona">📍 ${misi.zona || '-'}</span>
                     </div>
                     ${isOverride ? '<span class="badge-diganti">⚠️ ALAT DIGANTI</span>' : ''}
+                    <div style="margin-top:4px; margin-bottom:6px;">${badgeTanggalHtml}</div>
                     <div class="mission-title" style="display:flex; justify-content:space-between; align-items:center;">
                         <span>${judulTugas}</span> <span class="toggle-icon">▼</span>
                     </div>
@@ -438,22 +482,41 @@ function processScanResult(decodedText, rowIndex, idMisi, targetKodeBarangString
         return;
     }
 
-    triggerFeedback('success'); closeMissionScanner(); executeCompleteMission(rowIndex, idMisi, targetKodeBarangString);
+    triggerFeedback('success'); closeMissionScanner(); 
+    // Otomatis klik eksekusi
+    let dummyBtn = document.createElement("button");
+    executeCompleteMission(dummyBtn, rowIndex, idMisi, targetKodeBarangString);
 }
 
 function closeMissionScanner() { if (html5QrCode) { html5QrCode.stop().catch(e => console.log(e)); html5QrCode = null; } const m = document.getElementById("missionScannerModal"); if(m) m.remove(); }
 
-async function executeCompleteMission(rowIndex, idMisi, kodeBarang) {
+async function executeCompleteMission(btnElement, rowIndex, idMisi, kodeBarang) {
+    if(btnElement && btnElement.innerText) { btnElement.innerText = "⏳..."; btnElement.disabled = true; }
     showToast(`⏳ Memproses ${idMisi}...`);
     try {
         const response = await fetch(SCRIPT_URL, { 
             method: "POST", 
-            body: JSON.stringify({ action: "complete_mission", pin: API_BACKEND_PIN, user_name: currentUserName, row_index: rowIndex, id_misi: idMisi, kode_barang: kodeBarang }) 
+            body: JSON.stringify({ action: "complete_mission", pin: API_BACKEND_PIN, user_name: currentUserName, db_kota: activeDbKota, row_index: rowIndex, id_misi: idMisi, kode_barang: kodeBarang }) 
         });
         const data = await response.json();
-        if (data.status === "success") { showToast(`✅ Misi Selesai!`); triggerFeedback('success'); loadMissions(); } 
-        else { alert("Gagal:\n" + data.message); triggerFeedback('error'); }
-    } catch (e) { alert("Error Jaringan:\n" + e.message); triggerFeedback('error'); }
+        if (data.status === "success") { 
+            showToast(`✅ Misi Selesai!`); triggerFeedback('success'); 
+            
+            // Visual Audit Trail Langsung di Layar
+            if(btnElement && btnElement.parentNode) {
+                const waktu = new Date();
+                const jam = waktu.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                btnElement.parentNode.innerHTML = `
+                  <div style="background: #dcfce7; color: #166534; padding: 8px 12px; border-radius: 8px; font-size: 0.9rem; font-weight: bold; border: 1px solid #bbf7d0; display: inline-block; width:100%; box-sizing:border-box;">
+                    ✅ Diselesaikan ${jam} WIB oleh ${currentUserName}
+                  </div>
+                `;
+            } else {
+                loadMissions(); 
+            }
+        } 
+        else { alert("Gagal:\n" + data.message); triggerFeedback('error'); if(btnElement) { btnElement.innerText = "✅ SELESAI"; btnElement.disabled = false; } }
+    } catch (e) { alert("Error Jaringan:\n" + e.message); triggerFeedback('error'); if(btnElement) { btnElement.innerText = "✅ SELESAI"; btnElement.disabled = false; } }
 }
 
 async function executeOverrideMission(rowIndex, idMisi, oldTargetString, newScannedCode) {
@@ -468,7 +531,7 @@ async function executeOverrideMission(rowIndex, idMisi, oldTargetString, newScan
     try {
         const response = await fetch(SCRIPT_URL, { 
             method: "POST", 
-            body: JSON.stringify({ action: "complete_mission", pin: API_BACKEND_PIN, user_name: currentUserName, row_index: rowIndex, id_misi: idMisi, kode_barang: finalKodeString, update_kode: finalKodeString, alasan_override: reason }) 
+            body: JSON.stringify({ action: "complete_mission", pin: API_BACKEND_PIN, user_name: currentUserName, db_kota: activeDbKota, row_index: rowIndex, id_misi: idMisi, kode_barang: finalKodeString, update_kode: finalKodeString, alasan_override: reason }) 
         });
         const data = await response.json();
         if (data.status === "success") { showToast(`✅ Alat diganti & Misi Selesai!`); triggerFeedback('success'); loadMissions(); } 
@@ -482,12 +545,12 @@ async function undoMission(event, rowIndex, idMisi, kodeBarang) {
     try {
         const response = await fetch(SCRIPT_URL, { 
             method: "POST", 
-            body: JSON.stringify({ action: "undo_mission", pin: API_BACKEND_PIN, user_name: currentUserName, row_index: rowIndex, id_misi: idMisi, kode_barang: kodeBarang }) 
+            body: JSON.stringify({ action: "undo_mission", pin: API_BACKEND_PIN, user_name: currentUserName, db_kota: activeDbKota, row_index: rowIndex, id_misi: idMisi, kode_barang: kodeBarang }) 
         });
         const data = await response.json();
         if (data.status === "success") { showToast(`✅ Dibatalkan!`); loadMissions(); } 
-        else { alert("Gagal:\n" + data.message); btn.innerText = "❌ BATALKAN"; btn.disabled = false; }
-    } catch (e) { alert("Error:\n" + e.message); btn.innerText = "❌ BATALKAN"; btn.disabled = false; }
+        else { alert("Gagal:\n" + data.message); btn.innerText = "❌ Batal"; btn.disabled = false; }
+    } catch (e) { alert("Error:\n" + e.message); btn.innerText = "❌ Batal"; btn.disabled = false; }
 }
 
 function openItemDetail(kodeBarang) {

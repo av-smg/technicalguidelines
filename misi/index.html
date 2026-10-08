@@ -6,8 +6,7 @@ location: "MISSION CARD"
 <head>
     {% include head.html %}
     <title>Mission Control A/V</title>
-    <!-- V.16.3: Dark Mode FIX & Prioritas Pemasangan -->
-    <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/custom-misi.css?v=16.3">
+    <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/custom-misi.css?v=20.0">
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <style>
         .admin-only { display: none !important; }
@@ -16,38 +15,63 @@ location: "MISSION CARD"
         body.admin-mode-active .btn-lock { background: #f0fdf4; border-color: #22c55e; color: #16a34a; }
         
         /* GEMBOK KEAMANAN: Tombol disembunyikan dari Publik secara baku */
-        .aksi-misi, .aksi-gudang { 
-            display: none !important; 
+        .aksi-misi, .aksi-gudang { display: none !important; }
+
+        /* UI MODERN UNTUK HEADER MISI */
+        .misi-header-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 10px 10px 15px 10px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
         }
+        body.dark-mode .misi-header-card { background: #1e293b; border-color: #334155; }
+        
+        .modern-select { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 15px; font-size: 13px; font-weight: 900; color: #4f46e5; cursor: pointer; outline: none; transition: 0.2s; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
+        body.dark-mode .modern-select { background: #0f172a; color: #818cf8; border-color: #475569; }
     </style>
 </head>
 <body id="missionBody">
     {% include navbar.html %}
     
     <main>
-        <div style="display:flex; justify-content:space-between; align-items:center; margin:10px 15px;">
-            <div>
-                <h2 style="font-weight:900; margin:0; font-size:16px;">🎯 MISSION CONTROL</h2>
-                <p style="font-size:9px; color:gray; margin:0;">Status: <span id="modeStatusText">🟢 Read-Only Mode</span></p>
+        <!-- PANEL KONTROL ATAS -->
+        <div class="misi-header-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <div>
+                    <h2 style="font-weight:900; margin:0; font-size:18px; color:#1e293b;">🎯 MISSION CONTROL</h2>
+                    <p style="font-size:10px; color:#64748b; margin:0;">Status: <span id="modeStatusText">🟢 Read-Only Mode</span></p>
+                </div>
             </div>
-            <!-- Tombol Unlock Manual Dihapus karena sudah pakai Sistem PIN -->
+
+            <!-- DROPDOWN PEMILIH KOTA (PENTING FASE 4) -->
+            <div style="margin-bottom: 12px;">
+                <label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">📍 Pilih Pangkalan Operasi (Kota Event):</label>
+                <select id="dbKotaSelector" class="modern-select" style="width: 100%;" onchange="changeKota()">
+                    <option value="Database_Misi_Semarang">🚩 Event Area Semarang</option>
+                    <option value="Database_Misi_Yogya">🚩 Event Area Yogyakarta</option>
+                </select>
+            </div>
+
+            <!-- FILTER TIM -->
+            <label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">👥 Pilih Divisi Tim:</label>
+            <div class="team-filters" id="teamFilters" style="margin-top:0;">
+                <button class="btn-team" onclick="setTeamFilter('Inventaris')">🗂️ Inventaris</button>
+                <button class="btn-team" onclick="setTeamFilter('Speaker')">🔊 Speaker</button>
+                <button class="btn-team" onclick="setTeamFilter('Kabel')">🔌 Kabel</button>
+                <button class="btn-team" onclick="setTeamFilter('Booth')">🎛️ Booth</button>
+            </div>
         </div>
 
-        <div class="team-filters" id="teamFilters">
-           <button class="btn-team" onclick="setTeamFilter('Inventaris')">🗂️ Tim Inventaris</button>
-            <button class="btn-team" onclick="setTeamFilter('Speaker')">🔊 Tim Speaker</button>
-            <button class="btn-team" onclick="setTeamFilter('Kabel')">🔌 Tim Kabel</button>
-            <button class="btn-team" onclick="setTeamFilter('Booth')">🎛️ Tim Booth</button>
-        </div>
-
-        <div id="loading" style="text-align: center; padding: 40px; color: gray; font-weight:bold; font-size:11px;">Tunggu sebentar yaa. . .</div>
+        <div id="loading" style="text-align: center; padding: 40px; color: gray; font-weight:bold; font-size:11px;">Membangun Koneksi ke Satelit Misi...</div>
         
-        <div class="missions-container" id="missionsContainer"></div>
+        <div class="missions-container" id="missionsContainer" style="padding: 0 10px;"></div>
     </main>
 
     <div id="toastMsg" class="toast-msg">Notifikasi</div>
 
-    <script src="{{ site.baseurl }}/assets/js/script-misi.js?v=18.5"></script>
+    <script src="{{ site.baseurl }}/assets/js/script-misi.js?v=20.0"></script>
 
     <!-- SCRIPT KEAMANAN RBAC & AUDIT TRAIL UNTUK KARTU DINAMIS -->
     <script>
@@ -58,7 +82,7 @@ location: "MISSION CARD"
 
         if (!userRole) return; 
 
-        // 1. LOGIKA RBAC: Kalau yang login Master atau Kapten, paksa munculkan tombol Misi
+        // 1. LOGIKA RBAC: Kalau yang login Master atau Kapten
         if (userRole === "Master" || userRole === "Kapten") {
             const style = document.createElement('style');
             style.innerHTML = '.aksi-misi { display: inline-block !important; }';
@@ -70,21 +94,8 @@ location: "MISSION CARD"
             }
         }
 
-        // 2. LOGIKA AUDIT TRAIL (Event Delegation untuk Kartu dari Database)
-        document.body.addEventListener('click', function(event) {
-            // Mengecek apakah yang diklik memiliki class 'aksi-misi'
-            if (event.target && event.target.classList.contains('aksi-misi')) {
-                const waktu = new Date();
-                const jam = waktu.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-                
-                // Mengubah wujud tombol menjadi Badge Laporan
-                event.target.outerHTML = `
-                  <div style="background: #dcfce7; color: #166534; padding: 8px 12px; border-radius: 8px; font-size: 0.9rem; font-weight: bold; border: 1px solid #bbf7d0; display: inline-block; margin-top: 10px;">
-                    ✅ Selesai ${jam} WIB oleh ${userName}
-                  </div>
-                `;
-            }
-        });
+        // 2. LOGIKA AUDIT TRAIL (Menunggu eksekusi berhasil dari server)
+        // Kita pindahkan logika Audit Trail langsung ke dalam script-misi.js agar lebih aman (tidak merubah HTML sebelum server membalas "Sukses").
       });
     </script>
 </body>

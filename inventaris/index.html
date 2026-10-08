@@ -6,7 +6,7 @@ location: "MASTER"
 <head>
     {% include head.html %}
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-    <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/custom-gudang.css?v=55.0">
+    <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/custom-gudang.css?v=62.0">
     
     <style>
         .form-input { width: 100%; padding: 10px; margin-bottom: 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 12px; }
@@ -68,11 +68,9 @@ location: "MASTER"
                 <button onclick="openScannerModal()" style="padding:8px 12px; border-radius:6px; background:#1e293b; color:white; border:none; font-weight:bold; font-size:11px; display:flex; align-items:center; gap:4px;">📷 Scan QR</button>
             </div>
             
-            <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
+            <div class="top-actions-wrapper" style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
                 <button onclick="openAddModal()" class="aksi-gudang" style="padding:6px 12px; border-radius:6px; background:#16a34a; color:white; border:none; font-weight:bold; font-size:11px;">➕ Tambah</button>
                 <button id="btnBulkMode" onclick="toggleBulkMode()" class="aksi-gudang" style="padding:6px 12px; border-radius:6px; background:#ea580c; color:white; border:none; font-weight:bold; font-size:11px;">🛒 Massal</button>
-                <button onclick="printSuratJalan()" class="aksi-gudang" style="padding:6px 12px; border-radius:6px; background:#3b82f6; color:white; border:none; font-weight:bold; font-size:11px;">📄 Cetak</button>
-                <button onclick="printFormCO31()" class="aksi-gudang" style="padding:6px 12px; border-radius:6px; background:#8b5cf6; color:white; border:none; font-weight:bold; font-size:11px;">📄 Cetak CO-31</button>
                 <button onclick="exportToExcel()" class="aksi-gudang" style="padding:6px 12px; border-radius:6px; background:#10b981; color:white; border:none; font-weight:bold; font-size:11px;">📥 Export Excel</button>
                 
                 <div style="margin-left:auto; display:flex; gap:6px;">
@@ -82,11 +80,7 @@ location: "MASTER"
             </div>
             
             <div class="filter-pills-wrapper" style="margin-top:8px; margin-bottom:8px;">
-                <button class="pill-btn active" data-filter="all" onclick="setFilterPill('all', this)">Semua Alat</button>
-                <button class="pill-btn" data-filter="Akan Dibawa" onclick="setFilterPill('Akan Dibawa', this)">🛒 Akan Dibawa</button>
-                <button class="pill-btn" data-filter="Sedang Dipakai" onclick="setFilterPill('Sedang Dipakai', this)">🔌 Dipakai</button>
-                <button class="pill-btn" data-filter="Di Gudang" onclick="setFilterPill('Di Gudang', this)">🏢 Di Gudang</button>
-                <button class="pill-btn" data-filter="Rusak" onclick="setFilterPill('Rusak', this)">🚨 Perbaikan</button>
+                <!-- Dikosongkan agar diisi otomatis oleh setupStickyHeader di script-gudang.js -->
             </div>
 
             <div style="margin-bottom: 2px;">
@@ -262,8 +256,8 @@ location: "MASTER"
     </div>
     <div id="toastMsg" class="toast-msg">Notifikasi</div>
     
-    <!-- MENGGUNAKAN VERSI 56.0 UNTUK MENCEGAH CACHE -->
-    <script src="{{ site.baseurl }}/assets/js/script-gudang.js?v=56.0"></script>
+    <!-- MENGGUNAKAN VERSI 62.0 -->
+    <script src="{{ site.baseurl }}/assets/js/script-gudang.js?v=62.0"></script>
     
     <!-- SCRIPT KEAMANAN RBAC -->
     <script>

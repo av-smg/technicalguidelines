@@ -1,5 +1,5 @@
 // ==========================================
-// MESIN LOGIKA GUDANG (V.60.0 - SMART DUPLICATOR & PAKET ZONA)
+// MESIN LOGIKA GUDANG (V.61.0 - MISSION PLANNER & PAKET ZONA)
 // ==========================================
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec"; 
@@ -94,7 +94,7 @@ function getFilteredData() {
        const matchQ = (i.nama_barang||"").toLowerCase().includes(q) || 
                        (i.kode_barang||"").toLowerCase().includes(q) || 
                        (i.kode_wadah||"").toLowerCase().includes(q) ||
-                       (i.paket_zona||"").toLowerCase().includes(q); // <--- LOGIKA PENCARIAN PAKET ZONA
+                       (i.paket_zona||"").toLowerCase().includes(q); 
         let stat = i.status_digunakan || 'Di Gudang'; if(stat === 'FALSE') stat = 'Di Gudang'; 
         let lok = i.lokasi_saat_ini || i.lokasi || i["Lokasi Saat Ini"] || '';
         let matchPill = false;
@@ -263,25 +263,73 @@ async function saveEditLokasiStatus(rowIndex) {
 
 function openAssignMissionModal() { 
     if (selectedRows.size === 0) { alert("Pilih minimal 1 barang!"); return; } 
-    const modalHtml = `<div id="assignModal" class="modal-overlay active"><div class="modal-content" style="max-width:350px; padding:20px; background:white; border-radius:15px; position:relative;"><button onclick="document.getElementById('assignModal').remove()" style="position:absolute; top:15px; right:15px; border:none; background:#f1f5f9; width:30px; height:30px; border-radius:50%; font-weight:bold; cursor:pointer;">✕</button><h3 style="margin:0; color:#2563eb; font-size:18px;">🎯 Tugas Misi & Event</h3><div style="font-size:12px; color:#64748b; margin-top:5px; margin-bottom:15px; font-weight:bold;">${selectedRows.size} Alat Terpilih</div><div style="text-align:left; margin-bottom:12px;"><label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">🎪 Nama Event / Tujuan:</label><input type="text" id="assignNewTujuan" placeholder="Pertemuan Wilayah Oktober 2026 - Semarang" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; font-weight:bold; box-sizing:border-box;"></div><div style="background:#eff6ff; border:1px solid #bfdbfe; padding:15px; border-radius:10px; margin-bottom:15px;"><label style="font-size:11px; font-weight:bold; color:#1d4ed8; display:block; margin-bottom:6px;">🎯 ID Misi Lapangan (Opsional):</label><input type="text" id="assignMissionId" placeholder="Ketik ID Misi (Contoh: M-001)" style="width:100%; padding:10px; border-radius:8px; border:1px solid #93c5fd; font-weight:bold; text-transform:uppercase; margin-bottom:8px; box-sizing:border-box;"></div><button onclick="processAssignMission(this)" style="width:100%; padding:12px; background:#2563eb; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">KIRIM UPDATE 🚀</button></div></div>`; 
+    const modalHtml = `
+    <div id="assignModal" class="modal-overlay active">
+        <div class="modal-content" style="max-width:400px; padding:25px; background:white; border-radius:15px; position:relative; text-align:left;">
+            <button onclick="document.getElementById('assignModal').remove()" style="position:absolute; top:15px; right:15px; border:none; background:#fef2f2; color:#dc2626; width:30px; height:30px; border-radius:50%; font-weight:bold; cursor:pointer;">✕</button>
+            <h3 style="margin:0 0 10px 0; color:#2563eb; font-size:18px; font-weight:900;">🎯 Mission Planner</h3>
+            <div style="font-size:11px; color:#64748b; margin-bottom:15px; padding-bottom:10px; border-bottom:1px solid #e2e8f0;">Menugaskan <b>${selectedRows.size} Alat</b> ke lapangan.</div>
+            
+            <label style="font-size:11px; font-weight:bold; color:#1e293b; display:block; margin-bottom:4px;">📍 Pilih Database Kota / Event:</label>
+            <select id="assignDbKota" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; font-weight:bold; margin-bottom:12px; background:#f8fafc;">
+                <option value="Database_Misi_Semarang">Event Semarang (Sheet: Database_Misi_Semarang)</option>
+                <option value="Database_Misi_Yogya">Event Yogyakarta (Sheet: Database_Misi_Yogya)</option>
+                <option value="Database_Misi_Jakarta">Event Jakarta (Sheet: Database_Misi_Jakarta)</option>
+            </select>
+
+            <label style="font-size:11px; font-weight:bold; color:#1e293b; display:block; margin-bottom:4px;">🏷️ ID Misi Lapangan:</label>
+            <input type="text" id="assignMissionId" placeholder="Contoh: M-SMG-01" style="width:100%; padding:10px; border-radius:8px; border:1px solid #93c5fd; font-weight:bold; text-transform:uppercase; margin-bottom:12px; background:#eff6ff; box-sizing:border-box;">
+            
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+                <div>
+                    <label style="font-size:11px; font-weight:bold; color:#1e293b; display:block; margin-bottom:4px;">📦 Paket Zona:</label>
+                    <input type="text" id="assignZonaMisi" placeholder="Contoh: Zona A" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; box-sizing:border-box; font-size:12px;">
+                </div>
+                <div>
+                    <label style="font-size:11px; font-weight:bold; color:#1e293b; display:block; margin-bottom:4px;">👥 Tim Tugas:</label>
+                    <input type="text" id="assignTimMisi" placeholder="Contoh: Tim Audio" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; box-sizing:border-box; font-size:12px;">
+                </div>
+            </div>
+
+            <label style="font-size:11px; font-weight:bold; color:#1e293b; display:block; margin-bottom:4px;">📝 Instruksi / Tugas:</label>
+            <textarea id="assignTugasMisi" placeholder="Tarik kabel 25m ke titik panggung..." rows="2" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; margin-bottom:15px; font-size:12px; box-sizing:border-box; font-family:inherit;"></textarea>
+
+            <button onclick="processAssignMission(this)" style="width:100%; padding:14px; background:#2563eb; color:white; border:none; border-radius:10px; font-weight:900; cursor:pointer; box-shadow:0 4px 6px rgba(37, 99, 235, 0.2);">🚀 TERBITKAN MISI</button>
+        </div>
+    </div>`; 
     document.body.insertAdjacentHTML('beforeend', modalHtml); 
 }
 
 async function processAssignMission(btn) { 
     const missionId = document.getElementById("assignMissionId").value.trim().toUpperCase(); 
-    const eventName = document.getElementById("assignNewTujuan").value; 
-    if (!missionId && !eventName) { alert("Isi Nama Event atau ID Misi!"); return; } 
+    const dbKota = document.getElementById("assignDbKota").value; 
+    const zonaMisi = document.getElementById("assignZonaMisi").value.trim(); 
+    const timMisi = document.getElementById("assignTimMisi").value.trim(); 
+    const tugasMisi = document.getElementById("assignTugasMisi").value.trim(); 
+    
+    if (!missionId) { alert("⚠️ ID Misi Wajib Diisi!"); return; } 
+    
     let selectedCodes = []; 
     Array.from(selectedRows).forEach(rowIndex => { let item = allItems.find(i => i.row_index === rowIndex); if (item) { let codeToPush = item.kode_wadah ? item.kode_wadah : item.kode_barang; if (codeToPush && codeToPush.trim() !== "") selectedCodes.push(codeToPush); } }); 
     selectedCodes = [...new Set(selectedCodes)]; 
-    if (missionId && selectedCodes.length === 0) { alert("Alat yang dipilih tidak memiliki Kode Barang/Wadah!"); return; } 
+    if (selectedCodes.length === 0) { alert("Alat yang dipilih tidak memiliki Kode Barang/Wadah!"); return; } 
+    
     btn.disabled = true; btn.innerText = "MENGIRIM KE SERVER... 🚀"; 
     try { 
-        const payload = { action: "assign_to_mission", pin: API_BACKEND_PIN, user_name: localStorage.getItem('av_session_nama') || "Kru Tanpa Nama", id_misi: missionId, new_tujuan: eventName, rows: Array.from(selectedRows), kode_barang_array: selectedCodes }; 
+        const payload = { 
+            action: "assign_to_mission", pin: API_BACKEND_PIN, user_name: localStorage.getItem('av_session_nama') || "Kru Tanpa Nama", 
+            id_misi: missionId, db_kota: dbKota, zona_misi: zonaMisi, tim_misi: timMisi, tugas_misi: tugasMisi, 
+            new_tujuan: "Misi: " + missionId, rows: Array.from(selectedRows), kode_barang_array: selectedCodes 
+        }; 
         const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) }); 
         const data = await response.json(); 
-        if(data.status === "success") { document.getElementById('assignModal').remove(); toggleBulkMode(); showToast(`✅ Sukses Misi & Efek Domino Wadah!`); loadData(); } else { alert("Gagal:\n" + data.message); } 
-    } catch (e) { alert("Error Sistem:\n" + e.message); } finally { btn.disabled = false; btn.innerText = "KIRIM UPDATE 🚀"; } 
+        if(data.status === "success") { 
+            document.getElementById('assignModal').remove(); 
+            toggleBulkMode(); 
+            showToast(`✅ ${data.message}`); 
+            loadData(); 
+        } else { alert("Gagal:\n" + data.message); } 
+    } catch (e) { alert("Error Sistem:\n" + e.message); } finally { btn.disabled = false; btn.innerText = "🚀 TERBITKAN MISI"; } 
 }
 
 // ==========================================
@@ -509,10 +557,7 @@ function executePrint() {
 // AKSI: DUPLIKAT BARANG DARI KARTU DETAIL
 // ==========================================
 async function duplicateItem(rowIndex) {
-    // 1. Munculkan pop-up tanya jumlah
     let qtyInput = prompt("📦 Berapa banyak duplikat yang ingin dibuat?\n(Ketik angka, maksimal 50. Contoh: 5)", "1");
-    
-    // Jika kru menekan Cancel atau input kosong
     if (qtyInput === null || qtyInput.trim() === "") return;
 
     let qty = parseInt(qtyInput);
@@ -533,7 +578,7 @@ async function duplicateItem(rowIndex) {
             pin: API_BACKEND_PIN,
             user_name: localStorage.getItem('av_session_nama') || "Kru Tanpa Nama",
             row_index: rowIndex,
-            qty: qty // Kirim data jumlah ke server
+            qty: qty 
         };
 
         const response = await fetch(SCRIPT_URL, {
@@ -545,14 +590,13 @@ async function duplicateItem(rowIndex) {
         if (data.status === "success") {
             document.getElementById('detailModal').remove();
             showToast(`✅ Sukses! ${qty} alat berhasil diduplikat.`);
-            loadData(); // Refresh tampilan web otomatis
+            loadData(); 
         } else {
             alert("Gagal:\n" + data.message);
         }
     } catch (err) {
         alert("Error Sistem:\n" + err.message);
     } finally {
-        // Kembalikan tombol ke keadaan semula jika modal belum tertutup
         if (document.body.contains(btn)) {
             btn.innerHTML = originalText;
             btn.disabled = false;

@@ -86,7 +86,7 @@ async function loadData() {
 function populateFilterTim() { const container = document.querySelector('#panelFilterLanjutan div'); if(!container) return; let daftarTim = new Set(); allItems.forEach(item => { let tim = item.tim || item["Tim"] || ""; if (tim && tim.trim() !== "") daftarTim.add(tim.trim()); }); if(daftarTim.size > 0) { container.innerHTML = ""; daftarTim.forEach(tim => { let val = tim.toLowerCase(); container.innerHTML += `<label><input type="checkbox" class="cek-tim" value="${val}" onchange="applyFilters()"> ${tim}</label>`; }); } }
 
 // ==============================================================
-// 🎨 UI REVAMP: PENYEDERHANAAN HEADER & TOMBOL KOMANDO
+// 🎨 UI REVAMP: PENYEDERHANAAN HEADER & PENGHAPUSAN TOMBOL CETAK
 // ==============================================================
 function setupStickyHeader() { 
     let toolbar = document.querySelector(".toolbar-card"); 
@@ -95,10 +95,12 @@ function setupStickyHeader() {
         toolbar.style.top = "0px"; 
         toolbar.style.zIndex = "99"; 
         
-        // Bersihkan dan tata ulang Filter Pills
+        // 1. TATA ULANG FILTER & MUNCULKAN KEMBALI MISSION BUILDER
         let pillsWrapper = document.querySelector(".filter-pills-wrapper"); 
         if(pillsWrapper) {
-            // Hapus isi lama agar tidak menumpuk
+            // Tombol khusus Admin
+            let adminBtnHtml = isAdminMode ? `<button class="pill-btn" onclick="openMissionBuilder()" style="background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%); color:white; border:none; font-weight:900; box-shadow:0 4px 6px rgba(59, 130, 246, 0.3); margin-left:15px; border-radius:8px; cursor:pointer;">🛠️ MISSION BUILDER</button>` : ``;
+            
             pillsWrapper.innerHTML = `
                 <button class="pill-btn active" data-filter="all" onclick="setFilterPill('all', this)">Semua Alat</button>
                 <button class="pill-btn" data-filter="Akan Dibawa" onclick="setFilterPill('Akan Dibawa', this)">🛒 Akan Dibawa</button>
@@ -106,28 +108,24 @@ function setupStickyHeader() {
                 <button class="pill-btn" data-filter="Di Gudang" onclick="setFilterPill('Di Gudang', this)">📦 Di Gudang</button>
                 <button class="pill-btn" data-filter="Rusak" onclick="setFilterPill('Rusak', this)">⚠️ Perbaikan</button>
                 
-                <!-- Filter Lokasi dijadikan Dropdown agar rapi -->
                 <select onchange="setFilterPill(this.value, this)" style="background:#f1f5f9; border:1px solid #cbd5e1; border-radius:20px; padding:6px 12px; font-size:11px; font-weight:bold; color:#334155; margin-left:10px; cursor:pointer;">
                     <option value="all">📍 Semua Lokasi</option>
                     <option value="Gudang Kanguru">🏢 Kanguru</option>
                     <option value="Gudang Mrican">🏢 Mrican</option>
                     <option value="Di Lokasi Event">🚩 Di Event</option>
                 </select>
+                
+                ${adminBtnHtml}
             `;
         }
 
-        // Tata ulang Panel Tombol Atas (Mission Builder, Mode Pilih, dll)
-        let topBar = document.querySelector(".top-actions-wrapper"); // Pastikan class HTML-nya sesuai
-        if (topBar && isAdminMode && !document.getElementById("btnMissionBuilderMain")) {
-             // Jika masuk sebagai Admin, suntikkan tombol Mission Builder di posisi strategis
-             topBar.insertAdjacentHTML('beforeend', `
-                 <button id="btnMissionBuilderMain" onclick="openMissionBuilder()" style="background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%); color:white; border:none; padding:8px 15px; border-radius:8px; font-weight:900; font-size:12px; margin-left:auto; box-shadow:0 4px 6px rgba(59, 130, 246, 0.3); cursor:pointer; transition: transform 0.2s;">🛠️ MISSION BUILDER</button>
-             `);
-        } else if (topBar && !isAdminMode) {
-             // Sembunyikan jika bukan admin
-             let btnM = document.getElementById("btnMissionBuilderMain");
-             if(btnM) btnM.style.display = "none";
-        }
+        // 2. HILANGKAN TOMBOL "CETAK" (YANG BIRU BIASA) SECARA OTOMATIS
+        let allBtns = document.querySelectorAll('button');
+        allBtns.forEach(btn => {
+            if (btn.textContent.trim() === "Cetak") {
+                btn.style.display = "none"; // Eksekusi penghilangan tombol
+            }
+        });
     } 
 }
 

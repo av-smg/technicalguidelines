@@ -85,14 +85,49 @@ async function loadData() {
 
 function populateFilterTim() { const container = document.querySelector('#panelFilterLanjutan div'); if(!container) return; let daftarTim = new Set(); allItems.forEach(item => { let tim = item.tim || item["Tim"] || ""; if (tim && tim.trim() !== "") daftarTim.add(tim.trim()); }); if(daftarTim.size > 0) { container.innerHTML = ""; daftarTim.forEach(tim => { let val = tim.toLowerCase(); container.innerHTML += `<label><input type="checkbox" class="cek-tim" value="${val}" onchange="applyFilters()"> ${tim}</label>`; }); } }
 
+// ==============================================================
+// 🎨 UI REVAMP: PENYEDERHANAAN HEADER & TOMBOL KOMANDO
+// ==============================================================
 function setupStickyHeader() { 
     let toolbar = document.querySelector(".toolbar-card"); 
     if(toolbar) { 
-        toolbar.style.position = "sticky"; toolbar.style.top = "0px"; toolbar.style.zIndex = "99"; 
+        toolbar.style.position = "sticky"; 
+        toolbar.style.top = "0px"; 
+        toolbar.style.zIndex = "99"; 
+        
+        // Bersihkan dan tata ulang Filter Pills
         let pillsWrapper = document.querySelector(".filter-pills-wrapper"); 
-        if(pillsWrapper && !pillsWrapper.innerHTML.includes("Di Lokasi Event")) { 
-            pillsWrapper.insertAdjacentHTML('beforeend', `<button class="pill-btn" data-filter="Di Lokasi Event" onclick="setFilterPill('Di Lokasi Event', this)">⚠️ Event</button><button class="pill-btn" data-filter="Gudang Kanguru" onclick="setFilterPill('Gudang Kanguru', this)" style="border-left: 2px solid #cbd5e1; margin-left:5px;">🏢 Kanguru</button><button class="pill-btn" data-filter="Gudang Mrican" onclick="setFilterPill('Gudang Mrican', this)">🏢 Mrican</button><button class="pill-btn" onclick="openMissionBuilder()" style="background:#4f46e5; color:white; border:none; margin-left:15px; font-weight:bold; box-shadow:0 2px 4px rgba(0,0,0,0.2);">🛠️ MISSION BUILDER</button>`); 
-        } 
+        if(pillsWrapper) {
+            // Hapus isi lama agar tidak menumpuk
+            pillsWrapper.innerHTML = `
+                <button class="pill-btn active" data-filter="all" onclick="setFilterPill('all', this)">Semua Alat</button>
+                <button class="pill-btn" data-filter="Akan Dibawa" onclick="setFilterPill('Akan Dibawa', this)">🛒 Akan Dibawa</button>
+                <button class="pill-btn" data-filter="Sedang Dipakai" onclick="setFilterPill('Sedang Dipakai', this)">📍 Dipakai</button>
+                <button class="pill-btn" data-filter="Di Gudang" onclick="setFilterPill('Di Gudang', this)">📦 Di Gudang</button>
+                <button class="pill-btn" data-filter="Rusak" onclick="setFilterPill('Rusak', this)">⚠️ Perbaikan</button>
+                
+                <!-- Filter Lokasi dijadikan Dropdown agar rapi -->
+                <select onchange="setFilterPill(this.value, this)" style="background:#f1f5f9; border:1px solid #cbd5e1; border-radius:20px; padding:6px 12px; font-size:11px; font-weight:bold; color:#334155; margin-left:10px; cursor:pointer;">
+                    <option value="all">📍 Semua Lokasi</option>
+                    <option value="Gudang Kanguru">🏢 Kanguru</option>
+                    <option value="Gudang Mrican">🏢 Mrican</option>
+                    <option value="Di Lokasi Event">🚩 Di Event</option>
+                </select>
+            `;
+        }
+
+        // Tata ulang Panel Tombol Atas (Mission Builder, Mode Pilih, dll)
+        let topBar = document.querySelector(".top-actions-wrapper"); // Pastikan class HTML-nya sesuai
+        if (topBar && isAdminMode && !document.getElementById("btnMissionBuilderMain")) {
+             // Jika masuk sebagai Admin, suntikkan tombol Mission Builder di posisi strategis
+             topBar.insertAdjacentHTML('beforeend', `
+                 <button id="btnMissionBuilderMain" onclick="openMissionBuilder()" style="background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%); color:white; border:none; padding:8px 15px; border-radius:8px; font-weight:900; font-size:12px; margin-left:auto; box-shadow:0 4px 6px rgba(59, 130, 246, 0.3); cursor:pointer; transition: transform 0.2s;">🛠️ MISSION BUILDER</button>
+             `);
+        } else if (topBar && !isAdminMode) {
+             // Sembunyikan jika bukan admin
+             let btnM = document.getElementById("btnMissionBuilderMain");
+             if(btnM) btnM.style.display = "none";
+        }
     } 
 }
 

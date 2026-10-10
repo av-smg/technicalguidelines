@@ -86,7 +86,7 @@ async function loadData() {
 function populateFilterTim() { const container = document.querySelector('#panelFilterLanjutan div'); if(!container) return; let daftarTim = new Set(); allItems.forEach(item => { let tim = item.tim || item["Tim"] || ""; if (tim && tim.trim() !== "") daftarTim.add(tim.trim()); }); if(daftarTim.size > 0) { container.innerHTML = ""; daftarTim.forEach(tim => { let val = tim.toLowerCase(); container.innerHTML += `<label><input type="checkbox" class="cek-tim" value="${val}" onchange="applyFilters()"> ${tim}</label>`; }); } }
 
 // ==============================================================
-// 🎨 UI REVAMP: PENYEDERHANAAN HEADER & PENGHAPUSAN TOMBOL EXCEL/CETAK LAMA
+// 🎨 UI REVAMP: PENYEDERHANAAN HEADER & LOGIKA TOMBOL TIM
 // ==============================================================
 function setupStickyHeader() { 
     let toolbar = document.querySelector(".toolbar-card"); 
@@ -101,16 +101,28 @@ function setupStickyHeader() {
             pillsWrapper.remove();
         }
 
-        // Hapus tombol "Cetak" yang lama jika ada (biru biasa)
-        let allBtns = document.querySelectorAll('button');
-        allBtns.forEach(btn => {
-            if (btn.textContent.trim() === "Cetak") {
-                // btn.style.display = "none"; // Kita pakai tombol cetak ungu yang ada id-nya
-            }
-        });
+        // --- TAMBAHAN BARU: EVENT LISTENER TOMBOL TIM ---
+        const btnBukaFilter = document.getElementById('btnBukaFilter'); 
+        const panelFilter = document.getElementById('panelFilterLanjutan'); 
+        if (btnBukaFilter && panelFilter) { 
+            // Kita clone dan replace untuk menghapus event listener lama yang menempel
+            btnBukaFilter.replaceWith(btnBukaFilter.cloneNode(true)); 
+            const newBtnBukaFilter = document.getElementById('btnBukaFilter'); 
+            
+            newBtnBukaFilter.addEventListener('click', () => { 
+                if (panelFilter.style.display === 'none') { 
+                    panelFilter.style.display = 'block'; 
+                    newBtnBukaFilter.innerHTML = '❌ TUTUP FILTER'; 
+                    newBtnBukaFilter.style.background = '#ef4444'; 
+                } else { 
+                    panelFilter.style.display = 'none'; 
+                    newBtnBukaFilter.innerHTML = '⚙️ TIM'; 
+                    newBtnBukaFilter.style.background = '#334155'; 
+                } 
+            }); 
+        }
     } 
 }
-
 // ==============================================================
 // LOGIKA TOMBOL WADAH, FILTER & VIEW 
 // ==============================================================

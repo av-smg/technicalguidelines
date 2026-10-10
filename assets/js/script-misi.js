@@ -120,12 +120,21 @@ function toggleMissionContent(element) {
     else { if (icon) icon.innerText = '▼'; }
 }
 
+// ==========================================
+// RENDER MISI (V.21.0 - MODERN GRID UI)
+// ==========================================
 function renderMissions() {
-    if (!isDataLoaded) return; const container = document.getElementById("missionsContainer"); container.innerHTML = "";
+    if (!isDataLoaded) return; 
+    const container = document.getElementById("missionsContainer"); 
+    const bannerContainer = document.getElementById("missionBanners");
+    container.innerHTML = "";
+    bannerContainer.innerHTML = "";
     
-    if (activeTeam === '') { container.innerHTML = `<div style="text-align:center; padding:30px 15px; color:#64748b; font-size:12px; grid-column: 1 / -1;"><h3 style="margin-bottom:5px;">Pilih Divisi Tim 👆</h3></div>`; return; }
+    if (activeTeam === '') { 
+        bannerContainer.innerHTML = `<div style="text-align:center; padding:50px 15px; background:white; border-radius:16px; border:2px dashed #cbd5e1; margin:10px;"><h3 style="margin:0 0 10px 0; color:#475569;">Pilih Divisi Tim Terlebih Dahulu 👆</h3><p style="font-size:12px; color:#94a3b8; margin:0;">Silakan klik salah satu divisi di panel atas untuk melihat daftar tugas.</p></div>`; 
+        return; 
+    }
     
-    // FILTER BERDASARKAN KOTA YANG DIPILIH & TIM
     let filtered = allMissions.filter(m => {
         let isTeamMatch = String(m.tim || "").toLowerCase().includes(activeTeam.toLowerCase());
         let isKotaMatch = (m.sheet_asal === activeDbKota);
@@ -134,7 +143,7 @@ function renderMissions() {
 
     if(filtered.length === 0) { 
         let namaKota = activeDbKota === "Database_Misi_Semarang" ? "Semarang" : "Yogyakarta";
-        container.innerHTML = `<div style="text-align:center; padding:30px 15px; color:#64748b; font-size:12px; grid-column: 1 / -1;">✅ Belum ada tugas untuk tim ini di wilayah <b>${namaKota}</b>.</div>`; 
+        bannerContainer.innerHTML = `<div style="text-align:center; padding:50px 15px; background:#f0fdf4; border-radius:16px; border:2px dashed #bbf7d0; margin:10px;"><h3 style="margin:0 0 5px 0; color:#166534;">✅ Area Bersih!</h3><p style="font-size:12px; color:#16a34a; margin:0;">Belum ada tugas untuk tim ini di wilayah <b>${namaKota}</b>.</p></div>`; 
         return; 
     }
 
@@ -143,33 +152,33 @@ function renderMissions() {
     let persentase = Math.round((selesaiMisi / totalMisi) * 100) || 0;
     let teamLower = activeTeam.toLowerCase();
 
-    // 1. BANNER CONTACT PERSON
+    // 1. BANNER CONTACT PERSON (Gaya Baru)
     let rosterHtml = "";
     let foundTeamKey = Object.keys(teamRoster).find(k => teamLower.includes(k));
     if (foundTeamKey) {
         let cp = teamRoster[foundTeamKey];
         rosterHtml = `
-        <div style="background:#eff6ff; border:1px solid #bfdbfe; color:#1e3a8a; padding:6px 10px; border-radius:6px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; grid-column: 1 / -1;">
+        <div style="background:white; border:1px solid #e2e8f0; border-left:4px solid #3b82f6; padding:12px 15px; border-radius:12px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 2px 4px rgba(0,0,0,0.02);">
             <div>
-                <div style="font-size:8px; font-weight:bold; color:#3b82f6; margin-bottom:2px;">📞 CONTACT PERSON</div>
-                <div style="font-size:10px;"><b>👑 Kapten:</b> ${cp.kapten} &nbsp; <b>🛠️ Asisten:</b> ${cp.asisten}</div>
+                <div style="font-size:10px; font-weight:900; color:#3b82f6; margin-bottom:4px; text-transform:uppercase;">📞 Contact Person</div>
+                <div style="font-size:13px; color:#1e293b;"><b>👑 Kapten:</b> ${cp.kapten} <span style="color:#cbd5e1; margin:0 6px;">|</span> <b>🛠️ Asisten:</b> ${cp.asisten}</div>
             </div>
-            <div style="font-size:16px; opacity:0.8;">📱</div>
+            <div style="font-size:24px; opacity:0.2;">📱</div>
         </div>`;
     }
 
     // 2. KOTAK PRIORITAS PEMASANGAN
     let prioritasHtml = `
-    <div class="priority-box" style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:6px; margin-bottom:8px; grid-column: 1 / -1; overflow:hidden;">
-        <div class="priority-header" onclick="this.nextElementSibling.classList.toggle('open')" style="cursor:pointer; padding:6px 10px; font-size:9px; font-weight:bold; color:#1e293b; background:#e2e8f0; display:flex; justify-content:space-between; align-items:center;">
+    <div style="background:white; border:1px solid #e2e8f0; border-radius:12px; margin-bottom:10px; overflow:hidden; box-shadow:0 2px 4px rgba(0,0,0,0.02);">
+        <div onclick="this.nextElementSibling.classList.toggle('open')" style="cursor:pointer; padding:12px 15px; font-size:11px; font-weight:900; color:#475569; background:#f8fafc; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #f1f5f9;">
             <span>📋 PRIORITAS PEMASANGAN (KLIK)</span>
-            <span style="font-size:10px;">▼</span>
+            <span>▼</span>
         </div>
-        <div class="mission-content priority-content" style="padding:8px 10px; font-size:10px; color:#334155; line-height:1.5;">
-            <ol style="margin:0; padding-left:15px;">
+        <div class="mission-content" style="padding:15px; font-size:12px; color:#334155; line-height:1.6; background:white;">
+            <ol style="margin:0; padding-left:18px;">
                 <li><b>Area Hadirin</b> (Zona C1, C2, D, E, G)</li>
-                <li><b>Area Samping Panggung & Belakang Panggung</b> (Zona A)</li>
-                <li><b>Area Ruang P3K</b> (Zona F)</li>
+                <li><b>Samping & Belakang Panggung</b> (Zona A)</li>
+                <li><b>Ruang P3K</b> (Zona F)</li>
                 <li><b>Area Panggung</b> (Zona B)</li>
             </ol>
         </div>
@@ -177,28 +186,27 @@ function renderMissions() {
 
     // 3. BANNER APD 
     let apdText = "🥾 Sepatu | 🦺 Rompi | 🧤 Sarung Tangan"; 
-    if (teamLower.includes("speaker")) { 
-        apdText = "🪖 Helm | 🥾 Sepatu | 🦺 Rompi | 🧤 Sarung Tangan"; 
-    }
-    let apdHtml = `<div style="background:#fffbeb; border:1px solid #fde68a; color:#b45309; padding:5px 8px; border-radius:6px; margin-bottom:6px; font-size:9px; font-weight:bold; display:flex; align-items:center; gap:4px;"><span style="font-size:12px;">⚠️</span> <span><b>APD:</b> ${apdText}</span></div>`;
+    if (teamLower.includes("speaker")) { apdText = "🪖 Helm | " + apdText; }
+    let apdHtml = `
+    <div style="background:#fffbeb; border:1px solid #fde68a; border-left:4px solid #f59e0b; padding:10px 15px; border-radius:12px; margin-bottom:10px; font-size:11px; font-weight:bold; color:#b45309; display:flex; align-items:center; gap:8px; box-shadow:0 2px 4px rgba(0,0,0,0.02);">
+        <span style="font-size:16px;">⚠️</span> <span><b>STANDAR APD:</b> ${apdText}</span>
+    </div>`;
 
     // 4. PROGRESS BAR
     let progressHtml = `
-    <div class="mission-progress-container" style="margin-bottom:0; padding:6px 8px;">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div style="font-size:10px; font-weight:bold; color:#1e293b;">📊 Progress: ${selesaiMisi}/${totalMisi} (${persentase}%)</div>
-            <button class="filter-toggle ${isHideCompleted ? 'active' : ''}" onclick="toggleHideCompleted()">${isHideCompleted ? '👁️ Semua' : '🙈 Sembunyikan'}</button>
+    <div style="background:white; border:1px solid #e2e8f0; border-radius:12px; padding:15px; margin-bottom:15px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.05);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <div style="font-size:13px; font-weight:900; color:#0f172a;">📊 Progress Event: ${selesaiMisi} / ${totalMisi}</div>
+            <button class="filter-toggle ${isHideCompleted ? 'active' : ''}" onclick="toggleHideCompleted()" style="background:#f1f5f9; color:#475569; border:1px solid #cbd5e1; padding:4px 10px; border-radius:20px; font-size:10px; font-weight:bold; cursor:pointer;">${isHideCompleted ? '👁️ Tampilkan Semua' : '🙈 Sembunyikan Selesai'}</button>
         </div>
-        <div class="progress-bar-bg" style="margin-top:4px;"><div class="progress-bar-fill" style="width:${persentase}%;"></div></div>
+        <div style="width:100%; background:#e2e8f0; height:8px; border-radius:4px; overflow:hidden;">
+            <div style="width:${persentase}%; background:${persentase === 100 ? '#10b981' : '#3b82f6'}; height:100%; border-radius:4px; transition:width 0.5s ease;"></div>
+        </div>
+        <div style="text-align:right; font-size:10px; font-weight:bold; color:#64748b; margin-top:4px;">${persentase}% Selesai</div>
     </div>`;
     
-    // STICKY HEADER GABUNGAN
-    let stickyHeaderHtml = `
-    <div style="position: sticky; top: 50px; z-index: 90; background: rgba(248, 250, 252, 0.95); backdrop-filter: blur(8px); padding: 4px 0 8px 0; margin-bottom: 5px; grid-column: 1 / -1; border-bottom: 2px dashed #cbd5e1;">
-        ${apdHtml} ${progressHtml}
-    </div>`;
-
-    container.innerHTML = rosterHtml + prioritasHtml + stickyHeaderHtml;
+    // Inject Banners
+    bannerContainer.innerHTML = rosterHtml + prioritasHtml + apdHtml + progressHtml;
 
     filtered.sort((a, b) => {
         let statA = String(a.status_misi || "").toLowerCase() === 'selesai' ? 1 : -1;
@@ -245,34 +253,34 @@ function renderMissions() {
 
             let finalDetailText = cleanDetail.join("<br>");
 
-            // Tampilkan Tanggal Misi (Fitur Fase 4)
+            // Tampilan Tanggal
             let badgeTanggalHtml = "";
             if(misi.tgl_mulai && misi.tgl_selesai) {
                 let dMulai = new Date(misi.tgl_mulai).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
                 let dSelesai = new Date(misi.tgl_selesai).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
-                badgeTanggalHtml = `<span style="font-size:9px; color:#166534; background:#dcfce7; padding:2px 6px; border-radius:4px; font-weight:bold; border:1px solid #bbf7d0;">📅 ${dMulai} - ${dSelesai}</span>`;
+                badgeTanggalHtml = `<div style="font-size:10px; color:#64748b; margin-top:8px; font-weight:bold;"><span style="display:inline-block; margin-right:4px;">📅</span>${dMulai} - ${dSelesai}</div>`;
             }
 
             let extraUI = "";
-            if (txtPanjang) extraUI += `<div class="tag-panjang" style="background:#fffbeb; color:#b45309; padding:4px 8px; border-radius:6px; font-size:9px; font-weight:bold; display:inline-flex; align-items:center; margin-right:5px; margin-bottom:5px; border:1px solid #fde68a;">📏 Kebutuhan Panjang: ${txtPanjang}</div>`;
+            if (txtPanjang) extraUI += `<div style="background:#fef3c7; color:#d97706; padding:6px 10px; border-radius:8px; font-size:11px; font-weight:bold; display:inline-flex; align-items:center; margin-top:10px; border:1px solid #fde68a;">📏 Kebutuhan Panjang: ${txtPanjang}</div>`;
 
             let denahHtml = "";
             if (txtDenah) {
                 denahHtml = `
-                <div style="margin-top:8px; border-top:1px dashed #cbd5e1; padding-top:8px;">
-                    <div style="font-size:9px; font-weight:bold; color:#64748b; margin-bottom:4px; display:flex; align-items:center; gap:4px;">🗺️ DENAH LOKASI:</div>
-                    <img src="${txtDenah}" style="width:100%; max-height:120px; object-fit:cover; border-radius:6px; border:1px solid #cbd5e1; cursor:zoom-in; box-shadow:0 1px 3px rgba(0,0,0,0.1);" onclick="openZoomModal('${txtDenah.replace('w800', 's2000')}')">
+                <div style="margin-top:12px;">
+                    <div style="font-size:10px; font-weight:800; color:#94a3b8; margin-bottom:6px; text-transform:uppercase;">🗺️ DENAH LOKASI</div>
+                    <img src="${txtDenah}" style="width:100%; height:120px; object-fit:cover; border-radius:8px; border:1px solid #cbd5e1; cursor:zoom-in;" onclick="openZoomModal('${txtDenah.replace('w800', 's2000')}')">
                 </div>`;
             }
 
             let detailHtml = (finalDetailText || extraUI || denahHtml) ? `
-                <div class="instruction-box" style="background:#f8fafc; border-left:3px solid #3b82f6; padding:8px; font-size:10px; color:#334155; margin-bottom:8px; border-radius:6px; line-height:1.4;">
-                    ${finalDetailText ? `<b style="color:#1d4ed8; font-size:9px;">📝 INSTRUKSI:</b><br>${finalDetailText}<br><div style="margin-bottom:6px;"></div>` : ''}
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; border-left:3px solid #3b82f6; padding:12px; font-size:12px; color:#334155; margin:12px 0; border-radius:8px; line-height:1.5;">
+                    ${finalDetailText ? `<div style="color:#1d4ed8; font-size:10px; font-weight:900; margin-bottom:4px; text-transform:uppercase;">📝 Instruksi Khusus</div><div>${finalDetailText}</div>` : ''}
                     ${extraUI}
                     ${denahHtml}
                 </div>` : '';
 
-            let packageHtml = `<div class="package-list"><div style="font-size:8px; font-weight:bold; color:gray; margin-bottom:2px;">📦 Daftar Alat / Barang:</div>`;
+            let packageHtml = `<div style="margin-top:15px;"><div style="font-size:10px; font-weight:900; color:#94a3b8; margin-bottom:8px; text-transform:uppercase;">📦 Komponen Misi</div>`;
             
             if (misi.kode_barang && String(misi.kode_barang).trim() !== "") {
                 let codes = String(misi.kode_barang).split(',').map(c => c.trim()).filter(c => c);
@@ -295,18 +303,18 @@ function renderMissions() {
                         let boxThumbUrl = boxItem ? getThumbUrl(boxItem) : 'https://placehold.co/100x100/EEEEEE/999999?text=BOX';
                         
                         packageHtml += `
-                        <div class="box-group" style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:6px; margin-bottom:4px; overflow:hidden;">
-                            <div class="box-group-header" onclick="openItemDetail('${wadah}')" style="cursor:pointer; background:#e2e8f0; padding:4px 6px; font-size:9px; font-weight:bold; color:#0f172a; border-bottom:1px solid #cbd5e1; display:flex; justify-content:space-between; align-items:center;">
-                                <div style="display:flex; align-items:center; gap:4px;">
-                                    <img src="${boxThumbUrl}" style="width:20px; height:20px; object-fit:cover; border-radius:3px; border:1px solid #cbd5e1; background:white;">
+                        <div style="background:white; border:1px solid #cbd5e1; border-radius:8px; margin-bottom:8px; overflow:hidden;">
+                            <div onclick="openItemDetail('${wadah}')" style="cursor:pointer; background:#f1f5f9; padding:8px 12px; font-size:11px; font-weight:800; color:#0f172a; border-bottom:1px solid #cbd5e1; display:flex; justify-content:space-between; align-items:center;">
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <img src="${boxThumbUrl}" style="width:24px; height:24px; object-fit:cover; border-radius:4px; border:1px solid #cbd5e1; background:white;">
                                     <span>🧰 ${boxName}</span>
                                 </div>
-                                <span style="font-size:10px;">🔍</span>
+                                <span style="color:#94a3b8;">🔍</span>
                             </div>
-                            <div style="padding:4px;">`;
+                            <div style="padding:6px;">`;
                         
                         items.forEach(foundItem => {
-                            packageHtml += `<div class="package-item" style="cursor:pointer; border:none; background:transparent; margin-bottom:2px; padding:2px; border-bottom:1px dashed #e2e8f0;" onclick="openItemDetail('${foundItem.kode_barang}')"><img src="${getThumbUrl(foundItem)}" class="pkg-img" loading="lazy"><div class="pkg-info"><div class="pkg-name">${foundItem.nama_barang}</div><div class="pkg-code">#${foundItem.kode_barang}</div></div></div>`;
+                            packageHtml += `<div style="display:flex; align-items:center; gap:10px; cursor:pointer; padding:6px; border-bottom:1px dashed #e2e8f0; transition:background 0.2s;" onclick="openItemDetail('${foundItem.kode_barang}')" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'"><img src="${getThumbUrl(foundItem)}" style="width:35px; height:35px; border-radius:6px; object-fit:cover; border:1px solid #e2e8f0;"><div style="flex:1;"><div style="font-size:12px; font-weight:bold; color:#1e293b;">${foundItem.nama_barang}</div><div style="font-size:10px; color:#3b82f6; font-weight:bold; margin-top:2px;">#${foundItem.kode_barang}</div></div></div>`;
                         });
                         packageHtml += `</div></div>`;
                     }
@@ -314,76 +322,97 @@ function renderMissions() {
 
                 if (groupedItems["NON_BOX"]) {
                     groupedItems["NON_BOX"].forEach(foundItem => {
-                        packageHtml += `<div class="package-item" style="cursor:pointer;" onclick="openItemDetail('${foundItem.kode_barang}')"><img src="${getThumbUrl(foundItem)}" class="pkg-img" loading="lazy"><div class="pkg-info"><div class="pkg-name">${foundItem.nama_barang}</div><div class="pkg-code">#${foundItem.kode_barang}</div></div></div>`;
+                        packageHtml += `<div style="display:flex; align-items:center; gap:10px; cursor:pointer; background:white; padding:8px 12px; border:1px solid #cbd5e1; border-radius:8px; margin-bottom:6px; transition:border 0.2s;" onclick="openItemDetail('${foundItem.kode_barang}')" onmouseover="this.style.borderColor='#3b82f6'" onmouseout="this.style.borderColor='#cbd5e1'"><img src="${getThumbUrl(foundItem)}" style="width:40px; height:40px; border-radius:6px; object-fit:cover; border:1px solid #e2e8f0;"><div style="flex:1;"><div style="font-size:12px; font-weight:bold; color:#1e293b;">${foundItem.nama_barang}</div><div style="font-size:10px; color:#3b82f6; font-weight:bold; margin-top:2px;">#${foundItem.kode_barang}</div></div></div>`;
                     });
                 }
-                notFoundCodes.forEach(code => { packageHtml += `<div class="package-item"><div class="pkg-info"><div class="pkg-code" style="color:#ef4444;">#${code} (Tidak Ada)</div></div></div>`; });
+                notFoundCodes.forEach(code => { packageHtml += `<div style="background:#fef2f2; color:#dc2626; padding:8px 12px; border:1px solid #fecaca; border-radius:8px; font-size:11px; font-weight:bold; margin-bottom:6px;">⚠️ #${code} (Tidak Terdaftar)</div>`; });
             } else {
-                packageHtml += `<div style="font-size:9px; color:#ef4444; font-style:italic;">⚠️ Keranjang alat masih kosong.</div>`;
+                packageHtml += `<div style="font-size:11px; color:#ef4444; font-style:italic; background:#fef2f2; padding:10px; border-radius:8px;">⚠️ Keranjang alat kosong.</div>`;
             }
             packageHtml += `</div>`;
             
             let buttonHtml = '';
             if (isSelesai) {
                 if (isAdminMode) {
-                    buttonHtml = `<div style="display:flex; gap:6px; width:100%;">
-                        <div class="btn-complete done" style="flex:1; margin:0; text-align:left; padding-left:12px; display:flex; flex-direction:column; justify-content:center;">
-                            <div style="font-size:11px;">✅ SELESAI</div>
-                            <div style="font-size:9px; font-weight:normal; margin-top:2px;">${misi.waktu_selesai} • Oleh: <b>${misi.eksekutor || 'Kru A/V'}</b></div>
+                    buttonHtml = `<div style="display:flex; gap:8px; width:100%; margin-top:15px; border-top:1px dashed #cbd5e1; padding-top:15px;">
+                        <div style="flex:1; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:10px; display:flex; flex-direction:column; justify-content:center;">
+                            <div style="font-size:12px; font-weight:900; color:#166534;">✅ SELESAI</div>
+                            <div style="font-size:10px; color:#15803d; margin-top:2px;">Oleh: <b>${misi.eksekutor || 'Kru A/V'}</b></div>
                         </div>
-                        <button class="btn-complete aksi-misi" style="background:#ef4444; flex:0 0 auto; padding:6px 15px;" onclick="undoMission(event, '${misi.row_index}', '${misi.id_misi}', '${misi.kode_barang || ''}')">❌ Batal</button>
+                        <button class="aksi-misi" style="background:white; color:#ef4444; border:1px solid #fca5a5; border-radius:8px; padding:0 15px; font-weight:bold; cursor:pointer; font-size:12px;" onclick="undoMission(event, '${misi.row_index}', '${misi.id_misi}', '${misi.kode_barang || ''}')">Batal</button>
                     </div>`;
                 }
                 else {
-                    buttonHtml = `<div class="btn-complete done" style="width:100%; text-align:left; padding-left:15px; display:flex; flex-direction:column; justify-content:center;">
-                        <div style="font-size:12px;">✅ SELESAI</div>
-                        <div style="font-size:9px; font-weight:normal; margin-top:3px;">${misi.waktu_selesai} • Oleh: <b>${misi.eksekutor || 'Kru A/V'}</b></div>
+                    buttonHtml = `<div style="width:100%; margin-top:15px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:12px; text-align:center;">
+                        <div style="font-size:14px; font-weight:900; color:#166534;">✅ MISI SELESAI</div>
+                        <div style="font-size:10px; color:#15803d; margin-top:4px;">${misi.waktu_selesai} • Oleh: <b>${misi.eksekutor || 'Kru A/V'}</b></div>
                     </div>`;
                 }
             } else {
                 if (isAdminMode) {
                     let safeKodeBarang = String(misi.kode_barang || "");
-                    let scanBtn = `<button class="btn-complete" style="background:#2563eb; margin:0;" onclick="openMissionScanner('${misi.row_index}', '${misi.id_misi}', '${safeKodeBarang}')">📷 SCAN BARANG</button>`;
+                    let scanBtn = `<button style="background:#eff6ff; color:#2563eb; border:1px solid #bfdbfe; padding:12px; border-radius:8px; font-weight:900; font-size:12px; cursor:pointer; flex:1; display:flex; align-items:center; justify-content:center; gap:6px; transition:all 0.2s;" onmouseover="this.style.background='#dbeafe'" onmouseout="this.style.background='#eff6ff'" onclick="openMissionScanner('${misi.row_index}', '${misi.id_misi}', '${safeKodeBarang}')">📷 SCAN ITEM</button>`;
                     
                     if (teamLower.includes("booth") || teamLower.includes("kabel") || teamLower.includes("speaker") || teamLower.includes("inventaris")) {
-                        buttonHtml = `<div style="display:flex; gap:6px; align-items:stretch; width:100%;">
+                        buttonHtml = `<div style="display:flex; gap:10px; width:100%; margin-top:15px; border-top:1px dashed #cbd5e1; padding-top:15px;">
                             ${scanBtn}
-                            <button class="btn-complete aksi-misi" style="background:#10b981; margin:0;" onclick="executeCompleteMission(this, '${misi.row_index}', '${misi.id_misi}', '${safeKodeBarang}')">✅ SELESAI</button>
+                            <button class="aksi-misi" style="background:#10b981; color:white; border:none; padding:12px; border-radius:8px; font-weight:900; font-size:12px; cursor:pointer; flex:1; display:flex; align-items:center; justify-content:center; gap:6px; transition:background 0.2s;" onmouseover="this.style.background='#059669'" onmouseout="this.style.background='#10b981'" onclick="executeCompleteMission(this, '${misi.row_index}', '${misi.id_misi}', '${safeKodeBarang}')">✅ SELESAI</button>
                         </div>`;
                     } else {
-                        buttonHtml = `<div style="width:100%; display:flex;">${scanBtn}</div>`;
+                        buttonHtml = `<div style="width:100%; margin-top:15px; border-top:1px dashed #cbd5e1; padding-top:15px; display:flex;">${scanBtn}</div>`;
                     }
                 }
                 else {
-                    buttonHtml = `<div style="margin-top:5px; padding:10px; background:#f1f5f9; border-radius:8px; font-size:11px; color:#64748b; text-align:center; font-weight:bold;">🔒 Login Kapten/Master untuk eksekusi misi</div>`;
+                    buttonHtml = `<div style="margin-top:15px; padding:12px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; font-size:11px; color:#64748b; text-align:center; font-weight:bold;">🔒 Akses dikunci. Silakan login untuk eksekusi.</div>`;
                 }
             }
 
+            // STYLE KARTU UTAMA (Card)
+            let borderColor = isSelesai ? '#bbf7d0' : '#e2e8f0';
+            let bgColor = isSelesai ? '#f8fafc' : '#ffffff';
+            let shadow = isSelesai ? 'none' : '0 4px 6px -1px rgba(0,0,0,0.05)';
+
             const card = document.createElement("div"); 
-            card.className = `mission-card ${isSelesai ? 'selesai' : ''}`;
+            card.style.cssText = `background:${bgColor}; border:1px solid ${borderColor}; border-radius:12px; padding:15px; box-shadow:${shadow}; display:flex; flex-direction:column; position:relative; overflow:hidden; transition:transform 0.2s, box-shadow 0.2s;`;
+            
+            // Garis indikator hijau/abu di sebelah kiri kartu
+            let leftStripe = `<div style="position:absolute; top:0; left:0; width:6px; height:100%; background:${isSelesai ? '#22c55e' : '#cbd5e1'};"></div>`;
+
             card.innerHTML = `
-                <div class="mission-header-click" onclick="toggleMissionContent(this)">
-                    <div class="mission-top">
-                        <span class="mission-id"><span style="background:#e2e8f0; color:#1e293b; padding:2px 4px; border-radius:4px; margin-right:4px; font-weight:bold;">#${index + 1}</span> ${misi.id_misi}</span>
-                        <span class="badge-zona">📍 ${misi.zona || '-'}</span>
+                ${leftStripe}
+                <div style="padding-left:10px;">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span style="background:#f1f5f9; color:#475569; font-size:10px; font-weight:900; padding:4px 8px; border-radius:6px; border:1px solid #e2e8f0;">#${index + 1}</span>
+                            <span style="font-size:13px; font-weight:800; color:#0f172a; letter-spacing:-0.5px;">${misi.id_misi}</span>
+                        </div>
+                        <span style="background:#fffbeb; color:#d97706; padding:4px 8px; border-radius:6px; font-size:10px; font-weight:bold; border:1px solid #fde68a;">📍 ${misi.zona || '-'}</span>
                     </div>
-                    ${isOverride ? '<span class="badge-diganti">⚠️ ALAT DIGANTI</span>' : ''}
-                    <div style="margin-top:4px; margin-bottom:6px;">${badgeTanggalHtml}</div>
-                    <div class="mission-title" style="display:flex; justify-content:space-between; align-items:center;">
-                        <span>${judulTugas}</span> <span class="toggle-icon">▼</span>
-                    </div>
-                </div>
-                <div class="mission-content">
+                    
+                    ${isOverride ? '<div style="margin-bottom:8px;"><span style="background:#fee2e2; color:#b91c1c; padding:4px 8px; border-radius:6px; font-size:10px; font-weight:bold; border:1px solid #fecaca;">⚠️ ALAT DIGANTI LAPANGAN</span></div>' : ''}
+                    
+                    <div style="font-size:15px; font-weight:800; color:#1e293b; line-height:1.3; margin-bottom:5px;">${judulTugas}</div>
+                    
+                    ${badgeTanggalHtml}
                     ${detailHtml}
                     ${packageHtml}
-                    <div class="mission-action">${buttonHtml}</div>
+                    
+                    <div style="margin-top:auto;">${buttonHtml}</div>
                 </div>`;
+                
+            // Interaksi hover pada kartu
+            if(!isSelesai) {
+                card.onmouseover = () => { card.style.transform = 'translateY(-2px)'; card.style.boxShadow = '0 10px 15px -3px rgba(0,0,0,0.1)'; };
+                card.onmouseout = () => { card.style.transform = 'translateY(0)'; card.style.boxShadow = '0 4px 6px -1px rgba(0,0,0,0.05)'; };
+            }
+
             container.appendChild(card);
             
         } catch (err) {
             console.error("Row Error:", err);
-            const errCard = document.createElement("div"); errCard.className = "mission-card";
-            errCard.innerHTML = `<div style="color:red; font-size:12px; font-weight:bold; margin:0;">⚠️ Kesalahan Data Excel</div><p style="font-size:9px; margin:2px 0;">ID: ${misi.id_misi || '?'}</p>`;
+            const errCard = document.createElement("div"); 
+            errCard.style.cssText = "background:#fef2f2; border:1px solid #fca5a5; padding:15px; border-radius:12px;";
+            errCard.innerHTML = `<div style="color:red; font-size:14px; font-weight:bold; margin:0;">⚠️ Kesalahan Data Database</div><p style="font-size:11px; margin:5px 0 0 0; color:#b91c1c;">Misi ID: ${misi.id_misi || 'Tidak Diketahui'}</p>`;
             container.appendChild(errCard);
         }
     });

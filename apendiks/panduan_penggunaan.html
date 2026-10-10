@@ -147,9 +147,10 @@ location: "APENDIKS"
                 <li><a href="#detail-foto">5. Klik Detail Alat, Galeri Foto, & Zoom</a></li>
                 <li><a href="#tambah-edit-duplikat">6. Nambah Alat, Edit Data, & Fitur "Duplikat Alat"</a></li>
                 <li><a href="#misi-event">7. Kirim Misi (Semarang / Yogya) & Efek Domino Wadah</a></li>
-                <li><a href="#mission-control">8. Cara Pakai Mission Control (Misi Lapangan & Progress Tim)</a></li>
-                <li><a href="#cetak-laporan">9. Cetak Surat Jalan (Manifest), CO-31, & Export Excel</a></li>
-                <li><a href="#tanya">10. Tanya Jawab Cepat (Troubleshooting)</a></li>
+                <li><a href="#mission-builder">8. Mission Builder (Merakit Zona)</a></li>
+                <li><a href="#mission-control">9. Mission Control (Eksekusi Misi Lapangan)</a></li>
+                <li><a href="#cetak-laporan">10. Pusat Cetak Laporan & Kebutuhan Tim</a></li>
+                <li><a href="#tanya">11. Tanya Jawab Cepat (Troubleshooting)</a></li>
             </ul>
         </div>
 
@@ -172,17 +173,17 @@ location: "APENDIKS"
         <h2 id="cari-filter">3. Cara Cari Alat, Filter Tim, & Tombol "Hanya Wadah"</h2>
         <ul>
             <li><strong>Kolom Pencarian:</strong> Ketik nama, merk, atau kode barang (misal: <code>ADPT-JACK3.5</code> atau <code>HRCS-018</code>) untuk menyaring item secara instan.</li>
-            <li><strong>Pill Filter:</strong> Menyaring item berdasarkan status cepat seperti <em>Akan Dibawa, Dipakai, Di Gudang, Perbaikan</em>, atau lokasi gudang.</li>
-            <li><strong>Filter Tim:</strong> Tombol <span class="badge-key">⚙️ FILTER TIM</span> untuk menyaring barang berdasarkan kategori tim (Speaker, Kabel, Booth).</li>
-            <li><strong>🧰 Hanya Wadah:</strong> Tombol pintas untuk menyembunyikan barang eceran dan hanya menampilkan **Hardcase, Koper, atau Box utamanya saja**. Sangat membantu saat proses hitung bagasi truk.</li>
+            <li><strong>Dropdown Filter:</strong> Menyaring item berdasarkan <strong>Status</strong> (Akan Dibawa, Di Gudang, Sedang Dipakai) dan <strong>Lokasi</strong> (Gudang Kanguru, Event Semarang, Event Yogyakarta, dll).</li>
+            <li><strong>Filter Tim:</strong> Tombol <span class="badge-key">⚙️ TIM</span> untuk menyaring barang berdasarkan kategori divisi tim (Speaker, Kabel, Booth).</li>
+            <li><strong>🧰 Hanya Wadah:</strong> Tombol pintas untuk menyembunyikan barang eceran dan hanya menampilkan <strong>Hardcase, Koper, atau Box utamanya saja</strong>. Sangat membantu saat proses hitung bagasi truk.</li>
         </ul>
 
         <!-- 4. SCANNER -->
         <h2 id="scan">4. Cara Pakai Scan QR / Barcode & Mode Massal</h2>
-        <p>Klik tombol <span class="badge-key">📷 Scan QR</span> di sebelah kolom pencarian:</p>
+        <p>Klik tombol <span class="badge-key">📷 Scan QR</span> di sebelah kolom pencarian. Sistem pemindai terbaru kini dilengkapi dengan indikator audio (suara) dan getar!</p>
         <ul>
-            <li><strong>Scan Biasa:</strong> Cukup klik Scan QR, arahkan kamera ke kode barang. Sistem otomatis mencari dan membuka detail barang tersebut di layar.</li>
-            <li><strong>Scan + Mode Massal (Pilih Banyak):</strong> Jika Anda mengaktifkan tombol <strong>Massal</strong> terlebih dahulu sebelum menekan Scan QR, kamera pemindai akan berfungsi untuk <strong>mencentang dan memilih banyak barang secara otomatis</strong> hanya dengan mengarahkan kamera ke satu persatu QR Code barang. Barang-barang yang di-scan akan langsung masuk ke daftar terpilih untuk di-update statusnya secara massal!</li>
+            <li><strong>Scan Biasa:</strong> Arahkan kamera ke kode barang. Jika terbaca, akan terdengar <strong>nada tinggi (BEEP)</strong> dan detail barang otomatis terbuka. Jika gagal atau barang tidak ada di database, akan terdengar nada rendah berdengung.</li>
+            <li><strong>Scan + Mode Massal (Pilih Banyak):</strong> Jika Anda mengaktifkan tombol <strong>☑️ Mode Pilih</strong> terlebih dahulu sebelum menekan Scan QR, kamera pemindai akan berfungsi ganda. Arahkan kamera ke satu per satu QR Code barang—sistem akan <strong>mencentang alat secara otomatis beruntun tanpa menutup kamera</strong>, diiringi suara BEEP setiap kali alat sukses ditambahkan ke keranjang.</li>
             <li>Tersedia juga tombol <strong>🔄 Kamera</strong> (putar depan/belakang) dan <strong>🔦 Senter</strong> di dalam layar scanner.</li>
         </ul>
 
@@ -206,42 +207,44 @@ location: "APENDIKS"
         <!-- 7. MISI & EVENT -->
         <h2 id="misi-event">7. Kirim Misi (Semarang / Yogya) & Efek Domino Wadah</h2>
         <ul>
-            <li><strong>Mode Pilih (Massal):</strong> Centang beberapa item sekaligus untuk memperbarui status secara bersamaan.</li>
-            <li><strong>Misi & Event Spesifik:</strong> Saat menyiapkan pengiriman, masukkan nama event dan tentukan destinasi spesifik:
-                <div class="tip-box">
-                    👉 <strong>"Akan Dibawa ke Gedung UTC Semarang"</strong><br>
-                    👉 <strong>"Akan Dibawa ke Gedung Pacific Yogya"</strong>
-                </div>
-            </li>
-            <li><strong>Efek Domino Wadah:</strong> Memilih koper utama untuk dibawa ke event akan membuat sistem secara otomatis menandai seluruh kabel atau alat di dalam koper tersebut ikut berstatus *Akan Dibawa*, mencegah ada item kecil yang tertinggal di gudang (*🚨 TERTINGGAL*).</li>
+            <li><strong>Mode Pilih (Massal):</strong> Centang beberapa item sekaligus untuk memperbarui status dan lokasi (misal: memindahkan seluruh barang terpilih dari Gudang Kanguru ke Event Yogyakarta).</li>
+            <li><strong>Efek Domino Wadah:</strong> Memilih koper utama untuk dibawa ke event akan membuat sistem secara otomatis menandai seluruh kabel atau alat eceran di dalam koper tersebut ikut berstatus *Akan Dibawa*, mencegah ada item kecil yang tertinggal di gudang.</li>
         </ul>
 
-        <!-- 8. MISSION CONTROL -->
-        <h2 id="mission-control">8. Cara Pakai Mission Control (Misi Lapangan & Progress Tim)</h2>
-        <p>Menu <strong>Mission Control</strong> (dapat diakses dari halaman Beranda atau Menu Samping) adalah pusat komando bagi kru di lokasi event untuk memantau tugas harian.</p>
+        <!-- 8. MISSION BUILDER -->
+        <h2 id="mission-builder">8. Mission Builder (Merakit Zona)</h2>
+        <p>Fitur baru untuk merancang paket alat sebelum diterjunkan ke lapangan.</p>
         <ul>
-            <li><strong>Memantau Tugas Tim:</strong> Di halaman ini, kru bisa melihat daftar tugas yang dibebankan ke masing-masing tim (*Speaker, Kabel, Booth, Inventaris*), lengkap dengan zona dan status misinya (*Pending* atau *Selesai*).</li>
-            <li><strong>🎯 Selesaikan Misi:</strong> Ketika alat sudah sampai di lokasi event dan siap digunakan, kru tinggal mengeklik tombol <strong>Selesaikan Misi</strong> pada kartu tugas tersebut. Sistem secara otomatis:
-                <ul>
-                    <li>Mengubah status barang di database utama menjadi <code>📍 Di Lokasi Event</code> dan <code>🔌 Sedang Dipakai</code>.</li>
-                    <li>Mencatat jam selesai dan nama kru yang menyelesaikan tugas.</li>
-                </ul>
-            </li>
-            <li><strong>⚠️ Override / Ganti Alat Darurat:</strong> Jika di tengah jalan ada alat utama yang rusak dan harus diganti dengan alat cadangan, kru dapat memasukkan kode alat pengganti yang baru beserta alasannya langsung di form misi.</li>
-            <li><strong>↩️ Batalkan (Undo) Misi:</strong> Jika ada kesalahan input atau misi batal, tombol *Undo* akan mereset status misi kembali ke *Pending* dan mengembalikan status barang ke gudang asal.</li>
-            <li><strong>📊 Progress Bar Otomatis:</strong> Setiap kali kru menyelesaikan misi di halaman Mission Control, grafik indikator (*progress bar*) di halaman Beranda akan otomatis terisi dan persentasenya naik secara *real-time*!</li>
+            <li>Klik tombol <strong>🛠️ MISSION BUILDER</strong> (khusus Admin).</li>
+            <li>Pilih Kota Event (Semarang/Yogya), tentukan ID Misi dan Zona.</li>
+            <li><strong>Radar Bentrok:</strong> Saat Anda memasukkan tanggal mulai dan selesai acara, sistem akan memindai seluruh *database*. Jika alat yang Anda mau sedang dipakai di event lain pada tanggal yang sama, alat tersebut akan dikunci dengan tombol <span class="badge-key">Terkunci (BENTROK)</span>.</li>
+            <li>Jika aman, masukkan alat ke keranjang dan terbitkan misinya!</li>
         </ul>
 
-        <!-- 9. LAPORAN -->
-        <h2 id="cetak-laporan">9. Cetak Surat Jalan (Manifest), CO-31, & Export Excel</h2>
+        <!-- 9. MISSION CONTROL -->
+        <h2 id="mission-control">9. Mission Control (Eksekusi Misi Lapangan)</h2>
+        <p>Menu <strong>Mission Control</strong> (dapat diakses dari halaman Beranda) adalah pusat komando bagi kru di lokasi event untuk memantau tugas harian.</p>
         <ul>
-            <li><strong>📄 Cetak Surat Jalan:</strong> Mencetak daftar muatan yang dikelompokkan rapi per gudang asal dan per koper untuk kru/supir.</li>
-            <li><strong>📄 Cetak CO-31:</strong> Format cetak lampiran barang yang disesuaikan dengan form pesanan pengiriman resmi *CO-31-IN*.</li>
-            <li><strong>📥 Export Excel:</strong> Mengunduh data inventaris dalam format CSV dengan opsi filter sesuai kebutuhan.</li>
+            <li><strong>Desain Grid Lipat:</strong> Semua misi tampil rapi. Klik salah satu misi untuk meluncurkan rincian alat dan instruksi.</li>
+            <li><strong>Memantau Tugas Tim:</strong> Di halaman ini, kru bisa melihat daftar tugas yang dibebankan ke masing-masing tim (*Speaker, Kabel, Booth*), lengkap dengan Standar APD dan Prioritas Pemasangan.</li>
+            <li><strong>🎯 Selesaikan Misi:</strong> Kru memindai (*scan*) barang langsung di lapangan menggunakan tombol <strong>📷 SCAN ITEM</strong>. Jika alat cocok, misi dapat diselesaikan. Sistem otomatis mengubah status barang menjadi <code>🔌 Sedang Dipakai</code> dan mencatat jam selesai beserta nama kru pelaksana.</li>
+            <li><strong>⚠️ Override / Ganti Alat Darurat:</strong> Jika alat utama bermasalah dan kru memindai alat pengganti/cadangan, sistem akan mendeteksi perbedaan kode dan memunculkan kotak <strong>ALAT DIGANTI LAPANGAN</strong> untuk mencatat alasan penggantian secara darurat.</li>
+            <li><strong>📊 Progress Bar Otomatis:</strong> Setiap misi yang diselesaikan akan otomatis mengisi grafik indikator di layar secara *real-time*.</li>
         </ul>
 
-        <!-- 10. TROUBLESHOOTING -->
-        <h2 id="tanya">10. Tanya Jawab Cepat (Troubleshooting)</h2>
+        <!-- 10. PUSAT CETAK -->
+        <h2 id="cetak-laporan">10. Pusat Cetak Laporan & Kebutuhan Tim</h2>
+        <p>Sistem cetak kini jauh lebih *powerful*, otomatis, dan irit kertas.</p>
+        <ul>
+            <li>Klik tombol <span class="badge-key">🖨️ Cetak</span>.</li>
+            <li><strong>Format CO-31 (Daftar Detail):</strong> Cetak laporan lengkap. Sistem akan mencetak daftar Wadah/Hardcase beserta isinya secara utuh di halaman awal, baru dilanjutkan mencetak barang lepasan (tanpa wadah) di halaman berikutnya.</li>
+            <li><strong>Format Checklist Hardcase (Cetak Tempel):</strong> Sangat cocok untuk *checklist* kru. Setiap Hardcase akan dipisah (1 lembar kertas = 1 Hardcase). Nama dan kode barang digabung ke samping (horizontal) agar tidak boros kertas.</li>
+            <li><strong>Format Rekap Gabungan:</strong> Menggabungkan item yang sama dan hanya menampilkan total angka akhirnya.</li>
+            <li><strong>Format Daftar Kebutuhan per Tim:</strong> <em>(Fitur Unggulan)</em> Sistem akan menarik data dari <em>Database Misi</em>, kemudian memisahkan daftar barang mana saja yang harus disiapkan oleh Tim Speaker, Tim Kabel, dll secara otomatis!</li>
+        </ul>
+
+        <!-- 11. TROUBLESHOOTING -->
+        <h2 id="tanya">11. Tanya Jawab Cepat (Troubleshooting)</h2>
         <table>
             <tr>
                 <th>Kendala di Lapangan</th>
@@ -258,6 +261,14 @@ location: "APENDIKS"
             <tr>
                 <td>Kamera scanner gagal terbuka?</td>
                 <td>Izin browser untuk mengakses kamera belum diizinkan. Pilih "Allow/Izinkan" saat diminta akses.</td>
+            </tr>
+            <tr>
+                <td>Scanner tidak bersuara saat membaca barcode?</td>
+                <td>Pastikan media volume (suara) HP Anda tidak dibisukan/mute. Sistem memerlukan interaksi ketukan pada tombol "Scan" untuk membuka kunci audio browser.</td>
+            </tr>
+            <tr>
+                <td>Kartu Mission Control tidak muncul?</td>
+                <td>Pastikan Anda sudah mengeklik tombol filter Divisi Tim di atas layar (Speaker/Kabel/Inventaris).</td>
             </tr>
         </table>
 

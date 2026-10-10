@@ -249,7 +249,7 @@ function openDetailModal(item) {
     }
 
     let logHtml = `<div style="text-align:left; margin-top:10px; background:#f1f5f9; padding:8px; border-radius:6px; font-size:10px; color:#475569; max-height:80px; overflow-y:auto; white-space:pre-wrap; border:1px solid #cbd5e1;"><b>📜 Histori Log:</b><br>${item.log || 'Belum ada histori.'}</div>`;
-    let optionsLokasi = `<option value="Gudang Kanguru" ${lok.includes('Kanguru') ? 'selected':''}>🏢 Gudang Kanguru</option><option value="Gudang Mrican" ${lok.includes('Mrican') ? 'selected':''}>🏢 Gudang Mrican</option><option value="Dalam Perjalanan" ${lok === 'Dalam Perjalanan' ? 'selected':''}>🚚 Dalam Perjalanan</option><option value="Di Lokasi Event" ${lok === 'Di Lokasi Event' ? 'selected':''}>📍 Di Lokasi Event</option>`; 
+    let optionsLokasi = `<option value="Gudang Kanguru" ${lok.includes('Kanguru') ? 'selected':''}>🏢 Gudang Kanguru</option><option value="Gudang Mrican" ${lok.includes('Mrican') ? 'selected':''}>🏢 Gudang Mrican</option><option value="Gudang Yogyakarta" ${lok.includes('Yogya') ? 'selected':''}>🏢 Gudang Yogyakarta</option><option value="Dalam Perjalanan" ${lok === 'Dalam Perjalanan' ? 'selected':''}>🚚 Dalam Perjalanan</option><option value="Di Lokasi Event" ${lok === 'Di Lokasi Event' ? 'selected':''}>📍 Di Lokasi Event</option>`; 
     let optionsStatus = `<option value="Di Gudang" ${stat === 'Di Gudang' ? 'selected':''}>📦 Standby / Di Gudang</option><option value="Akan Dibawa" ${stat === 'Akan Dibawa' ? 'selected':''}>🛒 Akan Dibawa (Packing)</option><option value="Sedang Dipakai" ${stat === 'Sedang Dipakai' ? 'selected':''}>🔌 Sedang Dipakai / Aktivasi</option><option value="Sedang Diservis" ${stat === 'Sedang Diservis' ? 'selected':''}>🛠️ Sedang Diservis</option>`;
     
     let actionButtons = isAdminMode ? `
@@ -445,7 +445,38 @@ function selectAllVisible() { getFilteredData().forEach(item => selectedRows.add
 
 function openBulkUpdateModal() { 
     if (selectedRows.size === 0) { alert("Pilih minimal 1 barang!"); return; } 
-    const modalHtml = `<div id="bulkModal" class="modal-overlay active"><div class="modal-content" style="max-width:350px; padding:20px; background:white; border-radius:15px; position:relative;"><button onclick="document.getElementById('bulkModal').remove()" style="position:absolute; top:15px; right:15px; border:none; background:#f1f5f9; width:30px; height:30px; border-radius:50%; font-weight:bold; cursor:pointer;">✕</button><h3 style="margin:0; color:#ea580c; font-size:18px;">⚙️ Update Status & Lokasi</h3><div style="font-size:12px; color:#64748b; margin-top:5px; margin-bottom:15px; font-weight:bold;">${selectedRows.size} Alat Terpilih</div><div style="text-align:left; margin-bottom:12px;"><label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">📍 Ubah Lokasi:</label><select id="bulkNewLokasi" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; font-weight:bold;"><option value="TETAP">-- Jangan Ubah Lokasi --</option><option value="Gudang Kanguru">🏢 Gudang Kanguru</option><option value="Gudang Mrican">🏢 Gudang Mrican</option><option value="Dalam Perjalanan">🚚 Dalam Perjalanan</option><option value="Di Lokasi Event">📍 Di Lokasi Event</option></select></div><div style="text-align:left; margin-bottom:15px;"><label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">🔌 Ubah Status:</label><select id="bulkNewStatus" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; font-weight:bold;"><option value="TETAP">-- Jangan Ubah Status --</option><option value="Akan Dibawa">🛒 Akan Dibawa (Packing)</option><option value="Sedang Dipakai">🔌 Sedang Dipakai / Aktivasi</option><option value="Di Gudang">📦 Standby / Di Gudang</option></select></div><button onclick="processBulkUpdate(this)" style="width:100%; padding:12px; background:#ea580c; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">PROSES UPDATE MASSAL</button></div></div>`; 
+    const modalHtml = `
+    <div id="bulkModal" class="modal-overlay active">
+        <div class="modal-content" style="max-width:350px; padding:20px; background:white; border-radius:15px; position:relative;">
+            <button onclick="document.getElementById('bulkModal').remove()" style="position:absolute; top:15px; right:15px; border:none; background:#f1f5f9; width:30px; height:30px; border-radius:50%; font-weight:bold; cursor:pointer;">✕</button>
+            <h3 style="margin:0; color:#ea580c; font-size:18px;">⚙️ Update Status & Lokasi</h3>
+            <div style="font-size:12px; color:#64748b; margin-top:5px; margin-bottom:15px; font-weight:bold;">${selectedRows.size} Alat Terpilih</div>
+            
+            <div style="text-align:left; margin-bottom:12px;">
+                <label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">📍 Ubah Lokasi:</label>
+                <select id="bulkNewLokasi" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; font-weight:bold;">
+                    <option value="TETAP">-- Jangan Ubah Lokasi --</option>
+                    <option value="Gudang Kanguru">🏢 Gudang Kanguru</option>
+                    <option value="Gudang Mrican">🏢 Gudang Mrican</option>
+                    <option value="Gudang Yogyakarta">🏢 Gudang Yogyakarta</option>
+                    <option value="Dalam Perjalanan">🚚 Dalam Perjalanan</option>
+                    <option value="Di Lokasi Event">📍 Di Lokasi Event</option>
+                </select>
+            </div>
+            
+            <div style="text-align:left; margin-bottom:15px;">
+                <label style="font-size:11px; font-weight:bold; color:gray; display:block; margin-bottom:4px;">🔌 Ubah Status:</label>
+                <select id="bulkNewStatus" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; font-weight:bold;">
+                    <option value="TETAP">-- Jangan Ubah Status --</option>
+                    <option value="Akan Dibawa">🛒 Akan Dibawa (Packing)</option>
+                    <option value="Sedang Dipakai">🔌 Sedang Dipakai / Aktivasi</option>
+                    <option value="Di Gudang">📦 Standby / Di Gudang</option>
+                </select>
+            </div>
+            
+            <button onclick="processBulkUpdate(this)" style="width:100%; padding:12px; background:#ea580c; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">PROSES UPDATE MASSAL</button>
+        </div>
+    </div>`; 
     document.body.insertAdjacentHTML('beforeend', modalHtml); 
 }
 

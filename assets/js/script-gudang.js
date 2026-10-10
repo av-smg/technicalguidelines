@@ -1099,3 +1099,98 @@ function startScanner() { if(html5QrCode) { html5QrCode.stop().catch(e=>console.
 function toggleCameraFacing() { currentCameraFacing = currentCameraFacing === "environment" ? "user" : "environment"; showToast("Mengganti kamera...", true); if (html5QrCode) { html5QrCode.stop().then(() => { setTimeout(startScanner, 300); }).catch(err => console.log(err)); } }
 function toggleFlashlight() { if (!html5QrCode) return; isFlashlightOn = !isFlashlightOn; html5QrCode.applyVideoConstraints({ advanced: [{ torch: isFlashlightOn }] }).then(() => { document.getElementById("btnFlashlight").style.background = isFlashlightOn ? "#fef08a" : "#f1f5f9"; }).catch(err => { showToast("Senter tidak didukung.", false); isFlashlightOn = false; document.getElementById("btnFlashlight").style.background = "#f1f5f9"; }); }
 function closeScannerModal() { if (html5QrCode) { html5QrCode.stop().catch(e=>console.log(e)); html5QrCode = null; } const m = document.getElementById("tempScannerModal"); if(m) m.remove(); }
+
+// FUNGSI BARU: Generator Suara Beep & Getar Instan
+function playScanBeep(isSuccess = true) {
+    try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        const ctx = new AudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        
+        if (isSuccess) {
+            // Suara sukses: Nada tinggi (1000Hz), Getar pendek
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(1000, ctx.currentTime);
+            gain.gain.setValueAtTime(0.1, ctx.currentTime);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.15); // Durasi 150ms
+            if ("vibrate" in navigator) navigator.vibrate([200]);
+        } else {
+            // Suara gagal/error: Nada rendah (300Hz), Getar panjang/putus-putus
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(300, ctx.currentTime);
+            gain.gain.setValueAtTime(0.1, ctx.currentTime);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.3); // Durasi 300ms
+            if ("vibrate" in navigator) navigator.vibrate([300, 100, 300]);
+        }
+    } catch(e) { 
+        console.log("Audio/Vibrate not supported"); 
+    }
+}
+
+function openScannerModal() { const oldModal = document.getElementById("tempScannerModal"); if(oldModal) oldModal.remove(); let modal = document.createElement("div"); modal.id = "tempScannerModal"; modal.className = "modal-overlay active"; modal.style.cssText = "position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.9); z-index: 999999; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(5px);"; modal.innerHTML = `<div class="modal-content" style="width: 90%; max-width: 400px; background: white; padding: 25px 20px; border-radius: 20px; text-align: center; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5);"><button onclick="closeScannerModal()" style="position: absolute; top: 15px; right: 15px; border: none; background: #fef2f2; color: #dc2626; width: 35px; height: 35px; border-radius: 50%; font-weight: bold; cursor: pointer; z-index: 9999; font-size: 16px;">✕</button><h3 style="margin: 0 0 5px 0; font-size: 18px; color: #0f172a; font-weight: 800;">📸 Scan Barcode</h3><div id="qr-reader" style="width: 100%; border-radius: 12px; overflow: hidden; border: 2px solid #e2e8f0; min-height: 250px; background: #1e293b;"></div><div class="scanner-controls" style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;"><button class="btn-scanner-action" style="padding: 12px; border-radius: 12px; border: none; background: #f1f5f9; color:#0f172a; font-weight: bold; cursor: pointer; flex: 1;" onclick="toggleCameraFacing()">🔄 Balik Kamera</button><button class="btn-scanner-action" id="btnFlashlight" style="padding: 12px; border-radius: 12px; border: none; background: #f1f5f9; color:#0f172a; font-weight: bold; cursor: pointer; flex: 1;" onclick="toggleFlashlight()">🔦 Senter</button></div></div>`; document.body.appendChild(modal); isFlashlightOn = false; startScanner(); }
+
+function startScanner() { 
+    if(html5QrCode) { html5QrCode.stop().catch(e=>console.log(e)); html5QrCode = null; } 
+    html5QrCode = new Html5Qrcode("qr-reader"); 
+    let config = { fps: 10, qrbox: { width: 220, height: 220 } }; 
+    
+    html5QrCode.start({ facingMode: currentCameraFacing }, config, (decodedText) => { 
+        const now = Date.now(); 
+        if (now - lastScanTime < 1500) return; 
+        lastScanTime = now; 
+        let scanResult = decodedText.trim(); 
+
+        if (isBulkMode) { 
+            const foundItem = allItems.find(i => (i.kode_barang||"").toString().toLowerCase() === scanResult.toLowerCase() || (i.kode_wadah||"").toString().toLowerCase() === scanResult.toLowerCase()); 
+            if (foundItem) { 
+                if (!selectedRows.has(foundItem.row_index)) { 
+                    selectedRows.add(foundItem.row_index); 
+                    document.getElementById("bulkCount").innerText = `${selectedRows.size} Terpilih`; 
+                    applyFilters(); 
+                    showToast(`✅ ${foundItem.nama_barang} ditambahkan!`); 
+                    playScanBeep(true); // BEEP SUKSES
+                } else { 
+                    showToast(`⚠️ ${foundItem.nama_barang} sudah terpilih!`); 
+                    playScanBeep(false); // BEEP ERROR (Duplikat)
+                } 
+            } else { 
+                showToast(`❌ Kode [${scanResult}] tidak ada di database!`, false); 
+                playScanBeep(false); // BEEP ERROR (Tidak ketemu)
+            } 
+        } else { 
+            closeScannerModal(); 
+            const searchBox = document.getElementById('searchInput'); 
+            if(searchBox) { 
+                searchBox.value = scanResult; 
+                
+                // Menyesuaikan reset dropdown ke logika UI baru
+                const statusDrop = document.getElementById("filterStatusDropdown");
+                const lokasiDrop = document.getElementById("filterLokasiDropdown");
+                if (statusDrop) statusDrop.value = "all";
+                if (lokasiDrop) lokasiDrop.value = "all";
+                
+                applyFilters(); 
+                const foundItem = allItems.find(i => (i.kode_barang||"").toString().toLowerCase() === scanResult.toLowerCase() || (i.kode_wadah||"").toString().toLowerCase() === scanResult.toLowerCase()); 
+                if (foundItem) { 
+                    playScanBeep(true); // BEEP SUKSES
+                    setTimeout(() => openDetailModal(foundItem), 300); 
+                } else { 
+                    playScanBeep(false); // BEEP ERROR
+                    showToast(`❌ Barang [${scanResult}] tidak ditemukan!`, false); 
+                } 
+            } 
+        } 
+    }, (errorMessage) => { } ).catch(err => { alert("Gagal membuka kamera: " + err); closeScannerModal(); }); 
+}
+
+// (Fungsi toggleCameraFacing, toggleFlashlight, dan closeScannerModal biarkan tetap sama)
+function toggleCameraFacing() { currentCameraFacing = currentCameraFacing === "environment" ? "user" : "environment"; showToast("Mengganti kamera...", true); if (html5QrCode) { html5QrCode.stop().then(() => { setTimeout(startScanner, 300); }).catch(err => console.log(err)); } }
+function toggleFlashlight() { if (!html5QrCode) return; isFlashlightOn = !isFlashlightOn; html5QrCode.applyVideoConstraints({ advanced: [{ torch: isFlashlightOn }] }).then(() => { document.getElementById("btnFlashlight").style.background = isFlashlightOn ? "#fef08a" : "#f1f5f9"; }).catch(err => { showToast("Senter tidak didukung.", false); isFlashlightOn = false; document.getElementById("btnFlashlight").style.background = "#f1f5f9"; }); }
+function closeScannerModal() { if (html5QrCode) { html5QrCode.stop().catch(e=>console.log(e)); html5QrCode = null; } const m = document.getElementById("tempScannerModal"); if(m) m.remove(); }

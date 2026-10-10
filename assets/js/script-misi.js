@@ -115,13 +115,18 @@ function toggleHideCompleted() { isHideCompleted = !isHideCompleted; renderMissi
 function toggleMissionContent(element) { 
     const content = element.nextElementSibling; 
     const icon = element.querySelector('.toggle-icon');
-    content.classList.toggle('open'); 
-    if (content.classList.contains('open')) { if (icon) icon.innerText = '▲'; } 
-    else { if (icon) icon.innerText = '▼'; }
+    
+    if (content.style.display === 'none' || content.style.display === '') {
+        content.style.display = 'block'; // Buka kartu
+        if (icon) icon.innerText = '▲'; 
+    } else {
+        content.style.display = 'none';  // Tutup kartu
+        if (icon) icon.innerText = '▼'; 
+    }
 }
 
 // ==========================================
-// RENDER MISI (V.21.0 - MODERN GRID UI)
+// RENDER MISI (V.21.1 - MODERN GRID + BUKA TUTUP)
 // ==========================================
 function renderMissions() {
     if (!isDataLoaded) return; 
@@ -170,11 +175,11 @@ function renderMissions() {
     // 2. KOTAK PRIORITAS PEMASANGAN
     let prioritasHtml = `
     <div style="background:white; border:1px solid #e2e8f0; border-radius:12px; margin-bottom:10px; overflow:hidden; box-shadow:0 2px 4px rgba(0,0,0,0.02);">
-        <div onclick="this.nextElementSibling.classList.toggle('open')" style="cursor:pointer; padding:12px 15px; font-size:11px; font-weight:900; color:#475569; background:#f8fafc; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #f1f5f9;">
+        <div onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none'" style="cursor:pointer; padding:12px 15px; font-size:11px; font-weight:900; color:#475569; background:#f8fafc; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #f1f5f9;">
             <span>📋 PRIORITAS PEMASANGAN (KLIK)</span>
             <span>▼</span>
         </div>
-        <div class="mission-content" style="padding:15px; font-size:12px; color:#334155; line-height:1.6; background:white;">
+        <div class="mission-content" style="display:none; padding:15px; font-size:12px; color:#334155; line-height:1.6; background:white;">
             <ol style="margin:0; padding-left:18px;">
                 <li><b>Area Hadirin</b> (Zona C1, C2, D, E, G)</li>
                 <li><b>Samping & Belakang Panggung</b> (Zona A)</li>
@@ -205,7 +210,6 @@ function renderMissions() {
         <div style="text-align:right; font-size:10px; font-weight:bold; color:#64748b; margin-top:4px;">${persentase}% Selesai</div>
     </div>`;
     
-    // Inject Banners
     bannerContainer.innerHTML = rosterHtml + prioritasHtml + apdHtml + progressHtml;
 
     filtered.sort((a, b) => {
@@ -258,7 +262,7 @@ function renderMissions() {
             if(misi.tgl_mulai && misi.tgl_selesai) {
                 let dMulai = new Date(misi.tgl_mulai).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
                 let dSelesai = new Date(misi.tgl_selesai).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
-                badgeTanggalHtml = `<div style="font-size:10px; color:#64748b; margin-top:8px; font-weight:bold;"><span style="display:inline-block; margin-right:4px;">📅</span>${dMulai} - ${dSelesai}</div>`;
+                badgeTanggalHtml = `<div style="font-size:10px; color:#64748b; margin-top:6px; font-weight:bold;"><span style="display:inline-block; margin-right:4px;">📅</span>${dMulai} - ${dSelesai}</div>`;
             }
 
             let extraUI = "";
@@ -334,7 +338,7 @@ function renderMissions() {
             let buttonHtml = '';
             if (isSelesai) {
                 if (isAdminMode) {
-                    buttonHtml = `<div style="display:flex; gap:8px; width:100%; margin-top:15px; border-top:1px dashed #cbd5e1; padding-top:15px;">
+                    buttonHtml = `<div style="display:flex; gap:8px; width:100%; border-top:1px solid #bbf7d0; padding-top:15px;">
                         <div style="flex:1; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:10px; display:flex; flex-direction:column; justify-content:center;">
                             <div style="font-size:12px; font-weight:900; color:#166534;">✅ SELESAI</div>
                             <div style="font-size:10px; color:#15803d; margin-top:2px;">Oleh: <b>${misi.eksekutor || 'Kru A/V'}</b></div>
@@ -343,7 +347,7 @@ function renderMissions() {
                     </div>`;
                 }
                 else {
-                    buttonHtml = `<div style="width:100%; margin-top:15px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:12px; text-align:center;">
+                    buttonHtml = `<div style="width:100%; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:12px; text-align:center;">
                         <div style="font-size:14px; font-weight:900; color:#166534;">✅ MISI SELESAI</div>
                         <div style="font-size:10px; color:#15803d; margin-top:4px;">${misi.waktu_selesai} • Oleh: <b>${misi.eksekutor || 'Kru A/V'}</b></div>
                     </div>`;
@@ -354,16 +358,16 @@ function renderMissions() {
                     let scanBtn = `<button style="background:#eff6ff; color:#2563eb; border:1px solid #bfdbfe; padding:12px; border-radius:8px; font-weight:900; font-size:12px; cursor:pointer; flex:1; display:flex; align-items:center; justify-content:center; gap:6px; transition:all 0.2s;" onmouseover="this.style.background='#dbeafe'" onmouseout="this.style.background='#eff6ff'" onclick="openMissionScanner('${misi.row_index}', '${misi.id_misi}', '${safeKodeBarang}')">📷 SCAN ITEM</button>`;
                     
                     if (teamLower.includes("booth") || teamLower.includes("kabel") || teamLower.includes("speaker") || teamLower.includes("inventaris")) {
-                        buttonHtml = `<div style="display:flex; gap:10px; width:100%; margin-top:15px; border-top:1px dashed #cbd5e1; padding-top:15px;">
+                        buttonHtml = `<div style="display:flex; gap:10px; width:100%;">
                             ${scanBtn}
                             <button class="aksi-misi" style="background:#10b981; color:white; border:none; padding:12px; border-radius:8px; font-weight:900; font-size:12px; cursor:pointer; flex:1; display:flex; align-items:center; justify-content:center; gap:6px; transition:background 0.2s;" onmouseover="this.style.background='#059669'" onmouseout="this.style.background='#10b981'" onclick="executeCompleteMission(this, '${misi.row_index}', '${misi.id_misi}', '${safeKodeBarang}')">✅ SELESAI</button>
                         </div>`;
                     } else {
-                        buttonHtml = `<div style="width:100%; margin-top:15px; border-top:1px dashed #cbd5e1; padding-top:15px; display:flex;">${scanBtn}</div>`;
+                        buttonHtml = `<div style="width:100%; display:flex;">${scanBtn}</div>`;
                     }
                 }
                 else {
-                    buttonHtml = `<div style="margin-top:15px; padding:12px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; font-size:11px; color:#64748b; text-align:center; font-weight:bold;">🔒 Akses dikunci. Silakan login untuk eksekusi.</div>`;
+                    buttonHtml = `<div style="padding:12px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; font-size:11px; color:#64748b; text-align:center; font-weight:bold;">🔒 Akses dikunci. Silakan login untuk eksekusi.</div>`;
                 }
             }
 
@@ -373,31 +377,38 @@ function renderMissions() {
             let shadow = isSelesai ? 'none' : '0 4px 6px -1px rgba(0,0,0,0.05)';
 
             const card = document.createElement("div"); 
-            card.style.cssText = `background:${bgColor}; border:1px solid ${borderColor}; border-radius:12px; padding:15px; box-shadow:${shadow}; display:flex; flex-direction:column; position:relative; overflow:hidden; transition:transform 0.2s, box-shadow 0.2s;`;
+            card.style.cssText = `background:${bgColor}; border:1px solid ${borderColor}; border-radius:12px; padding:15px; box-shadow:${shadow}; display:flex; flex-direction:column; position:relative; transition:transform 0.2s, box-shadow 0.2s;`;
             
-            // Garis indikator hijau/abu di sebelah kiri kartu
             let leftStripe = `<div style="position:absolute; top:0; left:0; width:6px; height:100%; background:${isSelesai ? '#22c55e' : '#cbd5e1'};"></div>`;
 
             card.innerHTML = `
                 ${leftStripe}
-                <div style="padding-left:10px;">
-                    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
-                        <div style="display:flex; align-items:center; gap:8px;">
-                            <span style="background:#f1f5f9; color:#475569; font-size:10px; font-weight:900; padding:4px 8px; border-radius:6px; border:1px solid #e2e8f0;">#${index + 1}</span>
-                            <span style="font-size:13px; font-weight:800; color:#0f172a; letter-spacing:-0.5px;">${misi.id_misi}</span>
+                <div style="padding-left:10px; width:100%; box-sizing:border-box;">
+                    <!-- HEADER BISA DIKLIK -->
+                    <div onclick="toggleMissionContent(this)" style="cursor:pointer;">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <span style="background:#f1f5f9; color:#475569; font-size:10px; font-weight:900; padding:4px 8px; border-radius:6px; border:1px solid #e2e8f0;">#${index + 1}</span>
+                                <span style="font-size:13px; font-weight:800; color:#0f172a; letter-spacing:-0.5px;">${misi.id_misi}</span>
+                            </div>
+                            <div style="display:flex; gap:6px; align-items:center;">
+                                <span style="background:#fffbeb; color:#d97706; padding:4px 8px; border-radius:6px; font-size:10px; font-weight:bold; border:1px solid #fde68a;">📍 ${misi.zona || '-'}</span>
+                                <span class="toggle-icon" style="color:#94a3b8; font-size:10px; font-weight:bold; padding:4px; margin-left:4px;">▼</span>
+                            </div>
                         </div>
-                        <span style="background:#fffbeb; color:#d97706; padding:4px 8px; border-radius:6px; font-size:10px; font-weight:bold; border:1px solid #fde68a;">📍 ${misi.zona || '-'}</span>
+                        
+                        ${isOverride ? '<div style="margin-bottom:8px;"><span style="background:#fee2e2; color:#b91c1c; padding:4px 8px; border-radius:6px; font-size:10px; font-weight:bold; border:1px solid #fecaca;">⚠️ ALAT DIGANTI LAPANGAN</span></div>' : ''}
+                        
+                        <div style="font-size:14px; font-weight:800; color:#1e293b; line-height:1.3;">${judulTugas}</div>
+                        ${badgeTanggalHtml}
                     </div>
                     
-                    ${isOverride ? '<div style="margin-bottom:8px;"><span style="background:#fee2e2; color:#b91c1c; padding:4px 8px; border-radius:6px; font-size:10px; font-weight:bold; border:1px solid #fecaca;">⚠️ ALAT DIGANTI LAPANGAN</span></div>' : ''}
-                    
-                    <div style="font-size:15px; font-weight:800; color:#1e293b; line-height:1.3; margin-bottom:5px;">${judulTugas}</div>
-                    
-                    ${badgeTanggalHtml}
-                    ${detailHtml}
-                    ${packageHtml}
-                    
-                    <div style="margin-top:auto;">${buttonHtml}</div>
+                    <!-- KONTEN BISA DILIPAT (DEFAULT: TUTUP) -->
+                    <div class="mission-content" style="display:none; margin-top:15px; border-top:1px dashed #e2e8f0; padding-top:15px;">
+                        ${detailHtml}
+                        ${packageHtml}
+                        <div style="margin-top:15px;">${buttonHtml}</div>
+                    </div>
                 </div>`;
                 
             // Interaksi hover pada kartu

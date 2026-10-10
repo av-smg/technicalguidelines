@@ -138,7 +138,7 @@ function getFilteredData() {
     let filterStatus = document.getElementById("filterStatusDropdown") ? document.getElementById("filterStatusDropdown").value : "all";
     let filterLokasi = document.getElementById("filterLokasiDropdown") ? document.getElementById("filterLokasiDropdown").value : "all";
 
-    return allItems.filter(i => { 
+    let filtered = allItems.filter(i => { 
        const matchQ = (i.nama_barang||"").toLowerCase().includes(q) || 
                       (i.kode_barang||"").toLowerCase().includes(q) || 
                       (i.kode_wadah||"").toLowerCase().includes(q) || 
@@ -147,6 +147,9 @@ function getFilteredData() {
         let stat = i.status_digunakan || 'Di Gudang'; if(stat === 'FALSE') stat = 'Di Gudang'; 
         let lok = i.lokasi_saat_ini || i.lokasi || i["Lokasi Saat Ini"] || '';
         let kondisi = (i.kondisi||"").toLowerCase();
+
+        // Mengakomodasi legacy data yang masih menyimpan "Dalam Perjalanan" di kolom lokasi
+        if (lok === 'Dalam Perjalanan') stat = 'Dalam Perjalanan';
 
         let matchStatus = true;
         if (filterStatus === 'Rusak') {
@@ -179,6 +182,22 @@ function getFilteredData() {
         }
         return matchQ && matchStatus && matchLokasi && matchAdvanced && matchWadah; 
     }); 
+
+    // POIN 1: Prioritaskan barang yang baru di-scan / dipilih ke posisi teratas saat Mode Pilih aktif
+    if (isBulkMode) {
+        filtered.sort((a, b) => {
+            let aSel = selectedRows.has(a.row_index) ? 1 : 0;
+            let bSel = selectedRows.has(b.row_index) ? 1 : 0;
+            if (aSel !== bSel) return bSel - aSel; // Yang bernilai 1 (terpilih) naik ke atas
+            
+            // Sisanya tetap diurutkan berdasar abjad
+            let nameA = String(a.nama_barang || "").toUpperCase(); 
+            let nameB = String(b.nama_barang || "").toUpperCase(); 
+            return nameA.localeCompare(nameB);
+        });
+    }
+
+    return filtered;
 }
 
 function applyFilters() { render(getFilteredData()); }
@@ -262,8 +281,8 @@ function openDetailModal(item) {
     }
 
     let logHtml = `<div style="text-align:left; margin-top:10px; background:#f1f5f9; padding:8px; border-radius:6px; font-size:10px; color:#475569; max-height:80px; overflow-y:auto; white-space:pre-wrap; border:1px solid #cbd5e1;"><b>📜 Histori Log:</b><br>${item.log || 'Belum ada histori.'}</div>`;
-    let optionsLokasi = `<option value="Gudang Kanguru" ${lok.includes('Kanguru') ? 'selected':''}>🏢 Gudang Kanguru</option><option value="Gudang Mrican" ${lok.includes('Mrican') ? 'selected':''}>🏢 Gudang Mrican</option><option value="Dalam Perjalanan" ${lok === 'Dalam Perjalanan' ? 'selected':''}>🚚 Dalam Perjalanan</option><option value="Semarang | Di Lokasi Event" ${(lok.includes('Semarang') || lok === 'Di Lokasi Event') && !lok.includes('Yogya') ? 'selected':''}>📍 Event Semarang</option><option value="Yogyakarta | Di Lokasi Event" ${lok.includes('Yogya') ? 'selected':''}>🚩 Event Yogyakarta</option>`;
-    let optionsStatus = `<option value="Di Gudang" ${stat === 'Di Gudang' ? 'selected':''}>📦 Standby / Di Gudang</option><option value="Akan Dibawa" ${stat === 'Akan Dibawa' ? 'selected':''}>🛒 Akan Dibawa (Packing)</option><option value="Sedang Dipakai" ${stat === 'Sedang Dipakai' ? 'selected':''}>🔌 Sedang Dipakai / Aktivasi</option><option value="Sedang Diservis" ${stat === 'Sedang Diservis' ? 'selected':''}>🛠️ Sedang Diservis</option>`;
+    let optionsLokasi = `<option value="Gudang Kanguru" ${lok.includes('Kanguru') ? 'selected':''}>🏢 Gudang Kanguru</option><option value="Gudang Mrican" ${lok.includes('Mrican') ? 'selected':''}>🏢 Gudang Mrican</option><option value="Semarang | Di Lokasi Event" ${(lok.includes('Semarang') || lok === 'Di Lokasi Event') && !lok.includes('Yogya') ? 'selected':''}>📍 Event Semarang</option><option value="Yogyakarta | Di Lokasi Event" ${lok.includes('Yogya') ? 'selected':''}>🚩 Event Yogyakarta</option>`;
+    let optionsStatus = `<option value="Di Gudang" ${stat === 'Di Gudang' ? 'selected':''}>📦 Standby / Di Gudang</option><option value="Akan Dibawa" ${stat === 'Akan Dibawa' ? 'selected':''}>🛒 Akan Dibawa (Packing)</option><option value="Dalam Perjalanan" ${(stat === 'Dalam Perjalanan' || lok === 'Dalam Perjalanan') ? 'selected':''}>🚚 Dalam Perjalanan</option><option value="Sedang Dipakai" ${stat === 'Sedang Dipakai' ? 'selected':''}>🔌 Sedang Dipakai / Aktivasi</option><option value="Sedang Diservis" ${stat === 'Sedang Diservis' ? 'selected':''}>🛠️ Sedang Diservis</option>`;
     
     let actionButtons = isAdminMode ? `
         <button onclick="duplicateItem(${item.row_index})" style="width:100%; padding:10px; background:#8b5cf6; color:white; border:none; border-radius:8px; font-weight:bold; margin-bottom:8px; cursor:pointer;">📋 Duplikat Alat</button>
@@ -470,7 +489,6 @@ function openBulkUpdateModal() {
                     <option value="TETAP">-- Jangan Ubah Lokasi --</option>
                     <option value="Gudang Kanguru">🏢 Gudang Kanguru</option>
                     <option value="Gudang Mrican">🏢 Gudang Mrican</option>
-                    <option value="Dalam Perjalanan">🚚 Dalam Perjalanan</option>
                     <option value="Semarang | Di Lokasi Event">📍 Event Semarang</option>
                     <option value="Yogyakarta | Di Lokasi Event">🚩 Event Yogyakarta</option>
                 </select>
@@ -481,6 +499,7 @@ function openBulkUpdateModal() {
                 <select id="bulkNewStatus" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; font-weight:bold;">
                     <option value="TETAP">-- Jangan Ubah Status --</option>
                     <option value="Akan Dibawa">🛒 Akan Dibawa (Packing)</option>
+                    <option value="Dalam Perjalanan">🚚 Dalam Perjalanan</option>
                     <option value="Sedang Dipakai">🔌 Sedang Dipakai / Aktivasi</option>
                     <option value="Di Gudang">📦 Standby / Di Gudang</option>
                 </select>
@@ -768,10 +787,13 @@ function executePrint() {
     let filteredData = [];
     allItems.forEach(i => {
         let stat = i.status_digunakan || 'Di Gudang'; if(stat === 'FALSE') stat = 'Di Gudang';
-        let lok = i.lokasi_saat_ini || i.lokasi || i["Lokasi Saat Ini"] || '';
-        let kondisi = (i.kondisi || "").toLowerCase();
+        let lok = i.lokasi_saat_ini || i.lokasi || i["Lokasi Saat Karena Ini"] || '';
+        
+        // Transisi Data Legacy
+        if (lok === 'Dalam Perjalanan') stat = 'Dalam Perjalanan';
 
-        if (kondisi === 'rusak' || kondisi === 'periksa') return;
+        // POIN 3: Blokir barang rusak DIHAPUS. Barang rusak akan tercetak jika filter dropdown mencakupnya.
+        // (Baris if kondisi rusak dihapus)
 
         if (source === "semua") {
             filteredData.push(i);
@@ -847,12 +869,13 @@ function executePrint() {
                     let stat = item.status_digunakan || 'Di Gudang'; if(stat === 'FALSE') stat = 'Di Gudang';
                     let lok = item.lokasi_saat_ini || item.lokasi || item["Lokasi Saat Ini"] || '';
                     
+                   // (Cari baris ini di dalam if format CO-31)
                     let sumberLabel = "TIDAK DIKETAHUI";
                     if (stat === 'Akan Dibawa') sumberLabel = "🛒 AKAN DIBAWA";
                     else if (lok.includes('Event') || stat === 'Sedang Dipakai') sumberLabel = "🚩 DI LOKASI EVENT";
                     else if (lok.includes('Kanguru')) sumberLabel = "🏢 GUDANG KANGURU";
                     else if (lok.includes('Mrican')) sumberLabel = "🏢 GUDANG MRICAN";
-                    else if (lok === 'Dalam Perjalanan') sumberLabel = "🚚 DALAM PERJALANAN";
+                    else if (stat === 'Dalam Perjalanan') sumberLabel = "🚚 DALAM PERJALANAN"; // Diubah baca stat
                     else sumberLabel = `📦 ${lok.toUpperCase()}`;
 
                     if (!lepasanBySumber[sumberLabel]) lepasanBySumber[sumberLabel] = [];

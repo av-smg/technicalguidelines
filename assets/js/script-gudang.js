@@ -1,5 +1,5 @@
 // ==========================================
-// MESIN LOGIKA GUDANG (V.62.0 - FULL ENTERPRISE: MISSION BUILDER & RADAR BENTROK)
+// MESIN LOGIKA GUDANG (V.66.0 - KEBUTUHAN TIM, HARDCASE FIX & LEPASAN)
 // ==========================================
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm4eJGQjBytrLTQgYrsfEXIQxLQ_Rq7NFVM__Y8AhRfzPe8q5FJhofecqrDJ5ywkeBEg/exec"; 
@@ -7,7 +7,7 @@ const API_BACKEND_PIN = "a1b2c3";
 
 let allItems = []; let allMissions = []; let optionsData = { lokasi: [], tim: [] }; 
 let html5QrCode = null; 
-let isAdminMode = false, isBulkMode = false, selectedRows = new Set(), lastScanTime = 0, activeFilterPill = 'all', currentViewMode = 'grid'; 
+let isAdminMode = false, isBulkMode = false, selectedRows = new Set(), lastScanTime = 0, currentViewMode = 'grid'; 
 
 // Status toggle wadah
 let showOnlyWadah = false; 
@@ -95,17 +95,14 @@ function setupStickyHeader() {
         toolbar.style.top = "0px"; 
         toolbar.style.zIndex = "99"; 
         
-        // Hapus injeksi Mission Builder yang lama di header (jika ada)
         let pillsWrapper = document.querySelector(".filter-pills-wrapper"); 
         if(pillsWrapper) {
             pillsWrapper.remove();
         }
 
-        // --- TAMBAHAN BARU: EVENT LISTENER TOMBOL TIM ---
         const btnBukaFilter = document.getElementById('btnBukaFilter'); 
         const panelFilter = document.getElementById('panelFilterLanjutan'); 
         if (btnBukaFilter && panelFilter) { 
-            // Kita clone dan replace untuk menghapus event listener lama yang menempel
             btnBukaFilter.replaceWith(btnBukaFilter.cloneNode(true)); 
             const newBtnBukaFilter = document.getElementById('btnBukaFilter'); 
             
@@ -123,13 +120,13 @@ function setupStickyHeader() {
         }
     } 
 }
+
 // ==============================================================
 // LOGIKA TOMBOL WADAH, FILTER & VIEW 
 // ==============================================================
 function toggleViewMode() { const btn = document.getElementById("btnViewToggle"); if (currentViewMode === 'grid') { currentViewMode = 'list'; btn.innerHTML = '🖼️ Grid View'; document.getElementById("dataContainer").className = "list-view-container"; } else { currentViewMode = 'grid'; btn.innerHTML = '📄 List View'; document.getElementById("dataContainer").className = "grid-cards"; } applyFilters(); }
 function toggleWadahMode() { showOnlyWadah = !showOnlyWadah; const btn = document.getElementById("btnWadahToggle"); if (showOnlyWadah) { btn.innerHTML = '📦 Tampilkan Semua'; btn.style.background = '#ea580c'; btn.style.color = 'white'; btn.style.border = '1px solid #ea580c'; } else { btn.innerHTML = '🧰 Hanya Wadah'; btn.style.background = '#f1f5f9'; btn.style.color = '#334155'; btn.style.border = '1px solid #ccc'; } applyFilters(); }
 
-// Trigger untuk filter dropdown
 function setFilterPill(triggerData) { 
     applyFilters(); 
 }
@@ -138,7 +135,6 @@ function getFilteredData() {
     const q = document.getElementById("searchInput").value.toLowerCase(); 
     let timAktif = Array.from(document.querySelectorAll('.cek-tim:checked')).map(cb => cb.value.toLowerCase());
     
-    // Ambil nilai filter dari HTML
     let filterStatus = document.getElementById("filterStatusDropdown") ? document.getElementById("filterStatusDropdown").value : "all";
     let filterLokasi = document.getElementById("filterLokasiDropdown") ? document.getElementById("filterLokasiDropdown").value : "all";
 
@@ -152,17 +148,14 @@ function getFilteredData() {
         let lok = i.lokasi_saat_ini || i.lokasi || i["Lokasi Saat Ini"] || '';
         let kondisi = (i.kondisi||"").toLowerCase();
 
-        // Logika Filter Status
         let matchStatus = true;
         if (filterStatus === 'Rusak') {
             matchStatus = (kondisi === 'rusak' || kondisi === 'periksa');
         } else if (filterStatus !== 'all') {
             matchStatus = (stat === filterStatus);
-            // Jangan tampilkan barang rusak di filter status lain
             if (matchStatus && (kondisi === 'rusak' || kondisi === 'periksa')) matchStatus = false;
         }
 
-        // Logika Filter Lokasi
         let matchLokasi = true;
         if (filterLokasi !== 'all') {
             if (filterLokasi === 'Semarang | Di Lokasi Event') {
@@ -359,11 +352,10 @@ function checkBentrokJadwal(itemKode, tglMulaiWeb, tglSelesaiWeb) {
         
         let kodes = (m.kode_barang || "").toLowerCase().split(',').map(k=>k.trim());
         if(kodes.includes(itemKode.toLowerCase())) {
-            // Logika Overlap Kalender (Saling menimpa)
             if (startA <= endB && endA >= startB) return m.id_misi; 
         }
     }
-    return false; // Tidak bentrok, lampu hijau!
+    return false;
 }
 
 function renderBuilderSearch() {
@@ -722,8 +714,8 @@ function openFeedbackModal() { const currentUser = localStorage.getItem('av_sess
 function closeFeedbackModal() { document.getElementById('feedbackModal').classList.remove('active'); }
 async function submitFeedback(e) { e.preventDefault(); const btn = document.getElementById("btnSubmitFb"); btn.disabled = true; btn.innerHTML = "⏳ MENGIRIM..."; setTimeout(() => { showToast("✅ Laporan Terekam!"); document.getElementById("formFeedback").reset(); closeFeedbackModal(); btn.disabled = false; btn.innerHTML = "🚀 KIRIM"; }, 1000); }
 
-function printSuratJalan() { openPrintModal('co31'); }
-function printFormCO31() { openPrintModal('co31'); }
+function printSuratJalan() { openPrintModal(); }
+function printFormCO31() { openPrintModal(); }
 
 // ==========================================
 // FITUR PRINT ENGINE (V.66.0 - KEBUTUHAN TIM, HARDCASE FIX & LEPASAN)
@@ -1027,3 +1019,10 @@ function executePrint() {
     
     printWin.document.write(html); printWin.document.close(); closePrintModal(); 
 }
+
+// === SCANNER QR ===
+function openScannerModal() { const oldModal = document.getElementById("tempScannerModal"); if(oldModal) oldModal.remove(); let modal = document.createElement("div"); modal.id = "tempScannerModal"; modal.className = "modal-overlay active"; modal.style.cssText = "position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.9); z-index: 999999; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(5px);"; modal.innerHTML = `<div class="modal-content" style="width: 90%; max-width: 400px; background: white; padding: 25px 20px; border-radius: 20px; text-align: center; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5);"><button onclick="closeScannerModal()" style="position: absolute; top: 15px; right: 15px; border: none; background: #fef2f2; color: #dc2626; width: 35px; height: 35px; border-radius: 50%; font-weight: bold; cursor: pointer; z-index: 9999; font-size: 16px;">✕</button><h3 style="margin: 0 0 5px 0; font-size: 18px; color: #0f172a; font-weight: 800;">📸 Scan Barcode</h3><div id="qr-reader" style="width: 100%; border-radius: 12px; overflow: hidden; border: 2px solid #e2e8f0; min-height: 250px; background: #1e293b;"></div><div class="scanner-controls" style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;"><button class="btn-scanner-action" style="padding: 12px; border-radius: 12px; border: none; background: #f1f5f9; color:#0f172a; font-weight: bold; cursor: pointer; flex: 1;" onclick="toggleCameraFacing()">🔄 Balik Kamera</button><button class="btn-scanner-action" id="btnFlashlight" style="padding: 12px; border-radius: 12px; border: none; background: #f1f5f9; color:#0f172a; font-weight: bold; cursor: pointer; flex: 1;" onclick="toggleFlashlight()">🔦 Senter</button></div></div>`; document.body.appendChild(modal); isFlashlightOn = false; startScanner(); }
+function startScanner() { if(html5QrCode) { html5QrCode.stop().catch(e=>console.log(e)); html5QrCode = null; } html5QrCode = new Html5Qrcode("qr-reader"); let config = { fps: 10, qrbox: { width: 220, height: 220 } }; html5QrCode.start({ facingMode: currentCameraFacing }, config, (decodedText) => { const now = Date.now(); if (now - lastScanTime < 1500) return; lastScanTime = now; let scanResult = decodedText.trim(); try { if ("vibrate" in navigator) navigator.vibrate([200]); } catch(e){} if (isBulkMode) { const foundItem = allItems.find(i => (i.kode_barang||"").toString().toLowerCase() === scanResult.toLowerCase() || (i.kode_wadah||"").toString().toLowerCase() === scanResult.toLowerCase()); if (foundItem) { if (!selectedRows.has(foundItem.row_index)) { selectedRows.add(foundItem.row_index); document.getElementById("bulkCount").innerText = `${selectedRows.size} Terpilih`; applyFilters(); showToast(`✅ ${foundItem.nama_barang} ditambahkan!`); } else { showToast(`⚠️ ${foundItem.nama_barang} sudah terpilih!`); } } else { try { if ("vibrate" in navigator) navigator.vibrate([300, 100, 300]); } catch(e){} showToast(`❌ Kode [${scanResult}] tidak ada di database!`, false); } } else { closeScannerModal(); const searchBox = document.getElementById('searchInput'); if(searchBox) { searchBox.value = scanResult; setFilterPill('all', document.querySelector('.pill-btn[data-filter="all"]')); applyFilters(); const foundItem = allItems.find(i => (i.kode_barang||"").toString().toLowerCase() === scanResult.toLowerCase() || (i.kode_wadah||"").toString().toLowerCase() === scanResult.toLowerCase()); if (foundItem) { setTimeout(() => openDetailModal(foundItem), 300); } else { showToast(`❌ Barang [${scanResult}] tidak ditemukan!`, false); } } } }, (errorMessage) => { } ).catch(err => { alert("Gagal membuka kamera: " + err); closeScannerModal(); }); }
+function toggleCameraFacing() { currentCameraFacing = currentCameraFacing === "environment" ? "user" : "environment"; showToast("Mengganti kamera...", true); if (html5QrCode) { html5QrCode.stop().then(() => { setTimeout(startScanner, 300); }).catch(err => console.log(err)); } }
+function toggleFlashlight() { if (!html5QrCode) return; isFlashlightOn = !isFlashlightOn; html5QrCode.applyVideoConstraints({ advanced: [{ torch: isFlashlightOn }] }).then(() => { document.getElementById("btnFlashlight").style.background = isFlashlightOn ? "#fef08a" : "#f1f5f9"; }).catch(err => { showToast("Senter tidak didukung.", false); isFlashlightOn = false; document.getElementById("btnFlashlight").style.background = "#f1f5f9"; }); }
+function closeScannerModal() { if (html5QrCode) { html5QrCode.stop().catch(e=>console.log(e)); html5QrCode = null; } const m = document.getElementById("tempScannerModal"); if(m) m.remove(); }

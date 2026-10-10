@@ -61,16 +61,14 @@ location: "MASTER"
                 <button onclick="openScannerModal()" style="padding:8px 12px; border-radius:8px; background:#1e293b; color:white; border:none; font-weight:bold; font-size:11px; display:flex; align-items:center; gap:4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">📷 Scan QR</button>
             </div>
             
-            <!-- BARIS 2: FILTER STATUS & FILTER LOKASI (CLEAN UI) -->
+           <!-- BARIS 2: FILTER STATUS & FILTER LOKASI (CLEAN UI) -->
             <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; align-items:center;">
                 <!-- Filter Status Menggantikan Tombol Pills -->
                 <select id="filterStatusDropdown" class="modern-select" onchange="setFilterPill(this.value)" style="flex:1; min-width:140px;">
-                    <option value="all">🔸 Tampilkan Semua Status</option>
-                    <option value="Di Gudang">📦 Di Gudang (Standby)</option>
-                    <!-- Pembagian "Akan Dibawa" menjadi per Kota -->
-                    <option value="Akan Dibawa (Semarang)">🛒 Akan Dibawa (Ke Semarang)</option>
-                    <option value="Akan Dibawa (Yogya)">🛒 Akan Dibawa (Ke Yogya)</option>
-                    <option value="Sedang Dipakai">🔌 Sedang Dipakai (Di Event)</option>
+                    <option value="all">🔸 Semua Status</option>
+                    <option value="Di Gudang">📦 Di Gudang</option>
+                    <option value="Akan Dibawa">🛒 Akan Dibawa</option>
+                    <option value="Sedang Dipakai">🔌 Sedang Dipakai</option>
                     <option value="Rusak">⚠️ Perbaikan / Rusak</option>
                 </select>
                 
@@ -78,7 +76,9 @@ location: "MASTER"
                     <option value="all">📍 Semua Lokasi</option>
                     <option value="Gudang Kanguru">🏢 Gudang Kanguru</option>
                     <option value="Gudang Mrican">🏢 Gudang Mrican</option>
-                    <option value="Di Lokasi Event">🚩 Di Lokasi Event</option>
+                    <option value="Semarang | Di Lokasi Event">🚩 Event Semarang</option>
+                    <option value="Yogyakarta | Di Lokasi Event">🚩 Event Yogyakarta</option>
+                    <option value="Dalam Perjalanan">🚚 Dalam Perjalanan</option>
                 </select>
                 
                 <button id="btnBukaFilter" style="background:#334155; color:white; border:none; padding:8px 12px; border-radius:8px; font-size:11px; font-weight:bold; cursor:pointer;">⚙️ TIM</button>
@@ -90,6 +90,26 @@ location: "MASTER"
                     <label><input type="checkbox" class="cek-tim" value="Speaker"> Speaker</label>
                     <label><input type="checkbox" class="cek-tim" value="Kabel"> Kabel</label>
                     <label><input type="checkbox" class="cek-tim" value="Booth"> Booth</label>
+                </div>
+            </div>
+
+            <!-- BARIS 3: TOMBOL AKSI & TAMPILAN -->
+            <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px;">
+                <!-- Kiri: Aksi Data -->
+                <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                    <button onclick="openAddModal()" class="aksi-gudang" style="padding:6px 12px; border-radius:6px; background:#16a34a; color:white; border:none; font-weight:bold; font-size:11px;">➕ Tambah</button>
+                    <button id="btnBulkMode" onclick="toggleBulkMode()" class="aksi-gudang" style="padding:6px 12px; border-radius:6px; background:#ea580c; color:white; border:none; font-weight:bold; font-size:11px;">☑️ Mode Pilih</button>
+                    <!-- Teks Tombol Cetak sudah disesuaikan -->
+                    <button onclick="printFormCO31()" class="aksi-gudang" style="padding:6px 12px; border-radius:6px; background:#8b5cf6; color:white; border:none; font-weight:bold; font-size:11px;">🖨️ Cetak</button>
+                </div>
+                
+                <!-- Kanan: Tampilan & Mission Builder -->
+                <div style="display:flex; gap:6px;">
+                    <button id="btnWadahToggle" onclick="toggleWadahMode()" style="padding:6px 10px; border-radius:6px; background:#f1f5f9; color:#334155; border:1px solid #ccc; font-weight:bold; font-size:10px; transition:0.2s;">🧰 Wadah</button>
+                    <button id="btnViewToggle" onclick="toggleViewMode()" style="padding:6px 10px; border-radius:6px; background:#f1f5f9; color:#334155; border:1px solid #ccc; font-weight:bold; font-size:10px;">📋 List</button>
+                    
+                    <!-- Tempat Mission Builder akan disuntikkan secara dinamis -->
+                    <div id="missionBuilderContainer"></div>
                 </div>
             </div>
 
@@ -233,66 +253,3 @@ location: "MASTER"
         </div>
     </div>
 
-    <!-- MODAL EXPORT EXCEL CUSTOM -->
-    <div id="modalExport" class="modal-overlay">
-        <div class="modal-content" style="max-width:350px; background:white; padding:25px; border-radius:15px; position:relative;">
-            <button onclick="closeExportModal()" style="position:absolute; top:15px; right:15px; border:none; background:#f1f5f9; width:30px; height:30px; border-radius:50%; font-weight:bold; cursor:pointer; color:#334155;">✕</button>
-            <h3 style="margin-top:0; color:#10b981; margin-bottom:5px; font-weight:900; text-align:center;">📥 Export Data Excel</h3>
-            <p style="font-size:11px; color:#64748b; margin-bottom:20px; text-align:center;">Filter data spesifik yang ingin diunduh:</p>
-            
-            <label style="font-size:11px; font-weight:bold; color:#1e293b; margin-bottom:4px; display:block;">📍 Pilih Gudang / Lokasi:</label>
-            <select id="exportLokasi" style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1; margin-bottom:15px; font-size:12px; font-weight:bold; color:#334155;">
-                <option value="ALL">📦 Semua Gudang / Lokasi</option>
-            </select>
-
-            <label style="font-size:11px; font-weight:bold; color:#1e293b; margin-bottom:4px; display:block;">👥 Pilih Tim Terkait:</label>
-            <select id="exportTim" style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1; margin-bottom:15px; font-size:12px; font-weight:bold; color:#334155;">
-                <option value="ALL">Semua Tim</option>
-                <option value="speaker">🔊 Tim Speaker</option>
-                <option value="kabel">🔌 Tim Kabel</option>
-                <option value="booth">🎛️ Tim Booth</option>
-            </select>
-
-            <label style="font-size:11px; font-weight:bold; color:#1e293b; margin-bottom:4px; display:block;">✨ Kondisi Barang:</label>
-            <select id="exportKondisi" style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1; margin-bottom:25px; font-size:12px; font-weight:bold; color:#334155;">
-                <option value="ALL">Semua Kondisi</option>
-                <option value="bagus">Bagus</option>
-                <option value="periksa">Periksa</option>
-                <option value="rusak">Rusak</option>
-            </select>
-
-            <button onclick="executeCustomExport()" style="width:100%; padding:14px; background:#10b981; color:white; border:none; border-radius:10px; font-weight:900; cursor:pointer; font-size:13px; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2);">🚀 DOWNLOAD EXCEL</button>
-        </div>
-    </div>
-    
-    <div id="zoomModal" class="zoom-overlay" onclick="closeZoomModal()">
-        <button onclick="closeZoomModal()" style="position:absolute; top:20px; left:20px; padding:10px 16px; background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.4); border-radius:8px; color:white; font-weight:bold; cursor:pointer; backdrop-filter:blur(4px); z-index:1000000; box-shadow:0 4px 10px rgba(0,0,0,0.5);">⬅ Kembali</button>
-        <img id="zoomImgSrc" src="" onclick="event.stopPropagation()">
-    </div>
-    <div id="toastMsg" class="toast-msg">Notifikasi</div>
-    
-    <script src="{{ site.baseurl }}/assets/js/script-gudang.js?v=65"></script>
-    
-    <!-- SCRIPT KEAMANAN RBAC -->
-    <script>
-      document.addEventListener("DOMContentLoaded", function() {
-        const userRole = localStorage.getItem('av_session_role');
-        const statusText = document.getElementById('modeStatusText');
-
-        if (!userRole) return; 
-
-        if (userRole === "Master" || userRole === "Kru") {
-          document.querySelectorAll('.aksi-gudang').forEach(btn => {
-            btn.style.display = "inline-flex"; 
-            btn.style.setProperty("display", "inline-flex", "important");
-          });
-          
-          if(statusText) {
-             statusText.innerHTML = "🔴 Edit Mode Aktif";
-             statusText.style.color = "#ef4444";
-          }
-        }
-      });
-    </script>
-</body>
-</html>

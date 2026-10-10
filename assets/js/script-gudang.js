@@ -249,7 +249,7 @@ function openDetailModal(item) {
     }
 
     let logHtml = `<div style="text-align:left; margin-top:10px; background:#f1f5f9; padding:8px; border-radius:6px; font-size:10px; color:#475569; max-height:80px; overflow-y:auto; white-space:pre-wrap; border:1px solid #cbd5e1;"><b>📜 Histori Log:</b><br>${item.log || 'Belum ada histori.'}</div>`;
-    let optionsLokasi = `<option value="Gudang Kanguru" ${lok.includes('Kanguru') ? 'selected':''}>🏢 Gudang Kanguru</option><option value="Gudang Mrican" ${lok.includes('Mrican') ? 'selected':''}>🏢 Gudang Mrican</option><option value="Gudang Yogyakarta" ${lok.includes('Yogya') ? 'selected':''}>🏢 Gudang Yogyakarta</option><option value="Dalam Perjalanan" ${lok === 'Dalam Perjalanan' ? 'selected':''}>🚚 Dalam Perjalanan</option><option value="Di Lokasi Event" ${lok === 'Di Lokasi Event' ? 'selected':''}>📍 Di Lokasi Event</option>`; 
+    let optionsLokasi = `<option value="Gudang Kanguru" ${lok.includes('Kanguru') ? 'selected':''}>🏢 Gudang Kanguru</option><option value="Gudang Mrican" ${lok.includes('Mrican') ? 'selected':''}>🏢 Gudang Mrican</option><option value="Dalam Perjalanan" ${lok === 'Dalam Perjalanan' ? 'selected':''}>🚚 Dalam Perjalanan</option><option value="Semarang | Di Lokasi Event" ${(lok.includes('Semarang') || lok === 'Di Lokasi Event') && !lok.includes('Yogya') ? 'selected':''}>📍 Event Semarang</option><option value="Yogyakarta | Di Lokasi Event" ${lok.includes('Yogya') ? 'selected':''}>🚩 Event Yogyakarta</option>`;
     let optionsStatus = `<option value="Di Gudang" ${stat === 'Di Gudang' ? 'selected':''}>📦 Standby / Di Gudang</option><option value="Akan Dibawa" ${stat === 'Akan Dibawa' ? 'selected':''}>🛒 Akan Dibawa (Packing)</option><option value="Sedang Dipakai" ${stat === 'Sedang Dipakai' ? 'selected':''}>🔌 Sedang Dipakai / Aktivasi</option><option value="Sedang Diservis" ${stat === 'Sedang Diservis' ? 'selected':''}>🛠️ Sedang Diservis</option>`;
     
     let actionButtons = isAdminMode ? `
@@ -458,9 +458,9 @@ function openBulkUpdateModal() {
                     <option value="TETAP">-- Jangan Ubah Lokasi --</option>
                     <option value="Gudang Kanguru">🏢 Gudang Kanguru</option>
                     <option value="Gudang Mrican">🏢 Gudang Mrican</option>
-                    <option value="Gudang Yogyakarta">🏢 Gudang Yogyakarta</option>
                     <option value="Dalam Perjalanan">🚚 Dalam Perjalanan</option>
-                    <option value="Di Lokasi Event">📍 Di Lokasi Event</option>
+                    <option value="Semarang | Di Lokasi Event">📍 Event Semarang</option>
+                    <option value="Yogyakarta | Di Lokasi Event">🚩 Event Yogyakarta</option>
                 </select>
             </div>
             

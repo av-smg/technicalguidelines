@@ -800,17 +800,13 @@ function executePrint() {
         body { font-family: 'Arial', sans-serif; font-size:12px; color:#000; } 
         
         table { width: 100%; border-collapse: collapse; margin-top: 5px; margin-bottom: 20px;} 
-        
-        /* Poin 1: Mengurangi row height dengan mengecilkan padding atas-bawah */
         th, td { border: 1px solid #000; padding: 3px 8px; text-align: left; vertical-align: middle;} 
-        
         th { background: #f0f0f0; padding-top: 6px; padding-bottom: 6px; } 
         .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 10px; }
         
         .page-break { break-before: page; page-break-before: always; }
         .no-break-inside { break-inside: avoid; page-break-inside: avoid; }
         
-        /* CSS Label Hardcase Fix Border */
         .hardcase-wrapper { width: 100%; border: 2px solid #0f172a; border-radius: 8px; font-family: 'Arial', sans-serif; background: #fff; box-shadow: 2px 2px 0px #0f172a; margin-bottom:20px; padding:15px; box-sizing:border-box;}
         .hardcase-header { text-align: center; border-bottom: 3px double #0f172a; padding-bottom: 10px; margin-bottom: 15px; }
         .hardcase-title { margin: 0; font-size: 20px; font-weight: 900; color: #0f172a; text-transform: uppercase;}
@@ -831,19 +827,43 @@ function executePrint() {
     // FORMAT 1: CO-31 (Daftar Detail per Wadah)
     // ==========================================
     if (format === "co31") {
-        html += `<div class="header"><h2 style="margin:0;">LAMPIRAN DAFTAR BARANG (CO-31)</h2><p style="margin:5px 0 0 0; color:#444; font-size:13px;">Konteks Data: <b>${titleContextText.toUpperCase()}</b></p></div>`;
-        
-        let groupedWadah = {}; let lepasan = [];
+        let groupedWadah = {}; 
+        let wadahKosong = []; 
+        let lepasanBySumber = {};
+
         filteredData.forEach(item => { 
             let wadah = (item.kode_wadah || "").toUpperCase().trim(); 
             if (wadah && wadah !== "-") { 
                 if (!groupedWadah[wadah]) groupedWadah[wadah] = []; 
                 groupedWadah[wadah].push(item); 
             } else { 
-                lepasan.push(item); 
+                // Cek apakah item ini berjenis Wadah/Box
+                let nama = (item.nama_barang || "").toLowerCase();
+                let isWadah = nama.includes('hardcase') || nama.includes('koper') || nama.includes('wadah') || nama.includes('box') || nama.includes('container') || nama.includes('tas');
+                
+                if (isWadah) {
+                    wadahKosong.push(item);
+                } else {
+                    let stat = item.status_digunakan || 'Di Gudang'; if(stat === 'FALSE') stat = 'Di Gudang';
+                    let lok = item.lokasi_saat_ini || item.lokasi || item["Lokasi Saat Ini"] || '';
+                    
+                    let sumberLabel = "TIDAK DIKETAHUI";
+                    if (stat === 'Akan Dibawa') sumberLabel = "🛒 AKAN DIBAWA";
+                    else if (lok.includes('Event') || stat === 'Sedang Dipakai') sumberLabel = "🚩 DI LOKASI EVENT";
+                    else if (lok.includes('Kanguru')) sumberLabel = "🏢 GUDANG KANGURU";
+                    else if (lok.includes('Mrican')) sumberLabel = "🏢 GUDANG MRICAN";
+                    else if (lok === 'Dalam Perjalanan') sumberLabel = "🚚 DALAM PERJALANAN";
+                    else sumberLabel = `📦 ${lok.toUpperCase()}`;
+
+                    if (!lepasanBySumber[sumberLabel]) lepasanBySumber[sumberLabel] = [];
+                    lepasanBySumber[sumberLabel].push(item);
+                }
             } 
         });
 
+        html += `<div class="header"><h2 style="margin:0;">LAMPIRAN DAFTAR BARANG (CO-31)</h2><p style="margin:5px 0 0 0; color:#444; font-size:13px;">Konteks Data: <b>${titleContextText.toUpperCase()}</b></p></div>`;
+
+        // 1. DAFTAR BARANG DI DALAM WADAH (HARDCASE)
         if (Object.keys(groupedWadah).length > 0) {
             html += `<table>`;
             html += `<thead><tr><th style="width:8%; text-align:center;">Jumlah</th><th style="width:72%;">Uraian Detail Barang (Wadah & Isi)</th><th style="width:20%; text-align:center;">Checklist</th></tr></thead><tbody>`;
@@ -851,7 +871,6 @@ function executePrint() {
                 let boxItem = allItems.find(i => i.kode_barang && i.kode_barang.toUpperCase() === wadah); 
                 let boxName = boxItem ? boxItem.nama_barang.toUpperCase() : `WADAH #${wadah}`;
                 
-                // Poin 2: Menghapus kolom checklist pada baris judul Hardcase (pakai colspan)
                 html += `<tr class="no-break-inside" style="background-color:#f1f5f9;"><td style="text-align:center; font-weight:bold; font-size:12px; border-bottom:1px solid #ccc; padding:6px 8px;">1 Pcs</td><td colspan="2" style="font-weight:bold; font-size:12px; border-bottom:1px solid #ccc; padding:6px 8px; color:#0f172a;">🧰 ${boxName} (#${wadah})</td></tr>`;
                 
                 groupedWadah[wadah].forEach(item => { 
@@ -861,16 +880,40 @@ function executePrint() {
             html += `</tbody></table>`;
         }
 
-        if (lepasan.length > 0) {
+        // 2. DAFTAR FISIK WADAH KOSONG / UTAMA
+        if (wadahKosong.length > 0) {
             if (Object.keys(groupedWadah).length > 0) html += `<div class="page-break"></div>`; 
-            html += `<div class="header"><h2 style="margin:0;">LAMPIRAN DAFTAR BARANG (CO-31)</h2><p style="margin:5px 0 0 0; color:#444; font-size:13px;">Konteks Data: <b>${titleContextText.toUpperCase()}</b></p></div>`;
-            html += `<h3 style="background:#e2e8f0; padding:6px 8px; border-left:4px solid #475569; font-size:13px; text-transform:uppercase; margin-bottom:5px;">Daftar Barang Lepasan (Tanpa Wadah)</h3>`;
+            if (Object.keys(groupedWadah).length > 0) {
+                html += `<div class="header"><h2 style="margin:0;">LAMPIRAN DAFTAR BARANG (CO-31)</h2><p style="margin:5px 0 0 0; color:#444; font-size:13px;">Konteks Data: <b>${titleContextText.toUpperCase()}</b></p></div>`;
+            }
+            html += `<h3 style="background:#fef3c7; padding:6px 8px; border-left:4px solid #d97706; font-size:13px; text-transform:uppercase; margin-bottom:5px; color:#92400e;">🧰 DAFTAR FISIK WADAH / KOTAK PENYIMPANAN</h3>`;
             html += `<table>`;
-            html += `<thead><tr><th style="width:8%; text-align:center;">Jumlah</th><th style="width:72%;">Uraian Detail Barang</th><th style="width:20%; text-align:center;">Checklist</th></tr></thead><tbody>`;
-            lepasan.forEach(item => { 
+            html += `<thead><tr><th style="width:8%; text-align:center;">Jumlah</th><th style="width:72%;">Nama Wadah</th><th style="width:20%; text-align:center;">Checklist</th></tr></thead><tbody>`;
+            wadahKosong.forEach(item => { 
                 html += `<tr class="no-break-inside"><td style="text-align:center; font-weight:bold; font-size:11px;">${item.jumlah} Pcs</td><td><span class="alat-nama">${item.nama_barang.toUpperCase()}</span> ${item.kode_barang ? '<span class="alat-kode">(#'+item.kode_barang+')</span>' : ''}</td><td style="text-align:center;"><span class="box-check">☐</span></td></tr>`; 
             });
             html += `</tbody></table>`;
+        }
+
+        // 3. DAFTAR LEPASAN BERDASARKAN SUMBER LOKASI/STATUS
+        let sumberKeys = Object.keys(lepasanBySumber).sort();
+        if (sumberKeys.length > 0) {
+            if (Object.keys(groupedWadah).length > 0 || wadahKosong.length > 0) html += `<div class="page-break"></div>`; 
+            
+            sumberKeys.forEach((sumber, idx) => {
+                // Header utama (CO-31) dicetak di awal halaman baru
+                if (idx === 0) {
+                     html += `<div class="header"><h2 style="margin:0;">LAMPIRAN DAFTAR BARANG (CO-31)</h2><p style="margin:5px 0 0 0; color:#444; font-size:13px;">Konteks Data: <b>${titleContextText.toUpperCase()}</b></p></div>`;
+                }
+                
+                html += `<h3 style="background:#e2e8f0; padding:6px 8px; border-left:4px solid #475569; font-size:13px; text-transform:uppercase; margin-top:10px; margin-bottom:5px;">Daftar Barang Lepasan - ${sumber}</h3>`;
+                html += `<table>`;
+                html += `<thead><tr><th style="width:8%; text-align:center;">Jumlah</th><th style="width:72%;">Uraian Detail Barang</th><th style="width:20%; text-align:center;">Checklist</th></tr></thead><tbody>`;
+                lepasanBySumber[sumber].forEach(item => { 
+                    html += `<tr class="no-break-inside"><td style="text-align:center; font-weight:bold; font-size:11px;">${item.jumlah} Pcs</td><td><span class="alat-nama">${item.nama_barang.toUpperCase()}</span> ${item.kode_barang ? '<span class="alat-kode">(#'+item.kode_barang+')</span>' : ''}</td><td style="text-align:center;"><span class="box-check">☐</span></td></tr>`; 
+                });
+                html += `</tbody></table>`;
+            });
         }
     }
     
@@ -987,7 +1030,6 @@ function executePrint() {
                     let invItem = allItems.find(i => i.kode_barang && i.kode_barang.toLowerCase() === code);
                     let namaAlat = invItem ? invItem.nama_barang : `Alat #${code.toUpperCase()}`;
                     
-                    // Poin 3: Tidak digabung, dimasukkan ke array satu per satu
                     timDataList[timName].push({
                         nama: namaAlat,
                         kode: code.toUpperCase()
@@ -1004,7 +1046,6 @@ function executePrint() {
                 let pBreak = !isFirstTim ? 'page-break' : '';
                 isFirstTim = false;
                 
-                // Urutkan berdasarkan nama barang agar rapi
                 timDataList[tim].sort((a, b) => a.nama.localeCompare(b.nama));
                 
                 html += `<div class="${pBreak}">`;

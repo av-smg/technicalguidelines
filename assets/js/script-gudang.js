@@ -716,51 +716,100 @@ function closePrintModal() {
     document.getElementById("modalPrintSettings").classList.remove("active"); 
 }
 
+// ==========================================
+// FITUR PRINT ENGINE (V.63.5 - PELACAKAN AKURAT)
+// ==========================================
 function executePrint() {
     const source = document.getElementById("printSource").value; 
     const format = document.getElementById("printFormat").value;
     
-    // 1. FILTERING DATA BERDASARKAN FASE LOGISTIK SECARA CERDAS
-    let dataBawa = [];
+    // 1. FILTERING DATA BERDASARKAN STATUS LOKASI SECARA AKURAT
+    let dataBawaSemarang = [];
+    let dataBawaYogya = [];
+    let dataBawaLain = []; // Jaga-jaga kalau tujuan tidak tertulis spesifik
     let dataJalan = [];
-    let dataLokasi = [];
-    let dataGudang = [];
+    let dataLokasiSemarang = [];
+    let dataLokasiYogya = [];
+    let dataLokasiLain = [];
+    let dataGudangKanguru = [];
+    let dataGudangMrican = [];
+    let dataGudangLain = [];
+    let dataRusak = [];
 
     allItems.forEach(i => {
         let stat = i.status_digunakan || 'Di Gudang'; if(stat === 'FALSE') stat = 'Di Gudang';
         let lok = i.lokasi_saat_ini || i.lokasi || i["Lokasi Saat Ini"] || '';
+        let tujuan = (i.tujuan || "").toLowerCase();
+        let kondisi = (i.kondisi || "").toLowerCase();
 
-        // Deteksi Fase dengan prioritas
-        if (lok === 'Dalam Perjalanan') {
+        // Pisahkan yang rusak terlebih dahulu
+        if (kondisi === 'rusak' || kondisi === 'periksa') {
+            dataRusak.push(i);
+            return; // Skip ke item berikutnya
+        }
+
+        // Deteksi berdasarkan Status dan Lokasi
+        if (stat === 'Akan Dibawa') {
+            if (tujuan.includes('smg') || tujuan.includes('semarang')) dataBawaSemarang.push(i);
+            else if (tujuan.includes('yogya') || tujuan.includes('jogja')) dataBawaYogya.push(i);
+            else dataBawaLain.push(i);
+        } 
+        else if (lok === 'Dalam Perjalanan') {
             dataJalan.push(i);
-        } else if (lok === 'Di Lokasi Event' || stat === 'Sedang Dipakai') {
-            dataLokasi.push(i);
-        } else if (stat === 'Akan Dibawa') {
-            dataBawa.push(i);
-        } else {
-            dataGudang.push(i);
+        } 
+        else if (lok === 'Di Lokasi Event' || stat === 'Sedang Dipakai') {
+            if (tujuan.includes('smg') || tujuan.includes('semarang')) dataLokasiSemarang.push(i);
+            else if (tujuan.includes('yogya') || tujuan.includes('jogja')) dataLokasiYogya.push(i);
+            else dataLokasiLain.push(i);
+        } 
+        else {
+            // Berarti statusnya "Di Gudang"
+            if (lok.includes('Kanguru')) dataGudangKanguru.push(i);
+            else if (lok.includes('Mrican')) dataGudangMrican.push(i);
+            else dataGudangLain.push(i);
         }
     });
 
     let buckets = [];
     let titleContext = "";
 
-    // 2. TENTUKAN APA YANG MAU DICETAK
+    // 2. TENTUKAN APA YANG MAU DICETAK & BERI JUDUL YANG JELAS (Tanpa kata "Fase")
     if (source === "tracking_all") {
-        titleContext = "Laporan Pelacakan Seluruh Aset (Urut Progres)";
-        buckets.push({ title: "1️⃣ FASE 1: AKAN DIBAWA (PACKING)", color: "#ea580c", data: dataBawa });
-        buckets.push({ title: "2️⃣ FASE 2: DALAM PERJALANAN", color: "#3b82f6", data: dataJalan });
-        buckets.push({ title: "3️⃣ FASE 3: DI LOKASI EVENT (TERPASANG)", color: "#16a34a", data: dataLokasi });
-        buckets.push({ title: "4️⃣ FASE 4: STANDBY DI GUDANG", color: "#64748b", data: dataGudang });
+        titleContext = "Laporan Posisi Seluruh Aset Terkini";
+        
+        // Kelompok Akan Dibawa (Loading)
+        if (dataBawaSemarang.length > 0) buckets.push({ title: "🛒 AKAN DIBAWA (TUJUAN: SEMARANG)", color: "#ea580c", data: dataBawaSemarang });
+        if (dataBawaYogya.length > 0) buckets.push({ title: "🛒 AKAN DIBAWA (TUJUAN: YOGYAKARTA)", color: "#ea580c", data: dataBawaYogya });
+        if (dataBawaLain.length > 0) buckets.push({ title: "🛒 AKAN DIBAWA (TUJUAN UMUM)", color: "#ea580c", data: dataBawaLain });
+        
+        // Kelompok Perjalanan
+        if (dataJalan.length > 0) buckets.push({ title: "🚚 DALAM PERJALANAN", color: "#3b82f6", data: dataJalan });
+        
+        // Kelompok Di Lokasi (Event Aktif)
+        if (dataLokasiSemarang.length > 0) buckets.push({ title: "📍 DI LOKASI EVENT (SEMARANG)", color: "#16a34a", data: dataLokasiSemarang });
+        if (dataLokasiYogya.length > 0) buckets.push({ title: "📍 DI LOKASI EVENT (YOGYAKARTA)", color: "#16a34a", data: dataLokasiYogya });
+        if (dataLokasiLain.length > 0) buckets.push({ title: "📍 DI LOKASI EVENT (UMUM)", color: "#16a34a", data: dataLokasiLain });
+        
+        // Kelompok Gudang (Standby)
+        if (dataGudangKanguru.length > 0) buckets.push({ title: "🏢 STANDBY (GUDANG KANGURU)", color: "#475569", data: dataGudangKanguru });
+        if (dataGudangMrican.length > 0) buckets.push({ title: "🏢 STANDBY (GUDANG MRICAN)", color: "#475569", data: dataGudangMrican });
+        if (dataGudangLain.length > 0) buckets.push({ title: "🏢 STANDBY (LOKASI LAIN)", color: "#475569", data: dataGudangLain });
+
+        // Kelompok Rusak
+        if (dataRusak.length > 0) buckets.push({ title: "⚠️ PERBAIKAN / RUSAK", color: "#dc2626", data: dataRusak });
+
     } else if (source === "bawa") {
-        titleContext = "Fase Loading (Akan Dibawa)";
-        buckets.push({ title: titleContext, color: "#000", data: dataBawa });
+        titleContext = "Barang Persiapan Loading (Akan Dibawa)";
+        let gabungBawa = [].concat(dataBawaSemarang, dataBawaYogya, dataBawaLain);
+        buckets.push({ title: titleContext, color: "#000", data: gabungBawa });
     } else if (source === "semua_gudang") {
-        titleContext = "Sisa Alat Di Gudang (Standby)";
-        buckets.push({ title: titleContext, color: "#000", data: dataGudang });
+        titleContext = "Semua Barang Standby di Gudang";
+        let gabungGudang = [].concat(dataGudangKanguru, dataGudangMrican, dataGudangLain);
+        buckets.push({ title: titleContext, color: "#000", data: gabungGudang });
     } else if (source === "semua_event") {
-        titleContext = "Semua Event Lapangan Aktif";
-        buckets.push({ title: titleContext, color: "#000", data: dataLokasi });
+        titleContext = "Semua Barang di Lokasi Event";
+        let gabungEvent = [].concat(dataLokasiSemarang, dataLokasiYogya, dataLokasiLain);
+        buckets.push({ title: titleContext, color: "#000", data: gabungEvent });
     }
 
     // Bersihkan bucket yang datanya kosong agar tidak buang kertas
@@ -778,10 +827,8 @@ function executePrint() {
         // Urutkan barang sesuai abjad agar rapi
         bucket.data.sort((a, b) => (a.nama_barang || "").localeCompare(b.nama_barang || ""));
 
-        // Jika mode Lacak Semua, beri judul tebal berwarna per fasenya
-        if (source === "tracking_all") {
-            html += `<h3 style="margin-top:15px; margin-bottom:5px; color:${bucket.color}; font-size:14px; border-bottom:2px solid ${bucket.color}; padding-bottom:4px;">${bucket.title}</h3>`;
-        }
+        // Judul grup yang lebih jelas dan deskriptif
+        html += `<h3 style="margin-top:20px; margin-bottom:5px; color:${bucket.color}; font-size:13px; font-weight:900; background:#f8fafc; padding:6px 10px; border-left:4px solid ${bucket.color}; border-top:1px solid #e2e8f0; border-right:1px solid #e2e8f0;">${bucket.title}</h3>`;
 
         if (format === "kompak") {
             let grouped = {}; bucket.data.forEach(i => { let nama = (i.nama_barang || "Tanpa Nama").toUpperCase(); if(!grouped[nama]) grouped[nama] = 0; grouped[nama] += parseInt(i.jumlah || 1); });
@@ -797,7 +844,7 @@ function executePrint() {
             
             for (let wadah in groupedWadah) {
                 let boxItem = allItems.find(i => i.kode_barang && i.kode_barang.toUpperCase() === wadah); let boxName = boxItem ? boxItem.nama_barang.toUpperCase() : `WADAH #${wadah}`;
-                html += `<tr style="background-color:#f8fafc;"><td style="text-align:center; font-weight:bold; font-size:12px; border-bottom:1px solid #ccc;">1 Pcs</td><td style="font-weight:bold; font-size:12px; border-bottom:1px solid #ccc;">🧰 ${boxName} (#${wadah})</td><td style="border-bottom:1px solid #ccc;">[ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ]</td></tr>`;
+                html += `<tr style="background-color:#f1f5f9;"><td style="text-align:center; font-weight:bold; font-size:12px; border-bottom:1px solid #ccc;">1 Pcs</td><td style="font-weight:bold; font-size:12px; border-bottom:1px solid #ccc;">🧰 ${boxName} (#${wadah})</td><td style="border-bottom:1px solid #ccc;">[ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ]</td></tr>`;
                 groupedWadah[wadah].forEach(item => { html += `<tr><td style="text-align:center; font-size:10px; color:#555; border-bottom:1px dashed #e2e8f0;">${item.jumlah} Pcs</td><td style="padding-left:15px; color:#555; font-size:10px; font-style:italic; border-bottom:1px dashed #e2e8f0;">- ${item.nama_barang} ${item.kode_barang ? '(#'+item.kode_barang+')' : ''}</td><td style="border-bottom:1px dashed #e2e8f0;"></td></tr>`; });
             }
             lepasan.forEach(item => { 
@@ -809,7 +856,7 @@ function executePrint() {
     });
     
     if(format === "kompak") html += `<div style="margin-top:5px; font-size:11px; color:#555;"><i>*Format Gabungan otomatis untuk merekap barang sejenis.</i></div>`;
-    html += `<div style="margin-top: 20px; font-size:10px; color:#555; text-align:right;"><i>Dicetak Modul Lacak Logistik AV pada: ${new Date().toLocaleString('id-ID')}</i></div></body></html>`;
+    html += `<div style="margin-top: 20px; font-size:10px; color:#555; text-align:right;"><i>Dicetak pada: ${new Date().toLocaleString('id-ID')}</i></div></body></html>`;
     
     printWin.document.write(html); printWin.document.close(); closePrintModal(); 
 }

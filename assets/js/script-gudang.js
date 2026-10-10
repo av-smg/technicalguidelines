@@ -718,6 +718,9 @@ function closePrintModal() {
     document.getElementById("modalPrintSettings").classList.remove("active"); 
 }
 
+// ==========================================
+// FITUR PRINT ENGINE (V.64.1 - HARDCASE 1 HALAMAN + LOKASI)
+// ==========================================
 function executePrint() {
     const source = document.getElementById("printSource").value; 
     const format = document.getElementById("printFormat").value;
@@ -806,14 +809,17 @@ function executePrint() {
         .hardcase-header { text-align: center; border-bottom: 3px double #0f172a; padding-bottom: 10px; margin-bottom: 15px; }
         .hardcase-title { margin: 0; font-size: 20px; font-weight: 900; color: #0f172a; text-transform: uppercase;}
         .hardcase-kode { margin: 5px 0 0 0; font-size: 14px; font-weight: bold; color: #475569; }
+        .hardcase-lokasi { display: inline-block; margin-top: 10px; padding: 5px 12px; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 11px; font-weight: bold; color: #0f172a; }
         .hardcase-box { width: 18px; height: 18px; border: 1.5px solid #0f172a; margin: 0 auto; border-radius: 3px; }
         .hardcase-footer { margin-top: 15px; padding-top: 10px; border-top: 1px dashed #94a3b8; font-size: 11px; display: flex; justify-content: space-between; align-items: flex-end; }
     </style></head><body onload="window.print()">`;
     
-    // Jika format BUKAN hardcase, tampilkan header dokumen global
+    // Header halaman utama (Kecuali mode hardcase)
     if (format !== "hardcase") {
         html += `<div class="header"><h2 style="margin:0;">LAMPIRAN DAFTAR BARANG (CO-31)</h2><p style="margin:5px 0 0 0; color:#444; font-size:13px;">Konteks: <b>${titleContext.toUpperCase()}</b></p></div>`;
     }
+
+    let isFirstHardcaseCard = true; // Penanda khusus mode Hardcase
 
     buckets.forEach((bucket, index) => {
         bucket.data.sort((a, b) => (a.nama_barang || "").localeCompare(b.nama_barang || ""));
@@ -821,19 +827,18 @@ function executePrint() {
 
         html += `<div class="${pageBreakClass}">`; 
         
-        // Judul grup tidak perlu ditampilkan di mode hardcase (karena akan dicetak per hardcase)
+        // Judul tabel untuk selain mode hardcase
         if (format !== "hardcase") {
             html += `<h3 style="margin-top:20px; margin-bottom:5px; color:${bucket.color}; font-size:13px; font-weight:900; background:#f8fafc; padding:6px 10px; border-left:4px solid ${bucket.color}; border-top:1px solid #e2e8f0; border-right:1px solid #e2e8f0;">${bucket.title}</h3>`;
         }
 
         if (format === "hardcase") {
             // ==========================================
-            // FORMAT CETAK BARU: KARTU HARDCASE (KELUAR/MASUK)
+            // FORMAT KARTU HARDCASE (KELUAR/MASUK)
             // ==========================================
             let groupedWadah = {};
             bucket.data.forEach(item => {
                 let wadah = (item.kode_wadah || "").toUpperCase().trim();
-                // Hanya memproses item yang memang punya wadah (masuk hardcase)
                 if (wadah && wadah !== "-") {
                     if (!groupedWadah[wadah]) groupedWadah[wadah] = [];
                     groupedWadah[wadah].push(item);
@@ -844,17 +849,32 @@ function executePrint() {
                 let boxItem = allItems.find(i => i.kode_barang && i.kode_barang.toUpperCase() === wadah); 
                 let boxName = boxItem ? boxItem.nama_barang : `WADAH #${wadah}`;
                 
-                html += `<div class="hardcase-card no-break-inside">`;
+                // Ekstrak Informasi Lokasi & Tujuan dari isi pertama hardcase tersebut
+                let firstItem = groupedWadah[wadah][0];
+                let infoLokasi = firstItem.lokasi_saat_ini || firstItem.lokasi || "Gudang Kanguru";
+                let infoTujuan = firstItem.tujuan || "";
+                
+                let teksPosisi = infoLokasi;
+                if (infoTujuan && infoTujuan !== "TETAP" && infoTujuan !== "-") {
+                    teksPosisi += ` - ${infoTujuan}`;
+                }
+
+                // Berikan jeda halaman (Page Break) untuk setiap Hardcase, kecuali hardcase yang paling pertama dicetak
+                let cardPageBreak = isFirstHardcaseCard ? "" : "page-break";
+                isFirstHardcaseCard = false;
+                
+                html += `<div class="hardcase-card ${cardPageBreak}">`;
                 html += `   <div class="hardcase-header">`;
                 html += `       <h2 class="hardcase-title">🧰 ${boxName}</h2>`;
                 html += `       <p class="hardcase-kode">ID WADAH: #${wadah}</p>`;
+                html += `       <div class="hardcase-lokasi">📍 Posisi: ${teksPosisi}</div>`;
                 html += `   </div>`;
                 html += `   <table>`;
                 html += `       <thead><tr>`;
                 html += `           <th style="width:10%; text-align:center;">QTY</th>`;
                 html += `           <th style="width:60%;">NAMA ALAT (ISI HARDCASE)</th>`;
-                html += `           <th style="width:15%; text-align:center; background:#fee2e2; color:#991b1b;">OUT 📤</th>`;
-                html += `           <th style="width:15%; text-align:center; background:#dcfce7; color:#166534;">IN 📥</th>`;
+                html += `           <th style="width:15%; text-align:center; background:#fee2e2; color:#991b1b; font-size:14px;">OUT 📤</th>`;
+                html += `           <th style="width:15%; text-align:center; background:#dcfce7; color:#166534; font-size:14px;">IN 📥</th>`;
                 html += `       </tr></thead><tbody>`;
                 
                 groupedWadah[wadah].forEach(item => { 
@@ -868,14 +888,14 @@ function executePrint() {
                 
                 html += `       </tbody></table>`;
                 html += `   <div class="hardcase-footer">`;
-                html += `       <div><b>Dicetak:</b> ${new Date().toLocaleDateString('id-ID')} | <b>Grup:</b> ${bucket.title.split('(')[0].trim()}</div>`;
+                html += `       <div><b>Dicetak:</b> ${new Date().toLocaleDateString('id-ID')} | <b>Grup Status:</b> ${bucket.title.split('(')[0].trim()}</div>`;
                 html += `       <div style="text-align:right;"><b>Paraf OUT:</b> ____________ &nbsp;&nbsp;&nbsp; <b>Paraf IN:</b> ____________</div>`;
                 html += `   </div>`;
                 html += `</div>`;
             }
 
         } else if (format === "kompak") {
-            // FORMAT GABUNGAN REKAP ANGKA
+            // FORMAT GABUNGAN
             let grouped = {}; bucket.data.forEach(i => { let nama = (i.nama_barang || "Tanpa Nama").toUpperCase(); if(!grouped[nama]) grouped[nama] = 0; grouped[nama] += parseInt(i.jumlah || 1); });
             let sortedNames = Object.keys(grouped).sort();
             html += `<table><thead><tr><th style="width:8%; text-align:center;">No</th><th style="width:72%;">Nama Alat (Data Gabungan)</th><th style="width:20%; text-align:center;">Total (Qty)</th></tr></thead><tbody>`;

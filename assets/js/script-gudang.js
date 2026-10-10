@@ -706,32 +706,33 @@ function printSuratJalan() { openPrintModal('co31'); }
 function printFormCO31() { openPrintModal('co31'); }
 
 // ==========================================
-// FITUR PRINT ENGINE (V.64.0 - CHECKLIST HARDCASE)
+// FITUR PRINT ENGINE (V.65.0 - KEBUTUHAN TIM & SIMPLIFIKASI)
 // ==========================================
 function injectPrintModalUI() {
-    if (document.getElementById("modalPrintSettings")) return;
+    if (document.getElementById("modalPrintSettings")) document.getElementById("modalPrintSettings").remove();
     const modalHtml = `
     <div id="modalPrintSettings" class="modal-overlay">
         <div class="modal-content" style="max-width:400px; background:white; padding:25px; border-radius:15px; text-align:left; position:relative;">
             <button type="button" onclick="closePrintModal()" style="position:absolute; top:15px; right:15px; border:none; background:#f1f5f9; width:30px; height:30px; border-radius:50%; font-weight:bold; cursor:pointer;">✕</button>
-            <h3 style="margin:0 0 5px 0; color:#2563eb; font-weight:900; font-size:18px;">🖨️ Pengaturan Cetak CO-31</h3>
-            <p style="font-size:11px; color:#64748b; margin-bottom:15px;">Pilih sumber data yang ingin dicetak.</p>
+            <h3 style="margin:0 0 5px 0; color:#2563eb; font-weight:900; font-size:18px;">🖨️ Pusat Cetak Dokumen</h3>
+            <p style="font-size:11px; color:#64748b; margin-bottom:15px;">Pilih sumber data dan format laporan.</p>
             
             <input type="hidden" id="printType" value="co31">
             
             <label style="font-size:11px; font-weight:bold; color:#1e293b; display:block; margin-bottom:6px;">📍 Sumber Data:</label>
             <select id="printSource" style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1; margin-bottom:15px; font-size:12px; font-weight:bold; background:#f8fafc; color:#ea580c;">
-                <option value="tracking_all">🕵️‍♂️ Lacak Semua (Urut Progres Jalur)</option>
-                <option value="bawa">🛒 Hanya Fase Loading (Akan Dibawa)</option>
-                <option value="semua_event">📍 Hanya Event Aktif (Di Lokasi)</option>
-                <option value="semua_gudang">🏢 Hanya Sisa Di Gudang</option>
+                <option value="tracking_all">🌐 Semua</option>
+                <option value="bawa">🛒 Akan Dibawa</option>
+                <option value="semua_gudang">🏢 Data di Gudang</option>
+                <option value="semua_event">📍 Di Lokasi Gedung</option>
             </select>
             
             <label style="font-size:11px; font-weight:bold; color:#1e293b; display:block; margin-bottom:6px;">📊 Format Cetak:</label>
             <select id="printFormat" style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1; margin-bottom:25px; font-size:12px; font-weight:bold; background:#f8fafc;">
-                <option value="detail">Format Data Detail (Per Wadah)</option>
-                <option value="hardcase">📑 Checklist Tempel Hardcase (Keluar/Masuk)</option>
-                <option value="kompak">Format Gabungan (Rekap Angka)</option>
+                <option value="detail">CO-31 (Daftar Detail per Wadah)</option>
+                <option value="hardcase">Checklist Tiap Wadah (Format Tempel)</option>
+                <option value="kompak">Data Gabungan (Rekap Angka Total)</option>
+                <option value="kebutuhan_tim">Daftar Kebutuhan per Tim (Dari Misi)</option>
             </select>
             
             <button onclick="executePrint()" style="width:100%; padding:14px; background:#3b82f6; color:white; border:none; border-radius:10px; font-weight:900; cursor:pointer;">🚀 CETAK DOKUMEN</button>
@@ -749,9 +750,6 @@ function closePrintModal() {
     document.getElementById("modalPrintSettings").classList.remove("active"); 
 }
 
-// ==========================================
-// FITUR PRINT ENGINE (V.64.2 - FIX PAGE BREAK & OVERLAP)
-// ==========================================
 function executePrint() {
     const source = document.getElementById("printSource").value; 
     const format = document.getElementById("printFormat").value;
@@ -777,9 +775,9 @@ function executePrint() {
             else dataBawaLain.push(i);
         } 
         else if (lok === 'Dalam Perjalanan') { dataJalan.push(i); } 
-        else if (lok === 'Di Lokasi Event' || stat === 'Sedang Dipakai') {
-            if (tujuan.includes('smg') || tujuan.includes('semarang')) dataLokasiSemarang.push(i);
-            else if (tujuan.includes('yogya') || tujuan.includes('jogja')) dataLokasiYogya.push(i);
+        else if (lok.includes('Event') || stat === 'Sedang Dipakai') {
+            if (tujuan.includes('smg') || tujuan.includes('semarang') || lok.includes('Semarang')) dataLokasiSemarang.push(i);
+            else if (tujuan.includes('yogya') || tujuan.includes('jogja') || lok.includes('Yogya')) dataLokasiYogya.push(i);
             else dataLokasiLain.push(i);
         } 
         else {
@@ -792,30 +790,35 @@ function executePrint() {
     let buckets = [];
     let titleContext = "";
 
-    // 2. TENTUKAN APA YANG MAU DICETAK
+    // 2. PENYEDERHANAAN KATA SUMBER DATA
     if (source === "tracking_all") {
         titleContext = "Laporan Posisi Seluruh Aset Terkini";
-        if (dataBawaSemarang.length > 0) buckets.push({ title: "🛒 AKAN DIBAWA (TUJUAN: SEMARANG)", color: "#ea580c", data: dataBawaSemarang });
-        if (dataBawaYogya.length > 0) buckets.push({ title: "🛒 AKAN DIBAWA (TUJUAN: YOGYAKARTA)", color: "#ea580c", data: dataBawaYogya });
-        if (dataBawaLain.length > 0) buckets.push({ title: "🛒 AKAN DIBAWA (TUJUAN UMUM)", color: "#ea580c", data: dataBawaLain });
+        if (dataBawaSemarang.length > 0) buckets.push({ title: "🛒 AKAN DIBAWA (SEMARANG)", color: "#ea580c", data: dataBawaSemarang });
+        if (dataBawaYogya.length > 0) buckets.push({ title: "🛒 AKAN DIBAWA (YOGYAKARTA)", color: "#ea580c", data: dataBawaYogya });
+        if (dataBawaLain.length > 0) buckets.push({ title: "🛒 AKAN DIBAWA", color: "#ea580c", data: dataBawaLain });
+        
         if (dataJalan.length > 0) buckets.push({ title: "🚚 DALAM PERJALANAN", color: "#3b82f6", data: dataJalan });
-        if (dataLokasiSemarang.length > 0) buckets.push({ title: "📍 DI LOKASI EVENT (SEMARANG)", color: "#16a34a", data: dataLokasiSemarang });
-        if (dataLokasiYogya.length > 0) buckets.push({ title: "📍 DI LOKASI EVENT (YOGYAKARTA)", color: "#16a34a", data: dataLokasiYogya });
-        if (dataLokasiLain.length > 0) buckets.push({ title: "📍 DI LOKASI EVENT (UMUM)", color: "#16a34a", data: dataLokasiLain });
-        if (dataGudangKanguru.length > 0) buckets.push({ title: "🏢 STANDBY (GUDANG KANGURU)", color: "#475569", data: dataGudangKanguru });
-        if (dataGudangMrican.length > 0) buckets.push({ title: "🏢 STANDBY (GUDANG MRICAN)", color: "#475569", data: dataGudangMrican });
-        if (dataGudangLain.length > 0) buckets.push({ title: "🏢 STANDBY (LOKASI LAIN)", color: "#475569", data: dataGudangLain });
+        
+        if (dataLokasiSemarang.length > 0) buckets.push({ title: "📍 DI LOKASI GEDUNG (SEMARANG)", color: "#16a34a", data: dataLokasiSemarang });
+        if (dataLokasiYogya.length > 0) buckets.push({ title: "📍 DI LOKASI GEDUNG (YOGYAKARTA)", color: "#16a34a", data: dataLokasiYogya });
+        if (dataLokasiLain.length > 0) buckets.push({ title: "📍 DI LOKASI GEDUNG", color: "#16a34a", data: dataLokasiLain });
+        
+        if (dataGudangKanguru.length > 0) buckets.push({ title: "🏢 DATA DI GUDANG (KANGURU)", color: "#475569", data: dataGudangKanguru });
+        if (dataGudangMrican.length > 0) buckets.push({ title: "🏢 DATA DI GUDANG (MRICAN)", color: "#475569", data: dataGudangMrican });
+        if (dataGudangLain.length > 0) buckets.push({ title: "🏢 DATA DI GUDANG", color: "#475569", data: dataGudangLain });
+        
         if (dataRusak.length > 0) buckets.push({ title: "⚠️ PERBAIKAN / RUSAK", color: "#dc2626", data: dataRusak });
+
     } else if (source === "bawa") {
         titleContext = "Barang Persiapan Loading (Akan Dibawa)";
         let gabungBawa = [].concat(dataBawaSemarang, dataBawaYogya, dataBawaLain);
         buckets.push({ title: titleContext, color: "#000", data: gabungBawa });
     } else if (source === "semua_gudang") {
-        titleContext = "Semua Barang Standby di Gudang";
+        titleContext = "Data Standby di Gudang";
         let gabungGudang = [].concat(dataGudangKanguru, dataGudangMrican, dataGudangLain);
         buckets.push({ title: titleContext, color: "#000", data: gabungGudang });
     } else if (source === "semua_event") {
-        titleContext = "Semua Barang di Lokasi Event";
+        titleContext = "Barang di Lokasi Gedung (Event)";
         let gabungEvent = [].concat(dataLokasiSemarang, dataLokasiYogya, dataLokasiLain);
         buckets.push({ title: titleContext, color: "#000", data: gabungEvent });
     }
@@ -835,150 +838,188 @@ function executePrint() {
         th { background: #f0f0f0; } 
         .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 10px; }
         
-        /* CLASS UNTUK MEMAKSA HALAMAN BARU */
         .page-break { break-before: page; page-break-before: always; }
         .no-break-inside { break-inside: avoid; page-break-inside: avoid; }
         
-        /* CSS Khusus Label Hardcase (Mencegah Overlap saat terpotong) */
-        .hardcase-wrapper { width: 100%; margin-bottom: 20px; break-before: page; page-break-before: always; }
-        .hardcase-card-table { width: 100%; border-collapse: separate; border-spacing: 0; border: 2px solid #0f172a; border-radius: 8px; font-family: 'Arial', sans-serif; background: #fff; box-shadow: 2px 2px 0px #0f172a; }
+        /* CSS Label Hardcase */
+        .hardcase-card-table { width: 100%; border-collapse: separate; border-spacing: 0; border: 2px solid #0f172a; border-radius: 8px; font-family: 'Arial', sans-serif; background: #fff; box-shadow: 2px 2px 0px #0f172a; margin-bottom:20px; }
         .hardcase-card-table > tbody > tr > td { padding: 15px; border: none; }
-        
         .hardcase-header { text-align: center; border-bottom: 3px double #0f172a; padding-bottom: 10px; margin-bottom: 15px; }
         .hardcase-title { margin: 0; font-size: 20px; font-weight: 900; color: #0f172a; text-transform: uppercase;}
         .hardcase-kode { margin: 5px 0 0 0; font-size: 14px; font-weight: bold; color: #475569; }
         .hardcase-lokasi { display: inline-block; margin-top: 10px; padding: 5px 12px; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 11px; font-weight: bold; color: #0f172a; }
         .hardcase-box { width: 18px; height: 18px; border: 1.5px solid #0f172a; margin: 0 auto; border-radius: 3px; }
         .hardcase-footer { margin-top: 15px; padding-top: 10px; border-top: 1px dashed #94a3b8; font-size: 11px; display: flex; justify-content: space-between; align-items: flex-end; }
-        
-        /* Tabel Isi di dalam Hardcase */
         .inner-table { width: 100%; border-collapse: collapse; }
         .inner-table th, .inner-table td { border: 1px solid #0f172a; padding: 6px 8px; }
         .inner-table th { background: #f8fafc; font-size: 12px; text-transform: uppercase; }
-        .inner-table tr { break-inside: avoid; page-break-inside: avoid; }
     </style></head><body onload="window.print()">`;
     
-    // Header halaman utama (Kecuali mode hardcase)
+    // Header dokumen global
     if (format !== "hardcase") {
-        html += `<div class="header"><h2 style="margin:0;">LAMPIRAN DAFTAR BARANG (CO-31)</h2><p style="margin:5px 0 0 0; color:#444; font-size:13px;">Konteks: <b>${titleContext.toUpperCase()}</b></p></div>`;
+        let titleReport = format === "kebutuhan_tim" ? "DAFTAR KEBUTUHAN BARANG PER TIM" : "LAMPIRAN DAFTAR BARANG (CO-31)";
+        html += `<div class="header"><h2 style="margin:0;">${titleReport}</h2><p style="margin:5px 0 0 0; color:#444; font-size:13px;">Filter Sumber: <b>${titleContext.toUpperCase()}</b></p></div>`;
     }
 
-    let isFirstGroup = true; // Penanda untuk Grup Status (Laporan Biasa)
-    let isFirstHardcase = true; // Penanda untuk Kartu Hardcase
+    let isFirstGroup = true; 
 
-    buckets.forEach((bucket) => {
-        bucket.data.sort((a, b) => (a.nama_barang || "").localeCompare(b.nama_barang || ""));
+    // ==========================================
+    // 🚀 OPSI 4: FORMAT DAFTAR KEBUTUHAN PER TIM
+    // ==========================================
+    if (format === "kebutuhan_tim") {
+        let timData = {};
         
-        // Aturan Page Break: Beri halaman baru untuk setiap Grup (jika bukan Hardcase mode)
-        let groupPageBreak = (!isFirstGroup && format !== "hardcase") ? 'page-break' : '';
-        isFirstGroup = false;
+        // Buat filter alat: Hanya alat yang lolos dari "Sumber Data" yang diproses
+        let allowedCodes = new Set();
+        buckets.forEach(b => b.data.forEach(i => {
+            if (i.kode_barang) allowedCodes.add(i.kode_barang.toLowerCase());
+            if (i.kode_wadah) allowedCodes.add(i.kode_wadah.toLowerCase()); // Masukkan wadahnya juga
+        }));
 
-        if (format !== "hardcase") {
-            html += `<div class="${groupPageBreak}">`; 
-            html += `<h3 style="margin-top:20px; margin-bottom:5px; color:${bucket.color}; font-size:13px; font-weight:900; background:#f8fafc; padding:6px 10px; border-left:4px solid ${bucket.color}; border-top:1px solid #e2e8f0; border-right:1px solid #e2e8f0;">${bucket.title}</h3>`;
-        }
-
-        if (format === "hardcase") {
-            // ==========================================
-            // FORMAT KARTU HARDCASE (KELUAR/MASUK)
-            // ==========================================
-            let groupedWadah = {};
-            bucket.data.forEach(item => {
-                let wadah = (item.kode_wadah || "").toUpperCase().trim();
-                if (wadah && wadah !== "-") {
-                    if (!groupedWadah[wadah]) groupedWadah[wadah] = [];
-                    groupedWadah[wadah].push(item);
+        // Pindai Misi untuk mencari siapa pemakainya
+        allMissions.forEach(m => {
+            let timName = (m.tim || "UMUM").toUpperCase();
+            let codes = String(m.kode_barang || "").split(',').map(c => c.trim().toLowerCase()).filter(c => c);
+            
+            codes.forEach(code => {
+                // Jika alat tsb ada di filter sumber (contoh: Akan Dibawa), masukkan ke daftar tim
+                if (allowedCodes.has(code)) {
+                    if (!timData[timName]) timData[timName] = {};
+                    let invItem = allItems.find(i => i.kode_barang && i.kode_barang.toLowerCase() === code);
+                    let namaAlat = invItem ? invItem.nama_barang : `Alat #${code.toUpperCase()}`;
+                    
+                    if (!timData[timName][namaAlat]) timData[timName][namaAlat] = { qty: 0, codes: [] };
+                    timData[timName][namaAlat].qty += 1;
+                    timData[timName][namaAlat].codes.push(code.toUpperCase());
                 }
             });
+        });
 
-            for (let wadah in groupedWadah) {
-                let boxItem = allItems.find(i => i.kode_barang && i.kode_barang.toUpperCase() === wadah); 
-                let boxName = boxItem ? boxItem.nama_barang : `WADAH #${wadah}`;
+        if (Object.keys(timData).length === 0) {
+            html += `<div style="text-align:center; margin-top:50px;"><h3>Tidak ada barang yang terhubung ke Misi Tim pada filter ini.</h3></div>`;
+        } else {
+            for (let tim in timData) {
+                let pageBreakClass = !isFirstGroup ? 'page-break' : '';
+                isFirstGroup = false;
                 
-                let firstItem = groupedWadah[wadah][0];
-                let infoLokasi = firstItem.lokasi_saat_ini || firstItem.lokasi || "Gudang Kanguru";
-                let infoTujuan = firstItem.tujuan || "";
+                html += `<div class="${pageBreakClass}">`;
+                html += `<h3 style="margin-top:20px; margin-bottom:5px; color:#4f46e5; font-size:15px; font-weight:900; background:#e0e7ff; padding:8px 12px; border-left:5px solid #4f46e5; text-transform:uppercase;">👥 KEBUTUHAN TIM: ${tim}</h3>`;
+                html += `<table><thead><tr><th style="width:10%; text-align:center;">Total Qty</th><th style="width:60%;">Nama Barang</th><th style="width:30%;">Keterangan (Kode Barang)</th></tr></thead><tbody>`;
                 
-                let teksPosisi = infoLokasi;
-                if (infoTujuan && infoTujuan !== "TETAP" && infoTujuan !== "-") {
-                    teksPosisi += ` - ${infoTujuan}`;
-                }
-
-                // Setiap Hardcase memaksa pembuatan halaman baru, kecuali hardcase paling awal
-                let hardcasePageBreak = isFirstHardcase ? "" : "page-break";
-                isFirstHardcase = false;
-                
-                // Gunakan struktur tabel sebagai pembungkus Card agar tidak rusak (overlap) saat terpotong 2 halaman
-                html += `<div class="${hardcasePageBreak}">`;
-                html += `<table class="hardcase-card-table"><tbody><tr><td>`;
-                
-                html += `   <div class="hardcase-header">`;
-                html += `       <h2 class="hardcase-title">🧰 ${boxName}</h2>`;
-                html += `       <p class="hardcase-kode">ID WADAH: #${wadah}</p>`;
-                html += `       <div class="hardcase-lokasi">📍 Posisi: ${teksPosisi}</div>`;
-                html += `   </div>`;
-                
-                html += `   <table class="inner-table">`;
-                // PENTING: Penggunaan <thead> akan membuat header tabel diulang secara otomatis di halaman berikutnya jika tabel terpotong.
-                html += `       <thead><tr>`;
-                html += `           <th style="width:10%; text-align:center;">QTY</th>`;
-                html += `           <th style="width:60%;">NAMA ALAT (ISI HARDCASE)</th>`;
-                html += `           <th style="width:15%; text-align:center; background:#fee2e2; color:#991b1b; font-size:14px;">OUT 📤</th>`;
-                html += `           <th style="width:15%; text-align:center; background:#dcfce7; color:#166534; font-size:14px;">IN 📥</th>`;
-                html += `       </tr></thead><tbody>`;
-                
-                groupedWadah[wadah].forEach(item => { 
-                    html += `   <tr>`;
-                    html += `       <td style="text-align:center; font-weight:bold; font-size:13px;">${item.jumlah}</td>`;
-                    html += `       <td style="font-size:11px; font-weight:bold;">${item.nama_barang} <div style="font-weight:normal; color:#64748b; font-size:9px; margin-top:2px;">#${item.kode_barang || '-'}</div></td>`;
-                    html += `       <td style="text-align:center; vertical-align:middle;"><div class="hardcase-box"></div></td>`;
-                    html += `       <td style="text-align:center; vertical-align:middle;"><div class="hardcase-box"></div></td>`;
-                    html += `   </tr>`;
+                let sortedItems = Object.keys(timData[tim]).sort();
+                sortedItems.forEach(nama => {
+                    let info = timData[tim][nama];
+                    let codesStr = info.codes.length <= 6 ? info.codes.join(', ') : (info.codes.slice(0,6).join(', ') + ' ...');
+                    html += `<tr class="no-break-inside"><td style="text-align:center; font-weight:bold; font-size:12px;">${info.qty} Pcs</td><td style="font-size:12px; font-weight:bold;">${nama}</td><td style="font-size:10px; color:#64748b;">${codesStr}</td></tr>`;
                 });
                 
-                html += `       </tbody></table>`;
-                html += `   <div class="hardcase-footer no-break-inside">`;
-                html += `       <div><b>Dicetak:</b> ${new Date().toLocaleDateString('id-ID')} | <b>Status:</b> ${bucket.title.split('(')[0].trim()}</div>`;
-                html += `       <div style="text-align:right;"><b>Paraf OUT:</b> ____________ &nbsp;&nbsp;&nbsp; <b>Paraf IN:</b> ____________</div>`;
-                html += `   </div>`;
-                
-                html += `</td></tr></tbody></table>`; // Penutup hardcase-card-table
-                html += `</div>`; // Penutup hardcase-wrapper
+                html += `</tbody></table></div>`;
+            }
+        }
+    } 
+    // ==========================================
+    // OPSI 1, 2, & 3: FORMAT REGULER
+    // ==========================================
+    else {
+        let isFirstHardcase = true; 
+        
+        buckets.forEach((bucket) => {
+            bucket.data.sort((a, b) => (a.nama_barang || "").localeCompare(b.nama_barang || ""));
+            
+            let groupPageBreak = (!isFirstGroup && format !== "hardcase") ? 'page-break' : '';
+            isFirstGroup = false;
+
+            if (format !== "hardcase") {
+                html += `<div class="${groupPageBreak}">`; 
+                html += `<h3 style="margin-top:20px; margin-bottom:5px; color:${bucket.color}; font-size:13px; font-weight:900; background:#f8fafc; padding:6px 10px; border-left:4px solid ${bucket.color}; border-top:1px solid #e2e8f0; border-right:1px solid #e2e8f0;">${bucket.title}</h3>`;
             }
 
-        } else if (format === "kompak") {
-            // FORMAT GABUNGAN
-            let grouped = {}; bucket.data.forEach(i => { let nama = (i.nama_barang || "Tanpa Nama").toUpperCase(); if(!grouped[nama]) grouped[nama] = 0; grouped[nama] += parseInt(i.jumlah || 1); });
-            let sortedNames = Object.keys(grouped).sort();
-            html += `<table>`;
-            html += `<thead><tr><th style="width:8%; text-align:center;">No</th><th style="width:72%;">Nama Alat (Data Gabungan)</th><th style="width:20%; text-align:center;">Total (Qty)</th></tr></thead><tbody>`;
-            sortedNames.forEach((nama, idx) => { html += `<tr class="no-break-inside"><td style="text-align:center;">${idx+1}</td><td>${nama}</td><td style="text-align:center; font-weight:bold;">${grouped[nama]} Pcs</td></tr>`; });
-            html += `</tbody></table>`;
-        } else {
-            // FORMAT STANDAR DETAIL PER WADAH
-            let groupedWadah = {}; let lepasan = []; let printedContainers = new Set();
-            bucket.data.forEach(item => { let wadah = (item.kode_wadah || "").toUpperCase().trim(); if (wadah) { if (!groupedWadah[wadah]) groupedWadah[wadah] = []; groupedWadah[wadah].push(item); printedContainers.add(wadah); } else { lepasan.push(item); } });
-            
-            html += `<table>`;
-            html += `<thead><tr><th style="width:12%; text-align:center;">Jumlah</th><th style="width:58%;">Uraian Detail Barang</th><th style="width:30%;">Checklist</th></tr></thead><tbody>`;
-            
-            for (let wadah in groupedWadah) {
-                let boxItem = allItems.find(i => i.kode_barang && i.kode_barang.toUpperCase() === wadah); let boxName = boxItem ? boxItem.nama_barang.toUpperCase() : `WADAH #${wadah}`;
-                html += `<tr class="no-break-inside" style="background-color:#f1f5f9;"><td style="text-align:center; font-weight:bold; font-size:12px; border-bottom:1px solid #ccc;">1 Pcs</td><td style="font-weight:bold; font-size:12px; border-bottom:1px solid #ccc;">🧰 ${boxName} (#${wadah})</td><td style="border-bottom:1px solid #ccc;">[ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ]</td></tr>`;
-                groupedWadah[wadah].forEach(item => { html += `<tr class="no-break-inside"><td style="text-align:center; font-size:10px; color:#555; border-bottom:1px dashed #e2e8f0;">${item.jumlah} Pcs</td><td style="padding-left:15px; color:#555; font-size:10px; font-style:italic; border-bottom:1px dashed #e2e8f0;">- ${item.nama_barang} ${item.kode_barang ? '(#'+item.kode_barang+')' : ''}</td><td style="border-bottom:1px dashed #e2e8f0;"></td></tr>`; });
+            if (format === "hardcase") {
+                let groupedWadah = {};
+                bucket.data.forEach(item => {
+                    let wadah = (item.kode_wadah || "").toUpperCase().trim();
+                    if (wadah && wadah !== "-") {
+                        if (!groupedWadah[wadah]) groupedWadah[wadah] = [];
+                        groupedWadah[wadah].push(item);
+                    }
+                });
+
+                for (let wadah in groupedWadah) {
+                    let boxItem = allItems.find(i => i.kode_barang && i.kode_barang.toUpperCase() === wadah); 
+                    let boxName = boxItem ? boxItem.nama_barang : `WADAH #${wadah}`;
+                    
+                    let firstItem = groupedWadah[wadah][0];
+                    let infoLokasi = firstItem.lokasi_saat_ini || firstItem.lokasi || "Gudang Kanguru";
+                    let infoTujuan = firstItem.tujuan || "";
+                    
+                    let teksPosisi = infoLokasi;
+                    if (infoTujuan && infoTujuan !== "TETAP" && infoTujuan !== "-") { teksPosisi += ` - ${infoTujuan}`; }
+
+                    let hardcasePageBreak = isFirstHardcase ? "" : "page-break";
+                    isFirstHardcase = false;
+                    
+                    html += `<div class="${hardcasePageBreak}">`;
+                    html += `<table class="hardcase-card-table"><tbody><tr><td>`;
+                    html += `   <div class="hardcase-header">`;
+                    html += `       <h2 class="hardcase-title">🧰 ${boxName}</h2>`;
+                    html += `       <p class="hardcase-kode">ID WADAH: #${wadah}</p>`;
+                    html += `       <div class="hardcase-lokasi">📍 Posisi: ${teksPosisi}</div>`;
+                    html += `   </div>`;
+                    html += `   <table class="inner-table">`;
+                    html += `       <thead><tr>`;
+                    html += `           <th style="width:10%; text-align:center;">QTY</th>`;
+                    html += `           <th style="width:60%;">NAMA ALAT (ISI HARDCASE)</th>`;
+                    html += `           <th style="width:15%; text-align:center; background:#fee2e2; color:#991b1b; font-size:14px;">OUT 📤</th>`;
+                    html += `           <th style="width:15%; text-align:center; background:#dcfce7; color:#166534; font-size:14px;">IN 📥</th>`;
+                    html += `       </tr></thead><tbody>`;
+                    
+                    groupedWadah[wadah].forEach(item => { 
+                        html += `   <tr class="no-break-inside">`;
+                        html += `       <td style="text-align:center; font-weight:bold; font-size:13px;">${item.jumlah}</td>`;
+                        html += `       <td style="font-size:11px; font-weight:bold;">${item.nama_barang} <div style="font-weight:normal; color:#64748b; font-size:9px; margin-top:2px;">#${item.kode_barang || '-'}</div></td>`;
+                        html += `       <td style="text-align:center; vertical-align:middle;"><div class="hardcase-box"></div></td>`;
+                        html += `       <td style="text-align:center; vertical-align:middle;"><div class="hardcase-box"></div></td>`;
+                        html += `   </tr>`;
+                    });
+                    
+                    html += `       </tbody></table>`;
+                    html += `   <div class="hardcase-footer no-break-inside">`;
+                    html += `       <div><b>Dicetak:</b> ${new Date().toLocaleDateString('id-ID')} | <b>Status:</b> ${bucket.title.split('(')[0].trim()}</div>`;
+                    html += `       <div style="text-align:right;"><b>Paraf OUT:</b> ____________ &nbsp;&nbsp;&nbsp; <b>Paraf IN:</b> ____________</div>`;
+                    html += `   </div>`;
+                    html += `</td></tr></tbody></table>`; 
+                    html += `</div>`; 
+                }
+
+            } else if (format === "kompak") {
+                let grouped = {}; bucket.data.forEach(i => { let nama = (i.nama_barang || "Tanpa Nama").toUpperCase(); if(!grouped[nama]) grouped[nama] = 0; grouped[nama] += parseInt(i.jumlah || 1); });
+                let sortedNames = Object.keys(grouped).sort();
+                html += `<table>`;
+                html += `<thead><tr><th style="width:8%; text-align:center;">No</th><th style="width:72%;">Nama Alat (Data Gabungan)</th><th style="width:20%; text-align:center;">Total (Qty)</th></tr></thead><tbody>`;
+                sortedNames.forEach((nama, idx) => { html += `<tr class="no-break-inside"><td style="text-align:center;">${idx+1}</td><td>${nama}</td><td style="text-align:center; font-weight:bold;">${grouped[nama]} Pcs</td></tr>`; });
+                html += `</tbody></table>`;
+            } else {
+                let groupedWadah = {}; let lepasan = []; let printedContainers = new Set();
+                bucket.data.forEach(item => { let wadah = (item.kode_wadah || "").toUpperCase().trim(); if (wadah) { if (!groupedWadah[wadah]) groupedWadah[wadah] = []; groupedWadah[wadah].push(item); printedContainers.add(wadah); } else { lepasan.push(item); } });
+                
+                html += `<table>`;
+                html += `<thead><tr><th style="width:12%; text-align:center;">Jumlah</th><th style="width:58%;">Uraian Detail Barang</th><th style="width:30%;">Checklist</th></tr></thead><tbody>`;
+                
+                for (let wadah in groupedWadah) {
+                    let boxItem = allItems.find(i => i.kode_barang && i.kode_barang.toUpperCase() === wadah); let boxName = boxItem ? boxItem.nama_barang.toUpperCase() : `WADAH #${wadah}`;
+                    html += `<tr class="no-break-inside" style="background-color:#f1f5f9;"><td style="text-align:center; font-weight:bold; font-size:12px; border-bottom:1px solid #ccc;">1 Pcs</td><td style="font-weight:bold; font-size:12px; border-bottom:1px solid #ccc;">🧰 ${boxName} (#${wadah})</td><td style="border-bottom:1px solid #ccc;">[ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ]</td></tr>`;
+                    groupedWadah[wadah].forEach(item => { html += `<tr class="no-break-inside"><td style="text-align:center; font-size:10px; color:#555; border-bottom:1px dashed #e2e8f0;">${item.jumlah} Pcs</td><td style="padding-left:15px; color:#555; font-size:10px; font-style:italic; border-bottom:1px dashed #e2e8f0;">- ${item.nama_barang} ${item.kode_barang ? '(#'+item.kode_barang+')' : ''}</td><td style="border-bottom:1px dashed #e2e8f0;"></td></tr>`; });
+                }
+                lepasan.forEach(item => { 
+                    let kb = (item.kode_barang || "").toUpperCase().trim(); 
+                    if (!printedContainers.has(kb)) html += `<tr class="no-break-inside"><td style="text-align:center; font-weight:bold; font-size:12px;">${item.jumlah} Pcs</td><td style="font-weight:bold; font-size:12px;">${item.nama_barang.toUpperCase()} ${item.kode_barang ? '(#'+item.kode_barang+')' : ''}</td><td>[ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ]</td></tr>`; 
+                });
+                html += `</tbody></table>`;
             }
-            lepasan.forEach(item => { 
-                let kb = (item.kode_barang || "").toUpperCase().trim(); 
-                if (!printedContainers.has(kb)) html += `<tr class="no-break-inside"><td style="text-align:center; font-weight:bold; font-size:12px;">${item.jumlah} Pcs</td><td style="font-weight:bold; font-size:12px;">${item.nama_barang.toUpperCase()} ${item.kode_barang ? '(#'+item.kode_barang+')' : ''}</td><td>[ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ]</td></tr>`; 
-            });
-            html += `</tbody></table>`;
-        }
-        
-        // Penutup div grup (untuk format bukan hardcase)
-        if (format !== "hardcase") {
-            html += `</div>`; 
-        }
-    });
+            
+            if (format !== "hardcase") { html += `</div>`; }
+        });
+    } // Akhir blok Opsi Reguler
     
     if(format === "kompak") html += `<div style="margin-top:5px; font-size:11px; color:#555;"><i>*Format Gabungan otomatis untuk merekap barang sejenis.</i></div>`;
     

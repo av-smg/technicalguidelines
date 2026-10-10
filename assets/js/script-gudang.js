@@ -673,49 +673,144 @@ async function submitFeedback(e) { e.preventDefault(); const btn = document.getE
 
 function printSuratJalan() { openPrintModal('co31'); }
 function printFormCO31() { openPrintModal('co31'); }
+// ==========================================
+// FITUR PRINT ENGINE (V.63.0 - LOGISTIK TRACKER)
+// ==========================================
 function injectPrintModalUI() {
     if (document.getElementById("modalPrintSettings")) return;
-    const modalHtml = `<div id="modalPrintSettings" class="modal-overlay"><div class="modal-content" style="max-width:400px; background:white; padding:25px; border-radius:15px; text-align:left; position:relative;"><button type="button" onclick="closePrintModal()" style="position:absolute; top:15px; right:15px; border:none; background:#f1f5f9; width:30px; height:30px; border-radius:50%; font-weight:bold; cursor:pointer;">✕</button><h3 style="margin:0 0 5px 0; color:#2563eb; font-weight:900; font-size:18px;">🖨️ Pengaturan Cetak</h3><input type="hidden" id="printType" value="co31"><label style="font-size:11px; font-weight:bold; color:#1e293b; display:block; margin-bottom:6px;">📍 Sumber Data:</label><select id="printSource" style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1; margin-bottom:15px; font-size:12px; font-weight:bold; background:#f8fafc;"><option value="bawa">🛒 Fase Loading (Akan Dibawa)</option><option value="semua_gudang">🏢 Semua Alat Di Gudang</option><option value="semua_event">📍 Semua Event Aktif</option></select><label style="font-size:11px; font-weight:bold; color:#1e293b; display:block; margin-bottom:6px;">📊 Format Cetak:</label><select id="printFormat" style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1; margin-bottom:25px; font-size:12px; font-weight:bold; background:#f8fafc;"><option value="detail">Format Data Detail</option><option value="kompak">Format Gabungan</option></select><button onclick="executePrint()" style="width:100%; padding:14px; background:#3b82f6; color:white; border:none; border-radius:10px; font-weight:900; cursor:pointer;">🚀 CETAK DOKUMEN</button></div></div>`;
+    const modalHtml = `
+    <div id="modalPrintSettings" class="modal-overlay">
+        <div class="modal-content" style="max-width:400px; background:white; padding:25px; border-radius:15px; text-align:left; position:relative;">
+            <button type="button" onclick="closePrintModal()" style="position:absolute; top:15px; right:15px; border:none; background:#f1f5f9; width:30px; height:30px; border-radius:50%; font-weight:bold; cursor:pointer;">✕</button>
+            <h3 style="margin:0 0 5px 0; color:#2563eb; font-weight:900; font-size:18px;">🖨️ Pengaturan Cetak CO-31</h3>
+            <p style="font-size:11px; color:#64748b; margin-bottom:15px;">Pilih sumber data yang ingin dicetak.</p>
+            
+            <input type="hidden" id="printType" value="co31">
+            
+            <label style="font-size:11px; font-weight:bold; color:#1e293b; display:block; margin-bottom:6px;">📍 Sumber Data:</label>
+            <select id="printSource" style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1; margin-bottom:15px; font-size:12px; font-weight:bold; background:#f8fafc; color:#ea580c;">
+                <option value="tracking_all">🕵️‍♂️ Lacak Semua (Urut Progres Jalur)</option>
+                <option value="bawa">🛒 Hanya Fase Loading (Akan Dibawa)</option>
+                <option value="semua_event">📍 Hanya Event Aktif (Di Lokasi)</option>
+                <option value="semua_gudang">🏢 Hanya Sisa Di Gudang</option>
+            </select>
+            
+            <label style="font-size:11px; font-weight:bold; color:#1e293b; display:block; margin-bottom:6px;">📊 Format Cetak:</label>
+            <select id="printFormat" style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1; margin-bottom:25px; font-size:12px; font-weight:bold; background:#f8fafc;">
+                <option value="detail">Format Data Detail (Per Wadah)</option>
+                <option value="kompak">Format Gabungan (Rekap Angka)</option>
+            </select>
+            
+            <button onclick="executePrint()" style="width:100%; padding:14px; background:#3b82f6; color:white; border:none; border-radius:10px; font-weight:900; cursor:pointer;">🚀 CETAK DOKUMEN</button>
+        </div>
+    </div>`;
     document.body.insertAdjacentHTML('beforeend', modalHtml);
 }
-function openPrintModal() { if(allItems.length === 0) return alert("Satelit memuat data!"); document.getElementById("modalPrintSettings").classList.add("active"); }
-function closePrintModal() { document.getElementById("modalPrintSettings").classList.remove("active"); }
+
+function openPrintModal() { 
+    if(allItems.length === 0) return alert("Satelit belum selesai memuat data!"); 
+    document.getElementById("modalPrintSettings").classList.add("active"); 
+}
+
+function closePrintModal() { 
+    document.getElementById("modalPrintSettings").classList.remove("active"); 
+}
+
 function executePrint() {
-    const source = document.getElementById("printSource").value; const format = document.getElementById("printFormat").value;
-    let targetData = []; let titleContext = "";
-    if (source === "bawa") { targetData = allItems.filter(i => i.status_digunakan === 'Akan Dibawa'); titleContext = "Fase Loading (Akan Dibawa)"; } 
-    else if (source === "semua_gudang") { targetData = allItems.filter(i => i.status_digunakan === 'Di Gudang' || i.status_digunakan === 'FALSE'); titleContext = "Sisa Alat Di Gudang (Standby)"; } 
-    else { targetData = allItems.filter(i => i.lokasi_saat_ini === 'Di Lokasi Event' || i.status_digunakan === 'Sedang Dipakai'); titleContext = "Semua Event Lapangan Aktif"; }
+    const source = document.getElementById("printSource").value; 
+    const format = document.getElementById("printFormat").value;
+    
+    // 1. FILTERING DATA BERDASARKAN FASE LOGISTIK SECARA CERDAS
+    let dataBawa = [];
+    let dataJalan = [];
+    let dataLokasi = [];
+    let dataGudang = [];
 
-    if (targetData.length === 0) { alert(`❌ Kosong! Tidak ditemukan barang untuk kategori: ${titleContext}`); return; }
-    targetData.sort((a, b) => (a.nama_barang || "").localeCompare(b.nama_barang || ""));
+    allItems.forEach(i => {
+        let stat = i.status_digunakan || 'Di Gudang'; if(stat === 'FALSE') stat = 'Di Gudang';
+        let lok = i.lokasi_saat_ini || i.lokasi || i["Lokasi Saat Ini"] || '';
 
-    let printWin = window.open('', '', 'width=900,height=800');
-    let html = `<html><head><title>Print - ${titleContext}</title><style>@page { size: A4 portrait; margin: 15mm; } body { font-family: 'Arial', sans-serif; font-size:12px; color:#000; } table { width: 100%; border-collapse: collapse; margin-top: 15px; } th, td { border: 1px solid #000; padding: 6px 8px; text-align: left; vertical-align: top;} th { background: #f0f0f0; } .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; }</style></head><body onload="window.print()">`;
-    html += `<div class="header"><h2 style="margin:0;">LAMPIRAN DAFTAR BARANG (CO-31)</h2><p style="margin:5px 0 0 0; color:#444; font-size:13px;">Sumber Data Target: <b>${titleContext.toUpperCase()}</b></p></div>`;
-
-    if (format === "kompak") {
-        let grouped = {}; targetData.forEach(i => { let nama = (i.nama_barang || "Tanpa Nama").toUpperCase(); if(!grouped[nama]) grouped[nama] = 0; grouped[nama] += parseInt(i.jumlah || 1); });
-        let sortedNames = Object.keys(grouped).sort();
-        html += `<table><thead><tr><th style="width:8%; text-align:center;">No</th><th style="width:72%;">Nama Alat (Data Gabungan)</th><th style="width:20%; text-align:center;">Total (Qty)</th></tr></thead><tbody>`;
-        sortedNames.forEach((nama, idx) => { html += `<tr><td style="text-align:center;">${idx+1}</td><td>${nama}</td><td style="text-align:center; font-weight:bold;">${grouped[nama]} Pcs</td></tr>`; });
-        html += `</tbody></table><div style="margin-top:20px; font-size:11px; color:#555;"><i>*Format Gabungan otomatis untuk merekap barang sejenis.</i></div>`;
-    } else {
-        let groupedWadah = {}; let lepasan = []; let printedContainers = new Set();
-        targetData.forEach(item => { let wadah = (item.kode_wadah || "").toUpperCase().trim(); if (wadah) { if (!groupedWadah[wadah]) groupedWadah[wadah] = []; groupedWadah[wadah].push(item); printedContainers.add(wadah); } else { lepasan.push(item); } });
-        html += `<table><thead><tr><th style="width:12%; text-align:center;">Jumlah</th><th style="width:58%;">Uraian Detail Barang</th><th style="width:30%;">Checklist Pengecekan</th></tr></thead><tbody>`;
-        for (let wadah in groupedWadah) {
-            let boxItem = allItems.find(i => i.kode_barang && i.kode_barang.toUpperCase() === wadah); let boxName = boxItem ? boxItem.nama_barang.toUpperCase() : `WADAH #${wadah}`;
-            html += `<tr style="background-color:#f8fafc;"><td style="text-align:center; font-weight:bold; font-size:12px; border-bottom:1px solid #ccc;">1 Pcs</td><td style="font-weight:bold; font-size:12px; border-bottom:1px solid #ccc;">🧰 ${boxName} (#${wadah})</td><td style="border-bottom:1px solid #ccc;">[ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ]</td></tr>`;
-            groupedWadah[wadah].forEach(item => { html += `<tr><td style="text-align:center; font-size:10px; color:#555; border-bottom:1px dashed #e2e8f0;">${item.jumlah} Pcs</td><td style="padding-left:15px; color:#555; font-size:10px; font-style:italic; border-bottom:1px dashed #e2e8f0;">- ${item.nama_barang} ${item.kode_barang ? `(#${item.kode_barang})` : ''}</td><td style="border-bottom:1px dashed #e2e8f0;"></td></tr>`; });
+        // Deteksi Fase dengan prioritas
+        if (lok === 'Dalam Perjalanan') {
+            dataJalan.push(i);
+        } else if (lok === 'Di Lokasi Event' || stat === 'Sedang Dipakai') {
+            dataLokasi.push(i);
+        } else if (stat === 'Akan Dibawa') {
+            dataBawa.push(i);
+        } else {
+            dataGudang.push(i);
         }
-        lepasan.forEach(item => { 
-            let kb = (item.kode_barang || "").toUpperCase().trim(); 
-            if (!printedContainers.has(kb)) html += `<tr><td style="text-align:center; font-weight:bold; font-size:12px;">${item.jumlah} Pcs</td><td style="font-weight:bold; font-size:12px;">${item.nama_barang.toUpperCase()} ${item.kode_barang ? `(#${item.kode_barang})` : ''}</td><td>[ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ]</td></tr>`; 
-        });
-        html += `</tbody></table>`;
+    });
+
+    let buckets = [];
+    let titleContext = "";
+
+    // 2. TENTUKAN APA YANG MAU DICETAK
+    if (source === "tracking_all") {
+        titleContext = "Laporan Pelacakan Seluruh Aset (Urut Progres)";
+        buckets.push({ title: "1️⃣ FASE 1: AKAN DIBAWA (PACKING)", color: "#ea580c", data: dataBawa });
+        buckets.push({ title: "2️⃣ FASE 2: DALAM PERJALANAN", color: "#3b82f6", data: dataJalan });
+        buckets.push({ title: "3️⃣ FASE 3: DI LOKASI EVENT (TERPASANG)", color: "#16a34a", data: dataLokasi });
+        buckets.push({ title: "4️⃣ FASE 4: STANDBY DI GUDANG", color: "#64748b", data: dataGudang });
+    } else if (source === "bawa") {
+        titleContext = "Fase Loading (Akan Dibawa)";
+        buckets.push({ title: titleContext, color: "#000", data: dataBawa });
+    } else if (source === "semua_gudang") {
+        titleContext = "Sisa Alat Di Gudang (Standby)";
+        buckets.push({ title: titleContext, color: "#000", data: dataGudang });
+    } else if (source === "semua_event") {
+        titleContext = "Semua Event Lapangan Aktif";
+        buckets.push({ title: titleContext, color: "#000", data: dataLokasi });
     }
-    html += `<div style="margin-top: 20px; font-size:10px; color:#555; text-align:right;"><i>Dicetak pada: ${new Date().toLocaleString('id-ID')}</i></div></body></html>`;
+
+    // Bersihkan bucket yang datanya kosong agar tidak buang kertas
+    buckets = buckets.filter(b => b.data.length > 0);
+
+    if (buckets.length === 0) { alert(`❌ Kosong! Tidak ditemukan barang untuk kategori yang dipilih.`); return; }
+
+    // 3. MULAI MENGGAMBAR DOKUMEN CETAK
+    let printWin = window.open('', '', 'width=900,height=800');
+    let html = `<html><head><title>Print - ${titleContext}</title><style>@page { size: A4 portrait; margin: 15mm; } body { font-family: 'Arial', sans-serif; font-size:12px; color:#000; } table { width: 100%; border-collapse: collapse; margin-top: 5px; margin-bottom: 20px;} th, td { border: 1px solid #000; padding: 6px 8px; text-align: left; vertical-align: top;} th { background: #f0f0f0; } .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 10px; }</style></head><body onload="window.print()">`;
+    
+    html += `<div class="header"><h2 style="margin:0;">LAMPIRAN DAFTAR BARANG (CO-31)</h2><p style="margin:5px 0 0 0; color:#444; font-size:13px;">Konteks: <b>${titleContext.toUpperCase()}</b></p></div>`;
+
+    buckets.forEach(bucket => {
+        // Urutkan barang sesuai abjad agar rapi
+        bucket.data.sort((a, b) => (a.nama_barang || "").localeCompare(b.nama_barang || ""));
+
+        // Jika mode Lacak Semua, beri judul tebal berwarna per fasenya
+        if (source === "tracking_all") {
+            html += `<h3 style="margin-top:15px; margin-bottom:5px; color:${bucket.color}; font-size:14px; border-bottom:2px solid ${bucket.color}; padding-bottom:4px;">${bucket.title}</h3>`;
+        }
+
+        if (format === "kompak") {
+            let grouped = {}; bucket.data.forEach(i => { let nama = (i.nama_barang || "Tanpa Nama").toUpperCase(); if(!grouped[nama]) grouped[nama] = 0; grouped[nama] += parseInt(i.jumlah || 1); });
+            let sortedNames = Object.keys(grouped).sort();
+            html += `<table><thead><tr><th style="width:8%; text-align:center;">No</th><th style="width:72%;">Nama Alat (Data Gabungan)</th><th style="width:20%; text-align:center;">Total (Qty)</th></tr></thead><tbody>`;
+            sortedNames.forEach((nama, idx) => { html += `<tr><td style="text-align:center;">${idx+1}</td><td>${nama}</td><td style="text-align:center; font-weight:bold;">${grouped[nama]} Pcs</td></tr>`; });
+            html += `</tbody></table>`;
+        } else {
+            let groupedWadah = {}; let lepasan = []; let printedContainers = new Set();
+            bucket.data.forEach(item => { let wadah = (item.kode_wadah || "").toUpperCase().trim(); if (wadah) { if (!groupedWadah[wadah]) groupedWadah[wadah] = []; groupedWadah[wadah].push(item); printedContainers.add(wadah); } else { lepasan.push(item); } });
+            
+            html += `<table><thead><tr><th style="width:12%; text-align:center;">Jumlah</th><th style="width:58%;">Uraian Detail Barang</th><th style="width:30%;">Checklist</th></tr></thead><tbody>`;
+            
+            for (let wadah in groupedWadah) {
+                let boxItem = allItems.find(i => i.kode_barang && i.kode_barang.toUpperCase() === wadah); let boxName = boxItem ? boxItem.nama_barang.toUpperCase() : `WADAH #${wadah}`;
+                html += `<tr style="background-color:#f8fafc;"><td style="text-align:center; font-weight:bold; font-size:12px; border-bottom:1px solid #ccc;">1 Pcs</td><td style="font-weight:bold; font-size:12px; border-bottom:1px solid #ccc;">🧰 ${boxName} (#${wadah})</td><td style="border-bottom:1px solid #ccc;">[ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ]</td></tr>`;
+                groupedWadah[wadah].forEach(item => { html += `<tr><td style="text-align:center; font-size:10px; color:#555; border-bottom:1px dashed #e2e8f0;">${item.jumlah} Pcs</td><td style="padding-left:15px; color:#555; font-size:10px; font-style:italic; border-bottom:1px dashed #e2e8f0;">- ${item.nama_barang} ${item.kode_barang ? '(#'+item.kode_barang+')' : ''}</td><td style="border-bottom:1px dashed #e2e8f0;"></td></tr>`; });
+            }
+            lepasan.forEach(item => { 
+                let kb = (item.kode_barang || "").toUpperCase().trim(); 
+                if (!printedContainers.has(kb)) html += `<tr><td style="text-align:center; font-weight:bold; font-size:12px;">${item.jumlah} Pcs</td><td style="font-weight:bold; font-size:12px;">${item.nama_barang.toUpperCase()} ${item.kode_barang ? '(#'+item.kode_barang+')' : ''}</td><td>[ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ]</td></tr>`; 
+            });
+            html += `</tbody></table>`;
+        }
+    });
+    
+    if(format === "kompak") html += `<div style="margin-top:5px; font-size:11px; color:#555;"><i>*Format Gabungan otomatis untuk merekap barang sejenis.</i></div>`;
+    html += `<div style="margin-top: 20px; font-size:10px; color:#555; text-align:right;"><i>Dicetak Modul Lacak Logistik AV pada: ${new Date().toLocaleString('id-ID')}</i></div></body></html>`;
+    
     printWin.document.write(html); printWin.document.close(); closePrintModal(); 
 }
 

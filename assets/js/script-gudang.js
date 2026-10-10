@@ -86,7 +86,7 @@ async function loadData() {
 function populateFilterTim() { const container = document.querySelector('#panelFilterLanjutan div'); if(!container) return; let daftarTim = new Set(); allItems.forEach(item => { let tim = item.tim || item["Tim"] || ""; if (tim && tim.trim() !== "") daftarTim.add(tim.trim()); }); if(daftarTim.size > 0) { container.innerHTML = ""; daftarTim.forEach(tim => { let val = tim.toLowerCase(); container.innerHTML += `<label><input type="checkbox" class="cek-tim" value="${val}" onchange="applyFilters()"> ${tim}</label>`; }); } }
 
 // ==============================================================
-// 🎨 UI REVAMP: PENYEDERHANAAN HEADER & PENGHAPUSAN TOMBOL CETAK
+// 🎨 UI REVAMP: PENYEDERHANAAN HEADER & PENGHAPUSAN TOMBOL EXCEL/CETAK LAMA
 // ==============================================================
 function setupStickyHeader() { 
     let toolbar = document.querySelector(".toolbar-card"); 
@@ -95,35 +95,17 @@ function setupStickyHeader() {
         toolbar.style.top = "0px"; 
         toolbar.style.zIndex = "99"; 
         
-        // 1. TATA ULANG FILTER & MUNCULKAN KEMBALI MISSION BUILDER
+        // Hapus injeksi Mission Builder yang lama di header (jika ada)
         let pillsWrapper = document.querySelector(".filter-pills-wrapper"); 
         if(pillsWrapper) {
-            // Tombol khusus Admin
-            let adminBtnHtml = isAdminMode ? `<button class="pill-btn" onclick="openMissionBuilder()" style="background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%); color:white; border:none; font-weight:900; box-shadow:0 4px 6px rgba(59, 130, 246, 0.3); margin-left:15px; border-radius:8px; cursor:pointer;">🛠️ MISSION BUILDER</button>` : ``;
-            
-            pillsWrapper.innerHTML = `
-                <button class="pill-btn active" data-filter="all" onclick="setFilterPill('all', this)">Semua Alat</button>
-                <button class="pill-btn" data-filter="Akan Dibawa" onclick="setFilterPill('Akan Dibawa', this)">🛒 Akan Dibawa</button>
-                <button class="pill-btn" data-filter="Sedang Dipakai" onclick="setFilterPill('Sedang Dipakai', this)">📍 Dipakai</button>
-                <button class="pill-btn" data-filter="Di Gudang" onclick="setFilterPill('Di Gudang', this)">📦 Di Gudang</button>
-                <button class="pill-btn" data-filter="Rusak" onclick="setFilterPill('Rusak', this)">⚠️ Perbaikan</button>
-                
-                <select onchange="setFilterPill(this.value, this)" style="background:#f1f5f9; border:1px solid #cbd5e1; border-radius:20px; padding:6px 12px; font-size:11px; font-weight:bold; color:#334155; margin-left:10px; cursor:pointer;">
-                    <option value="all">📍 Semua Lokasi</option>
-                    <option value="Gudang Kanguru">🏢 Kanguru</option>
-                    <option value="Gudang Mrican">🏢 Mrican</option>
-                    <option value="Di Lokasi Event">🚩 Di Event</option>
-                </select>
-                
-                ${adminBtnHtml}
-            `;
+            pillsWrapper.remove();
         }
 
-        // 2. HILANGKAN TOMBOL "CETAK" (YANG BIRU BIASA) SECARA OTOMATIS
+        // Hapus tombol "Cetak" yang lama jika ada (biru biasa)
         let allBtns = document.querySelectorAll('button');
         allBtns.forEach(btn => {
             if (btn.textContent.trim() === "Cetak") {
-                btn.style.display = "none"; // Eksekusi penghilangan tombol
+                // btn.style.display = "none"; // Kita pakai tombol cetak ungu yang ada id-nya
             }
         });
     } 
@@ -134,25 +116,51 @@ function setupStickyHeader() {
 // ==============================================================
 function toggleViewMode() { const btn = document.getElementById("btnViewToggle"); if (currentViewMode === 'grid') { currentViewMode = 'list'; btn.innerHTML = '🖼️ Grid View'; document.getElementById("dataContainer").className = "list-view-container"; } else { currentViewMode = 'grid'; btn.innerHTML = '📄 List View'; document.getElementById("dataContainer").className = "grid-cards"; } applyFilters(); }
 function toggleWadahMode() { showOnlyWadah = !showOnlyWadah; const btn = document.getElementById("btnWadahToggle"); if (showOnlyWadah) { btn.innerHTML = '📦 Tampilkan Semua'; btn.style.background = '#ea580c'; btn.style.color = 'white'; btn.style.border = '1px solid #ea580c'; } else { btn.innerHTML = '🧰 Hanya Wadah'; btn.style.background = '#f1f5f9'; btn.style.color = '#334155'; btn.style.border = '1px solid #ccc'; } applyFilters(); }
-function setFilterPill(status, btnElement) { activeFilterPill = status; document.querySelectorAll('.pill-btn').forEach(btn => btn.classList.remove('active')); btnElement.classList.add('active'); applyFilters(); }
+
+// Trigger untuk filter dropdown
+function setFilterPill(triggerData) { 
+    applyFilters(); 
+}
 
 function getFilteredData() { 
     const q = document.getElementById("searchInput").value.toLowerCase(); 
     let timAktif = Array.from(document.querySelectorAll('.cek-tim:checked')).map(cb => cb.value.toLowerCase());
+    
+    // Ambil nilai filter dari HTML
+    let filterStatus = document.getElementById("filterStatusDropdown") ? document.getElementById("filterStatusDropdown").value : "all";
+    let filterLokasi = document.getElementById("filterLokasiDropdown") ? document.getElementById("filterLokasiDropdown").value : "all";
+
     return allItems.filter(i => { 
        const matchQ = (i.nama_barang||"").toLowerCase().includes(q) || 
                       (i.kode_barang||"").toLowerCase().includes(q) || 
                       (i.kode_wadah||"").toLowerCase().includes(q) || 
                       (i.paket_zona||"").toLowerCase().includes(q); 
+                      
         let stat = i.status_digunakan || 'Di Gudang'; if(stat === 'FALSE') stat = 'Di Gudang'; 
         let lok = i.lokasi_saat_ini || i.lokasi || i["Lokasi Saat Ini"] || '';
-        let matchPill = false;
-        if (activeFilterPill === 'all') matchPill = true;
-        else if (activeFilterPill === 'Rusak') matchPill = ((i.kondisi||"").toLowerCase() === 'rusak' || (i.kondisi||"").toLowerCase() === 'periksa');
-        else if (activeFilterPill === 'Di Lokasi Event') matchPill = (lok === 'Di Lokasi Event'); 
-        else if (activeFilterPill === 'Gudang Kanguru') matchPill = (lok.includes('Kanguru'));
-        else if (activeFilterPill === 'Gudang Mrican') matchPill = (lok.includes('Mrican'));
-        else matchPill = (stat === activeFilterPill);
+        let kondisi = (i.kondisi||"").toLowerCase();
+
+        // Logika Filter Status
+        let matchStatus = true;
+        if (filterStatus === 'Rusak') {
+            matchStatus = (kondisi === 'rusak' || kondisi === 'periksa');
+        } else if (filterStatus !== 'all') {
+            matchStatus = (stat === filterStatus);
+            // Jangan tampilkan barang rusak di filter status lain
+            if (matchStatus && (kondisi === 'rusak' || kondisi === 'periksa')) matchStatus = false;
+        }
+
+        // Logika Filter Lokasi
+        let matchLokasi = true;
+        if (filterLokasi !== 'all') {
+            if (filterLokasi === 'Semarang | Di Lokasi Event') {
+                matchLokasi = (lok.includes('Semarang') && (lok.includes('Event') || stat === 'Sedang Dipakai'));
+            } else if (filterLokasi === 'Yogyakarta | Di Lokasi Event') {
+                matchLokasi = (lok.includes('Yogya') && (lok.includes('Event') || stat === 'Sedang Dipakai'));
+            } else {
+                matchLokasi = lok.includes(filterLokasi);
+            }
+        }
         
         let itemTim = String(i.tim || i["Tim"] || "").toLowerCase();
         let matchAdvanced = timAktif.length === 0 || timAktif.some(t => itemTim === t || itemTim.includes(t));
@@ -164,7 +172,7 @@ function getFilteredData() {
             if (!isWadah) { let nm = (i.nama_barang||"").toLowerCase(); isWadah = nm.includes('hardcase') || nm.includes('koper') || nm.includes('wadah') || nm.includes('box') || nm.includes('tas'); }
             matchWadah = isWadah;
         }
-        return matchQ && matchPill && matchAdvanced && matchWadah; 
+        return matchQ && matchStatus && matchLokasi && matchAdvanced && matchWadah; 
     }); 
 }
 
@@ -706,7 +714,7 @@ function printSuratJalan() { openPrintModal('co31'); }
 function printFormCO31() { openPrintModal('co31'); }
 
 // ==========================================
-// FITUR PRINT ENGINE (V.65.0 - KEBUTUHAN TIM & SIMPLIFIKASI)
+// FITUR PRINT ENGINE (V.66.0 - KEBUTUHAN TIM, HARDCASE FIX & LEPASAN)
 // ==========================================
 function injectPrintModalUI() {
     if (document.getElementById("modalPrintSettings")) document.getElementById("modalPrintSettings").remove();
@@ -717,21 +725,19 @@ function injectPrintModalUI() {
             <h3 style="margin:0 0 5px 0; color:#2563eb; font-weight:900; font-size:18px;">🖨️ Pusat Cetak Dokumen</h3>
             <p style="font-size:11px; color:#64748b; margin-bottom:15px;">Pilih sumber data dan format laporan.</p>
             
-            <input type="hidden" id="printType" value="co31">
-            
             <label style="font-size:11px; font-weight:bold; color:#1e293b; display:block; margin-bottom:6px;">📍 Sumber Data:</label>
             <select id="printSource" style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1; margin-bottom:15px; font-size:12px; font-weight:bold; background:#f8fafc; color:#ea580c;">
-                <option value="tracking_all">🌐 Semua</option>
-                <option value="bawa">🛒 Akan Dibawa</option>
-                <option value="semua_gudang">🏢 Data di Gudang</option>
-                <option value="semua_event">📍 Di Lokasi Gedung</option>
+                <option value="semua">Semua</option>
+                <option value="bawa">Akan Dibawa</option>
+                <option value="gudang">Data di Gudang</option>
+                <option value="event">Di Lokasi Gedung</option>
             </select>
             
             <label style="font-size:11px; font-weight:bold; color:#1e293b; display:block; margin-bottom:6px;">📊 Format Cetak:</label>
             <select id="printFormat" style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1; margin-bottom:25px; font-size:12px; font-weight:bold; background:#f8fafc;">
-                <option value="detail">CO-31 (Daftar Detail per Wadah)</option>
-                <option value="hardcase">Checklist Tiap Wadah (Format Tempel)</option>
-                <option value="kompak">Data Gabungan (Rekap Angka Total)</option>
+                <option value="co31">CO-31 (Daftar Detail per Wadah)</option>
+                <option value="hardcase">Checklist Tiap Wadah (Format Tempel / Hardcase)</option>
+                <option value="rekap">Rekap Gabungan Total Alat</option>
                 <option value="kebutuhan_tim">Daftar Kebutuhan per Tim (Dari Misi)</option>
             </select>
             
@@ -754,82 +760,38 @@ function executePrint() {
     const source = document.getElementById("printSource").value; 
     const format = document.getElementById("printFormat").value;
     
-    // 1. FILTERING DATA BERDASARKAN STATUS LOKASI
-    let dataBawaSemarang = []; let dataBawaYogya = []; let dataBawaLain = []; 
-    let dataJalan = [];
-    let dataLokasiSemarang = []; let dataLokasiYogya = []; let dataLokasiLain = [];
-    let dataGudangKanguru = []; let dataGudangMrican = []; let dataGudangLain = [];
-    let dataRusak = [];
-
+    // 1. FILTERING DATA BERDASARKAN SUMBER
+    let filteredData = [];
     allItems.forEach(i => {
         let stat = i.status_digunakan || 'Di Gudang'; if(stat === 'FALSE') stat = 'Di Gudang';
         let lok = i.lokasi_saat_ini || i.lokasi || i["Lokasi Saat Ini"] || '';
-        let tujuan = (i.tujuan || "").toLowerCase();
         let kondisi = (i.kondisi || "").toLowerCase();
 
-        if (kondisi === 'rusak' || kondisi === 'periksa') { dataRusak.push(i); return; }
+        if (kondisi === 'rusak' || kondisi === 'periksa') return;
 
-        if (stat === 'Akan Dibawa') {
-            if (tujuan.includes('smg') || tujuan.includes('semarang')) dataBawaSemarang.push(i);
-            else if (tujuan.includes('yogya') || tujuan.includes('jogja')) dataBawaYogya.push(i);
-            else dataBawaLain.push(i);
-        } 
-        else if (lok === 'Dalam Perjalanan') { dataJalan.push(i); } 
-        else if (lok.includes('Event') || stat === 'Sedang Dipakai') {
-            if (tujuan.includes('smg') || tujuan.includes('semarang') || lok.includes('Semarang')) dataLokasiSemarang.push(i);
-            else if (tujuan.includes('yogya') || tujuan.includes('jogja') || lok.includes('Yogya')) dataLokasiYogya.push(i);
-            else dataLokasiLain.push(i);
-        } 
-        else {
-            if (lok.includes('Kanguru')) dataGudangKanguru.push(i);
-            else if (lok.includes('Mrican')) dataGudangMrican.push(i);
-            else dataGudangLain.push(i);
+        if (source === "semua") {
+            filteredData.push(i);
+        } else if (source === "bawa" && stat === 'Akan Dibawa') {
+            filteredData.push(i);
+        } else if (source === "gudang" && stat === 'Di Gudang' && lok.includes('Gudang')) {
+            filteredData.push(i);
+        } else if (source === "event" && (lok.includes('Event') || stat === 'Sedang Dipakai')) {
+            filteredData.push(i);
         }
     });
 
-    let buckets = [];
-    let titleContext = "";
+    if (filteredData.length === 0) { alert(`❌ Kosong! Tidak ditemukan barang untuk sumber data yang dipilih.`); return; }
 
-    // 2. PENYEDERHANAAN KATA SUMBER DATA
-    if (source === "tracking_all") {
-        titleContext = "Laporan Posisi Seluruh Aset Terkini";
-        if (dataBawaSemarang.length > 0) buckets.push({ title: "🛒 AKAN DIBAWA (SEMARANG)", color: "#ea580c", data: dataBawaSemarang });
-        if (dataBawaYogya.length > 0) buckets.push({ title: "🛒 AKAN DIBAWA (YOGYAKARTA)", color: "#ea580c", data: dataBawaYogya });
-        if (dataBawaLain.length > 0) buckets.push({ title: "🛒 AKAN DIBAWA", color: "#ea580c", data: dataBawaLain });
-        
-        if (dataJalan.length > 0) buckets.push({ title: "🚚 DALAM PERJALANAN", color: "#3b82f6", data: dataJalan });
-        
-        if (dataLokasiSemarang.length > 0) buckets.push({ title: "📍 DI LOKASI GEDUNG (SEMARANG)", color: "#16a34a", data: dataLokasiSemarang });
-        if (dataLokasiYogya.length > 0) buckets.push({ title: "📍 DI LOKASI GEDUNG (YOGYAKARTA)", color: "#16a34a", data: dataLokasiYogya });
-        if (dataLokasiLain.length > 0) buckets.push({ title: "📍 DI LOKASI GEDUNG", color: "#16a34a", data: dataLokasiLain });
-        
-        if (dataGudangKanguru.length > 0) buckets.push({ title: "🏢 DATA DI GUDANG (KANGURU)", color: "#475569", data: dataGudangKanguru });
-        if (dataGudangMrican.length > 0) buckets.push({ title: "🏢 DATA DI GUDANG (MRICAN)", color: "#475569", data: dataGudangMrican });
-        if (dataGudangLain.length > 0) buckets.push({ title: "🏢 DATA DI GUDANG", color: "#475569", data: dataGudangLain });
-        
-        if (dataRusak.length > 0) buckets.push({ title: "⚠️ PERBAIKAN / RUSAK", color: "#dc2626", data: dataRusak });
+    let titleContextText = "";
+    if (source === "semua") titleContextText = "Semua";
+    if (source === "bawa") titleContextText = "Akan Dibawa";
+    if (source === "gudang") titleContextText = "Data di Gudang";
+    if (source === "event") titleContextText = "Di Lokasi Gedung";
 
-    } else if (source === "bawa") {
-        titleContext = "Barang Persiapan Loading (Akan Dibawa)";
-        let gabungBawa = [].concat(dataBawaSemarang, dataBawaYogya, dataBawaLain);
-        buckets.push({ title: titleContext, color: "#000", data: gabungBawa });
-    } else if (source === "semua_gudang") {
-        titleContext = "Data Standby di Gudang";
-        let gabungGudang = [].concat(dataGudangKanguru, dataGudangMrican, dataGudangLain);
-        buckets.push({ title: titleContext, color: "#000", data: gabungGudang });
-    } else if (source === "semua_event") {
-        titleContext = "Barang di Lokasi Gedung (Event)";
-        let gabungEvent = [].concat(dataLokasiSemarang, dataLokasiYogya, dataLokasiLain);
-        buckets.push({ title: titleContext, color: "#000", data: gabungEvent });
-    }
-
-    buckets = buckets.filter(b => b.data.length > 0);
-    if (buckets.length === 0) { alert(`❌ Kosong! Tidak ditemukan barang untuk kategori yang dipilih.`); return; }
-
-    // 3. MULAI MENGGAMBAR DOKUMEN CETAK
+    // 2. MULAI MENGGAMBAR DOKUMEN CETAK
     let printWin = window.open('', '', 'width=900,height=800');
     
-    let html = `<html><head><title>Print - ${titleContext}</title><style>
+    let html = `<html><head><title>Print - ${titleContextText}</title><style>
         @page { size: A4 portrait; margin: 15mm; } 
         body { font-family: 'Arial', sans-serif; font-size:12px; color:#000; } 
         
@@ -841,48 +803,174 @@ function executePrint() {
         .page-break { break-before: page; page-break-before: always; }
         .no-break-inside { break-inside: avoid; page-break-inside: avoid; }
         
-        /* CSS Label Hardcase */
-        .hardcase-card-table { width: 100%; border-collapse: separate; border-spacing: 0; border: 2px solid #0f172a; border-radius: 8px; font-family: 'Arial', sans-serif; background: #fff; box-shadow: 2px 2px 0px #0f172a; margin-bottom:20px; }
-        .hardcase-card-table > tbody > tr > td { padding: 15px; border: none; }
+        /* CSS Label Hardcase Fix Border */
+        .hardcase-wrapper { width: 100%; border: 2px solid #0f172a; border-radius: 8px; font-family: 'Arial', sans-serif; background: #fff; box-shadow: 2px 2px 0px #0f172a; margin-bottom:20px; padding:15px; box-sizing:border-box;}
         .hardcase-header { text-align: center; border-bottom: 3px double #0f172a; padding-bottom: 10px; margin-bottom: 15px; }
         .hardcase-title { margin: 0; font-size: 20px; font-weight: 900; color: #0f172a; text-transform: uppercase;}
         .hardcase-kode { margin: 5px 0 0 0; font-size: 14px; font-weight: bold; color: #475569; }
         .hardcase-lokasi { display: inline-block; margin-top: 10px; padding: 5px 12px; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 11px; font-weight: bold; color: #0f172a; }
         .hardcase-box { width: 18px; height: 18px; border: 1.5px solid #0f172a; margin: 0 auto; border-radius: 3px; }
         .hardcase-footer { margin-top: 15px; padding-top: 10px; border-top: 1px dashed #94a3b8; font-size: 11px; display: flex; justify-content: space-between; align-items: flex-end; }
-        .inner-table { width: 100%; border-collapse: collapse; }
+        .inner-table { width: 100%; border-collapse: collapse; margin-bottom:0; }
         .inner-table th, .inner-table td { border: 1px solid #0f172a; padding: 6px 8px; }
         .inner-table th { background: #f8fafc; font-size: 12px; text-transform: uppercase; }
+        
+        .alat-nama { font-weight: bold; color: black; font-size: 11px; }
+        .alat-kode { color: gray; font-size: 9px; margin-left: 5px; }
     </style></head><body onload="window.print()">`;
     
-    // Header dokumen global
-    if (format !== "hardcase") {
-        let titleReport = format === "kebutuhan_tim" ? "DAFTAR KEBUTUHAN BARANG PER TIM" : "LAMPIRAN DAFTAR BARANG (CO-31)";
-        html += `<div class="header"><h2 style="margin:0;">${titleReport}</h2><p style="margin:5px 0 0 0; color:#444; font-size:13px;">Filter Sumber: <b>${titleContext.toUpperCase()}</b></p></div>`;
+    // ==========================================
+    // FORMAT 1: CO-31 (Daftar Detail per Wadah)
+    // ==========================================
+    if (format === "co31") {
+        html += `<div class="header"><h2 style="margin:0;">LAMPIRAN DAFTAR BARANG (CO-31)</h2><p style="margin:5px 0 0 0; color:#444; font-size:13px;">Konteks Data: <b>${titleContextText.toUpperCase()}</b></p></div>`;
+        
+        let groupedWadah = {}; let lepasan = [];
+        filteredData.forEach(item => { 
+            let wadah = (item.kode_wadah || "").toUpperCase().trim(); 
+            if (wadah && wadah !== "-") { 
+                if (!groupedWadah[wadah]) groupedWadah[wadah] = []; 
+                groupedWadah[wadah].push(item); 
+            } else { 
+                lepasan.push(item); 
+            } 
+        });
+
+        if (Object.keys(groupedWadah).length > 0) {
+            html += `<table>`;
+            html += `<thead><tr><th style="width:12%; text-align:center;">Jumlah</th><th style="width:58%;">Uraian Detail Barang (Wadah & Isi)</th><th style="width:30%;">Checklist</th></tr></thead><tbody>`;
+            for (let wadah in groupedWadah) {
+                let boxItem = allItems.find(i => i.kode_barang && i.kode_barang.toUpperCase() === wadah); 
+                let boxName = boxItem ? boxItem.nama_barang.toUpperCase() : `WADAH #${wadah}`;
+                html += `<tr class="no-break-inside" style="background-color:#f1f5f9;"><td style="text-align:center; font-weight:bold; font-size:12px; border-bottom:1px solid #ccc;">1 Pcs</td><td style="font-weight:bold; font-size:12px; border-bottom:1px solid #ccc;">🧰 ${boxName} (#${wadah})</td><td style="border-bottom:1px solid #ccc;">[ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ]</td></tr>`;
+                groupedWadah[wadah].forEach(item => { 
+                    html += `<tr class="no-break-inside"><td style="text-align:center; font-size:10px; color:#555; border-bottom:1px dashed #e2e8f0;">${item.jumlah} Pcs</td><td style="padding-left:15px; border-bottom:1px dashed #e2e8f0;"><span class="alat-nama">- ${item.nama_barang}</span> ${item.kode_barang ? '<span class="alat-kode">(#'+item.kode_barang+')</span>' : ''}</td><td style="border-bottom:1px dashed #e2e8f0;"></td></tr>`; 
+                });
+            }
+            html += `</tbody></table>`;
+        }
+
+        if (lepasan.length > 0) {
+            if (Object.keys(groupedWadah).length > 0) html += `<div class="page-break"></div>`; 
+            html += `<div class="header"><h2 style="margin:0;">LAMPIRAN DAFTAR BARANG (CO-31)</h2><p style="margin:5px 0 0 0; color:#444; font-size:13px;">Konteks Data: <b>${titleContextText.toUpperCase()}</b></p></div>`;
+            html += `<h3 style="background:#e2e8f0; padding:8px; border-left:4px solid #475569; font-size:14px; text-transform:uppercase;">Daftar Barang Lepasan (Tanpa Wadah)</h3>`;
+            html += `<table>`;
+            html += `<thead><tr><th style="width:12%; text-align:center;">Jumlah</th><th style="width:58%;">Uraian Detail Barang</th><th style="width:30%;">Checklist</th></tr></thead><tbody>`;
+            lepasan.forEach(item => { 
+                html += `<tr class="no-break-inside"><td style="text-align:center; font-weight:bold; font-size:12px;">${item.jumlah} Pcs</td><td><span class="alat-nama">${item.nama_barang.toUpperCase()}</span> ${item.kode_barang ? '<span class="alat-kode">(#'+item.kode_barang+')</span>' : ''}</td><td>[ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ]</td></tr>`; 
+            });
+            html += `</tbody></table>`;
+        }
     }
-
-    let isFirstGroup = true; 
-
+    
     // ==========================================
-    // 🚀 OPSI 4: FORMAT DAFTAR KEBUTUHAN PER TIM
+    // FORMAT 2: CHECKLIST TIAP WADAH (HARDCASE)
     // ==========================================
-    if (format === "kebutuhan_tim") {
+    else if (format === "hardcase") {
+        let groupedWadah = {};
+        filteredData.forEach(item => {
+            let wadah = (item.kode_wadah || "").toUpperCase().trim();
+            if (wadah && wadah !== "-") {
+                if (!groupedWadah[wadah]) groupedWadah[wadah] = [];
+                groupedWadah[wadah].push(item);
+            }
+        });
+
+        if (Object.keys(groupedWadah).length === 0) {
+             printWin.close();
+             alert("Tidak ada barang boks/hardcase di dalam sumber data yang dipilih.");
+             return;
+        }
+
+        let isFirst = true;
+        for (let wadah in groupedWadah) {
+            let boxItem = allItems.find(i => i.kode_barang && i.kode_barang.toUpperCase() === wadah); 
+            let boxName = boxItem ? boxItem.nama_barang : `WADAH #${wadah}`;
+            
+            let firstItem = groupedWadah[wadah][0];
+            let infoLokasi = firstItem.lokasi_saat_ini || firstItem.lokasi || "Gudang Kanguru";
+            let infoTujuan = firstItem.tujuan || "";
+            
+            let teksPosisi = infoLokasi;
+            if (infoTujuan && infoTujuan !== "TETAP" && infoTujuan !== "-" && infoLokasi.toLowerCase() !== infoTujuan.toLowerCase()) { 
+                teksPosisi += ` - ${infoTujuan}`; 
+            }
+
+            let pBreak = isFirst ? "" : "page-break";
+            isFirst = false;
+            
+            html += `<div class="hardcase-wrapper ${pBreak}">`;
+            html += `   <div class="hardcase-header">`;
+            html += `       <h2 class="hardcase-title">🧰 ${boxName}</h2>`;
+            html += `       <p class="hardcase-kode">ID WADAH: #${wadah}</p>`;
+            html += `       <div class="hardcase-lokasi">📍 Posisi: ${teksPosisi}</div>`;
+            html += `   </div>`;
+            
+            html += `   <table class="inner-table">`;
+            html += `       <thead><tr>`;
+            html += `           <th style="width:10%; text-align:center;">QTY</th>`;
+            html += `           <th style="width:60%;">NAMA ALAT (ISI HARDCASE)</th>`;
+            html += `           <th style="width:15%; text-align:center; background:#fee2e2; color:#991b1b; font-size:14px;">OUT 📤</th>`;
+            html += `           <th style="width:15%; text-align:center; background:#dcfce7; color:#166534; font-size:14px;">IN 📥</th>`;
+            html += `       </tr></thead><tbody>`;
+            
+            groupedWadah[wadah].forEach(item => { 
+                html += `   <tr class="no-break-inside">`;
+                html += `       <td style="text-align:center; font-weight:bold; font-size:13px;">${item.jumlah}</td>`;
+                html += `       <td><span class="alat-nama">${item.nama_barang}</span> <span class="alat-kode">${item.kode_barang ? '#'+item.kode_barang : ''}</span></td>`;
+                html += `       <td style="text-align:center; vertical-align:middle;"><div class="hardcase-box"></div></td>`;
+                html += `       <td style="text-align:center; vertical-align:middle;"><div class="hardcase-box"></div></td>`;
+                html += `   </tr>`;
+            });
+            
+            html += `       </tbody></table>`;
+            html += `   <div class="hardcase-footer no-break-inside">`;
+            html += `       <div><b>Dicetak:</b> ${new Date().toLocaleDateString('id-ID')} | <b>Status:</b> ${titleContextText}</div>`;
+            html += `       <div style="text-align:right;"><b>Paraf OUT:</b> ____________ &nbsp;&nbsp;&nbsp; <b>Paraf IN:</b> ____________</div>`;
+            html += `   </div>`;
+            html += `</div>`; 
+        }
+    }
+    
+    // ==========================================
+    // FORMAT 3: REKAP GABUNGAN TOTAL ALAT
+    // ==========================================
+    else if (format === "rekap") {
+        html += `<div class="header"><h2 style="margin:0;">REKAP GABUNGAN TOTAL ALAT</h2><p style="margin:5px 0 0 0; color:#444; font-size:13px;">Konteks Data: <b>${titleContextText.toUpperCase()}</b></p></div>`;
+        let grouped = {}; 
+        filteredData.forEach(i => { 
+            let nama = (i.nama_barang || "Tanpa Nama").toUpperCase(); 
+            if(!grouped[nama]) grouped[nama] = 0; 
+            grouped[nama] += parseInt(i.jumlah || 1); 
+        });
+        let sortedNames = Object.keys(grouped).sort();
+        
+        html += `<table>`;
+        html += `<thead><tr><th style="width:8%; text-align:center;">No</th><th style="width:72%;">Nama Alat (Data Gabungan)</th><th style="width:20%; text-align:center;">Total (Qty)</th></tr></thead><tbody>`;
+        sortedNames.forEach((nama, idx) => { 
+            html += `<tr class="no-break-inside"><td style="text-align:center;">${idx+1}</td><td><span class="alat-nama">${nama}</span></td><td style="text-align:center; font-weight:bold;">${grouped[nama]} Pcs</td></tr>`; 
+        });
+        html += `</tbody></table>`;
+    }
+    
+    // ==========================================
+    // FORMAT 4: DAFTAR KEBUTUHAN PER TIM (MISI)
+    // ==========================================
+    else if (format === "kebutuhan_tim") {
+        html += `<div class="header"><h2 style="margin:0;">DAFTAR KEBUTUHAN BARANG PER TIM</h2><p style="margin:5px 0 0 0; color:#444; font-size:13px;">Konteks Data: <b>${titleContextText.toUpperCase()}</b></p></div>`;
         let timData = {};
         
-        // Buat filter alat: Hanya alat yang lolos dari "Sumber Data" yang diproses
         let allowedCodes = new Set();
-        buckets.forEach(b => b.data.forEach(i => {
+        filteredData.forEach(i => {
             if (i.kode_barang) allowedCodes.add(i.kode_barang.toLowerCase());
-            if (i.kode_wadah) allowedCodes.add(i.kode_wadah.toLowerCase()); // Masukkan wadahnya juga
-        }));
+            if (i.kode_wadah) allowedCodes.add(i.kode_wadah.toLowerCase());
+        });
 
-        // Pindai Misi untuk mencari siapa pemakainya
         allMissions.forEach(m => {
             let timName = (m.tim || "UMUM").toUpperCase();
             let codes = String(m.kode_barang || "").split(',').map(c => c.trim().toLowerCase()).filter(c => c);
             
             codes.forEach(code => {
-                // Jika alat tsb ada di filter sumber (contoh: Akan Dibawa), masukkan ke daftar tim
                 if (allowedCodes.has(code)) {
                     if (!timData[timName]) timData[timName] = {};
                     let invItem = allItems.find(i => i.kode_barang && i.kode_barang.toLowerCase() === code);
@@ -896,133 +984,29 @@ function executePrint() {
         });
 
         if (Object.keys(timData).length === 0) {
-            html += `<div style="text-align:center; margin-top:50px;"><h3>Tidak ada barang yang terhubung ke Misi Tim pada filter ini.</h3></div>`;
+            html += `<div style="text-align:center; margin-top:50px;"><h3>Tidak ada barang yang terhubung ke Misi Tim pada sumber data ini.</h3></div>`;
         } else {
+            let isFirstTim = true;
             for (let tim in timData) {
-                let pageBreakClass = !isFirstGroup ? 'page-break' : '';
-                isFirstGroup = false;
+                let pBreak = !isFirstTim ? 'page-break' : '';
+                isFirstTim = false;
                 
-                html += `<div class="${pageBreakClass}">`;
+                html += `<div class="${pBreak}">`;
                 html += `<h3 style="margin-top:20px; margin-bottom:5px; color:#4f46e5; font-size:15px; font-weight:900; background:#e0e7ff; padding:8px 12px; border-left:5px solid #4f46e5; text-transform:uppercase;">👥 KEBUTUHAN TIM: ${tim}</h3>`;
-                html += `<table><thead><tr><th style="width:10%; text-align:center;">Total Qty</th><th style="width:60%;">Nama Barang</th><th style="width:30%;">Keterangan (Kode Barang)</th></tr></thead><tbody>`;
+                html += `<table><thead><tr><th style="width:10%; text-align:center;">Total Qty</th><th style="width:50%;">Nama Barang</th><th style="width:40%;">Daftar Lengkap Kode Alat</th></tr></thead><tbody>`;
                 
                 let sortedItems = Object.keys(timData[tim]).sort();
                 sortedItems.forEach(nama => {
                     let info = timData[tim][nama];
-                    let codesStr = info.codes.length <= 6 ? info.codes.join(', ') : (info.codes.slice(0,6).join(', ') + ' ...');
-                    html += `<tr class="no-break-inside"><td style="text-align:center; font-weight:bold; font-size:12px;">${info.qty} Pcs</td><td style="font-size:12px; font-weight:bold;">${nama}</td><td style="font-size:10px; color:#64748b;">${codesStr}</td></tr>`;
+                    let codesStr = info.codes.join(', ');
+                    html += `<tr class="no-break-inside"><td style="text-align:center; font-weight:bold; font-size:12px;">${info.qty} Pcs</td><td><span class="alat-nama">${nama}</span></td><td style="font-size:10px; color:#64748b;">${codesStr}</td></tr>`;
                 });
                 
                 html += `</tbody></table></div>`;
             }
         }
-    } 
-    // ==========================================
-    // OPSI 1, 2, & 3: FORMAT REGULER
-    // ==========================================
-    else {
-        let isFirstHardcase = true; 
-        
-        buckets.forEach((bucket) => {
-            bucket.data.sort((a, b) => (a.nama_barang || "").localeCompare(b.nama_barang || ""));
-            
-            let groupPageBreak = (!isFirstGroup && format !== "hardcase") ? 'page-break' : '';
-            isFirstGroup = false;
+    }
 
-            if (format !== "hardcase") {
-                html += `<div class="${groupPageBreak}">`; 
-                html += `<h3 style="margin-top:20px; margin-bottom:5px; color:${bucket.color}; font-size:13px; font-weight:900; background:#f8fafc; padding:6px 10px; border-left:4px solid ${bucket.color}; border-top:1px solid #e2e8f0; border-right:1px solid #e2e8f0;">${bucket.title}</h3>`;
-            }
-
-            if (format === "hardcase") {
-                let groupedWadah = {};
-                bucket.data.forEach(item => {
-                    let wadah = (item.kode_wadah || "").toUpperCase().trim();
-                    if (wadah && wadah !== "-") {
-                        if (!groupedWadah[wadah]) groupedWadah[wadah] = [];
-                        groupedWadah[wadah].push(item);
-                    }
-                });
-
-                for (let wadah in groupedWadah) {
-                    let boxItem = allItems.find(i => i.kode_barang && i.kode_barang.toUpperCase() === wadah); 
-                    let boxName = boxItem ? boxItem.nama_barang : `WADAH #${wadah}`;
-                    
-                    let firstItem = groupedWadah[wadah][0];
-                    let infoLokasi = firstItem.lokasi_saat_ini || firstItem.lokasi || "Gudang Kanguru";
-                    let infoTujuan = firstItem.tujuan || "";
-                    
-                    let teksPosisi = infoLokasi;
-                    if (infoTujuan && infoTujuan !== "TETAP" && infoTujuan !== "-") { teksPosisi += ` - ${infoTujuan}`; }
-
-                    let hardcasePageBreak = isFirstHardcase ? "" : "page-break";
-                    isFirstHardcase = false;
-                    
-                    html += `<div class="${hardcasePageBreak}">`;
-                    html += `<table class="hardcase-card-table"><tbody><tr><td>`;
-                    html += `   <div class="hardcase-header">`;
-                    html += `       <h2 class="hardcase-title">🧰 ${boxName}</h2>`;
-                    html += `       <p class="hardcase-kode">ID WADAH: #${wadah}</p>`;
-                    html += `       <div class="hardcase-lokasi">📍 Posisi: ${teksPosisi}</div>`;
-                    html += `   </div>`;
-                    html += `   <table class="inner-table">`;
-                    html += `       <thead><tr>`;
-                    html += `           <th style="width:10%; text-align:center;">QTY</th>`;
-                    html += `           <th style="width:60%;">NAMA ALAT (ISI HARDCASE)</th>`;
-                    html += `           <th style="width:15%; text-align:center; background:#fee2e2; color:#991b1b; font-size:14px;">OUT 📤</th>`;
-                    html += `           <th style="width:15%; text-align:center; background:#dcfce7; color:#166534; font-size:14px;">IN 📥</th>`;
-                    html += `       </tr></thead><tbody>`;
-                    
-                    groupedWadah[wadah].forEach(item => { 
-                        html += `   <tr class="no-break-inside">`;
-                        html += `       <td style="text-align:center; font-weight:bold; font-size:13px;">${item.jumlah}</td>`;
-                        html += `       <td style="font-size:11px; font-weight:bold;">${item.nama_barang} <div style="font-weight:normal; color:#64748b; font-size:9px; margin-top:2px;">#${item.kode_barang || '-'}</div></td>`;
-                        html += `       <td style="text-align:center; vertical-align:middle;"><div class="hardcase-box"></div></td>`;
-                        html += `       <td style="text-align:center; vertical-align:middle;"><div class="hardcase-box"></div></td>`;
-                        html += `   </tr>`;
-                    });
-                    
-                    html += `       </tbody></table>`;
-                    html += `   <div class="hardcase-footer no-break-inside">`;
-                    html += `       <div><b>Dicetak:</b> ${new Date().toLocaleDateString('id-ID')} | <b>Status:</b> ${bucket.title.split('(')[0].trim()}</div>`;
-                    html += `       <div style="text-align:right;"><b>Paraf OUT:</b> ____________ &nbsp;&nbsp;&nbsp; <b>Paraf IN:</b> ____________</div>`;
-                    html += `   </div>`;
-                    html += `</td></tr></tbody></table>`; 
-                    html += `</div>`; 
-                }
-
-            } else if (format === "kompak") {
-                let grouped = {}; bucket.data.forEach(i => { let nama = (i.nama_barang || "Tanpa Nama").toUpperCase(); if(!grouped[nama]) grouped[nama] = 0; grouped[nama] += parseInt(i.jumlah || 1); });
-                let sortedNames = Object.keys(grouped).sort();
-                html += `<table>`;
-                html += `<thead><tr><th style="width:8%; text-align:center;">No</th><th style="width:72%;">Nama Alat (Data Gabungan)</th><th style="width:20%; text-align:center;">Total (Qty)</th></tr></thead><tbody>`;
-                sortedNames.forEach((nama, idx) => { html += `<tr class="no-break-inside"><td style="text-align:center;">${idx+1}</td><td>${nama}</td><td style="text-align:center; font-weight:bold;">${grouped[nama]} Pcs</td></tr>`; });
-                html += `</tbody></table>`;
-            } else {
-                let groupedWadah = {}; let lepasan = []; let printedContainers = new Set();
-                bucket.data.forEach(item => { let wadah = (item.kode_wadah || "").toUpperCase().trim(); if (wadah) { if (!groupedWadah[wadah]) groupedWadah[wadah] = []; groupedWadah[wadah].push(item); printedContainers.add(wadah); } else { lepasan.push(item); } });
-                
-                html += `<table>`;
-                html += `<thead><tr><th style="width:12%; text-align:center;">Jumlah</th><th style="width:58%;">Uraian Detail Barang</th><th style="width:30%;">Checklist</th></tr></thead><tbody>`;
-                
-                for (let wadah in groupedWadah) {
-                    let boxItem = allItems.find(i => i.kode_barang && i.kode_barang.toUpperCase() === wadah); let boxName = boxItem ? boxItem.nama_barang.toUpperCase() : `WADAH #${wadah}`;
-                    html += `<tr class="no-break-inside" style="background-color:#f1f5f9;"><td style="text-align:center; font-weight:bold; font-size:12px; border-bottom:1px solid #ccc;">1 Pcs</td><td style="font-weight:bold; font-size:12px; border-bottom:1px solid #ccc;">🧰 ${boxName} (#${wadah})</td><td style="border-bottom:1px solid #ccc;">[ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ]</td></tr>`;
-                    groupedWadah[wadah].forEach(item => { html += `<tr class="no-break-inside"><td style="text-align:center; font-size:10px; color:#555; border-bottom:1px dashed #e2e8f0;">${item.jumlah} Pcs</td><td style="padding-left:15px; color:#555; font-size:10px; font-style:italic; border-bottom:1px dashed #e2e8f0;">- ${item.nama_barang} ${item.kode_barang ? '(#'+item.kode_barang+')' : ''}</td><td style="border-bottom:1px dashed #e2e8f0;"></td></tr>`; });
-                }
-                lepasan.forEach(item => { 
-                    let kb = (item.kode_barang || "").toUpperCase().trim(); 
-                    if (!printedContainers.has(kb)) html += `<tr class="no-break-inside"><td style="text-align:center; font-weight:bold; font-size:12px;">${item.jumlah} Pcs</td><td style="font-weight:bold; font-size:12px;">${item.nama_barang.toUpperCase()} ${item.kode_barang ? '(#'+item.kode_barang+')' : ''}</td><td>[ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ]</td></tr>`; 
-                });
-                html += `</tbody></table>`;
-            }
-            
-            if (format !== "hardcase") { html += `</div>`; }
-        });
-    } // Akhir blok Opsi Reguler
-    
-    if(format === "kompak") html += `<div style="margin-top:5px; font-size:11px; color:#555;"><i>*Format Gabungan otomatis untuk merekap barang sejenis.</i></div>`;
-    
     if (format !== "hardcase") {
         html += `<div style="margin-top: 20px; font-size:10px; color:#555; text-align:right;"><i>Dicetak pada: ${new Date().toLocaleString('id-ID')}</i></div>`;
     }
@@ -1031,16 +1015,3 @@ function executePrint() {
     
     printWin.document.write(html); printWin.document.close(); closePrintModal(); 
 }
-
-// === EXCEL EXPORT ===
-const btnBukaFilter = document.getElementById('btnBukaFilter'); const panelFilter = document.getElementById('panelFilterLanjutan'); if (btnBukaFilter && panelFilter) { btnBukaFilter.replaceWith(btnBukaFilter.cloneNode(true)); const newBtnBukaFilter = document.getElementById('btnBukaFilter'); newBtnBukaFilter.addEventListener('click', () => { if (panelFilter.style.display === 'none') { panelFilter.style.display = 'block'; newBtnBukaFilter.innerHTML = '❌ TUTUP FILTER'; newBtnBukaFilter.style.background = '#ef4444'; } else { panelFilter.style.display = 'none'; newBtnBukaFilter.innerHTML = '⚙️ FILTER TIM'; newBtnBukaFilter.style.background = '#334155'; } }); }
-function exportToExcel() { if (!allItems || allItems.length === 0) { alert("⚠️ Data inventaris belum selesai dimuat dari satelit!"); return; } const selectLokasi = document.getElementById('exportLokasi'); const selectTim = document.getElementById('exportTim'); selectLokasi.innerHTML = '<option value="ALL">📦 Semua Gudang / Lokasi</option>'; selectTim.innerHTML = '<option value="ALL">👥 Semua Tim</option>'; let daftarGudang = new Set(); let daftarTim = new Set(); allItems.forEach(item => { let lok = item.lokasi_saat_ini || item.lokasi || item["Lokasi Saat Ini"] || ""; if (lok && lok.trim() !== "") { daftarGudang.add(lok.trim()); } let tim = item.tim || item["Tim"] || ""; if (tim && tim.trim() !== "") { daftarTim.add(tim.trim()); } }); if(daftarGudang.size === 0) { daftarGudang.add("Gudang Kanguru"); daftarGudang.add("Gudang Mrican"); daftarGudang.add("Gedung UTC"); daftarGudang.add("Di Lokasi Event"); } daftarGudang.forEach(gudang => { let opt = document.createElement('option'); opt.value = gudang; opt.text = `📍 ${gudang}`; selectLokasi.appendChild(opt); }); daftarTim.forEach(tim => { let opt = document.createElement('option'); opt.value = tim; opt.text = `🏷️ ${tim}`; selectTim.appendChild(opt); }); const modal = document.getElementById('modalExport'); if(modal) { modal.style.display = 'flex'; modal.classList.add('active'); } }
-function closeExportModal() { const modal = document.getElementById('modalExport'); if(modal) { modal.style.display = 'none'; modal.classList.remove('active'); } }
-function executeCustomExport() { let dataToExport = getFilteredData(); if (dataToExport.length === 0) { alert("❌ Kosong! Tidak ada barang yang tampil di layar."); return; } let csvContent = "data:text/csv;charset=utf-8,Kode Barang,Nama Alat,Wadah,Kondisi,Lokasi Gudang,Status Pemakaian,Total Qty,Tim Terkait\n"; dataToExport.forEach(row => { let nama = `"${(row.nama_barang || "").replace(/"/g, '""')}"`; let kode = `"${row.kode_barang || "-"}"`; let wadah = `"${row.kode_wadah || "-"}"`; let kondisi = `"${row.kondisi || "Bagus"}"`; let lokasi = `"${row.lokasi_saat_ini || row.lokasi || row["Lokasi Saat Ini"] || "Gudang Kanguru"}"`; let status = `"${row.status_digunakan && row.status_digunakan !== 'FALSE' ? row.status_digunakan : 'Di Gudang'}"`; let qty = `"${row.jumlah || 1}"`; let tim = `"${row.tim || "-"}"`; csvContent += `${kode},${nama},${wadah},${kondisi},${lokasi},${status},${qty},${tim}\n`; }); let encodedUri = encodeURI(csvContent); let link = document.createElement("a"); link.setAttribute("href", encodedUri); let dateStr = new Date().toISOString().slice(0,10); link.setAttribute("download", `Laporan_GudangAV_${dateStr}.csv`); document.body.appendChild(link); link.click(); document.body.removeChild(link); closeExportModal(); showToast(`✅ SUKSES: ${dataToExport.length} data diekspor!`); }
-
-// === SCANNER QR ===
-function openScannerModal() { const oldModal = document.getElementById("tempScannerModal"); if(oldModal) oldModal.remove(); let modal = document.createElement("div"); modal.id = "tempScannerModal"; modal.className = "modal-overlay active"; modal.style.cssText = "position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.9); z-index: 999999; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(5px);"; modal.innerHTML = `<div class="modal-content" style="width: 90%; max-width: 400px; background: white; padding: 25px 20px; border-radius: 20px; text-align: center; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5);"><button onclick="closeScannerModal()" style="position: absolute; top: 15px; right: 15px; border: none; background: #fef2f2; color: #dc2626; width: 35px; height: 35px; border-radius: 50%; font-weight: bold; cursor: pointer; z-index: 9999; font-size: 16px;">✕</button><h3 style="margin: 0 0 5px 0; font-size: 18px; color: #0f172a; font-weight: 800;">📸 Scan Barcode</h3><div id="qr-reader" style="width: 100%; border-radius: 12px; overflow: hidden; border: 2px solid #e2e8f0; min-height: 250px; background: #1e293b;"></div><div class="scanner-controls" style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;"><button class="btn-scanner-action" style="padding: 12px; border-radius: 12px; border: none; background: #f1f5f9; color:#0f172a; font-weight: bold; cursor: pointer; flex: 1;" onclick="toggleCameraFacing()">🔄 Balik Kamera</button><button class="btn-scanner-action" id="btnFlashlight" style="padding: 12px; border-radius: 12px; border: none; background: #f1f5f9; color:#0f172a; font-weight: bold; cursor: pointer; flex: 1;" onclick="toggleFlashlight()">🔦 Senter</button></div></div>`; document.body.appendChild(modal); isFlashlightOn = false; startScanner(); }
-function startScanner() { if(html5QrCode) { html5QrCode.stop().catch(e=>console.log(e)); html5QrCode = null; } html5QrCode = new Html5Qrcode("qr-reader"); let config = { fps: 10, qrbox: { width: 220, height: 220 } }; html5QrCode.start({ facingMode: currentCameraFacing }, config, (decodedText) => { const now = Date.now(); if (now - lastScanTime < 1500) return; lastScanTime = now; let scanResult = decodedText.trim(); try { if ("vibrate" in navigator) navigator.vibrate([200]); } catch(e){} if (isBulkMode) { const foundItem = allItems.find(i => (i.kode_barang||"").toString().toLowerCase() === scanResult.toLowerCase() || (i.kode_wadah||"").toString().toLowerCase() === scanResult.toLowerCase()); if (foundItem) { if (!selectedRows.has(foundItem.row_index)) { selectedRows.add(foundItem.row_index); document.getElementById("bulkCount").innerText = `${selectedRows.size} Terpilih`; applyFilters(); showToast(`✅ ${foundItem.nama_barang} ditambahkan!`); } else { showToast(`⚠️ ${foundItem.nama_barang} sudah terpilih!`); } } else { try { if ("vibrate" in navigator) navigator.vibrate([300, 100, 300]); } catch(e){} showToast(`❌ Kode [${scanResult}] tidak ada di database!`, false); } } else { closeScannerModal(); const searchBox = document.getElementById('searchInput'); if(searchBox) { searchBox.value = scanResult; setFilterPill('all', document.querySelector('.pill-btn[data-filter="all"]')); applyFilters(); const foundItem = allItems.find(i => (i.kode_barang||"").toString().toLowerCase() === scanResult.toLowerCase() || (i.kode_wadah||"").toString().toLowerCase() === scanResult.toLowerCase()); if (foundItem) { setTimeout(() => openDetailModal(foundItem), 300); } else { showToast(`❌ Barang [${scanResult}] tidak ditemukan!`, false); } } } }, (errorMessage) => { } ).catch(err => { alert("Gagal membuka kamera: " + err); closeScannerModal(); }); }
-function toggleCameraFacing() { currentCameraFacing = currentCameraFacing === "environment" ? "user" : "environment"; showToast("Mengganti kamera...", true); if (html5QrCode) { html5QrCode.stop().then(() => { setTimeout(startScanner, 300); }).catch(err => console.log(err)); } }
-function toggleFlashlight() { if (!html5QrCode) return; isFlashlightOn = !isFlashlightOn; html5QrCode.applyVideoConstraints({ advanced: [{ torch: isFlashlightOn }] }).then(() => { document.getElementById("btnFlashlight").style.background = isFlashlightOn ? "#fef08a" : "#f1f5f9"; }).catch(err => { showToast("Senter tidak didukung.", false); isFlashlightOn = false; document.getElementById("btnFlashlight").style.background = "#f1f5f9"; }); }
-function closeScannerModal() { if (html5QrCode) { html5QrCode.stop().catch(e=>console.log(e)); html5QrCode = null; } const m = document.getElementById("tempScannerModal"); if(m) m.remove(); }

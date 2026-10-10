@@ -800,8 +800,11 @@ function executePrint() {
         body { font-family: 'Arial', sans-serif; font-size:12px; color:#000; } 
         
         table { width: 100%; border-collapse: collapse; margin-top: 5px; margin-bottom: 20px;} 
-        th, td { border: 1px solid #000; padding: 6px 8px; text-align: left; vertical-align: top;} 
-        th { background: #f0f0f0; } 
+        
+        /* Poin 1: Mengurangi row height dengan mengecilkan padding atas-bawah */
+        th, td { border: 1px solid #000; padding: 3px 8px; text-align: left; vertical-align: middle;} 
+        
+        th { background: #f0f0f0; padding-top: 6px; padding-bottom: 6px; } 
         .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 10px; }
         
         .page-break { break-before: page; page-break-before: always; }
@@ -813,14 +816,15 @@ function executePrint() {
         .hardcase-title { margin: 0; font-size: 20px; font-weight: 900; color: #0f172a; text-transform: uppercase;}
         .hardcase-kode { margin: 5px 0 0 0; font-size: 14px; font-weight: bold; color: #475569; }
         .hardcase-lokasi { display: inline-block; margin-top: 10px; padding: 5px 12px; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 11px; font-weight: bold; color: #0f172a; }
-        .hardcase-box { width: 18px; height: 18px; border: 1.5px solid #0f172a; margin: 0 auto; border-radius: 3px; }
+        .hardcase-box { width: 14px; height: 14px; border: 1.5px solid #0f172a; margin: 0 auto; border-radius: 3px; }
         .hardcase-footer { margin-top: 15px; padding-top: 10px; border-top: 1px dashed #94a3b8; font-size: 11px; display: flex; justify-content: space-between; align-items: flex-end; }
         .inner-table { width: 100%; border-collapse: collapse; margin-bottom:0; }
-        .inner-table th, .inner-table td { border: 1px solid #0f172a; padding: 6px 8px; }
-        .inner-table th { background: #f8fafc; font-size: 12px; text-transform: uppercase; }
+        .inner-table th, .inner-table td { border: 1px solid #0f172a; padding: 4px 8px; }
+        .inner-table th { background: #f8fafc; font-size: 12px; text-transform: uppercase; padding: 6px 8px;}
         
         .alat-nama { font-weight: bold; color: black; font-size: 11px; }
         .alat-kode { color: gray; font-size: 9px; margin-left: 5px; }
+        .box-check { font-size: 14px; color:#94a3b8; }
     </style></head><body onload="window.print()">`;
     
     // ==========================================
@@ -842,13 +846,16 @@ function executePrint() {
 
         if (Object.keys(groupedWadah).length > 0) {
             html += `<table>`;
-            html += `<thead><tr><th style="width:12%; text-align:center;">Jumlah</th><th style="width:58%;">Uraian Detail Barang (Wadah & Isi)</th><th style="width:30%;">Checklist</th></tr></thead><tbody>`;
+            html += `<thead><tr><th style="width:8%; text-align:center;">Jumlah</th><th style="width:72%;">Uraian Detail Barang (Wadah & Isi)</th><th style="width:20%; text-align:center;">Checklist</th></tr></thead><tbody>`;
             for (let wadah in groupedWadah) {
                 let boxItem = allItems.find(i => i.kode_barang && i.kode_barang.toUpperCase() === wadah); 
                 let boxName = boxItem ? boxItem.nama_barang.toUpperCase() : `WADAH #${wadah}`;
-                html += `<tr class="no-break-inside" style="background-color:#f1f5f9;"><td style="text-align:center; font-weight:bold; font-size:12px; border-bottom:1px solid #ccc;">1 Pcs</td><td style="font-weight:bold; font-size:12px; border-bottom:1px solid #ccc;">🧰 ${boxName} (#${wadah})</td><td style="border-bottom:1px solid #ccc;">[ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ]</td></tr>`;
+                
+                // Poin 2: Menghapus kolom checklist pada baris judul Hardcase (pakai colspan)
+                html += `<tr class="no-break-inside" style="background-color:#f1f5f9;"><td style="text-align:center; font-weight:bold; font-size:12px; border-bottom:1px solid #ccc; padding:6px 8px;">1 Pcs</td><td colspan="2" style="font-weight:bold; font-size:12px; border-bottom:1px solid #ccc; padding:6px 8px; color:#0f172a;">🧰 ${boxName} (#${wadah})</td></tr>`;
+                
                 groupedWadah[wadah].forEach(item => { 
-                    html += `<tr class="no-break-inside"><td style="text-align:center; font-size:10px; color:#555; border-bottom:1px dashed #e2e8f0;">${item.jumlah} Pcs</td><td style="padding-left:15px; border-bottom:1px dashed #e2e8f0;"><span class="alat-nama">- ${item.nama_barang}</span> ${item.kode_barang ? '<span class="alat-kode">(#'+item.kode_barang+')</span>' : ''}</td><td style="border-bottom:1px dashed #e2e8f0;"></td></tr>`; 
+                    html += `<tr class="no-break-inside"><td style="text-align:center; font-size:10px; color:#555; border-bottom:1px dashed #e2e8f0;">${item.jumlah} Pcs</td><td style="padding-left:15px; border-bottom:1px dashed #e2e8f0;"><span class="alat-nama">- ${item.nama_barang}</span> ${item.kode_barang ? '<span class="alat-kode">(#'+item.kode_barang+')</span>' : ''}</td><td style="border-bottom:1px dashed #e2e8f0; text-align:center;"><span class="box-check">☐</span></td></tr>`; 
                 });
             }
             html += `</tbody></table>`;
@@ -857,11 +864,11 @@ function executePrint() {
         if (lepasan.length > 0) {
             if (Object.keys(groupedWadah).length > 0) html += `<div class="page-break"></div>`; 
             html += `<div class="header"><h2 style="margin:0;">LAMPIRAN DAFTAR BARANG (CO-31)</h2><p style="margin:5px 0 0 0; color:#444; font-size:13px;">Konteks Data: <b>${titleContextText.toUpperCase()}</b></p></div>`;
-            html += `<h3 style="background:#e2e8f0; padding:8px; border-left:4px solid #475569; font-size:14px; text-transform:uppercase;">Daftar Barang Lepasan (Tanpa Wadah)</h3>`;
+            html += `<h3 style="background:#e2e8f0; padding:6px 8px; border-left:4px solid #475569; font-size:13px; text-transform:uppercase; margin-bottom:5px;">Daftar Barang Lepasan (Tanpa Wadah)</h3>`;
             html += `<table>`;
-            html += `<thead><tr><th style="width:12%; text-align:center;">Jumlah</th><th style="width:58%;">Uraian Detail Barang</th><th style="width:30%;">Checklist</th></tr></thead><tbody>`;
+            html += `<thead><tr><th style="width:8%; text-align:center;">Jumlah</th><th style="width:72%;">Uraian Detail Barang</th><th style="width:20%; text-align:center;">Checklist</th></tr></thead><tbody>`;
             lepasan.forEach(item => { 
-                html += `<tr class="no-break-inside"><td style="text-align:center; font-weight:bold; font-size:12px;">${item.jumlah} Pcs</td><td><span class="alat-nama">${item.nama_barang.toUpperCase()}</span> ${item.kode_barang ? '<span class="alat-kode">(#'+item.kode_barang+')</span>' : ''}</td><td>[ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ]</td></tr>`; 
+                html += `<tr class="no-break-inside"><td style="text-align:center; font-weight:bold; font-size:11px;">${item.jumlah} Pcs</td><td><span class="alat-nama">${item.nama_barang.toUpperCase()}</span> ${item.kode_barang ? '<span class="alat-kode">(#'+item.kode_barang+')</span>' : ''}</td><td style="text-align:center;"><span class="box-check">☐</span></td></tr>`; 
             });
             html += `</tbody></table>`;
         }
@@ -912,15 +919,15 @@ function executePrint() {
             
             html += `   <table class="inner-table">`;
             html += `       <thead><tr>`;
-            html += `           <th style="width:10%; text-align:center;">QTY</th>`;
-            html += `           <th style="width:60%;">NAMA ALAT (ISI HARDCASE)</th>`;
-            html += `           <th style="width:15%; text-align:center; background:#fee2e2; color:#991b1b; font-size:14px;">OUT 📤</th>`;
-            html += `           <th style="width:15%; text-align:center; background:#dcfce7; color:#166534; font-size:14px;">IN 📥</th>`;
+            html += `           <th style="width:8%; text-align:center;">QTY</th>`;
+            html += `           <th style="width:62%;">NAMA ALAT (ISI HARDCASE)</th>`;
+            html += `           <th style="width:15%; text-align:center; background:#fee2e2; color:#991b1b; font-size:13px;">OUT 📤</th>`;
+            html += `           <th style="width:15%; text-align:center; background:#dcfce7; color:#166534; font-size:13px;">IN 📥</th>`;
             html += `       </tr></thead><tbody>`;
             
             groupedWadah[wadah].forEach(item => { 
                 html += `   <tr class="no-break-inside">`;
-                html += `       <td style="text-align:center; font-weight:bold; font-size:13px;">${item.jumlah}</td>`;
+                html += `       <td style="text-align:center; font-weight:bold; font-size:12px;">${item.jumlah}</td>`;
                 html += `       <td><span class="alat-nama">${item.nama_barang}</span> <span class="alat-kode">${item.kode_barang ? '#'+item.kode_barang : ''}</span></td>`;
                 html += `       <td style="text-align:center; vertical-align:middle;"><div class="hardcase-box"></div></td>`;
                 html += `       <td style="text-align:center; vertical-align:middle;"><div class="hardcase-box"></div></td>`;
@@ -962,7 +969,7 @@ function executePrint() {
     // ==========================================
     else if (format === "kebutuhan_tim") {
         html += `<div class="header"><h2 style="margin:0;">DAFTAR KEBUTUHAN BARANG PER TIM</h2><p style="margin:5px 0 0 0; color:#444; font-size:13px;">Konteks Data: <b>${titleContextText.toUpperCase()}</b></p></div>`;
-        let timData = {};
+        let timDataList = {};
         
         let allowedCodes = new Set();
         filteredData.forEach(i => {
@@ -976,34 +983,36 @@ function executePrint() {
             
             codes.forEach(code => {
                 if (allowedCodes.has(code)) {
-                    if (!timData[timName]) timData[timName] = {};
+                    if (!timDataList[timName]) timDataList[timName] = [];
                     let invItem = allItems.find(i => i.kode_barang && i.kode_barang.toLowerCase() === code);
                     let namaAlat = invItem ? invItem.nama_barang : `Alat #${code.toUpperCase()}`;
                     
-                    if (!timData[timName][namaAlat]) timData[timName][namaAlat] = { qty: 0, codes: [] };
-                    timData[timName][namaAlat].qty += 1;
-                    timData[timName][namaAlat].codes.push(code.toUpperCase());
+                    // Poin 3: Tidak digabung, dimasukkan ke array satu per satu
+                    timDataList[timName].push({
+                        nama: namaAlat,
+                        kode: code.toUpperCase()
+                    });
                 }
             });
         });
 
-        if (Object.keys(timData).length === 0) {
+        if (Object.keys(timDataList).length === 0) {
             html += `<div style="text-align:center; margin-top:50px;"><h3>Tidak ada barang yang terhubung ke Misi Tim pada sumber data ini.</h3></div>`;
         } else {
             let isFirstTim = true;
-            for (let tim in timData) {
+            for (let tim in timDataList) {
                 let pBreak = !isFirstTim ? 'page-break' : '';
                 isFirstTim = false;
                 
-                html += `<div class="${pBreak}">`;
-                html += `<h3 style="margin-top:20px; margin-bottom:5px; color:#4f46e5; font-size:15px; font-weight:900; background:#e0e7ff; padding:8px 12px; border-left:5px solid #4f46e5; text-transform:uppercase;">👥 KEBUTUHAN TIM: ${tim}</h3>`;
-                html += `<table><thead><tr><th style="width:10%; text-align:center;">Total Qty</th><th style="width:50%;">Nama Barang</th><th style="width:40%;">Daftar Lengkap Kode Alat</th></tr></thead><tbody>`;
+                // Urutkan berdasarkan nama barang agar rapi
+                timDataList[tim].sort((a, b) => a.nama.localeCompare(b.nama));
                 
-                let sortedItems = Object.keys(timData[tim]).sort();
-                sortedItems.forEach(nama => {
-                    let info = timData[tim][nama];
-                    let codesStr = info.codes.join(', ');
-                    html += `<tr class="no-break-inside"><td style="text-align:center; font-weight:bold; font-size:12px;">${info.qty} Pcs</td><td><span class="alat-nama">${nama}</span></td><td style="font-size:10px; color:#64748b;">${codesStr}</td></tr>`;
+                html += `<div class="${pBreak}">`;
+                html += `<h3 style="margin-top:20px; margin-bottom:5px; color:#4f46e5; font-size:14px; font-weight:900; background:#e0e7ff; padding:6px 10px; border-left:4px solid #4f46e5; text-transform:uppercase;">👥 KEBUTUHAN TIM: ${tim}</h3>`;
+                html += `<table><thead><tr><th style="width:8%; text-align:center;">No</th><th style="width:72%;">Nama Barang (Kode Alat)</th><th style="width:20%; text-align:center;">Checklist</th></tr></thead><tbody>`;
+                
+                timDataList[tim].forEach((item, index) => {
+                    html += `<tr class="no-break-inside"><td style="text-align:center; font-size:11px;">${index + 1}</td><td><span class="alat-nama">${item.nama}</span> <span class="alat-kode">(#${item.kode})</span></td><td style="text-align:center;"><span class="box-check">☐</span></td></tr>`;
                 });
                 
                 html += `</tbody></table></div>`;

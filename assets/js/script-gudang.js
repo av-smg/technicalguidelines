@@ -901,30 +901,56 @@ function executePrint() {
             let wadahKosong = []; 
             let lepasan = [];
 
+            // 1. Kumpulkan dulu semua kode wadah yang terpakai (ada isinya)
+            let usedWadahCodes = new Set();
+            itemsInLocation.forEach(item => {
+                let wadah = (item.kode_wadah || "").toUpperCase().trim();
+                if (wadah && wadah !== "-") {
+                    usedWadahCodes.add(wadah);
+                    if (!groupedWadah[wadah]) groupedWadah[wadah] = []; 
+                    groupedWadah[wadah].push(item);
+                }
+            });
+
+            // 2. Pilah barang tersisa (Wadah Kosong vs Lepasan murni)
             itemsInLocation.forEach(item => { 
                 let wadah = (item.kode_wadah || "").toUpperCase().trim(); 
-                if (wadah && wadah !== "-") { 
-                    if (!groupedWadah[wadah]) groupedWadah[wadah] = []; 
-                    groupedWadah[wadah].push(item); 
-                } else { 
-                    // Cek apakah item ini berjenis Wadah Kosong/Utama
+                if (!wadah || wadah === "-") { 
+                    // Cek apakah item ini berjenis Wadah
                     let nama = (item.nama_barang || "").toLowerCase();
                     let isWadah = nama.includes('hardcase') || nama.includes('koper') || nama.includes('wadah') || nama.includes('box') || nama.includes('container') || nama.includes('tas');
-                    if (isWadah) wadahKosong.push(item);
-                    else lepasan.push(item);
+                    let kodeAsli = (item.kode_barang || "").toUpperCase().trim();
+                    
+                    if (isWadah) {
+                        // CEK: Jika wadah ini SUDAH tercetak isinya di atas, JANGAN masukkan ke daftar wadah kosong.
+                        if (!usedWadahCodes.has(kodeAsli)) {
+                            wadahKosong.push(item);
+                        }
+                    } else {
+                        lepasan.push(item);
+                    }
                 } 
             });
 
-            // 1A. CETAK HARDCASE & ISINYA
+            // 1A. CETAK HARDCASE & ISINYA (Dengan Checklist di Judul)
             let wadahKeys = Object.keys(groupedWadah).sort();
             if (wadahKeys.length > 0) {
                 wadahKeys.forEach(wadah => {
                     let boxItem = allItems.find(i => i.kode_barang && i.kode_barang.toUpperCase() === wadah); 
                     let boxName = boxItem ? boxItem.nama_barang.toUpperCase() : `WADAH #${wadah}`;
                     
-                    html += `<div class="no-break-inside">`;
-                    html += `<div class="wadah-title">🧰 HARDCASE: ${boxName} (#${wadah})</div>`;
-                    html += `<table><thead><tr><th style="width:8%; text-align:center;">Qty</th><th style="width:72%;">Uraian Detail Barang (Isi Wadah)</th><th style="width:20%; text-align:center;">Checklist</th></tr></thead><tbody>`;
+                    html += `<div class="no-break-inside" style="margin-bottom: 20px;">`;
+                    // Judul Hardcase sekarang punya kolom checklist sendiri!
+                    html += `<table style="margin-bottom:0; border-bottom:none;">
+                                <tbody>
+                                    <tr style="background:#e2e8f0;">
+                                        <td style="width:80%; border:1px solid #334155; border-bottom:none; font-weight:900; font-size:13px; padding:8px 12px; color:#0f172a;">🧰 HARDCASE: ${boxName} (#${wadah})</td>
+                                        <td style="width:20%; border:1px solid #334155; border-bottom:none; text-align:center; font-weight:bold;">[ KOTAK FISIK: <span class="box-check" style="color:#0f172a; margin-left:5px;">☐</span> ]</td>
+                                    </tr>
+                                </tbody>
+                             </table>`;
+                    
+                    html += `<table style="margin-top:0;"><thead><tr><th style="width:8%; text-align:center;">Qty</th><th style="width:72%;">Uraian Detail Barang (Isi Wadah)</th><th style="width:20%; text-align:center;">Checklist Isi</th></tr></thead><tbody>`;
                     
                     groupedWadah[wadah].forEach(item => { 
                         let badge = getBadgeRusakHTML(item.kondisi);
@@ -934,7 +960,7 @@ function executePrint() {
                 });
             }
 
-            // 1B. CETAK WADAH KOSONG UTAMA
+            // 1B. CETAK WADAH KOSONG (Hanya yang benar-benar kosong/tidak ada isinya)
             if (wadahKosong.length > 0) {
                 html += `<div class="no-break-inside">`;
                 html += `<div class="wadah-title" style="background:#fef3c7; color:#92400e; border-color:#d97706;">🧰 FISIK WADAH KOSONG / TAS</div>`;
@@ -1048,7 +1074,6 @@ function executePrint() {
             let sortedBagus = Object.keys(groupedBagus).sort();
             let sortedRusak = Object.keys(groupedRusak).sort();
 
-            // TABEL 1: KONDISI BAGUS
             if (sortedBagus.length > 0) {
                 html += `<h3 style="background:#dcfce7; padding:8px; border-left:4px solid #16a34a; font-size:13px; margin-bottom:5px; color:#166534;">✅ KONDISI BAGUS / SIAP PAKAI</h3>`;
                 html += `<table><thead><tr><th style="width:8%; text-align:center;">No</th><th style="width:72%;">Nama Alat (Data Gabungan)</th><th style="width:20%; text-align:center;">Total (Qty)</th></tr></thead><tbody>`;
@@ -1058,13 +1083,10 @@ function executePrint() {
                 html += `</tbody></table>`;
             }
 
-            // TABEL 2: KONDISI RUSAK (DIPAKSA PINDAH HALAMAN JIKA ADA)
             if (sortedRusak.length > 0) {
-                // Tambahkan Page Break dan Cetak Ulang Header Lokasi agar tidak bingung ini data gudang mana
                 html += `<div class="page-break"></div>`;
                 html += `<div class="header"><h2 style="margin:0;">REKAP GABUNGAN TOTAL ALAT</h2><p style="margin:5px 0 0 0; color:#444; font-size:13px;">Data: <b>${titleContextText.toUpperCase()}</b></p></div>`;
                 html += `<div class="lokasi-title" style="background:#7f1d1d;">📍 ${lokasi} (LANJUTAN - KONDISI RUSAK)</div>`;
-                
                 html += `<h3 style="background:#fee2e2; padding:8px; border-left:4px solid #dc2626; font-size:13px; margin-top:15px; margin-bottom:5px; color:#991b1b;">🛠️ KONDISI RUSAK / PERBAIKAN</h3>`;
                 html += `<table><thead><tr><th style="width:8%; text-align:center;">No</th><th style="width:72%;">Nama Alat (Data Gabungan)</th><th style="width:20%; text-align:center;">Total (Qty)</th></tr></thead><tbody>`;
                 sortedRusak.forEach((nama, idx) => { 
@@ -1072,7 +1094,7 @@ function executePrint() {
                 });
                 html += `</tbody></table>`;
             }
-        }
+        }    
         
         // ==========================================
         // FORMAT 4: DAFTAR KEBUTUHAN PER TIM (MISI)
@@ -1080,14 +1102,12 @@ function executePrint() {
         else if (format === "kebutuhan_tim") {
             let timDataList = {};
             
-            // Siapkan katalog kode barang KHUSUS UNTUK LOKASI INI
             let allowedCodes = new Set();
             itemsInLocation.forEach(i => {
                 if (i.kode_barang) allowedCodes.add(i.kode_barang.toLowerCase());
                 if (i.kode_wadah) allowedCodes.add(i.kode_wadah.toLowerCase());
             });
 
-            // Cocokkan misi dengan barang yang ada di lokasi ini
             allMissions.forEach(m => {
                 let timName = (m.tim || "UMUM").toUpperCase();
                 let codes = String(m.kode_barang || "").split(',').map(c => c.trim().toLowerCase()).filter(c => c);
@@ -1109,12 +1129,14 @@ function executePrint() {
             if (Object.keys(timDataList).length === 0) {
                 html += `<div style="text-align:center; margin:30px 0; font-style:italic;">Tidak ada barang yang terhubung ke Misi Tim di lokasi ini.</div>`;
             } else {
+                // Hapus logika page-break paksa pada setiap loop tim
                 for (let tim in timDataList) {
                     timDataList[tim].sort((a, b) => a.nama.localeCompare(b.nama));
                     
-                    html += `<div class="no-break-inside">`;
+                    // Gunakan inline-block agar divisi tim tidak mudah terpotong atau memicu blank page
+                    html += `<div style="page-break-inside: avoid; margin-bottom: 15px;">`;
                     html += `<div class="wadah-title" style="background:#e0e7ff; color:#3730a3; border-color:#a5b4fc; border-left:4px solid #4f46e5;">👥 DIVISI TIM: ${tim}</div>`;
-                    html += `<table><thead><tr><th style="width:8%; text-align:center;">No</th><th style="width:72%;">Nama Barang (Kode Alat)</th><th style="width:20%; text-align:center;">Checklist</th></tr></thead><tbody>`;
+                    html += `<table style="margin-bottom:0;"><thead><tr><th style="width:8%; text-align:center;">No</th><th style="width:72%;">Nama Barang (Kode Alat)</th><th style="width:20%; text-align:center;">Checklist</th></tr></thead><tbody>`;
                     
                     timDataList[tim].forEach((item, index) => {
                         let badge = getBadgeRusakHTML(item.kondisi);
@@ -1125,7 +1147,6 @@ function executePrint() {
                 }
             }
         }
-
         html += `</div>`; // Tutup div container per Lokasi
     });
 

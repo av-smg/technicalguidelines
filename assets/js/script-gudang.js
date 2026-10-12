@@ -791,10 +791,9 @@ function executePrint() {
         let stat = i.status_digunakan || 'Di Gudang'; if(stat === 'FALSE') stat = 'Di Gudang';
         let lok = i.lokasi_saat_ini || i.lokasi || i["Lokasi Saat Karena Ini"] || '';
         
-        // Transisi Data Legacy
-        if (lok === 'Dalam Perjalanan') stat = 'Dalam Perjalanan';
+        // Transisi Data Legacy (Dimatikan agar tidak nyangkut ke Dalam Perjalanan jika status sudah beda)
+        // if (lok === 'Dalam Perjalanan') stat = 'Dalam Perjalanan';
 
-        // POIN 3: Blokir barang rusak DIHAPUS. Barang rusak akan tercetak.
         if (source === "semua") {
             filteredData.push(i);
         } else if (source === "bawa" && stat === 'Akan Dibawa') {
@@ -815,7 +814,7 @@ function executePrint() {
     if (source === "event") titleContextText = "Di Lokasi Gedung";
 
     // ==========================================
-    // 2. KELOMPOKKAN BERDASARKAN LOKASI (PANGLIMA TERTINGGI)
+    // 2. KELOMPOKKAN BERDASARKAN LOKASI 
     // ==========================================
     let groupedByLocation = {};
     filteredData.forEach(item => {
@@ -835,6 +834,15 @@ function executePrint() {
     // Helper: Cetak Badge Merah jika barang bermasalah
     const getBadgeRusakHTML = (kondisi) => {
         return isRusak(kondisi) ? `<span class="badge-rusak">⚠️ ${(kondisi||"RUSAK").toUpperCase()}</span>` : '';
+    };
+
+    // Helper: Cetak Keterangan Teknis / Referensi
+    const getKetHTML = (keterangan) => {
+        let ket = (keterangan || "").trim();
+        if (ket && ket !== "-" && ket.toLowerCase() !== "tidak ada catatan." && ket.toLowerCase() !== "tidak ada catatan") {
+            return `<div style="font-size:10px; color:#475569; font-style:italic; margin-top:3px; line-height:1.2;">*Ket: ${ket}</div>`;
+        }
+        return "";
     };
 
     // ==========================================
@@ -882,7 +890,6 @@ function executePrint() {
 
         html += `<div class="${locPageBreak}">`;
         
-        // Header Umum per Lokasi (Kecuali Format Hardcase yang punya headernya sendiri)
         if (format !== "hardcase") {
             let judulDokumen = "DOKUMEN LOGISTIK A/V";
             if (format === "co31") judulDokumen = "LAMPIRAN DAFTAR BARANG (CO-31)";
@@ -900,9 +907,8 @@ function executePrint() {
             let groupedWadah = {}; 
             let wadahKosong = []; 
             let lepasan = [];
-
-            // 1. Kumpulkan dulu semua kode wadah yang terpakai (ada isinya)
             let usedWadahCodes = new Set();
+            
             itemsInLocation.forEach(item => {
                 let wadah = (item.kode_wadah || "").toUpperCase().trim();
                 if (wadah && wadah !== "-") {
@@ -912,27 +918,22 @@ function executePrint() {
                 }
             });
 
-            // 2. Pilah barang tersisa (Wadah Kosong vs Lepasan murni)
             itemsInLocation.forEach(item => { 
                 let wadah = (item.kode_wadah || "").toUpperCase().trim(); 
                 if (!wadah || wadah === "-") { 
-                    // Cek apakah item ini berjenis Wadah
                     let nama = (item.nama_barang || "").toLowerCase();
                     let isWadah = nama.includes('hardcase') || nama.includes('koper') || nama.includes('wadah') || nama.includes('box') || nama.includes('container') || nama.includes('tas');
                     let kodeAsli = (item.kode_barang || "").toUpperCase().trim();
                     
                     if (isWadah) {
-                        // CEK: Jika wadah ini SUDAH tercetak isinya di atas, JANGAN masukkan ke daftar wadah kosong.
-                        if (!usedWadahCodes.has(kodeAsli)) {
-                            wadahKosong.push(item);
-                        }
+                        if (!usedWadahCodes.has(kodeAsli)) wadahKosong.push(item);
                     } else {
                         lepasan.push(item);
                     }
                 } 
             });
 
-            // 1A. CETAK HARDCASE & ISINYA (Dengan Checklist di Judul)
+            // 1A. CETAK HARDCASE & ISINYA 
             let wadahKeys = Object.keys(groupedWadah).sort();
             if (wadahKeys.length > 0) {
                 wadahKeys.forEach(wadah => {
@@ -940,7 +941,6 @@ function executePrint() {
                     let boxName = boxItem ? boxItem.nama_barang.toUpperCase() : `WADAH #${wadah}`;
                     
                     html += `<div class="no-break-inside" style="margin-bottom: 20px;">`;
-                    // Judul Hardcase sekarang punya kolom checklist sendiri!
                     html += `<table style="margin-bottom:0; border-bottom:none;">
                                 <tbody>
                                     <tr style="background:#e2e8f0;">
@@ -954,25 +954,27 @@ function executePrint() {
                     
                     groupedWadah[wadah].forEach(item => { 
                         let badge = getBadgeRusakHTML(item.kondisi);
-                        html += `<tr><td style="text-align:center; font-weight:bold;">${item.jumlah}</td><td><span class="alat-nama">${item.nama_barang.toUpperCase()}</span> ${item.kode_barang ? '<span class="alat-kode">(#'+item.kode_barang+')</span>' : ''} ${badge}</td><td style="text-align:center;"><span class="box-check">☐</span></td></tr>`; 
+                        let ketStr = getKetHTML(item.keterangan);
+                        html += `<tr><td style="text-align:center; font-weight:bold; vertical-align:top;">${item.jumlah}</td><td style="vertical-align:top;"><span class="alat-nama">${item.nama_barang.toUpperCase()}</span> ${item.kode_barang ? '<span class="alat-kode">(#'+item.kode_barang+')</span>' : ''} ${badge} ${ketStr}</td><td style="text-align:center; vertical-align:middle;"><span class="box-check">☐</span></td></tr>`; 
                     });
                     html += `</tbody></table></div>`;
                 });
             }
 
-            // 1B. CETAK WADAH KOSONG (Hanya yang benar-benar kosong/tidak ada isinya)
+            // 1B. CETAK WADAH KOSONG
             if (wadahKosong.length > 0) {
                 html += `<div class="no-break-inside">`;
                 html += `<div class="wadah-title" style="background:#fef3c7; color:#92400e; border-color:#d97706;">🧰 FISIK WADAH KOSONG / TAS</div>`;
                 html += `<table><thead><tr><th style="width:8%; text-align:center;">Qty</th><th style="width:72%;">Nama Wadah</th><th style="width:20%; text-align:center;">Checklist</th></tr></thead><tbody>`;
                 wadahKosong.forEach(item => { 
                     let badge = getBadgeRusakHTML(item.kondisi);
-                    html += `<tr><td style="text-align:center; font-weight:bold;">${item.jumlah}</td><td><span class="alat-nama">${item.nama_barang.toUpperCase()}</span> ${item.kode_barang ? '<span class="alat-kode">(#'+item.kode_barang+')</span>' : ''} ${badge}</td><td style="text-align:center;"><span class="box-check">☐</span></td></tr>`; 
+                    let ketStr = getKetHTML(item.keterangan);
+                    html += `<tr><td style="text-align:center; font-weight:bold; vertical-align:top;">${item.jumlah}</td><td style="vertical-align:top;"><span class="alat-nama">${item.nama_barang.toUpperCase()}</span> ${item.kode_barang ? '<span class="alat-kode">(#'+item.kode_barang+')</span>' : ''} ${badge} ${ketStr}</td><td style="text-align:center; vertical-align:middle;"><span class="box-check">☐</span></td></tr>`; 
                 });
                 html += `</tbody></table></div>`;
             }
 
-            // 1C. CETAK BARANG LEPASAN (PAGE BREAK)
+            // 1C. CETAK BARANG LEPASAN
             if (lepasan.length > 0) {
                 let pbLepasan = (wadahKeys.length > 0 || wadahKosong.length > 0) ? "page-break" : "";
                 html += `<div class="${pbLepasan}">`;
@@ -984,7 +986,8 @@ function executePrint() {
                 html += `<table><thead><tr><th style="width:8%; text-align:center;">Qty</th><th style="width:72%;">Uraian Detail Barang</th><th style="width:20%; text-align:center;">Checklist</th></tr></thead><tbody>`;
                 lepasan.forEach(item => { 
                     let badge = getBadgeRusakHTML(item.kondisi);
-                    html += `<tr class="no-break-inside"><td style="text-align:center; font-weight:bold;">${item.jumlah}</td><td><span class="alat-nama">${item.nama_barang.toUpperCase()}</span> ${item.kode_barang ? '<span class="alat-kode">(#'+item.kode_barang+')</span>' : ''} ${badge}</td><td style="text-align:center;"><span class="box-check">☐</span></td></tr>`; 
+                    let ketStr = getKetHTML(item.keterangan);
+                    html += `<tr class="no-break-inside"><td style="text-align:center; font-weight:bold; vertical-align:top;">${item.jumlah}</td><td style="vertical-align:top;"><span class="alat-nama">${item.nama_barang.toUpperCase()}</span> ${item.kode_barang ? '<span class="alat-kode">(#'+item.kode_barang+')</span>' : ''} ${badge} ${ketStr}</td><td style="text-align:center; vertical-align:middle;"><span class="box-check">☐</span></td></tr>`; 
                 });
                 html += `</tbody></table></div>`;
             }
@@ -1023,7 +1026,6 @@ function executePrint() {
                 html += `       <p class="hardcase-kode">ID WADAH: #${wadah}</p>`;
                 html += `       <div class="hardcase-lokasi">📍 POSISI: ${teksPosisi.toUpperCase()}</div>`;
                 html += `   </div>`;
-                
                 html += `   <table style="margin-bottom:0;">`;
                 html += `       <thead><tr>`;
                 html += `           <th style="width:8%; text-align:center;">QTY</th>`;
@@ -1034,9 +1036,10 @@ function executePrint() {
                 
                 groupedWadah[wadah].forEach(item => { 
                     let badge = getBadgeRusakHTML(item.kondisi);
+                    let ketStr = getKetHTML(item.keterangan);
                     html += `   <tr class="no-break-inside">`;
-                    html += `       <td style="text-align:center; font-weight:bold; font-size:12px;">${item.jumlah}</td>`;
-                    html += `       <td><span class="alat-nama">${item.nama_barang}</span> <span class="alat-kode">${item.kode_barang ? '#'+item.kode_barang : ''}</span> ${badge}</td>`;
+                    html += `       <td style="text-align:center; font-weight:bold; font-size:12px; vertical-align:top;">${item.jumlah}</td>`;
+                    html += `       <td style="vertical-align:top;"><span class="alat-nama">${item.nama_barang}</span> <span class="alat-kode">${item.kode_barang ? '#'+item.kode_barang : ''}</span> ${badge} ${ketStr}</td>`;
                     html += `       <td style="text-align:center; vertical-align:middle;"><div class="hardcase-box"></div></td>`;
                     html += `       <td style="text-align:center; vertical-align:middle;"><div class="hardcase-box"></div></td>`;
                     html += `   </tr>`;
@@ -1046,8 +1049,7 @@ function executePrint() {
                 html += `   <div class="hardcase-footer no-break-inside">`;
                 html += `       <div><b>Dicetak:</b> ${new Date().toLocaleDateString('id-ID')} | <b>Data:</b> ${titleContextText}</div>`;
                 html += `       <div style="text-align:right;"><b>Paraf OUT:</b> ____________ &nbsp;&nbsp;&nbsp; <b>Paraf IN:</b> ____________</div>`;
-                html += `   </div>`;
-                html += `</div>`; 
+                html += `   </div></div>`; 
             }
         }
         
@@ -1061,7 +1063,6 @@ function executePrint() {
             itemsInLocation.forEach(i => { 
                 let nama = (i.nama_barang || "Tanpa Nama").toUpperCase(); 
                 let qty = parseInt(i.jumlah || 1);
-                
                 if (isRusak(i.kondisi)) {
                     if(!groupedRusak[nama]) groupedRusak[nama] = 0; 
                     groupedRusak[nama] += qty; 
@@ -1101,7 +1102,6 @@ function executePrint() {
         // ==========================================
         else if (format === "kebutuhan_tim") {
             let timDataList = {};
-            
             let allowedCodes = new Set();
             itemsInLocation.forEach(i => {
                 if (i.kode_barang) allowedCodes.add(i.kode_barang.toLowerCase());
@@ -1120,7 +1120,8 @@ function executePrint() {
                         timDataList[timName].push({
                             nama: invItem ? invItem.nama_barang : `Alat #${code.toUpperCase()}`,
                             kode: code.toUpperCase(),
-                            kondisi: invItem ? invItem.kondisi : "Bagus"
+                            kondisi: invItem ? invItem.kondisi : "Bagus",
+                            keterangan: invItem ? invItem.keterangan : "" // Ambil catatan teknis
                         });
                     }
                 });
@@ -1129,24 +1130,24 @@ function executePrint() {
             if (Object.keys(timDataList).length === 0) {
                 html += `<div style="text-align:center; margin:30px 0; font-style:italic;">Tidak ada barang yang terhubung ke Misi Tim di lokasi ini.</div>`;
             } else {
-                // Hapus logika page-break paksa pada setiap loop tim
                 for (let tim in timDataList) {
                     timDataList[tim].sort((a, b) => a.nama.localeCompare(b.nama));
                     
-                    // Gunakan inline-block agar divisi tim tidak mudah terpotong atau memicu blank page
                     html += `<div style="page-break-inside: avoid; margin-bottom: 15px;">`;
                     html += `<div class="wadah-title" style="background:#e0e7ff; color:#3730a3; border-color:#a5b4fc; border-left:4px solid #4f46e5;">👥 DIVISI TIM: ${tim}</div>`;
                     html += `<table style="margin-bottom:0;"><thead><tr><th style="width:8%; text-align:center;">No</th><th style="width:72%;">Nama Barang (Kode Alat)</th><th style="width:20%; text-align:center;">Checklist</th></tr></thead><tbody>`;
                     
                     timDataList[tim].forEach((item, index) => {
                         let badge = getBadgeRusakHTML(item.kondisi);
-                        html += `<tr><td style="text-align:center; font-size:11px;">${index + 1}</td><td><span class="alat-nama">${item.nama}</span> <span class="alat-kode">(#${item.kode})</span> ${badge}</td><td style="text-align:center;"><span class="box-check">☐</span></td></tr>`;
+                        let ketStr = getKetHTML(item.keterangan);
+                        html += `<tr><td style="text-align:center; font-size:11px; vertical-align:top;">${index + 1}</td><td style="vertical-align:top;"><span class="alat-nama">${item.nama}</span> <span class="alat-kode">(#${item.kode})</span> ${badge} ${ketStr}</td><td style="text-align:center; vertical-align:middle;"><span class="box-check">☐</span></td></tr>`;
                     });
                     
                     html += `</tbody></table></div>`;
                 }
             }
         }
+
         html += `</div>`; // Tutup div container per Lokasi
     });
 

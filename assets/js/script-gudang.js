@@ -1114,7 +1114,7 @@ function executePrint() {
                             nama: invItem ? invItem.nama_barang : `Alat #${code.toUpperCase()}`,
                             kode: code.toUpperCase(),
                             kondisi: invItem ? invItem.kondisi : "Bagus",
-                            itemRef: invItem || {}
+                            itemRef: invItem || {} 
                         });
                     }
                 });

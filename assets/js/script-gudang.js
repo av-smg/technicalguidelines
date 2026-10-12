@@ -833,10 +833,13 @@ function executePrint() {
         return isRusak(kondisi) ? `<span class="badge-rusak">⚠️ ${(kondisi||"RUSAK").toUpperCase()}</span>` : '';
     };
 
-    // Helper: Cetak Keterangan Teknis / Referensi (Mendukung "Keterangan Teknis" dari Sheets)
+    // Helper: Cetak Keterangan Teknis / Referensi (Versi Paksa Cetak)
     const getKetHTML = (item) => {
-        let ket = (item.keterangan_ref || "").trim();
-        if (ket && ket !== "-" && ket.toLowerCase() !== "tidak ada catatan." && ket.toLowerCase() !== "tidak ada catatan") {
+        if (!item || !item.keterangan_ref) return "";
+        let ket = item.keterangan_ref.toString().trim();
+        
+        // Cek apakah string tidak kosong dan bukan tanda strip atau default message
+        if (ket.length > 0 && ket !== "-" && ket.toLowerCase() !== "tidak ada catatan." && ket.toLowerCase() !== "tidak ada catatan") {
             return `<div style="font-size:10px; color:#475569; font-style:italic; margin-top:3px; line-height:1.2;">*Ket: ${ket}</div>`;
         }
         return "";

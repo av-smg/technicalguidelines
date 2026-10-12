@@ -1014,22 +1014,51 @@ function executePrint() {
     // ==========================================
     else if (format === "rekap") {
         html += `<div class="header"><h2 style="margin:0;">REKAP GABUNGAN TOTAL ALAT</h2><p style="margin:5px 0 0 0; color:#444; font-size:13px;">Konteks Data: <b>${titleContextText.toUpperCase()}</b></p></div>`;
-        let grouped = {}; 
+        
+        let groupedBagus = {}; 
+        let groupedRusak = {};
+
+        // Pisahkan data berdasarkan kondisi
         filteredData.forEach(i => { 
             let nama = (i.nama_barang || "Tanpa Nama").toUpperCase(); 
-            if(!grouped[nama]) grouped[nama] = 0; 
-            grouped[nama] += parseInt(i.jumlah || 1); 
+            let kondisi = (i.kondisi || "bagus").toLowerCase();
+            let qty = parseInt(i.jumlah || 1);
+            
+            // Deteksi keyword rusak/perbaikan
+            if (kondisi.includes('rusak') || kondisi.includes('periksa') || kondisi.includes('perbaikan') || kondisi.includes('service')) {
+                if(!groupedRusak[nama]) groupedRusak[nama] = 0; 
+                groupedRusak[nama] += qty; 
+            } else {
+                if(!groupedBagus[nama]) groupedBagus[nama] = 0; 
+                groupedBagus[nama] += qty; 
+            }
         });
-        let sortedNames = Object.keys(grouped).sort();
         
-        html += `<table>`;
-        html += `<thead><tr><th style="width:8%; text-align:center;">No</th><th style="width:72%;">Nama Alat (Data Gabungan)</th><th style="width:20%; text-align:center;">Total (Qty)</th></tr></thead><tbody>`;
-        sortedNames.forEach((nama, idx) => { 
-            html += `<tr class="no-break-inside"><td style="text-align:center;">${idx+1}</td><td><span class="alat-nama">${nama}</span></td><td style="text-align:center; font-weight:bold;">${grouped[nama]} Pcs</td></tr>`; 
-        });
-        html += `</tbody></table>`;
-    }
-    
+        let sortedBagus = Object.keys(groupedBagus).sort();
+        let sortedRusak = Object.keys(groupedRusak).sort();
+
+        // TABEL 1: KONDISI BAGUS
+        if (sortedBagus.length > 0) {
+            html += `<h3 style="background:#dcfce7; padding:6px 8px; border-left:4px solid #16a34a; font-size:13px; text-transform:uppercase; margin-bottom:5px; color:#166534;">✅ KONDISI BAGUS / SIAP PAKAI</h3>`;
+            html += `<table>`;
+            html += `<thead><tr><th style="width:8%; text-align:center;">No</th><th style="width:72%;">Nama Alat (Data Gabungan)</th><th style="width:20%; text-align:center;">Total (Qty)</th></tr></thead><tbody>`;
+            sortedBagus.forEach((nama, idx) => { 
+                html += `<tr class="no-break-inside"><td style="text-align:center;">${idx+1}</td><td><span class="alat-nama">${nama}</span></td><td style="text-align:center; font-weight:bold;">${groupedBagus[nama]} Pcs</td></tr>`; 
+            });
+            html += `</tbody></table>`;
+        }
+
+        // TABEL 2: KONDISI RUSAK / PERBAIKAN
+        if (sortedRusak.length > 0) {
+            html += `<h3 style="background:#fee2e2; padding:6px 8px; border-left:4px solid #dc2626; font-size:13px; text-transform:uppercase; margin-top:15px; margin-bottom:5px; color:#991b1b;">🛠️ KONDISI RUSAK / PERBAIKAN</h3>`;
+            html += `<table>`;
+            html += `<thead><tr><th style="width:8%; text-align:center;">No</th><th style="width:72%;">Nama Alat (Data Gabungan)</th><th style="width:20%; text-align:center;">Total (Qty)</th></tr></thead><tbody>`;
+            sortedRusak.forEach((nama, idx) => { 
+                html += `<tr class="no-break-inside"><td style="text-align:center;">${idx+1}</td><td><span class="alat-nama">${nama}</span></td><td style="text-align:center; font-weight:bold; color:#dc2626;">${groupedRusak[nama]} Pcs</td></tr>`; 
+            });
+            html += `</tbody></table>`;
+        }
+    }    
     // ==========================================
     // FORMAT 4: DAFTAR KEBUTUHAN PER TIM (MISI)
     // ==========================================

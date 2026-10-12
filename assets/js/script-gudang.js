@@ -837,8 +837,9 @@ function executePrint() {
     };
 
     // Helper: Cetak Keterangan Teknis / Referensi
-    const getKetHTML = (keterangan) => {
-        let ket = (keterangan || "").trim();
+    const getKetHTML = (item) => {
+        // Menangkap berbagai kemungkinan nama kolom dari Google Sheets
+        let ket = (item["Keterangan Teknis"] || item.keterangan || item.catatan || item.ref || "").trim();
         if (ket && ket !== "-" && ket.toLowerCase() !== "tidak ada catatan." && ket.toLowerCase() !== "tidak ada catatan") {
             return `<div style="font-size:10px; color:#475569; font-style:italic; margin-top:3px; line-height:1.2;">*Ket: ${ket}</div>`;
         }

@@ -837,8 +837,6 @@ function executePrint() {
     const getKetHTML = (item) => {
         if (!item || !item.keterangan_ref) return "";
         let ket = item.keterangan_ref.toString().trim();
-        
-        // Cek apakah string tidak kosong dan bukan tanda strip atau default message
         if (ket.length > 0 && ket !== "-" && ket.toLowerCase() !== "tidak ada catatan." && ket.toLowerCase() !== "tidak ada catatan") {
             return `<div style="font-size:10px; color:#475569; font-style:italic; margin-top:3px; line-height:1.2;">*Ket: ${ket}</div>`;
         }
@@ -1035,7 +1033,10 @@ function executePrint() {
                     let ketStr = getKetHTML(item);
                     html += `   <tr class="no-break-inside">`;
                     html += `       <td style="text-align:center; font-weight:bold; font-size:12px; vertical-align:top;">${item.jumlah}</td>`;
+                    
+                    // PERBAIKAN FATAL: Sisipkan ${ketStr} ke dalam HTML rendering!
                     html += `       <td style="vertical-align:top;"><span class="alat-nama">${item.nama_barang}</span> <span class="alat-kode">${item.kode_barang ? '#'+item.kode_barang : ''}</span> ${badge} ${ketStr}</td>`;
+                    
                     html += `       <td style="text-align:center; vertical-align:middle;"><div class="hardcase-box"></div></td>`;
                     html += `       <td style="text-align:center; vertical-align:middle;"><div class="hardcase-box"></div></td>`;
                     html += `   </tr>`;

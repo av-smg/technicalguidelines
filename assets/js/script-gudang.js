@@ -1048,6 +1048,7 @@ function executePrint() {
             let sortedBagus = Object.keys(groupedBagus).sort();
             let sortedRusak = Object.keys(groupedRusak).sort();
 
+            // TABEL 1: KONDISI BAGUS
             if (sortedBagus.length > 0) {
                 html += `<h3 style="background:#dcfce7; padding:8px; border-left:4px solid #16a34a; font-size:13px; margin-bottom:5px; color:#166534;">✅ KONDISI BAGUS / SIAP PAKAI</h3>`;
                 html += `<table><thead><tr><th style="width:8%; text-align:center;">No</th><th style="width:72%;">Nama Alat (Data Gabungan)</th><th style="width:20%; text-align:center;">Total (Qty)</th></tr></thead><tbody>`;
@@ -1057,7 +1058,13 @@ function executePrint() {
                 html += `</tbody></table>`;
             }
 
+            // TABEL 2: KONDISI RUSAK (DIPAKSA PINDAH HALAMAN JIKA ADA)
             if (sortedRusak.length > 0) {
+                // Tambahkan Page Break dan Cetak Ulang Header Lokasi agar tidak bingung ini data gudang mana
+                html += `<div class="page-break"></div>`;
+                html += `<div class="header"><h2 style="margin:0;">REKAP GABUNGAN TOTAL ALAT</h2><p style="margin:5px 0 0 0; color:#444; font-size:13px;">Data: <b>${titleContextText.toUpperCase()}</b></p></div>`;
+                html += `<div class="lokasi-title" style="background:#7f1d1d;">📍 ${lokasi} (LANJUTAN - KONDISI RUSAK)</div>`;
+                
                 html += `<h3 style="background:#fee2e2; padding:8px; border-left:4px solid #dc2626; font-size:13px; margin-top:15px; margin-bottom:5px; color:#991b1b;">🛠️ KONDISI RUSAK / PERBAIKAN</h3>`;
                 html += `<table><thead><tr><th style="width:8%; text-align:center;">No</th><th style="width:72%;">Nama Alat (Data Gabungan)</th><th style="width:20%; text-align:center;">Total (Qty)</th></tr></thead><tbody>`;
                 sortedRusak.forEach((nama, idx) => { 
@@ -1065,7 +1072,7 @@ function executePrint() {
                 });
                 html += `</tbody></table>`;
             }
-        }    
+        }
         
         // ==========================================
         // FORMAT 4: DAFTAR KEBUTUHAN PER TIM (MISI)

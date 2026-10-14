@@ -6,7 +6,7 @@ location: "MASTER"
 <head>
     {% include head.html %}
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-    <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/custom-gudang.css?v=62.5">
+    <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/custom-gudang.css?v={{ site.time | date: '%s' }}">
     
     <style>
         .form-input { width: 100%; padding: 10px; margin-bottom: 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 12px; }
@@ -234,7 +234,7 @@ location: "MASTER"
     </div>
     <div id="toastMsg" class="toast-msg">Notifikasi</div>
     
-    <script src="{{ site.baseurl }}/assets/js/script-gudang.js?v=67"></script>
+    <script src="{{ site.baseurl }}/assets/js/script-gudang.js?v={{ site.time | date: '%s' }}"></script>
     
     <!-- SCRIPT KEAMANAN RBAC -->
     <script>

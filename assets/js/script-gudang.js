@@ -183,37 +183,33 @@ function getFilteredData() {
     }); 
 
     // POIN 1 & 2: Pengurutan / Sorting Dinamis
-    if (isBulkMode) {
-        // Prioritaskan Mode Pilih (Checkbox)
-        filtered.sort((a, b) => {
+    filtered.sort((a, b) => {
+        // 1. Prioriti Utama: Mode Pilih (Jika aktif, barang yang ditanda naik ke atas)
+        if (isBulkMode) {
             let aSel = selectedRows.has(a.row_index) ? 1 : 0;
             let bSel = selectedRows.has(b.row_index) ? 1 : 0;
             if (aSel !== bSel) return bSel - aSel; 
-            
-            let nameA = String(a.nama_barang || "").toUpperCase(); 
-            let nameB = String(b.nama_barang || "").toUpperCase(); 
-            return nameA.localeCompare(nameB);
-        });
-    } else if (q !== "") {
-        // Prioritaskan Hasil Pencarian: Pemilik Kode (Wadah) muncul di atas isinya
-        filtered.sort((a, b) => {
+        }
+        
+        // 2. Prioriti Kedua: Hasil Carian (Pemilik kod/wadah naik ke atas anak-anaknya)
+        if (q !== "") {
             let aKode = String(a.kode_barang || "").toLowerCase();
             let bKode = String(b.kode_barang || "").toLowerCase();
             
-            // 1. Prioritas Tertinggi: Kode Barang SAMA PERSIS dengan ketikan pencarian
             let aExact = (aKode === q) ? 1 : 0;
             let bExact = (bKode === q) ? 1 : 0;
             if (aExact !== bExact) return bExact - aExact;
             
-            // 2. Prioritas Kedua: Kode Barang MENGANDUNG kata pencarian 
-            // (Artinya dia adalah si Wadah, bukan alat yang hanya numpang "Kode Wadah")
             let aMatch = aKode.includes(q) ? 1 : 0;
             let bMatch = bKode.includes(q) ? 1 : 0;
             if (aMatch !== bMatch) return bMatch - aMatch;
-            
-            return 0; // Jika statusnya sama, biarkan urutan abjad default dari satelit
-        });
-    }
+        }
+
+        // 3. Prioriti Terakhir: Susunan Abjad (Untuk barang-barang lain)
+        let nameA = String(a.nama_barang || "").toUpperCase(); 
+        let nameB = String(b.nama_barang || "").toUpperCase(); 
+        return nameA.localeCompare(nameB);
+    });
 
     return filtered;
 }
@@ -237,7 +233,15 @@ function render(data) {
         const timeBadge = item.timestamp ? `<div style="font-size:8px; color:#94a3b8;">⏱ ${item.timestamp}</div>` : "";
         let colorKondisi = item.kondisi && item.kondisi.toLowerCase() === 'bagus' ? '#16a34a' : '#dc2626'; let bgKondisi = item.kondisi && item.kondisi.toLowerCase() === 'bagus' ? '#f0fdf4' : '#fef2f2'; 
         const kondisiBadge = `<span style="font-size:9px; padding:2px 4px; border-radius:4px; border:1px solid ${colorKondisi}; background:${bgKondisi}; color:${colorKondisi}; font-weight:bold;">${item.kondisi || 'Bagus'}</span>`;
-        const boxBadge = item.kode_wadah ? `<span style="font-size:9px; color:#d97706; background:#fef3c7; border-radius:4px; padding:2px 4px; border:1px solid #fde68a;">🧰 IN-BOX</span>` : "";
+        let boxBadge = "";
+        if (item.kode_wadah) {
+            let idWadah = item.kode_wadah.toString().toUpperCase().trim();
+            // Carian pilihan: Mencari nama penuh Hardcase untuk dipaparkan apabila pengguna meletakkan kursor (hover) di atasnya
+            let wadahInduk = allItems.find(w => (w.kode_barang || "").toLowerCase() === item.kode_wadah.toLowerCase());
+            let infoHover = wadahInduk ? wadahInduk.nama_barang : "Wadah " + idWadah;
+            
+            boxBadge = `<span style="font-size:9px; color:#d97706; background:#fef3c7; border-radius:4px; padding:2px 4px; border:1px solid #fde68a;" title="Disimpan di: ${infoHover}">🧰 IN: #${idWadah}</span>`;
+        }
         const zonaBadge = item.paket_zona ? `<span style="font-size:9px; color:#4338ca; background:#e0e7ff; border-radius:4px; padding:2px 4px; border:1px solid #c7d2fe; font-weight:bold;">📦 ${item.paket_zona}</span>` : "";
         
         if (currentViewMode === 'grid') { 

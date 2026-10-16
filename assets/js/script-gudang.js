@@ -538,7 +538,15 @@ async function processBulkUpdate(btn) {
         const payload = { action: "update_status_lokasi", pin: API_BACKEND_PIN, user_name: localStorage.getItem('av_session_nama') || "Kru Tanpa Nama", rows: Array.from(selectedRows), new_lokasi: newLokasi !== "TETAP" ? newLokasi : null, new_status: newStatus !== "TETAP" ? newStatus : null, new_tujuan: "TETAP" }; 
         const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) }); 
         const data = await response.json(); 
-        if(data.status === "success") { document.getElementById('bulkModal').remove(); toggleBulkMode(); loadData(); showToast("✅ Update massal & Efek Domino berhasil!"); } else { alert("Gagal:\n" + data.message); } 
+if(data.status === "success") { 
+            document.getElementById('bulkModal').remove(); 
+            toggleBulkMode(); 
+            showToast("✅ Update massal & Efek Domino berhasil!"); 
+            // Beri jeda 1 detik untuk update massal
+            setTimeout(() => { loadData(); }, 1000); 
+        } else { 
+            alert("Gagal:\n" + data.message); 
+        } 
     } catch (e) { alert("Error Sistem:\n" + e.message); } finally { btn.disabled = false; btn.innerText = "PROSES UPDATE MASSAL"; } 
 }
 
@@ -618,8 +626,11 @@ async function processAssignMission(btn) {
             document.getElementById('assignModal').remove(); 
             toggleBulkMode(); 
             showToast(`✅ ${data.message}`); 
-            loadData(); 
-        } else { alert("Gagal:\n" + data.message); } 
+            // Beri jeda 1 detik untuk update massal
+            setTimeout(() => { loadData(); }, 1000); 
+        } else { 
+            alert("Gagal:\n" + data.message); 
+        } 
     } catch (e) { alert("Error Sistem:\n" + e.message); } finally { if(document.body.contains(btn)) { btn.disabled = false; btn.innerText = "🚀 TERBITKAN MISI"; } }
 }
 

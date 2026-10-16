@@ -148,7 +148,6 @@ function getFilteredData() {
         let lok = i.lokasi_saat_ini || i.lokasi || i["Lokasi Saat Ini"] || '';
         let kondisi = (i.kondisi||"").toLowerCase();
 
-        // Mengakomodasi legacy data yang masih menyimpan "Dalam Perjalanan" di kolom lokasi
         if (lok === 'Dalam Perjalanan') stat = 'Dalam Perjalanan';
 
         let matchStatus = true;
@@ -183,17 +182,36 @@ function getFilteredData() {
         return matchQ && matchStatus && matchLokasi && matchAdvanced && matchWadah; 
     }); 
 
-    // POIN 1: Prioritaskan barang yang baru di-scan / dipilih ke posisi teratas saat Mode Pilih aktif
+    // POIN 1 & 2: Pengurutan / Sorting Dinamis
     if (isBulkMode) {
+        // Prioritaskan Mode Pilih (Checkbox)
         filtered.sort((a, b) => {
             let aSel = selectedRows.has(a.row_index) ? 1 : 0;
             let bSel = selectedRows.has(b.row_index) ? 1 : 0;
-            if (aSel !== bSel) return bSel - aSel; // Yang bernilai 1 (terpilih) naik ke atas
+            if (aSel !== bSel) return bSel - aSel; 
             
-            // Sisanya tetap diurutkan berdasar abjad
             let nameA = String(a.nama_barang || "").toUpperCase(); 
             let nameB = String(b.nama_barang || "").toUpperCase(); 
             return nameA.localeCompare(nameB);
+        });
+    } else if (q !== "") {
+        // Prioritaskan Hasil Pencarian: Pemilik Kode (Wadah) muncul di atas isinya
+        filtered.sort((a, b) => {
+            let aKode = String(a.kode_barang || "").toLowerCase();
+            let bKode = String(b.kode_barang || "").toLowerCase();
+            
+            // 1. Prioritas Tertinggi: Kode Barang SAMA PERSIS dengan ketikan pencarian
+            let aExact = (aKode === q) ? 1 : 0;
+            let bExact = (bKode === q) ? 1 : 0;
+            if (aExact !== bExact) return bExact - aExact;
+            
+            // 2. Prioritas Kedua: Kode Barang MENGANDUNG kata pencarian 
+            // (Artinya dia adalah si Wadah, bukan alat yang hanya numpang "Kode Wadah")
+            let aMatch = aKode.includes(q) ? 1 : 0;
+            let bMatch = bKode.includes(q) ? 1 : 0;
+            if (aMatch !== bMatch) return bMatch - aMatch;
+            
+            return 0; // Jika statusnya sama, biarkan urutan abjad default dari satelit
         });
     }
 

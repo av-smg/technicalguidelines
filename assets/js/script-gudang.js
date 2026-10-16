@@ -549,7 +549,11 @@ async function saveEditLokasiStatus(rowIndex) {
         const payload = { action: "update_status_lokasi", pin: API_BACKEND_PIN, user_name: localStorage.getItem('av_session_nama') || "Kru Tanpa Nama", rows: [rowIndex], new_lokasi: newLokasi, new_status: newStatus, new_tujuan: "TETAP" }; 
         const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) }); 
         const data = await response.json(); 
-        if(data.status === "success") { document.getElementById('detailModal').remove(); loadData(); showToast("✅ Status & Efek Domino Diperbarui!"); } else { alert("Gagal:\n" + data.message); } 
+        if(data.status === "success") { 
+    document.getElementById('detailModal').remove(); 
+    showToast("✅ Status & Efek Domino Diperbarui!"); 
+    setTimeout(() => { loadData(); }, 1000); // Tahan 1 detik biar Google sinkronisasi
+} 
     } catch (e) { alert("Error Sistem:\n" + e.message); } finally { btn.disabled = false; btn.innerText = "💾 SIMPAN STATUS"; } 
 }
 

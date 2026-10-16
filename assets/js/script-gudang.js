@@ -790,7 +790,7 @@ function executePrint() {
     let filteredData = [];
     allItems.forEach(i => {
         let stat = i.status_digunakan || 'Di Gudang'; if(stat === 'FALSE') stat = 'Di Gudang';
-        let lok = i.lokasi_saat_ini || i.lokasi || i["Lokasi Saat Karena Ini"] || '';
+        let lok = i.lokasi_saat_ini || i.lokasi || i["Lokasi Saat Ini"] || ''; 
         
        if (source === "semua") {
           filteredData.push(i);
@@ -819,7 +819,7 @@ function executePrint() {
     // ==========================================
     let groupedByLocation = {};
     filteredData.forEach(item => {
-        let lokasi = (item.lokasi_saat_ini || item.lokasi || item["Lokasi Saat Karena Ini"] || "Lokasi Belum Ditentukan").toUpperCase();
+        let lokasi = (item.lokasi_saat_ini || item.lokasi || item["Lokasi Saat Ini"] || "Lokasi Belum Ditentukan").toUpperCase();
         if (!groupedByLocation[lokasi]) groupedByLocation[lokasi] = [];
         groupedByLocation[lokasi].push(item);
     });
@@ -851,8 +851,16 @@ function executePrint() {
     // 3. MULAI MENGGAMBAR DOKUMEN CETAK
     // ==========================================
     let printWin = window.open('', '', 'width=900,height=800');
-    
-    let html = `<html><head><title>Print - ${titleContextText}</title><style>
+
+// ✅ TAMBAHKAN BLOK INI
+if (!printWin) {
+    alert("⚠️ Gagal membuka menu cetak! Browser kamu memblokir Pop-up. Tolong izinkan/Allow pop-up untuk situs ini (biasanya di icon gembok atas/kanan bar browser).");
+    closePrintModal();
+    return;
+}
+// ✅ BATAS AKHIR TAMBAHAN
+
+let html = `<html><head><title>Print - ${titleContextText}</title><style>
         @page { size: A4 portrait; margin: 15mm; } 
         body { font-family: 'Plus Jakarta Sans', 'Arial', sans-serif; font-size:12px; color:#0f172a; margin: 0; } 
         
@@ -902,13 +910,14 @@ function executePrint() {
         }
 
         // ==========================================
-        // FORMAT 1: CO-31 (Daftar Detail per Wadah)
-        // ==========================================
-        if (format === "co31") {
-            let groupedWadah = {}; 
-            let semuaWadahDiLokasi = []; 
-            let lepasan = [];
-            let usedWadahCodes = new Set();
+// FORMAT 1: CO-31 (Daftar Detail per Wadah)
+// ==========================================
+if (format === "co31") {
+    let groupedWadah = {}; 
+    let semuaWadahDiLokasi = []; 
+    let lepasan = [];
+    let usedWadahCodes = new Set();
+    let wadahKosong = []; // ✅ TAMBAHKAN DEKLARASI INI
             
             // A. Kumpulkan wadah yang punya isi di dalamnya
             itemsInLocation.forEach(item => {
@@ -921,18 +930,21 @@ function executePrint() {
             });
 
             // B. Kumpulkan SEMUA wadah fisik (baik kosong maupun ber-isi) untuk tabel ringkasan atas
-            itemsInLocation.forEach(item => { 
-                let nama = (item.nama_barang || "").toLowerCase();
-                let isWadah = nama.includes('hardcase') || nama.includes('koper') || nama.includes('wadah') || nama.includes('box') || nama.includes('container') || nama.includes('tas');
-                let wadahField = (item.kode_wadah || "").toUpperCase().trim();
-                
-                if (isWadah) {
-                    semuaWadahDiLokasi.push(item);
-                } else if (!wadahField || wadahField === "-") {
-                    lepasan.push(item);
-                }
-            });
+    itemsInLocation.forEach(item => { 
+        let nama = (item.nama_barang || "").toLowerCase();
+        let isWadah = nama.includes('hardcase') || nama.includes('koper') || nama.includes('wadah') || nama.includes('box') || nama.includes('container') || nama.includes('tas');
+        let wadahField = (item.kode_wadah || "").toUpperCase().trim();
+        
+        if (isWadah) {
+            semuaWadahDiLokasi.push(item);
+        } else if (!wadahField || wadahField === "-") {
+            lepasan.push(item);
+        }
+    });
 
+    // ✅ TAMBAHKAN BARIS INI (Memasukkan wadah yang tidak ada di dalam usedWadahCodes)
+    wadahKosong = semuaWadahDiLokasi.filter(w => !usedWadahCodes.has((w.kode_barang || "").toUpperCase()));
+    
             // CETAK TABEL RINGKASAN: DAFTAR FISIK WADAH / KOTAK PENYIMPANAN
             if (semuaWadahDiLokasi.length > 0) {
                 html += `<div class="no-break-inside" style="margin-bottom:20px;">`;

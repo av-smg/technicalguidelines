@@ -902,10 +902,11 @@ function executePrint() {
         // ==========================================
         if (format === "co31") {
             let groupedWadah = {}; 
-            let wadahKosong = []; 
+            let semuaWadahDiLokasi = []; 
             let lepasan = [];
             let usedWadahCodes = new Set();
             
+            // A. Kumpulkan wadah yang punya isi di dalamnya
             itemsInLocation.forEach(item => {
                 let wadah = (item.kode_wadah || "").toUpperCase().trim();
                 if (wadah && wadah !== "-") {
@@ -915,20 +916,32 @@ function executePrint() {
                 }
             });
 
+            // B. Kumpulkan SEMUA wadah fisik (baik kosong maupun ber-isi) untuk tabel ringkasan atas
             itemsInLocation.forEach(item => { 
-                let wadah = (item.kode_wadah || "").toUpperCase().trim(); 
-                if (!wadah || wadah === "-") { 
-                    let nama = (item.nama_barang || "").toLowerCase();
-                    let isWadah = nama.includes('hardcase') || nama.includes('koper') || nama.includes('wadah') || nama.includes('box') || nama.includes('container') || nama.includes('tas');
-                    let kodeAsli = (item.kode_barang || "").toUpperCase().trim();
-                    
-                    if (isWadah) {
-                        if (!usedWadahCodes.has(kodeAsli)) wadahKosong.push(item);
-                    } else {
-                        lepasan.push(item);
-                    }
-                } 
+                let nama = (item.nama_barang || "").toLowerCase();
+                let isWadah = nama.includes('hardcase') || nama.includes('koper') || nama.includes('wadah') || nama.includes('box') || nama.includes('container') || nama.includes('tas');
+                let wadahField = (item.kode_wadah || "").toUpperCase().trim();
+                
+                if (isWadah) {
+                    semuaWadahDiLokasi.push(item);
+                } else if (!wadahField || wadahField === "-") {
+                    lepasan.push(item);
+                }
             });
+
+            // CETAK TABEL RINGKASAN: DAFTAR FISIK WADAH / KOTAK PENYIMPANAN
+            if (semuaWadahDiLokasi.length > 0) {
+                html += `<div class="no-break-inside" style="margin-bottom:20px;">`;
+                html += `<div class="wadah-title" style="background:#fef3c7; color:#92400e; border-color:#d97706;">🧰 DAFTAR FISIK WADAH / KOTAK PENYIMPANAN</div>`;
+                html += `<table><thead><tr><th style="width:8%; text-align:center;">Qty</th><th style="width:72%;">Nama Wadah / Hardcase</th><th style="width:20%; text-align:center;">Checklist Fisik</th></tr></thead><tbody>`;
+
+                semuaWadahDiLokasi.forEach(item => { 
+                    let badge = getBadgeRusakHTML(item.kondisi);
+                    let ketStr = getKetHTML(item);
+                    html += `<tr><td style="text-align:center; font-weight:bold; vertical-align:top;">${item.jumlah}</td><td style="vertical-align:top;"><span class="alat-nama">${item.nama_barang.toUpperCase()}</span> ${item.kode_barang ? '<span class="alat-kode">(#'+item.kode_barang+')</span>' : ''} ${badge} ${ketStr}</td><td style="text-align:center; vertical-align:middle;"><span class="box-check">☐</span></td></tr>`; 
+                });
+                html += `</tbody></table></div>`;
+            }
 
             let wadahKeys = Object.keys(groupedWadah).sort();
             if (wadahKeys.length > 0) {
@@ -949,6 +962,9 @@ function executePrint() {
                     html += `<table style="margin-top:0;"><thead><tr><th style="width:8%; text-align:center;">Qty</th><th style="width:72%;">Uraian Detail Barang (Isi Wadah)</th><th style="width:20%; text-align:center;">Checklist Isi</th></tr></thead><tbody>`;
                     
                     groupedWadah[wadah].forEach(item => { 
+                        // Cek pengaman: Jangan cetak wadah itu sendiri sebagai isi di dalam kopernya sendiri
+                        if (item.kode_barang && item.kode_barang.toUpperCase().trim() === wadah) return;
+
                         let badge = getBadgeRusakHTML(item.kondisi);
                         let ketStr = getKetHTML(item);
                         html += `<tr><td style="text-align:center; font-weight:bold; vertical-align:top;">${item.jumlah}</td><td style="vertical-align:top;"><span class="alat-nama">${item.nama_barang.toUpperCase()}</span> ${item.kode_barang ? '<span class="alat-kode">(#'+item.kode_barang+')</span>' : ''} ${badge} ${ketStr}</td><td style="text-align:center; vertical-align:middle;"><span class="box-check">☐</span></td></tr>`; 
@@ -985,7 +1001,7 @@ function executePrint() {
                 });
                 html += `</tbody></table></div>`;
             }
-        } 
+        }
         
         // ==========================================
         // FORMAT 2: CHECKLIST TIAP WADAH (HARDCASE)

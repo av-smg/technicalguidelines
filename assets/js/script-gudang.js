@@ -749,12 +749,13 @@ function injectPrintModalUI() {
             <p style="font-size:11px; color:#64748b; margin-bottom:15px;">Pilih sumber data dan format laporan.</p>
             
             <label style="font-size:11px; font-weight:bold; color:#1e293b; display:block; margin-bottom:6px;">📍 Sumber Data:</label>
-            <select id="printSource" style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1; margin-bottom:15px; font-size:12px; font-weight:bold; background:#f8fafc; color:#ea580c;">
-                <option value="semua">Semua</option>
-                <option value="bawa">Akan Dibawa</option>
-                <option value="gudang">Data di Gudang</option>
-                <option value="event">Di Lokasi Gedung</option>
-            </select>
+    <select id="printSource" style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1; margin-bottom:15px; font-size:12px; font-weight:bold; background:#f8fafc; color:#ea580c;">
+        <option value="semua">Semua</option>
+        <option value="bawa">Akan Dibawa</option>
+        <option value="perjalanan">🚚 Dalam Perjalanan</option> <!-- TAMBAHAN DI SINI -->
+        <option value="gudang">Data di Gudang</option>
+        <option value="event">Di Lokasi Gedung</option>
+    </select>
             
             <label style="font-size:11px; font-weight:bold; color:#1e293b; display:block; margin-bottom:6px;">📊 Format Cetak:</label>
             <select id="printFormat" style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1; margin-bottom:25px; font-size:12px; font-weight:bold; background:#f8fafc;">
@@ -791,24 +792,27 @@ function executePrint() {
         let stat = i.status_digunakan || 'Di Gudang'; if(stat === 'FALSE') stat = 'Di Gudang';
         let lok = i.lokasi_saat_ini || i.lokasi || i["Lokasi Saat Karena Ini"] || '';
         
-        if (source === "semua") {
-            filteredData.push(i);
-        } else if (source === "bawa" && stat === 'Akan Dibawa') {
-            filteredData.push(i);
-        } else if (source === "gudang" && stat === 'Di Gudang' && lok.includes('Gudang')) {
-            filteredData.push(i);
-        } else if (source === "event" && (lok.includes('Event') || stat === 'Sedang Dipakai')) {
-            filteredData.push(i);
-        }
+       if (source === "semua") {
+          filteredData.push(i);
+      } else if (source === "bawa" && stat === 'Akan Dibawa') {
+          filteredData.push(i);
+      } else if (source === "perjalanan" && (stat === 'Dalam Perjalanan' || lok === 'Dalam Perjalanan')) {
+          filteredData.push(i); // TAMBAHAN FILTER UNTUK DALAM PERJALANAN
+      } else if (source === "gudang" && stat === 'Di Gudang' && lok.includes('Gudang')) {
+          filteredData.push(i);
+      } else if (source === "event" && (lok.includes('Event') || stat === 'Sedang Dipakai')) {
+          filteredData.push(i);
+      }
     });
 
     if (filteredData.length === 0) { alert(`❌ Kosong! Tidak ditemukan barang untuk sumber data yang dipilih.`); return; }
 
     let titleContextText = "";
-    if (source === "semua") titleContextText = "Semua";
-    if (source === "bawa") titleContextText = "Akan Dibawa";
-    if (source === "gudang") titleContextText = "Data di Gudang";
-    if (source === "event") titleContextText = "Di Lokasi Gedung";
+  if (source === "semua") titleContextText = "Semua";
+  if (source === "bawa") titleContextText = "Akan Dibawa";
+  if (source === "perjalanan") titleContextText = "Dalam Perjalanan"; // TAMBAHAN JUDUL
+  if (source === "gudang") titleContextText = "Data di Gudang";
+  if (source === "event") titleContextText = "Di Lokasi Gedung";
 
     // ==========================================
     // 2. KELOMPOKKAN BERDASARKAN LOKASI 
